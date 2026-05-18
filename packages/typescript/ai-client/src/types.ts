@@ -181,6 +181,13 @@ export interface StructuredOutputPart {
   raw: string
   reasoning?: string
   errorMessage?: string
+  /**
+   * Name of the schema that produced this part, when the hook is configured
+   * with `outputSchemas`. Acts as the runtime discriminator: render code
+   * `if (part.schemaName === 'recipe') { ... }` lines up with the typed
+   * variant on `ai-react`'s narrower wrapper types.
+   */
+  schemaName?: string
 }
 
 export type MessagePart<TTools extends ReadonlyArray<AnyClientTool> = any> =

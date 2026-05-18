@@ -392,6 +392,13 @@ export interface StructuredOutputPart {
   reasoning?: string
   /** Populated when `status === 'error'`. */
   errorMessage?: string
+  /**
+   * Name of the schema that produced this part. Set when the hook was
+   * configured with `outputSchemas: { [name]: schema }` and `sendMessage`
+   * (or the server) selected this schema for the turn. Undefined for
+   * single-schema flows (`outputSchema`) where there's only one shape.
+   */
+  schemaName?: string
 }
 
 export type MessagePart =
@@ -1141,7 +1148,15 @@ export interface StructuredOutputCompleteEvent<T = unknown> extends Omit<
   'name' | 'value'
 > {
   name: 'structured-output.complete'
-  value: { object: T; raw: string; reasoning?: string }
+  value: {
+    object: T
+    raw: string
+    reasoning?: string
+    /** Set when the originating run was driven by a named schema from
+     *  `outputSchemas`. The client processor stamps this onto the part
+     *  so consumers can narrow `data` against the discriminator. */
+    schemaName?: string
+  }
 }
 
 /**
@@ -1157,7 +1172,7 @@ export interface StructuredOutputStartEvent extends Omit<
   'name' | 'value'
 > {
   name: 'structured-output.start'
-  value: { messageId: string }
+  value: { messageId: string; schemaName?: string }
 }
 
 /**

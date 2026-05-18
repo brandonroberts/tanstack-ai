@@ -3406,6 +3406,77 @@ describe('StreamProcessor', () => {
       expect((sop as any).data).toEqual({ name: 'Alice' })
     })
 
+    it('stamps schemaName from structured-output.start onto the part', () => {
+      const processor = new StreamProcessor()
+
+      processor.processChunk(ev.runStarted())
+      processor.processChunk(ev.textStart('msg-1'))
+      processor.processChunk(
+        chunk(EventType.CUSTOM, {
+          name: 'structured-output.start',
+          value: { messageId: 'msg-1', schemaName: 'recipe' },
+        }),
+      )
+      processor.processChunk(ev.textContent('{"title":"Pasta"}', 'msg-1'))
+      processor.processChunk(
+        chunk(EventType.CUSTOM, {
+          name: 'structured-output.complete',
+          value: {
+            object: { title: 'Pasta' },
+            raw: '{"title":"Pasta"}',
+            messageId: 'msg-1',
+            schemaName: 'recipe',
+          },
+        }),
+      )
+      processor.processChunk(ev.runFinished('stop'))
+
+      const assistant = processor
+        .getMessages()
+        .find((m) => m.role === 'assistant')
+      const sop = assistant!.parts.find((p) => p.type === 'structured-output')
+      expect((sop as any).schemaName).toBe('recipe')
+      expect((sop as any).data).toEqual({ title: 'Pasta' })
+    })
+
+    it('preserves schemaName across delta updates even if only start carries it', () => {
+      // Belt-and-suspenders: a server that only sets schemaName on start
+      // (skipping it on complete) must still produce a part with the name.
+      const processor = new StreamProcessor()
+
+      processor.processChunk(ev.runStarted())
+      processor.processChunk(ev.textStart('msg-1'))
+      processor.processChunk(
+        chunk(EventType.CUSTOM, {
+          name: 'structured-output.start',
+          value: { messageId: 'msg-1', schemaName: 'plan' },
+        }),
+      )
+      // Multiple deltas — each call to appendStructuredOutputDelta must keep
+      // the schemaName from the prior part rather than dropping it.
+      processor.processChunk(ev.textContent('{"day"', 'msg-1'))
+      processor.processChunk(ev.textContent(':"Mon"', 'msg-1'))
+      processor.processChunk(ev.textContent('}', 'msg-1'))
+      processor.processChunk(
+        chunk(EventType.CUSTOM, {
+          name: 'structured-output.complete',
+          // Note: no schemaName here — falls back to the start event's value.
+          value: {
+            object: { day: 'Mon' },
+            raw: '{"day":"Mon"}',
+            messageId: 'msg-1',
+          },
+        }),
+      )
+      processor.processChunk(ev.runFinished('stop'))
+
+      const sop = processor
+        .getMessages()
+        .find((m) => m.role === 'assistant')!
+        .parts.find((p) => p.type === 'structured-output')
+      expect((sop as any).schemaName).toBe('plan')
+    })
+
     it('marks a streaming structured-output part as errored on RUN_ERROR', () => {
       const processor = new StreamProcessor()
 

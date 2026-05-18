@@ -151,8 +151,9 @@ export class StreamProcessor {
   // Messages whose TEXT_MESSAGE_CONTENT deltas should be routed into a
   // StructuredOutputPart instead of a TextPart. Populated by the
   // `structured-output.start` CUSTOM event; cleared by `structured-output.complete`
-  // / RUN_ERROR / finalize.
-  private structuredMessageIds: Set<string> = new Set()
+  // / RUN_ERROR / finalize. Value is the schemaName the start event carried
+  // (undefined for single-schema flows) so deltas can stamp it onto the part.
+  private structuredMessageIds: Map<string, string | undefined> = new Map()
 
   // Run tracking (for concurrent run safety)
   private activeRuns = new Set<string>()
@@ -861,10 +862,12 @@ export class StreamProcessor {
           ? chunk.content
           : '')
       if (delta !== '') {
+        const schemaName = this.structuredMessageIds.get(messageId)
         this.messages = appendStructuredOutputDelta(
           this.messages,
           messageId,
           delta,
+          schemaName,
         )
         state.totalTextContent += delta
         this.emitMessagesChange()
@@ -1421,13 +1424,14 @@ export class StreamProcessor {
 
     // Mark a message as carrying structured output. Subsequent
     // TEXT_MESSAGE_CONTENT deltas for this messageId route into the
-    // StructuredOutputPart instead of building a TextPart.
+    // StructuredOutputPart instead of building a TextPart. The schemaName
+    // (when present) is stamped on the part so consumers can narrow on it.
     if (chunk.name === 'structured-output.start' && chunk.value) {
-      const v = chunk.value as { messageId?: string }
+      const v = chunk.value as { messageId?: string; schemaName?: string }
       const targetId = v.messageId ?? messageId
       if (targetId) {
         this.ensureAssistantMessage(targetId)
-        this.structuredMessageIds.add(targetId)
+        this.structuredMessageIds.set(targetId, v.schemaName)
       }
       return
     }
@@ -1439,15 +1443,22 @@ export class StreamProcessor {
         raw?: string
         reasoning?: string
         messageId?: string
+        schemaName?: string
       }
       const targetId = v.messageId ?? messageId
       if (targetId) {
+        // Prefer the schemaName from the event; fall back to whatever the
+        // start event stamped (so a server that only emits schemaName once
+        // still works).
+        const schemaName =
+          v.schemaName ?? this.structuredMessageIds.get(targetId)
         this.messages = completeStructuredOutputPart(
           this.messages,
           targetId,
           v.object,
           v.raw ?? '',
           v.reasoning,
+          schemaName,
         )
         this.structuredMessageIds.delete(targetId)
         this.emitMessagesChange()

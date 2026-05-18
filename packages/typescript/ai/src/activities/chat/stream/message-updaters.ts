@@ -262,6 +262,7 @@ export function appendStructuredOutputDelta(
   messages: Array<UIMessage>,
   messageId: string,
   delta: string,
+  schemaName?: string,
 ): Array<UIMessage> {
   return messages.map((msg) => {
     if (msg.id !== messageId) {
@@ -277,6 +278,7 @@ export function appendStructuredOutputDelta(
 
     const nextRaw = (existing?.raw ?? '') + delta
     const progressive = parsePartialJSON(nextRaw)
+    const effectiveSchemaName = schemaName ?? existing?.schemaName
 
     const nextPart: StructuredOutputPart = {
       type: 'structured-output',
@@ -287,6 +289,9 @@ export function appendStructuredOutputDelta(
         : {}),
       ...(existing?.reasoning !== undefined
         ? { reasoning: existing.reasoning }
+        : {}),
+      ...(effectiveSchemaName !== undefined
+        ? { schemaName: effectiveSchemaName }
         : {}),
     }
 
@@ -312,6 +317,7 @@ export function completeStructuredOutputPart(
   data: unknown,
   raw: string,
   reasoning?: string,
+  schemaName?: string,
 ): Array<UIMessage> {
   return messages.map((msg) => {
     if (msg.id !== messageId) {
@@ -322,6 +328,9 @@ export function completeStructuredOutputPart(
     const existingIndex = parts.findIndex(
       (p): p is StructuredOutputPart => p.type === 'structured-output',
     )
+    const existing =
+      existingIndex >= 0 ? (parts[existingIndex] as StructuredOutputPart) : null
+    const effectiveSchemaName = schemaName ?? existing?.schemaName
 
     const nextPart: StructuredOutputPart = {
       type: 'structured-output',
@@ -334,6 +343,9 @@ export function completeStructuredOutputPart(
           ? (parts[existingIndex] as StructuredOutputPart).raw
           : ''),
       ...(reasoning !== undefined ? { reasoning } : {}),
+      ...(effectiveSchemaName !== undefined
+        ? { schemaName: effectiveSchemaName }
+        : {}),
     }
 
     if (existingIndex >= 0) {

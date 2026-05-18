@@ -16,6 +16,7 @@ import { Route as GenerationsVideoRouteImport } from './routes/generations.video
 import { Route as GenerationsTranscriptionRouteImport } from './routes/generations.transcription'
 import { Route as GenerationsSummarizeRouteImport } from './routes/generations.summarize'
 import { Route as GenerationsStructuredOutputRouteImport } from './routes/generations.structured-output'
+import { Route as GenerationsStructuredMultiRouteImport } from './routes/generations.structured-multi'
 import { Route as GenerationsStructuredChatRouteImport } from './routes/generations.structured-chat'
 import { Route as GenerationsSpeechRouteImport } from './routes/generations.speech'
 import { Route as GenerationsImageRouteImport } from './routes/generations.image'
@@ -24,6 +25,7 @@ import { Route as ApiTranscribeRouteImport } from './routes/api.transcribe'
 import { Route as ApiTanchatRouteImport } from './routes/api.tanchat'
 import { Route as ApiSummarizeRouteImport } from './routes/api.summarize'
 import { Route as ApiStructuredOutputRouteImport } from './routes/api.structured-output'
+import { Route as ApiStructuredMultiRouteImport } from './routes/api.structured-multi'
 import { Route as ApiStructuredChatRouteImport } from './routes/api.structured-chat'
 import { Route as ApiImageGenRouteImport } from './routes/api.image-gen'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
@@ -70,6 +72,12 @@ const GenerationsStructuredOutputRoute =
     path: '/generations/structured-output',
     getParentRoute: () => rootRouteImport,
   } as any)
+const GenerationsStructuredMultiRoute =
+  GenerationsStructuredMultiRouteImport.update({
+    id: '/generations/structured-multi',
+    path: '/generations/structured-multi',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const GenerationsStructuredChatRoute =
   GenerationsStructuredChatRouteImport.update({
     id: '/generations/structured-chat',
@@ -109,6 +117,11 @@ const ApiSummarizeRoute = ApiSummarizeRouteImport.update({
 const ApiStructuredOutputRoute = ApiStructuredOutputRouteImport.update({
   id: '/api/structured-output',
   path: '/api/structured-output',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStructuredMultiRoute = ApiStructuredMultiRouteImport.update({
+  id: '/api/structured-multi',
+  path: '/api/structured-multi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStructuredChatRoute = ApiStructuredChatRouteImport.update({
@@ -158,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/realtime': typeof RealtimeRoute
   '/api/image-gen': typeof ApiImageGenRoute
   '/api/structured-chat': typeof ApiStructuredChatRoute
+  '/api/structured-multi': typeof ApiStructuredMultiRoute
   '/api/structured-output': typeof ApiStructuredOutputRoute
   '/api/summarize': typeof ApiSummarizeRoute
   '/api/tanchat': typeof ApiTanchatRoute
@@ -166,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/generations/image': typeof GenerationsImageRoute
   '/generations/speech': typeof GenerationsSpeechRoute
   '/generations/structured-chat': typeof GenerationsStructuredChatRoute
+  '/generations/structured-multi': typeof GenerationsStructuredMultiRoute
   '/generations/structured-output': typeof GenerationsStructuredOutputRoute
   '/generations/summarize': typeof GenerationsSummarizeRoute
   '/generations/transcription': typeof GenerationsTranscriptionRoute
@@ -183,6 +198,7 @@ export interface FileRoutesByTo {
   '/realtime': typeof RealtimeRoute
   '/api/image-gen': typeof ApiImageGenRoute
   '/api/structured-chat': typeof ApiStructuredChatRoute
+  '/api/structured-multi': typeof ApiStructuredMultiRoute
   '/api/structured-output': typeof ApiStructuredOutputRoute
   '/api/summarize': typeof ApiSummarizeRoute
   '/api/tanchat': typeof ApiTanchatRoute
@@ -191,6 +207,7 @@ export interface FileRoutesByTo {
   '/generations/image': typeof GenerationsImageRoute
   '/generations/speech': typeof GenerationsSpeechRoute
   '/generations/structured-chat': typeof GenerationsStructuredChatRoute
+  '/generations/structured-multi': typeof GenerationsStructuredMultiRoute
   '/generations/structured-output': typeof GenerationsStructuredOutputRoute
   '/generations/summarize': typeof GenerationsSummarizeRoute
   '/generations/transcription': typeof GenerationsTranscriptionRoute
@@ -209,6 +226,7 @@ export interface FileRoutesById {
   '/realtime': typeof RealtimeRoute
   '/api/image-gen': typeof ApiImageGenRoute
   '/api/structured-chat': typeof ApiStructuredChatRoute
+  '/api/structured-multi': typeof ApiStructuredMultiRoute
   '/api/structured-output': typeof ApiStructuredOutputRoute
   '/api/summarize': typeof ApiSummarizeRoute
   '/api/tanchat': typeof ApiTanchatRoute
@@ -217,6 +235,7 @@ export interface FileRoutesById {
   '/generations/image': typeof GenerationsImageRoute
   '/generations/speech': typeof GenerationsSpeechRoute
   '/generations/structured-chat': typeof GenerationsStructuredChatRoute
+  '/generations/structured-multi': typeof GenerationsStructuredMultiRoute
   '/generations/structured-output': typeof GenerationsStructuredOutputRoute
   '/generations/summarize': typeof GenerationsSummarizeRoute
   '/generations/transcription': typeof GenerationsTranscriptionRoute
@@ -236,6 +255,7 @@ export interface FileRouteTypes {
     | '/realtime'
     | '/api/image-gen'
     | '/api/structured-chat'
+    | '/api/structured-multi'
     | '/api/structured-output'
     | '/api/summarize'
     | '/api/tanchat'
@@ -244,6 +264,7 @@ export interface FileRouteTypes {
     | '/generations/image'
     | '/generations/speech'
     | '/generations/structured-chat'
+    | '/generations/structured-multi'
     | '/generations/structured-output'
     | '/generations/summarize'
     | '/generations/transcription'
@@ -261,6 +282,7 @@ export interface FileRouteTypes {
     | '/realtime'
     | '/api/image-gen'
     | '/api/structured-chat'
+    | '/api/structured-multi'
     | '/api/structured-output'
     | '/api/summarize'
     | '/api/tanchat'
@@ -269,6 +291,7 @@ export interface FileRouteTypes {
     | '/generations/image'
     | '/generations/speech'
     | '/generations/structured-chat'
+    | '/generations/structured-multi'
     | '/generations/structured-output'
     | '/generations/summarize'
     | '/generations/transcription'
@@ -286,6 +309,7 @@ export interface FileRouteTypes {
     | '/realtime'
     | '/api/image-gen'
     | '/api/structured-chat'
+    | '/api/structured-multi'
     | '/api/structured-output'
     | '/api/summarize'
     | '/api/tanchat'
@@ -294,6 +318,7 @@ export interface FileRouteTypes {
     | '/generations/image'
     | '/generations/speech'
     | '/generations/structured-chat'
+    | '/generations/structured-multi'
     | '/generations/structured-output'
     | '/generations/summarize'
     | '/generations/transcription'
@@ -312,6 +337,7 @@ export interface RootRouteChildren {
   RealtimeRoute: typeof RealtimeRoute
   ApiImageGenRoute: typeof ApiImageGenRoute
   ApiStructuredChatRoute: typeof ApiStructuredChatRoute
+  ApiStructuredMultiRoute: typeof ApiStructuredMultiRoute
   ApiStructuredOutputRoute: typeof ApiStructuredOutputRoute
   ApiSummarizeRoute: typeof ApiSummarizeRoute
   ApiTanchatRoute: typeof ApiTanchatRoute
@@ -320,6 +346,7 @@ export interface RootRouteChildren {
   GenerationsImageRoute: typeof GenerationsImageRoute
   GenerationsSpeechRoute: typeof GenerationsSpeechRoute
   GenerationsStructuredChatRoute: typeof GenerationsStructuredChatRoute
+  GenerationsStructuredMultiRoute: typeof GenerationsStructuredMultiRoute
   GenerationsStructuredOutputRoute: typeof GenerationsStructuredOutputRoute
   GenerationsSummarizeRoute: typeof GenerationsSummarizeRoute
   GenerationsTranscriptionRoute: typeof GenerationsTranscriptionRoute
@@ -383,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GenerationsStructuredOutputRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/generations/structured-multi': {
+      id: '/generations/structured-multi'
+      path: '/generations/structured-multi'
+      fullPath: '/generations/structured-multi'
+      preLoaderRoute: typeof GenerationsStructuredMultiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/generations/structured-chat': {
       id: '/generations/structured-chat'
       path: '/generations/structured-chat'
@@ -437,6 +471,13 @@ declare module '@tanstack/react-router' {
       path: '/api/structured-output'
       fullPath: '/api/structured-output'
       preLoaderRoute: typeof ApiStructuredOutputRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/structured-multi': {
+      id: '/api/structured-multi'
+      path: '/api/structured-multi'
+      fullPath: '/api/structured-multi'
+      preLoaderRoute: typeof ApiStructuredMultiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/structured-chat': {
@@ -504,6 +545,7 @@ const rootRouteChildren: RootRouteChildren = {
   RealtimeRoute: RealtimeRoute,
   ApiImageGenRoute: ApiImageGenRoute,
   ApiStructuredChatRoute: ApiStructuredChatRoute,
+  ApiStructuredMultiRoute: ApiStructuredMultiRoute,
   ApiStructuredOutputRoute: ApiStructuredOutputRoute,
   ApiSummarizeRoute: ApiSummarizeRoute,
   ApiTanchatRoute: ApiTanchatRoute,
@@ -512,6 +554,7 @@ const rootRouteChildren: RootRouteChildren = {
   GenerationsImageRoute: GenerationsImageRoute,
   GenerationsSpeechRoute: GenerationsSpeechRoute,
   GenerationsStructuredChatRoute: GenerationsStructuredChatRoute,
+  GenerationsStructuredMultiRoute: GenerationsStructuredMultiRoute,
   GenerationsStructuredOutputRoute: GenerationsStructuredOutputRoute,
   GenerationsSummarizeRoute: GenerationsSummarizeRoute,
   GenerationsTranscriptionRoute: GenerationsTranscriptionRoute,

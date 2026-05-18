@@ -51,9 +51,18 @@ export type DeepPartial<T> =
  * Note: Connection and body changes will recreate the ChatClient instance.
  * To update these options, remount the component or use a key prop.
  */
+/**
+ * A record of named schemas, used to multiplex per-turn structured-output
+ * shapes in one conversation. Each `sendMessage` call can pick which schema
+ * the assistant should respond against; the resulting `structured-output`
+ * part carries the name as `schemaName` so render code can narrow.
+ */
+export type SchemaMap = Record<string, SchemaInput>
+
 export type UseChatOptions<
   TTools extends ReadonlyArray<AnyClientTool> = any,
   TSchema extends SchemaInput | undefined = undefined,
+  TSchemas extends SchemaMap | undefined = undefined,
 > = Omit<
   ChatClientOptions<TTools>,
   | 'onMessagesChange'
@@ -76,6 +85,18 @@ export type UseChatOptions<
    * against the schema passed to `chat({ outputSchema })` on the server route.
    */
   outputSchema?: TSchema
+  /**
+   * Map of named schemas for per-turn structured output. Pair with
+   * `sendMessage(content, { schema: 'name' })` to pick which schema the
+   * assistant should respond against for that turn. The structured-output
+   * part on the resulting assistant message carries `schemaName: 'name'` so
+   * render code can narrow on the discriminator.
+   *
+   * Mutually exclusive with `outputSchema` in practice; if both are set,
+   * `outputSchemas` wins at the type level for narrowing and `sendMessage`'s
+   * `schema` option becomes available.
+   */
+  outputSchemas?: TSchemas
 }
 
 /**
@@ -86,7 +107,8 @@ export type UseChatOptions<
 export type UseChatReturn<
   TTools extends ReadonlyArray<AnyClientTool> = any,
   TSchema extends SchemaInput | undefined = undefined,
-> = BaseUseChatReturn<TTools> &
+  TSchemas extends SchemaMap | undefined = undefined,
+> = BaseUseChatReturn<TTools, TSchemas> &
   (TSchema extends SchemaInput
     ? {
         /**
@@ -105,17 +127,61 @@ export type UseChatReturn<
       }
     : Record<never, never>)
 
-interface BaseUseChatReturn<TTools extends ReadonlyArray<AnyClientTool> = any> {
+/**
+ * Typed view of a `structured-output` part for a specific named schema. The
+ * `partial` and `data` fields are narrowed against the schema's inferred
+ * type, so render code can read them without manual casts.
+ */
+export interface TypedStructuredPart<TSchema extends SchemaInput> {
+  type: 'structured-output'
+  status: 'streaming' | 'complete' | 'error'
+  schemaName: string
+  raw: string
+  reasoning?: string
+  errorMessage?: string
+  partial?: DeepPartial<InferSchemaType<TSchema>>
+  data?: InferSchemaType<TSchema>
+}
+
+interface BaseUseChatReturn<
+  TTools extends ReadonlyArray<AnyClientTool> = any,
+  TSchemas extends SchemaMap | undefined = undefined,
+> {
   /**
    * Current messages in the conversation
    */
   messages: Array<UIMessage<TTools>>
 
   /**
+   * Look up a typed `structured-output` part on a message by its schemaName.
+   * Returns `undefined` if the message has no structured-output part, or if
+   * the part's `schemaName` doesn't match. The returned view's `data` and
+   * `partial` are narrowed against the corresponding schema in `outputSchemas`.
+   *
+   * Only available when `outputSchemas` was supplied at hook creation.
+   */
+  getStructuredPart: TSchemas extends SchemaMap
+    ? <TKey extends keyof TSchemas & string>(
+        message: UIMessage<TTools>,
+        schemaName: TKey,
+      ) => TypedStructuredPart<NonNullable<TSchemas[TKey]>> | undefined
+    : undefined
+
+  /**
    * Send a message and get a response.
    * Can be a simple string or multimodal content with images, audio, etc.
+   *
+   * When the hook was created with `outputSchemas`, pass `{ schema: 'name' }`
+   * to pick which named schema the assistant should respond against for
+   * this turn. The resulting assistant message's `structured-output` part
+   * will carry `schemaName: 'name'`.
    */
-  sendMessage: (content: string | MultimodalContent) => Promise<void>
+  sendMessage: (
+    content: string | MultimodalContent,
+    options?: TSchemas extends SchemaMap
+      ? { schema?: keyof TSchemas & string }
+      : { schema?: never },
+  ) => Promise<void>
 
   /**
    * Append a message to the conversation

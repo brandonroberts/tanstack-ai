@@ -476,6 +476,141 @@ describe('useChat({ outputSchema }) — runtime', () => {
   })
 })
 
+describe('useChat({ outputSchemas }) — per-turn schemas', () => {
+  type Recipe = { title: string; servings: number }
+  type Plan = { day: string; tasks: Array<string> }
+
+  const recipeSchema = {} as StandardJSONSchemaV1<Recipe, Recipe>
+  const planSchema = {} as StandardJSONSchemaV1<Plan, Plan>
+
+  function streamFor(
+    schemaName: 'recipe' | 'plan',
+    obj: unknown,
+    messageId: string,
+    runId: string,
+  ): Array<StreamChunk> {
+    const raw = JSON.stringify(obj)
+    return [
+      {
+        type: 'RUN_STARTED',
+        runId,
+        threadId: `thread-${runId}`,
+        model: 'test',
+        timestamp: Date.now(),
+      } as StreamChunk,
+      {
+        type: 'TEXT_MESSAGE_START',
+        messageId,
+        role: 'assistant',
+        model: 'test',
+        timestamp: Date.now(),
+      } as StreamChunk,
+      {
+        type: 'CUSTOM',
+        name: 'structured-output.start',
+        value: { messageId, schemaName },
+        model: 'test',
+        timestamp: Date.now(),
+      } as StreamChunk,
+      {
+        type: 'TEXT_MESSAGE_CONTENT',
+        messageId,
+        delta: raw,
+        content: raw,
+        model: 'test',
+        timestamp: Date.now(),
+      } as StreamChunk,
+      {
+        type: 'CUSTOM',
+        name: 'structured-output.complete',
+        value: { object: obj, raw, messageId, schemaName },
+        model: 'test',
+        timestamp: Date.now(),
+      } as StreamChunk,
+      {
+        type: 'RUN_FINISHED',
+        runId,
+        threadId: `thread-${runId}`,
+        model: 'test',
+        timestamp: Date.now(),
+        finishReason: 'stop',
+      } as StreamChunk,
+    ]
+  }
+
+  it('stamps schemaName on the part and getStructuredPart narrows by it', async () => {
+    const recipe: Recipe = { title: 'Pasta', servings: 2 }
+    const plan: Plan = { day: 'Mon', tasks: ['walk', 'work'] }
+
+    let call = 0
+    const adapter = {
+      async *connect() {
+        const chunks =
+          call === 0
+            ? streamFor('recipe', recipe, 'msg-a', 'run-a')
+            : streamFor('plan', plan, 'msg-b', 'run-b')
+        call++
+        for (const c of chunks) yield c
+      },
+    }
+
+    const { result } = renderHook(() =>
+      useChat({
+        connection: adapter,
+        outputSchemas: { recipe: recipeSchema, plan: planSchema },
+      }),
+    )
+
+    await act(async () => {
+      await result.current.sendMessage('give me dinner', { schema: 'recipe' })
+    })
+
+    await waitFor(() => {
+      const assistant = result.current.messages.find(
+        (m) => m.role === 'assistant',
+      )
+      const part = assistant?.parts.find(
+        (p) => p.type === 'structured-output',
+      ) as any
+      expect(part?.schemaName).toBe('recipe')
+      expect(part?.data).toEqual(recipe)
+    })
+
+    await act(async () => {
+      await result.current.sendMessage('plan my monday', { schema: 'plan' })
+    })
+
+    await waitFor(() => {
+      const assistants = result.current.messages.filter(
+        (m) => m.role === 'assistant',
+      )
+      expect(assistants).toHaveLength(2)
+      const planPart = assistants[1]!.parts.find(
+        (p) => p.type === 'structured-output',
+      ) as any
+      expect(planPart?.schemaName).toBe('plan')
+      expect(planPart?.data).toEqual(plan)
+    })
+
+    // getStructuredPart returns the typed view when schemaName matches…
+    const assistants = result.current.messages.filter(
+      (m) => m.role === 'assistant',
+    )
+    const recipeView = result.current.getStructuredPart!(
+      assistants[0]!,
+      'recipe',
+    )
+    expect(recipeView?.data).toEqual(recipe)
+
+    const planView = result.current.getStructuredPart!(assistants[1]!, 'plan')
+    expect(planView?.data).toEqual(plan)
+
+    // …and undefined when the schemaName doesn't match.
+    const wrongView = result.current.getStructuredPart!(assistants[0]!, 'plan')
+    expect(wrongView).toBeUndefined()
+  })
+})
+
 describe('useChat() without outputSchema — runtime', () => {
   it('does not break or track structured state when no schema is supplied', async () => {
     const adapter = createMockConnectionAdapter({

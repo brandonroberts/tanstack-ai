@@ -160,6 +160,18 @@ export interface TextActivityOptions<
    */
   outputSchema?: TSchema
   /**
+   * Optional name for the schema used in this run. When set, the synthetic
+   * `structured-output.start` and terminal `structured-output.complete`
+   * events carry this name as `value.schemaName`, and the client-side
+   * StructuredOutputPart inherits it. Useful when the caller is multiplexing
+   * several schemas across turns (Phase 2 `useChat({ outputSchemas })` flow)
+   * so render code can narrow on a discriminator without inspecting the
+   * payload shape.
+   *
+   * Has no effect unless `outputSchema` is also set.
+   */
+  schemaName?: string
+  /**
    * Whether to stream the text result.
    * When true (default), returns an AsyncIterable<StreamChunk> for streaming output.
    * When false, returns a Promise<string> with the collected text content.
@@ -1935,8 +1947,15 @@ async function* runStreamingStructuredOutputImpl<TSchema extends SchemaInput>(
   options: TextActivityOptions<AnyTextAdapter, TSchema, true>,
   jsonSchema: NonNullable<ReturnType<typeof convertSchemaToJsonSchema>>,
 ): StructuredOutputStreamInternal<InferSchemaType<TSchema>> {
-  const { adapter, outputSchema, middleware, context, debug, ...textOptions } =
-    options
+  const {
+    adapter,
+    outputSchema,
+    schemaName,
+    middleware,
+    context,
+    debug,
+    ...textOptions
+  } = options
   const model = adapter.model
   const logger = resolveDebugOption(debug)
   const runId = textOptions.runId
@@ -2080,7 +2099,10 @@ async function* runStreamingStructuredOutputImpl<TSchema extends SchemaInput>(
       yield {
         type: EventType.CUSTOM,
         name: 'structured-output.start',
-        value: { messageId: structuredMessageId },
+        value: {
+          messageId: structuredMessageId,
+          ...(schemaName ? { schemaName } : {}),
+        },
         model: 'model' in chunk ? (chunk.model ?? model) : model,
         timestamp:
           'timestamp' in chunk ? (chunk.timestamp ?? Date.now()) : Date.now(),
@@ -2108,7 +2130,8 @@ async function* runStreamingStructuredOutputImpl<TSchema extends SchemaInput>(
             // Forward `reasoning` through schema validation so consumers that
             // only listen for the terminal event don't lose chain-of-thought.
             // Tag with messageId so the client processor can snap the right
-            // assistant message's structured-output part.
+            // assistant message's structured-output part, and with schemaName
+            // (Phase 2) so it lands as the part's discriminator.
             value: {
               object: validated,
               raw: value.raw,
@@ -2116,6 +2139,7 @@ async function* runStreamingStructuredOutputImpl<TSchema extends SchemaInput>(
               ...(structuredMessageId
                 ? { messageId: structuredMessageId }
                 : {}),
+              ...(schemaName ? { schemaName } : {}),
             },
           }
           continue
@@ -2148,13 +2172,15 @@ async function* runStreamingStructuredOutputImpl<TSchema extends SchemaInput>(
         }
       }
       // No Standard schema (raw JSONSchema). Still tag the terminal event
-      // with messageId so the client processor can snap the right part.
-      if (structuredMessageId) {
+      // with messageId / schemaName so the client processor can snap the
+      // right part and stamp the discriminator.
+      if (structuredMessageId || schemaName) {
         yield {
           ...chunk,
           value: {
             ...(chunk.value as Record<string, unknown>),
-            messageId: structuredMessageId,
+            ...(structuredMessageId ? { messageId: structuredMessageId } : {}),
+            ...(schemaName ? { schemaName } : {}),
           },
         }
         continue

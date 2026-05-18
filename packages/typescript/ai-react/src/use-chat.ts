@@ -16,6 +16,7 @@ import type {
 import type {
   DeepPartial,
   MultimodalContent,
+  SchemaMap,
   UIMessage,
   UseChatOptions,
   UseChatReturn,
@@ -24,7 +25,10 @@ import type {
 export function useChat<
   TTools extends ReadonlyArray<AnyClientTool> = any,
   TSchema extends SchemaInput | undefined = undefined,
->(options: UseChatOptions<TTools, TSchema>): UseChatReturn<TTools, TSchema> {
+  TSchemas extends SchemaMap | undefined = undefined,
+>(
+  options: UseChatOptions<TTools, TSchema, TSchemas>,
+): UseChatReturn<TTools, TSchema, TSchemas> {
   const hookId = useId()
   const clientId = options.id || hookId
 
@@ -52,7 +56,7 @@ export function useChat<
   messagesRef.current = messages
 
   // Track current options in a ref to avoid recreating client when options change
-  const optionsRef = useRef<UseChatOptions<TTools, TSchema>>(options)
+  const optionsRef = useRef<UseChatOptions<TTools, TSchema, TSchemas>>(options)
   optionsRef.current = options
 
   // Create ChatClient instance with callbacks to sync state
@@ -141,8 +145,20 @@ export function useChat<
   }, [client, options.live])
 
   const sendMessage = useCallback(
-    async (content: string | MultimodalContent) => {
-      await client.sendMessage(content)
+    async (
+      content: string | MultimodalContent,
+      sendOptions?: { schema?: string },
+    ) => {
+      // When the caller picks a named schema for this turn, surface it in
+      // forwardedProps.schemaName so the server route can look up the
+      // matching schema and pass it to `chat({ outputSchema, schemaName })`.
+      // The server then tags the structured-output events with this name and
+      // the client processor stamps it onto the resulting part.
+      const body =
+        sendOptions && sendOptions.schema
+          ? { schemaName: sendOptions.schema }
+          : undefined
+      await client.sendMessage(content, body)
     },
     [client],
   )
@@ -236,9 +252,30 @@ export function useChat<
     return activeStructuredPart.data as Final
   }, [activeStructuredPart])
 
+  // Helper for narrowing a structured-output part to a typed view against a
+  // named schema. Returns undefined if the message has no part or the part's
+  // schemaName doesn't match. The runtime branch is identical regardless of
+  // whether `outputSchemas` was provided — the type system gates whether the
+  // helper is exposed (via the conditional on the return shape).
+  const getStructuredPart = useCallback(
+    (message: UIMessage<TTools>, schemaName: string) => {
+      const part = message.parts.find(
+        (p): p is StructuredOutputPart => p.type === 'structured-output',
+      )
+      if (!part || part.schemaName !== schemaName) return undefined
+      return part as unknown as ReturnType<
+        NonNullable<
+          UseChatReturn<TTools, TSchema, TSchemas>['getStructuredPart']
+        >
+      >
+    },
+    [],
+  )
+
   return {
     messages,
     sendMessage,
+    getStructuredPart,
     append,
     reload,
     stop,
@@ -254,5 +291,5 @@ export function useChat<
     addToolApprovalResponse,
     partial,
     final,
-  } as unknown as UseChatReturn<TTools, TSchema>
+  } as unknown as UseChatReturn<TTools, TSchema, TSchemas>
 }
