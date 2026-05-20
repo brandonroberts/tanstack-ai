@@ -27,8 +27,8 @@ import { Route as ApiTranscribeRouteImport } from './routes/api.transcribe'
 import { Route as ApiTanchatRouteImport } from './routes/api.tanchat'
 import { Route as ApiSummarizeRouteImport } from './routes/api.summarize'
 import { Route as ApiStructuredOutputRouteImport } from './routes/api.structured-output'
-import { Route as ApiOrchestrationRouteImport } from './routes/api.orchestration'
 import { Route as ApiStructuredChatRouteImport } from './routes/api.structured-chat'
+import { Route as ApiOrchestrationRouteImport } from './routes/api.orchestration'
 import { Route as ApiImageGenRouteImport } from './routes/api.image-gen'
 import { Route as ExampleGuitarsIndexRouteImport } from './routes/example.guitars/index'
 import { Route as ExampleGuitarsGuitarIdRouteImport } from './routes/example.guitars/$guitarId'
@@ -130,14 +130,14 @@ const ApiStructuredOutputRoute = ApiStructuredOutputRouteImport.update({
   path: '/api/structured-output',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiOrchestrationRoute = ApiOrchestrationRouteImport.update({
-  id: '/api/orchestration',
-  path: '/api/orchestration',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiStructuredChatRoute = ApiStructuredChatRouteImport.update({
   id: '/api/structured-chat',
   path: '/api/structured-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOrchestrationRoute = ApiOrchestrationRouteImport.update({
+  id: '/api/orchestration',
+  path: '/api/orchestration',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiImageGenRoute = ApiImageGenRouteImport.update({
@@ -512,18 +512,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiStructuredOutputRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/orchestration': {
-      id: '/api/orchestration'
-      path: '/api/orchestration'
-      fullPath: '/api/orchestration'
-      preLoaderRoute: typeof ApiOrchestrationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/structured-chat': {
       id: '/api/structured-chat'
       path: '/api/structured-chat'
       fullPath: '/api/structured-chat'
       preLoaderRoute: typeof ApiStructuredChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/orchestration': {
+      id: '/api/orchestration'
+      path: '/api/orchestration'
+      fullPath: '/api/orchestration'
+      preLoaderRoute: typeof ApiOrchestrationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/image-gen': {
