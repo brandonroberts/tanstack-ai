@@ -37,7 +37,10 @@ function mapVideoInputsToFalFields(
   const sources: Array<string> = []
   for (const part of videoInputs) {
     const url = videoPartToUrl(part)
-    if (part.metadata?.role === 'reference' || part.metadata?.role === 'character') {
+    if (
+      part.metadata?.role === 'reference' ||
+      part.metadata?.role === 'character'
+    ) {
       references.push(url)
     } else {
       sources.push(url)

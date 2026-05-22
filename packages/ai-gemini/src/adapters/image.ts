@@ -240,7 +240,12 @@ export class GeminiImageAdapter<
     }
     // For URL sources, prefer passing the URL through as `fileData` when it
     // looks like a Google Files API URI; otherwise fetch and inline as base64.
-    if (part.source.value.startsWith('gs://') || /^https?:\/\/generativelanguage\.googleapis\.com\//.test(part.source.value)) {
+    if (
+      part.source.value.startsWith('gs://') ||
+      /^https?:\/\/generativelanguage\.googleapis\.com\//.test(
+        part.source.value,
+      )
+    ) {
       return {
         fileData: {
           fileUri: part.source.value,

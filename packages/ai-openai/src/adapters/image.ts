@@ -237,7 +237,8 @@ export class OpenAIImageAdapter<
       image: sourceFiles.length === 1 ? sourceFiles[0]! : sourceFiles,
       n: numberOfImages ?? 1,
       stream: false,
-      ...((modelOptions ?? {}) as Partial<OpenAI_SDK.Images.ImageEditParamsNonStreaming>),
+      ...((modelOptions ??
+        {}) as Partial<OpenAI_SDK.Images.ImageEditParamsNonStreaming>),
     }
     if (size !== undefined) {
       request.size = size as Exclude<

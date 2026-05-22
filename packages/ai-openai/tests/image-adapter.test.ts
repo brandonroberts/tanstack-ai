@@ -317,7 +317,11 @@ describe('OpenAI Image Adapter', () => {
             },
             {
               type: 'image',
-              source: { type: 'data', value: 'YnllCg==', mimeType: 'image/png' },
+              source: {
+                type: 'data',
+                value: 'YnllCg==',
+                mimeType: 'image/png',
+              },
             },
           ],
           logger: testLogger,

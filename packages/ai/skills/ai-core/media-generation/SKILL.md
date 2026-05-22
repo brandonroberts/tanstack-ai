@@ -226,7 +226,11 @@ await generateImage({
   prompt: 'Replace the masked region with a tree',
   imageInputs: [
     { type: 'image', source: { type: 'url', value: photoUrl } },
-    { type: 'image', source: { type: 'url', value: maskUrl }, metadata: { role: 'mask' } },
+    {
+      type: 'image',
+      source: { type: 'url', value: maskUrl },
+      metadata: { role: 'mask' },
+    },
   ],
 })
 
@@ -250,8 +254,8 @@ await generateVideo({
 
 **Role hints** (`metadata.role`):
 
-| Role            | Maps to                                                                |
-| --------------- | ---------------------------------------------------------------------- |
+| Role            | Maps to                                                                  |
+| --------------- | ------------------------------------------------------------------------ |
 | `'reference'`   | fal `reference_image_urls`; Gemini multimodal part; positional otherwise |
 | `'character'`   | Same as `'reference'`; Veo `referenceImages` slot                        |
 | `'mask'`        | OpenAI `mask` (gpt-image-1, dall-e-2); fal `mask_url`                    |
@@ -261,14 +265,14 @@ await generateVideo({
 
 **Provider support matrix:**
 
-| Provider     | `generateImage` `imageInputs`                                                    | `generateVideo` `imageInputs`                                              |
-| ------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| OpenAI       | gpt-image-1 / -mini → `images.edit()` (up to 16). dall-e-2 → edit (1). dall-e-3 throws. | Sora-2 / -pro → `input_reference` (single). Throws if >1.            |
-| Gemini       | Native (gemini-\*-flash-image, "nano-banana") → multimodal `contents`. Imagen throws. | No native Veo adapter yet — deferred to a follow-up.                       |
-| fal          | 1 input → `image_url`; >1 → `image_urls`; roles → `mask_url` / `control_image_url` / `reference_image_urls`. | 1 input → `image_url`; `start_frame`/`end_frame` → `start_image_url`/`end_image_url`; `reference` → `reference_image_urls`. |
-| Grok         | Throws — adapter uses OpenAI-compat endpoint; native Imagine API rewrite pending. | n/a                                                                        |
-| OpenRouter   | Throws — multimodal injection pending.                                           | n/a                                                                        |
-| Anthropic    | n/a (no image generation API).                                                   | n/a                                                                        |
+| Provider   | `generateImage` `imageInputs`                                                                                | `generateVideo` `imageInputs`                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| OpenAI     | gpt-image-1 / -mini → `images.edit()` (up to 16). dall-e-2 → edit (1). dall-e-3 throws.                      | Sora-2 / -pro → `input_reference` (single). Throws if >1.                                                                   |
+| Gemini     | Native (gemini-\*-flash-image, "nano-banana") → multimodal `contents`. Imagen throws.                        | No native Veo adapter yet — deferred to a follow-up.                                                                        |
+| fal        | 1 input → `image_url`; >1 → `image_urls`; roles → `mask_url` / `control_image_url` / `reference_image_urls`. | 1 input → `image_url`; `start_frame`/`end_frame` → `start_image_url`/`end_image_url`; `reference` → `reference_image_urls`. |
+| Grok       | Throws — adapter uses OpenAI-compat endpoint; native Imagine API rewrite pending.                            | n/a                                                                                                                         |
+| OpenRouter | Throws — multimodal injection pending.                                                                       | n/a                                                                                                                         |
+| Anthropic  | n/a (no image generation API).                                                                               | n/a                                                                                                                         |
 
 `videoInputs` and `audioInputs` follow the same `metadata.role` convention
 for video-to-video and lipsync flows on fal; other providers throw when
@@ -716,7 +720,7 @@ generateImage({
 
 // CORRECT — use a model that supports edits/inputs
 generateImage({
-  adapter: openaiImage('gpt-image-1'),       // edits up to 16 images
+  adapter: openaiImage('gpt-image-1'), // edits up to 16 images
   prompt: 'Edit this',
   imageInputs: [{ type: 'image', source: { type: 'url', value: url } }],
 })
