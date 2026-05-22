@@ -243,7 +243,10 @@ function discoveryToOpenAPI(doc: DiscoveryDoc): OpenApiSpec {
 
   return {
     openapi: '3.0.4',
-    info: { title: doc.title ?? 'Google Generative Language API', version: doc.version ?? 'v1beta' },
+    info: {
+      title: doc.title ?? 'Google Generative Language API',
+      version: doc.version ?? 'v1beta',
+    },
     servers: [{ url: serverUrl.replace(/\/$/, '') }],
     paths,
     components,

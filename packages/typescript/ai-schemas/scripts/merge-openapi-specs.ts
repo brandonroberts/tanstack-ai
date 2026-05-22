@@ -60,8 +60,9 @@ function transformToFalFileSchema(
  * is safe and lets the generator emit clean Zod.
  */
 function coerceDefaults(spec: object): void {
-  const schemas = (spec as { components?: { schemas?: Record<string, object> } })
-    .components?.schemas
+  const schemas = (
+    spec as { components?: { schemas?: Record<string, object> } }
+  ).components?.schemas
   if (!schemas) return
   for (const schema of Object.values(schemas)) {
     coerceOrDropDefault(schema as Record<string, unknown>)
@@ -177,8 +178,9 @@ function coerceDefaultsRecursively(obj: object): void {
 }
 
 function transformFalFileFields(spec: object): void {
-  const schemas = (spec as { components?: { schemas?: Record<string, object> } })
-    .components?.schemas
+  const schemas = (
+    spec as { components?: { schemas?: Record<string, object> } }
+  ).components?.schemas
   if (!schemas) return
   for (const [schemaName, schema] of Object.entries(schemas)) {
     if (!schemaName.endsWith('Input')) continue

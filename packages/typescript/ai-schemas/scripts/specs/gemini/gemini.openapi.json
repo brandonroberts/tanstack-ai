@@ -3062,12 +3062,7 @@
           "serviceTier": {
             "type": "string",
             "description": "Optional. The service tier of the request.",
-            "enum": [
-              "unspecified",
-              "standard",
-              "flex",
-              "priority"
-            ]
+            "enum": ["unspecified", "standard", "flex", "priority"]
           },
           "store": {
             "type": "boolean",
@@ -3278,10 +3273,7 @@
           "language": {
             "type": "string",
             "description": "Required. Programming language of the `code`.",
-            "enum": [
-              "LANGUAGE_UNSPECIFIED",
-              "PYTHON"
-            ]
+            "enum": ["LANGUAGE_UNSPECIFIED", "PYTHON"]
           },
           "code": {
             "type": "string",
@@ -3464,11 +3456,7 @@
           "behavior": {
             "type": "string",
             "description": "Optional. Specifies the function Behavior. Currently only supported by the BidiGenerateContent method.",
-            "enum": [
-              "UNSPECIFIED",
-              "BLOCKING",
-              "NON_BLOCKING"
-            ]
+            "enum": ["UNSPECIFIED", "BLOCKING", "NON_BLOCKING"]
           }
         }
       },
@@ -3614,10 +3602,7 @@
           "mode": {
             "type": "string",
             "description": "The mode of the predictor to be used in dynamic retrieval.",
-            "enum": [
-              "MODE_UNSPECIFIED",
-              "MODE_DYNAMIC"
-            ]
+            "enum": ["MODE_UNSPECIFIED", "MODE_DYNAMIC"]
           },
           "dynamicThreshold": {
             "type": "number",
@@ -3688,10 +3673,7 @@
           "environment": {
             "type": "string",
             "description": "Required. The environment being operated.",
-            "enum": [
-              "ENVIRONMENT_UNSPECIFIED",
-              "ENVIRONMENT_BROWSER"
-            ]
+            "enum": ["ENVIRONMENT_UNSPECIFIED", "ENVIRONMENT_BROWSER"]
           },
           "excludedPredefinedFunctions": {
             "type": "array",
@@ -3806,13 +3788,7 @@
           "mode": {
             "type": "string",
             "description": "Optional. Specifies the mode in which function calling should execute. If unspecified, the default value will be set to AUTO.",
-            "enum": [
-              "MODE_UNSPECIFIED",
-              "AUTO",
-              "ANY",
-              "NONE",
-              "VALIDATED"
-            ]
+            "enum": ["MODE_UNSPECIFIED", "AUTO", "ANY", "NONE", "VALIDATED"]
           },
           "allowedFunctionNames": {
             "type": "array",
@@ -3972,12 +3948,7 @@
             "description": "Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.",
             "items": {
               "type": "string",
-              "enum": [
-                "MODALITY_UNSPECIFIED",
-                "TEXT",
-                "IMAGE",
-                "AUDIO"
-              ]
+              "enum": ["MODALITY_UNSPECIFIED", "TEXT", "IMAGE", "AUDIO"]
             }
           },
           "speechConfig": {
@@ -4127,11 +4098,7 @@
           "mimeType": {
             "type": "string",
             "description": "Optional. The MIME type of the text output.",
-            "enum": [
-              "MIME_TYPE_UNSPECIFIED",
-              "APPLICATION_JSON",
-              "TEXT_PLAIN"
-            ]
+            "enum": ["MIME_TYPE_UNSPECIFIED", "APPLICATION_JSON", "TEXT_PLAIN"]
           },
           "schema": {
             "type": "any",
@@ -4159,11 +4126,7 @@
           "delivery": {
             "type": "string",
             "description": "Optional. The delivery mode for the audio output.",
-            "enum": [
-              "DELIVERY_UNSPECIFIED",
-              "INLINE",
-              "URI"
-            ]
+            "enum": ["DELIVERY_UNSPECIFIED", "INLINE", "URI"]
           },
           "sampleRate": {
             "type": "integer",
@@ -4184,19 +4147,12 @@
           "mimeType": {
             "type": "string",
             "description": "Optional. The MIME type of the image output.",
-            "enum": [
-              "MIME_TYPE_UNSPECIFIED",
-              "IMAGE_JPEG"
-            ]
+            "enum": ["MIME_TYPE_UNSPECIFIED", "IMAGE_JPEG"]
           },
           "delivery": {
             "type": "string",
             "description": "Optional. The delivery mode for the image output.",
-            "enum": [
-              "DELIVERY_UNSPECIFIED",
-              "INLINE",
-              "URI"
-            ]
+            "enum": ["DELIVERY_UNSPECIFIED", "INLINE", "URI"]
           },
           "aspectRatio": {
             "type": "string",
@@ -4964,12 +4920,7 @@
           "serviceTier": {
             "type": "string",
             "description": "Output only. Service tier of the request.",
-            "enum": [
-              "unspecified",
-              "standard",
-              "flex",
-              "priority"
-            ]
+            "enum": ["unspecified", "standard", "flex", "priority"]
           }
         }
       },
@@ -5193,11 +5144,7 @@
           "blockReason": {
             "type": "string",
             "description": "Optional. If set, the input was blocked and no candidates are returned. Rephrase the input.",
-            "enum": [
-              "BLOCK_REASON_UNSPECIFIED",
-              "SAFETY",
-              "OTHER"
-            ]
+            "enum": ["BLOCK_REASON_UNSPECIFIED", "SAFETY", "OTHER"]
           },
           "safetyRatings": {
             "type": "array",
@@ -5990,11 +5937,7 @@
           "reason": {
             "type": "string",
             "description": "The reason content was blocked during request processing.",
-            "enum": [
-              "BLOCKED_REASON_UNSPECIFIED",
-              "SAFETY",
-              "OTHER"
-            ]
+            "enum": ["BLOCKED_REASON_UNSPECIFIED", "SAFETY", "OTHER"]
           },
           "message": {
             "type": "string",
@@ -6086,12 +6029,7 @@
           "state": {
             "type": "string",
             "description": "Output only. Processing state of the File.",
-            "enum": [
-              "STATE_UNSPECIFIED",
-              "PROCESSING",
-              "ACTIVE",
-              "FAILED"
-            ]
+            "enum": ["STATE_UNSPECIFIED", "PROCESSING", "ACTIVE", "FAILED"]
           },
           "source": {
             "type": "string",
@@ -6191,12 +6129,7 @@
           "state": {
             "type": "string",
             "description": "Output only. The state of the GeneratedFile.",
-            "enum": [
-              "STATE_UNSPECIFIED",
-              "GENERATING",
-              "GENERATED",
-              "FAILED"
-            ]
+            "enum": ["STATE_UNSPECIFIED", "GENERATING", "GENERATED", "FAILED"]
           },
           "error": {
             "$ref": "#/components/schemas/Status"
@@ -6345,12 +6278,7 @@
           "state": {
             "type": "string",
             "description": "Output only. The state of the tuned model.",
-            "enum": [
-              "STATE_UNSPECIFIED",
-              "CREATING",
-              "ACTIVE",
-              "FAILED"
-            ]
+            "enum": ["STATE_UNSPECIFIED", "CREATING", "ACTIVE", "FAILED"]
           },
           "createTime": {
             "type": "string",
@@ -6534,12 +6462,7 @@
           "granteeType": {
             "type": "string",
             "description": "Optional. Immutable. The type of the grantee.",
-            "enum": [
-              "GRANTEE_TYPE_UNSPECIFIED",
-              "USER",
-              "GROUP",
-              "EVERYONE"
-            ]
+            "enum": ["GRANTEE_TYPE_UNSPECIFIED", "USER", "GROUP", "EVERYONE"]
           },
           "emailAddress": {
             "type": "string",
@@ -6548,12 +6471,7 @@
           "role": {
             "type": "string",
             "description": "Required. The role granted by this permission.",
-            "enum": [
-              "ROLE_UNSPECIFIED",
-              "OWNER",
-              "WRITER",
-              "READER"
-            ]
+            "enum": ["ROLE_UNSPECIFIED", "OWNER", "WRITER", "READER"]
           }
         }
       },

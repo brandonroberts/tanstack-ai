@@ -1,5 +1,5 @@
 ---
-"@tanstack/ai-schemas": minor
+'@tanstack/ai-schemas': minor
 ---
 
 Initial release of `@tanstack/ai-schemas` — JSON Schema and Zod schemas for AI provider endpoints, generated nightly from upstream OpenAPI specs.
@@ -7,6 +7,7 @@ Initial release of `@tanstack/ai-schemas` — JSON Schema and Zod schemas for AI
 Covers OpenAI, Anthropic, Gemini, ElevenLabs, and FAL. Architecture ported from fal-ai/fal-js PR #212; extended to every provider that publishes an OpenAPI spec.
 
 Sources:
+
 - OpenAI: `github.com/openai/openai-openapi`
 - Anthropic: `docs.anthropic.com/openapi.json`
 - Gemini: Google Generative Language Discovery doc, converted to OpenAPI in-pipeline

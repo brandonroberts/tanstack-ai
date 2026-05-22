@@ -36,7 +36,9 @@ interface EndpointInfo {
   outputType: string
 }
 
-function extractEndpointsFromSpec(unit: ProviderCategorySpec): Array<EndpointInfo> {
+function extractEndpointsFromSpec(
+  unit: ProviderCategorySpec,
+): Array<EndpointInfo> {
   const endpoints: Array<EndpointInfo> = []
   const strategy = unit.outputStrategy ?? 'post-200'
 
@@ -51,11 +53,14 @@ function extractEndpointsFromSpec(unit: ProviderCategorySpec): Array<EndpointInf
     let outputRef: string | undefined
     if (strategy === 'sibling-get') {
       const resultPathKey = `${pathKey}/requests/{request_id}`
-      const resultGet = (unit.mergedSpec.paths[resultPathKey] as
-        | { get?: Record<string, any> }
-        | undefined)?.get
+      const resultGet = (
+        unit.mergedSpec.paths[resultPathKey] as
+          | { get?: Record<string, any> }
+          | undefined
+      )?.get
       outputRef =
-        resultGet?.responses?.['200']?.content?.['application/json']?.schema?.$ref
+        resultGet?.responses?.['200']?.content?.['application/json']?.schema
+          ?.$ref
     } else {
       outputRef =
         post.responses?.['200']?.content?.['application/json']?.schema?.$ref
@@ -94,7 +99,9 @@ function buildZodExportLookup(unitPath: string): Map<string, string> {
 function buildSchemaExportLookup(unitPath: string): Map<string, string> {
   const source = readFileSync(join(unitPath, 'schemas.gen.ts'), 'utf8')
   const lookup = new Map<string, string>()
-  for (const match of source.matchAll(/export const ([A-Za-z0-9_$]+)Schema\b/g)) {
+  for (const match of source.matchAll(
+    /export const ([A-Za-z0-9_$]+)Schema\b/g,
+  )) {
     lookup.set(normalizeId(match[1]!), `${match[1]}Schema`)
   }
   return lookup
@@ -218,7 +225,9 @@ function bundleSchemaWithDefs(
   return { ...rewrittenRoot, $defs: defs }
 }
 
-async function loadUnitSchemas(unitPath: string): Promise<Record<string, JsonValue>> {
+async function loadUnitSchemas(
+  unitPath: string,
+): Promise<Record<string, JsonValue>> {
   const url = pathToFileURL(join(unitPath, 'schemas.gen.ts')).href
   const mod = (await import(url)) as Record<string, unknown>
   const out: Record<string, JsonValue> = {}
@@ -230,7 +239,10 @@ async function loadUnitSchemas(unitPath: string): Promise<Record<string, JsonVal
   return out
 }
 
-async function rewriteSchemasGen(label: string, unitPath: string): Promise<void> {
+async function rewriteSchemasGen(
+  label: string,
+  unitPath: string,
+): Promise<void> {
   const schemas = await loadUnitSchemas(unitPath)
   const sortedNames = Object.keys(schemas).sort()
 
@@ -304,7 +316,10 @@ function postProcessZodGen(unitPath: string): void {
   }
 
   // Strip any prior headers (idempotent re-runs) so we produce a stable result.
-  source = source.replace(/^(\/\* eslint-disable \*\/\n|\/\/ @ts-nocheck\n)+/, '')
+  source = source.replace(
+    /^(\/\* eslint-disable \*\/\n|\/\/ @ts-nocheck\n)+/,
+    '',
+  )
   source = `/* eslint-disable */\n// @ts-nocheck\n${source}`
   writeFileSync(file, source)
 }
@@ -495,7 +510,9 @@ interface ProcessedUnit {
   relSrc: string
 }
 
-async function generateSchemasBarrel(units: Array<ProcessedUnit>): Promise<void> {
+async function generateSchemasBarrel(
+  units: Array<ProcessedUnit>,
+): Promise<void> {
   const lines = [
     `// AUTO-GENERATED - Do not edit manually`,
     `// Generated via scripts/generate-endpoint-maps.ts`,
@@ -503,7 +520,8 @@ async function generateSchemasBarrel(units: Array<ProcessedUnit>): Promise<void>
     `// Per-provider JSON Schemas + endpoint schema maps. Namespaced so identical`,
     `// schema names across providers (e.g. \`MessageInputSchema\`) don't collide.`,
     ...units.map(
-      (u) => `export * as ${toPascalCase(u.label)} from './${u.relSrc}/schemas-index.js'`,
+      (u) =>
+        `export * as ${toPascalCase(u.label)} from './${u.relSrc}/schemas-index.js'`,
     ),
   ]
   const out = await formatTypeScript(lines.join('\n'))
@@ -518,7 +536,8 @@ async function generateZodBarrel(units: Array<ProcessedUnit>): Promise<void> {
     ``,
     `// Per-provider Zod barrels. Requires the optional \`zod ^4\` peer.`,
     ...units.map(
-      (u) => `export * as ${toPascalCase(u.label)} from './${u.relSrc}/index.js'`,
+      (u) =>
+        `export * as ${toPascalCase(u.label)} from './${u.relSrc}/index.js'`,
     ),
   ]
   const out = await formatTypeScript(lines.join('\n'))

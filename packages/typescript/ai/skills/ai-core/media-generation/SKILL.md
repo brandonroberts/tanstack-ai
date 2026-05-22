@@ -614,9 +614,10 @@ instead of paying for a round-trip:
 ```ts
 import { videoEndpointZodMap } from '@tanstack/ai-schemas/zod/fal-video'
 
-const validated = videoEndpointZodMap[
-  'fal-ai/kling-video/o3/pro/text-to-video'
-].input.safeParse(requestBody)
+const validated =
+  videoEndpointZodMap[
+    'fal-ai/kling-video/o3/pro/text-to-video'
+  ].input.safeParse(requestBody)
 if (!validated.success) throw validated.error
 ```
 

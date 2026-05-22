@@ -41,9 +41,7 @@
               "type": "boolean"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "ListOperationsResponse"
           },
@@ -63,9 +61,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Operation"
           },
@@ -85,9 +81,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
@@ -107,9 +101,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
@@ -135,9 +127,7 @@
               "format": "google-fieldmask"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "request": {
             "$ref": "GenerateContentBatch"
           },
@@ -166,9 +156,7 @@
               "format": "google-fieldmask"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "request": {
             "$ref": "EmbedContentBatch"
           },
@@ -195,9 +183,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateContentRequest"
           },
@@ -220,9 +206,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateAnswerRequest"
           },
@@ -245,9 +229,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateContentRequest"
           },
@@ -270,9 +252,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "EmbedContentRequest"
           },
@@ -295,9 +275,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "BatchEmbedContentsRequest"
           },
@@ -320,9 +298,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "CountTokensRequest"
           },
@@ -345,9 +321,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "BatchGenerateContentRequest"
           },
@@ -370,9 +344,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "AsyncBatchEmbedContentRequest"
           },
@@ -395,9 +367,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateMessageRequest"
           },
@@ -420,9 +390,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "CountMessageTokensRequest"
           },
@@ -445,9 +413,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Model"
           },
@@ -491,9 +457,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "PredictRequest"
           },
@@ -516,9 +480,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "PredictLongRunningRequest"
           },
@@ -541,9 +503,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateTextRequest"
           },
@@ -566,9 +526,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "EmbedTextRequest"
           },
@@ -591,9 +549,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "BatchEmbedTextRequest"
           },
@@ -616,9 +572,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "CountTextTokensRequest"
           },
@@ -666,9 +620,7 @@
                   "type": "boolean"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "ListOperationsResponse"
               },
@@ -688,9 +640,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Operation"
               },
@@ -716,9 +666,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateContentRequest"
           },
@@ -741,9 +689,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateContentRequest"
           },
@@ -766,9 +712,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "BatchGenerateContentRequest"
           },
@@ -791,9 +735,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "AsyncBatchEmbedContentRequest"
           },
@@ -816,9 +758,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "TunedModel"
           },
@@ -894,9 +834,7 @@
               "format": "google-fieldmask"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "request": {
             "$ref": "TunedModel"
           },
@@ -919,9 +857,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
@@ -941,9 +877,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "request": {
             "$ref": "TransferOwnershipRequest"
           },
@@ -966,9 +900,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateTextRequest"
           },
@@ -1016,9 +948,7 @@
                   "type": "boolean"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "ListOperationsResponse"
               },
@@ -1038,9 +968,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Operation"
               },
@@ -1064,9 +992,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "parent"
-              ],
+              "parameterOrder": ["parent"],
               "request": {
                 "$ref": "Permission"
               },
@@ -1089,9 +1015,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Permission"
               },
@@ -1122,9 +1046,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "parent"
-              ],
+              "parameterOrder": ["parent"],
               "response": {
                 "$ref": "ListPermissionsResponse"
               },
@@ -1150,9 +1072,7 @@
                   "format": "google-fieldmask"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "request": {
                 "$ref": "Permission"
               },
@@ -1175,9 +1095,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Empty"
               },
@@ -1203,9 +1121,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateContentRequest"
           },
@@ -1228,9 +1144,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "model"
-          ],
+          "parameterOrder": ["model"],
           "request": {
             "$ref": "GenerateContentRequest"
           },
@@ -1265,9 +1179,7 @@
           "response": {
             "$ref": "ListCachedContentsResponse"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Lists CachedContents."
         },
         "create": {
@@ -1283,9 +1195,7 @@
           "response": {
             "$ref": "CachedContent"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Creates CachedContent resource."
         },
         "get": {
@@ -1302,15 +1212,11 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "CachedContent"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Reads CachedContent resource."
         },
         "patch": {
@@ -1333,18 +1239,14 @@
               "format": "google-fieldmask"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "request": {
             "$ref": "CachedContent"
           },
           "response": {
             "$ref": "CachedContent"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Updates CachedContent resource (only expiration is updatable)."
         },
         "delete": {
@@ -1361,15 +1263,11 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Deletes CachedContent resource."
         }
       }
@@ -1385,9 +1283,7 @@
           "parameterOrder": [],
           "supportsMediaUpload": true,
           "mediaUpload": {
-            "accept": [
-              "*/*"
-            ],
+            "accept": ["*/*"],
             "maxSize": "2147483648",
             "protocols": {
               "resumable": {
@@ -1406,9 +1302,7 @@
           "response": {
             "$ref": "CreateFileResponse"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Creates a `File`."
         },
         "uploadToFileSearchStore": {
@@ -1425,14 +1319,10 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "fileSearchStoreName"
-          ],
+          "parameterOrder": ["fileSearchStoreName"],
           "supportsMediaUpload": true,
           "mediaUpload": {
-            "accept": [
-              "*/*"
-            ],
+            "accept": ["*/*"],
             "maxSize": "104857600",
             "protocols": {
               "resumable": {
@@ -1451,9 +1341,7 @@
           "response": {
             "$ref": "CustomLongRunningOperation"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Uploads data to a FileSearchStore, preprocesses and chunks before storing it in a FileSearchStore Document."
         }
       }
@@ -1473,9 +1361,7 @@
           "response": {
             "$ref": "RegisterFilesResponse"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Registers a Google Cloud Storage files with FileService. The user is expected to provide Google Cloud Storage URIs and will receive a File resource for each URI in return. Note that the files are not copied, just registered with File API. If one file fails to register, the whole request fails."
         },
         "list": {
@@ -1500,9 +1386,7 @@
           "response": {
             "$ref": "ListFilesResponse"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Lists the metadata for `File`s owned by the requesting project."
         },
         "get": {
@@ -1519,15 +1403,11 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "File"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Gets the metadata for the given `File`."
         },
         "delete": {
@@ -1544,15 +1424,11 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Deletes the `File`."
         }
       }
@@ -1581,9 +1457,7 @@
           "response": {
             "$ref": "ListGeneratedFilesResponse"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Lists the generated files owned by the requesting project."
         }
       },
@@ -1604,9 +1478,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Operation"
               },
@@ -1647,9 +1519,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "FileSearchStore"
           },
@@ -1674,9 +1544,7 @@
               "type": "boolean"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
@@ -1720,18 +1588,14 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "fileSearchStoreName"
-          ],
+          "parameterOrder": ["fileSearchStoreName"],
           "request": {
             "$ref": "ImportFileRequest"
           },
           "response": {
             "$ref": "Operation"
           },
-          "scopes": [
-            "https://www.googleapis.com/auth/devstorage.read_only"
-          ],
+          "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"],
           "description": "Imports a `File` from File Service to a `FileSearchStore`."
         }
       },
@@ -1752,9 +1616,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Operation"
               },
@@ -1780,9 +1642,7 @@
                       "type": "string"
                     }
                   },
-                  "parameterOrder": [
-                    "name"
-                  ],
+                  "parameterOrder": ["name"],
                   "response": {
                     "$ref": "Operation"
                   },
@@ -1808,9 +1668,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Document"
               },
@@ -1835,9 +1693,7 @@
                   "type": "boolean"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Empty"
               },
@@ -1868,9 +1724,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "parent"
-              ],
+              "parameterOrder": ["parent"],
               "response": {
                 "$ref": "ListDocumentsResponse"
               },
@@ -1911,9 +1765,7 @@
               "type": "string"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Corpus"
           },
@@ -1938,9 +1790,7 @@
               "type": "boolean"
             }
           },
-          "parameterOrder": [
-            "name"
-          ],
+          "parameterOrder": ["name"],
           "response": {
             "$ref": "Empty"
           },
@@ -1988,9 +1838,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Operation"
               },
@@ -2014,9 +1862,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "parent"
-              ],
+              "parameterOrder": ["parent"],
               "request": {
                 "$ref": "Permission"
               },
@@ -2039,9 +1885,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Permission"
               },
@@ -2072,9 +1916,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "parent"
-              ],
+              "parameterOrder": ["parent"],
               "response": {
                 "$ref": "ListPermissionsResponse"
               },
@@ -2100,9 +1942,7 @@
                   "format": "google-fieldmask"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "request": {
                 "$ref": "Permission"
               },
@@ -2125,9 +1965,7 @@
                   "type": "string"
                 }
               },
-              "parameterOrder": [
-                "name"
-              ],
+              "parameterOrder": ["name"],
               "response": {
                 "$ref": "Empty"
               },
@@ -2288,12 +2126,7 @@
             "Flex service tier.",
             "Priority service tier."
           ],
-          "enum": [
-            "unspecified",
-            "standard",
-            "flex",
-            "priority"
-          ]
+          "enum": ["unspecified", "standard", "flex", "priority"]
         },
         "store": {
           "description": "Optional. Configures the logging behavior for a given request. If set, it takes precedence over the project-level logging config.",
@@ -2467,12 +2300,7 @@
             "Add the result to the conversation context, and prompt to generate output without interrupting ongoing generation.",
             "Add the result to the conversation context, interrupt ongoing generation and prompt to generate output."
           ],
-          "enum": [
-            "SCHEDULING_UNSPECIFIED",
-            "SILENT",
-            "WHEN_IDLE",
-            "INTERRUPT"
-          ]
+          "enum": ["SCHEDULING_UNSPECIFIED", "SILENT", "WHEN_IDLE", "INTERRUPT"]
         }
       }
     },
@@ -2534,10 +2362,7 @@
             "Unspecified language. This value should not be used.",
             "Python >= 3.10, with numpy and simpy available. Python is the default language."
           ],
-          "enum": [
-            "LANGUAGE_UNSPECIFIED",
-            "PYTHON"
-          ]
+          "enum": ["LANGUAGE_UNSPECIFIED", "PYTHON"]
         },
         "code": {
           "description": "Required. The code to be executed.",
@@ -2763,11 +2588,7 @@
             "If set, the system will wait to receive the function response before continuing the conversation.",
             "If set, the system will not wait to receive the function response. Instead, it will attempt to handle function responses as they become available while maintaining the conversation between the user and the model."
           ],
-          "enum": [
-            "UNSPECIFIED",
-            "BLOCKING",
-            "NON_BLOCKING"
-          ]
+          "enum": ["UNSPECIFIED", "BLOCKING", "NON_BLOCKING"]
         }
       }
     },
@@ -2932,10 +2753,7 @@
             "Always trigger retrieval.",
             "Run retrieval only when system decides it is necessary."
           ],
-          "enum": [
-            "MODE_UNSPECIFIED",
-            "MODE_DYNAMIC"
-          ]
+          "enum": ["MODE_UNSPECIFIED", "MODE_DYNAMIC"]
         },
         "dynamicThreshold": {
           "description": "The threshold to be used in dynamic retrieval. If not set, a system default value is used.",
@@ -3021,10 +2839,7 @@
             "Defaults to browser.",
             "Operates in a web browser."
           ],
-          "enum": [
-            "ENVIRONMENT_UNSPECIFIED",
-            "ENVIRONMENT_BROWSER"
-          ]
+          "enum": ["ENVIRONMENT_UNSPECIFIED", "ENVIRONMENT_BROWSER"]
         },
         "excludedPredefinedFunctions": {
           "description": "Optional. By default, predefined functions are included in the final model call. Some of them can be explicitly excluded from being automatically included. This can serve two purposes: 1. Using a more restricted / different action space. 2. Improving the definitions / instructions of predefined functions.",
@@ -3156,13 +2971,7 @@
             "Model will not predict any function call. Model behavior is same as when not passing any function declarations.",
             "Model decides to predict either a function call or a natural language response, but will validate function calls with constrained decoding. If \"allowed_function_names\" are set, the predicted function call will be limited to any one of \"allowed_function_names\", else the predicted function call will be any one of the provided \"function_declarations\"."
           ],
-          "enum": [
-            "MODE_UNSPECIFIED",
-            "AUTO",
-            "ANY",
-            "NONE",
-            "VALIDATED"
-          ]
+          "enum": ["MODE_UNSPECIFIED", "AUTO", "ANY", "NONE", "VALIDATED"]
         },
         "allowedFunctionNames": {
           "description": "Optional. A set of function names that, when provided, limits the functions the model will call. This should only be set when the Mode is ANY or VALIDATED. Function names should match [FunctionDeclaration.name]. When set, model will predict a function call from only allowed function names.",
@@ -3370,12 +3179,7 @@
               "Indicates the model should return images.",
               "Indicates the model should return audio."
             ],
-            "enum": [
-              "MODALITY_UNSPECIFIED",
-              "TEXT",
-              "IMAGE",
-              "AUDIO"
-            ]
+            "enum": ["MODALITY_UNSPECIFIED", "TEXT", "IMAGE", "AUDIO"]
           }
         },
         "speechConfig": {
@@ -3563,11 +3367,7 @@
             "JSON output format.",
             "Plain text output format."
           ],
-          "enum": [
-            "MIME_TYPE_UNSPECIFIED",
-            "APPLICATION_JSON",
-            "TEXT_PLAIN"
-          ]
+          "enum": ["MIME_TYPE_UNSPECIFIED", "APPLICATION_JSON", "TEXT_PLAIN"]
         },
         "schema": {
           "description": "Optional. The JSON schema that the output should conform to. Only applicable when mime_type is APPLICATION_JSON.",
@@ -3610,11 +3410,7 @@
             "Audio data is returned inline in the response.",
             "Audio data is returned as a URI."
           ],
-          "enum": [
-            "DELIVERY_UNSPECIFIED",
-            "INLINE",
-            "URI"
-          ]
+          "enum": ["DELIVERY_UNSPECIFIED", "INLINE", "URI"]
         },
         "sampleRate": {
           "description": "Optional. Sample rate in Hz.",
@@ -3640,10 +3436,7 @@
             "Default value. This value is unused.",
             "JPEG image format."
           ],
-          "enum": [
-            "MIME_TYPE_UNSPECIFIED",
-            "IMAGE_JPEG"
-          ]
+          "enum": ["MIME_TYPE_UNSPECIFIED", "IMAGE_JPEG"]
         },
         "delivery": {
           "description": "Optional. The delivery mode for the image output.",
@@ -3653,11 +3446,7 @@
             "Image data is returned inline in the response.",
             "Image data is returned as a URI."
           ],
-          "enum": [
-            "DELIVERY_UNSPECIFIED",
-            "INLINE",
-            "URI"
-          ]
+          "enum": ["DELIVERY_UNSPECIFIED", "INLINE", "URI"]
         },
         "aspectRatio": {
           "description": "Optional. The aspect ratio for the image output.",
@@ -4608,12 +4397,7 @@
             "Flex service tier.",
             "Priority service tier."
           ],
-          "enum": [
-            "unspecified",
-            "standard",
-            "flex",
-            "priority"
-          ]
+          "enum": ["unspecified", "standard", "flex", "priority"]
         }
       }
     },
@@ -4905,11 +4689,7 @@
             "Input was blocked due to safety reasons. Inspect `safety_ratings` to understand which safety category blocked it.",
             "Input was blocked due to other reasons."
           ],
-          "enum": [
-            "BLOCK_REASON_UNSPECIFIED",
-            "SAFETY",
-            "OTHER"
-          ]
+          "enum": ["BLOCK_REASON_UNSPECIFIED", "SAFETY", "OTHER"]
         },
         "safetyRatings": {
           "description": "Ratings for safety of the input. There is at most one rating per category.",
@@ -5864,11 +5644,7 @@
             "Content was blocked by safety settings.",
             "Content was blocked, but the reason is uncategorized."
           ],
-          "enum": [
-            "BLOCKED_REASON_UNSPECIFIED",
-            "SAFETY",
-            "OTHER"
-          ]
+          "enum": ["BLOCKED_REASON_UNSPECIFIED", "SAFETY", "OTHER"]
         },
         "message": {
           "description": "A string that describes the filtering behavior in more detail.",
@@ -5983,12 +5759,7 @@
             "File is processed and available for inference.",
             "File failed processing."
           ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "PROCESSING",
-            "ACTIVE",
-            "FAILED"
-          ]
+          "enum": ["STATE_UNSPECIFIED", "PROCESSING", "ACTIVE", "FAILED"]
         },
         "source": {
           "description": "Source of the File.",
@@ -5999,12 +5770,7 @@
             "Indicates the file is generated by Google.",
             "Indicates the file is a registered, i.e. a Google Cloud Storage file."
           ],
-          "enum": [
-            "SOURCE_UNSPECIFIED",
-            "UPLOADED",
-            "GENERATED",
-            "REGISTERED"
-          ]
+          "enum": ["SOURCE_UNSPECIFIED", "UPLOADED", "GENERATED", "REGISTERED"]
         },
         "error": {
           "description": "Output only. Error status if File processing failed.",
@@ -6111,12 +5877,7 @@
             "Generated and is ready for download.",
             "Failed to generate the GeneratedFile."
           ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "GENERATING",
-            "GENERATED",
-            "FAILED"
-          ]
+          "enum": ["STATE_UNSPECIFIED", "GENERATING", "GENERATED", "FAILED"]
         },
         "error": {
           "description": "Error details if the GeneratedFile ends up in the STATE_FAILED state.",
@@ -6279,12 +6040,7 @@
             "The model is ready to be used.",
             "The model failed to be created."
           ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "CREATING",
-            "ACTIVE",
-            "FAILED"
-          ]
+          "enum": ["STATE_UNSPECIFIED", "CREATING", "ACTIVE", "FAILED"]
         },
         "createTime": {
           "description": "Output only. The timestamp when this model was created.",
@@ -6498,12 +6254,7 @@
             "Represents a group. When set, you must provide email_address for the group.",
             "Represents access to everyone. No extra information is required."
           ],
-          "enum": [
-            "GRANTEE_TYPE_UNSPECIFIED",
-            "USER",
-            "GROUP",
-            "EVERYONE"
-          ]
+          "enum": ["GRANTEE_TYPE_UNSPECIFIED", "USER", "GROUP", "EVERYONE"]
         },
         "emailAddress": {
           "description": "Optional. Immutable. The email address of the user of group which this permission refers. Field is not set when permission's grantee type is EVERYONE.",
@@ -6518,12 +6269,7 @@
             "Writer can use, update and share the resource.",
             "Reader can use the resource."
           ],
-          "enum": [
-            "ROLE_UNSPECIFIED",
-            "OWNER",
-            "WRITER",
-            "READER"
-          ]
+          "enum": ["ROLE_UNSPECIFIED", "OWNER", "WRITER", "READER"]
         }
       }
     },
@@ -7685,11 +7431,7 @@
       "type": "string",
       "description": "Data format for response.",
       "default": "json",
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
+      "enum": ["json", "media", "proto"],
       "enumDescriptions": [
         "Responses with Content-Type of application/json",
         "Media download with context-dependent Content-Type",
@@ -7741,14 +7483,8 @@
     "$.xgafv": {
       "type": "string",
       "description": "V1 error format.",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ],
+      "enum": ["1", "2"],
+      "enumDescriptions": ["v1 error format", "v2 error format"],
       "location": "query"
     }
   },

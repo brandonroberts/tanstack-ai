@@ -14,13 +14,13 @@ pnpm add zod
 
 ## Providers covered
 
-| Provider   | Source                                                                          | Notes                                                |
-| ---------- | ------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| OpenAI     | `github.com/openai/openai-openapi` (raw `openapi.yaml`)                         | Public, no API key required.                         |
-| Anthropic  | Official OpenAPI from `anthropic-sdk-typescript` repo                           | Public.                                              |
-| Gemini     | `generativelanguage.googleapis.com/$discovery/rest?version=v1beta`              | Google Discovery doc converted to OpenAPI in-pipeline. |
-| ElevenLabs | `api.elevenlabs.io/openapi.json`                                                | Public.                                              |
-| FAL        | `api.fal.ai/v1/models?status=active&expand=openapi-3.0` (per-model OpenAPI)     | Needs `FAL_KEY` to fetch. Per-category split.        |
+| Provider   | Source                                                                      | Notes                                                  |
+| ---------- | --------------------------------------------------------------------------- | ------------------------------------------------------ |
+| OpenAI     | `github.com/openai/openai-openapi` (raw `openapi.yaml`)                     | Public, no API key required.                           |
+| Anthropic  | Official OpenAPI from `anthropic-sdk-typescript` repo                       | Public.                                                |
+| Gemini     | `generativelanguage.googleapis.com/$discovery/rest?version=v1beta`          | Google Discovery doc converted to OpenAPI in-pipeline. |
+| ElevenLabs | `api.elevenlabs.io/openapi.json`                                            | Public.                                                |
+| FAL        | `api.fal.ai/v1/models?status=active&expand=openapi-3.0` (per-model OpenAPI) | Needs `FAL_KEY` to fetch. Per-category split.          |
 
 OpenAI-compatible providers (Groq, xAI/Grok) reuse the OpenAI schemas.
 
@@ -30,7 +30,13 @@ ES modules only, per-provider subpath exports:
 
 ```ts
 // Default entry — namespaced JSON Schemas across providers.
-import { OpenAi, Anthropic, Gemini, Fal, ElevenLabs } from '@tanstack/ai-schemas'
+import {
+  OpenAi,
+  Anthropic,
+  Gemini,
+  Fal,
+  ElevenLabs,
+} from '@tanstack/ai-schemas'
 
 // Per-provider JSON Schemas (no `zod` peer required).
 import { openaiEndpointSchemaMap } from '@tanstack/ai-schemas/schemas/openai'

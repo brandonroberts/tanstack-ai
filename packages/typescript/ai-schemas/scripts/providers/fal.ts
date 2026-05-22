@@ -193,7 +193,9 @@ function loadFal(): Array<ProviderCategorySpec> {
       specs,
       `FAL.ai ${category} API`,
       (spec) => {
-        const info = (spec as { info?: { 'x-fal-metadata'?: { endpointId?: string } } }).info
+        const info = (
+          spec as { info?: { 'x-fal-metadata'?: { endpointId?: string } } }
+        ).info
         return info?.['x-fal-metadata']?.endpointId ?? 'unknown'
       },
     )

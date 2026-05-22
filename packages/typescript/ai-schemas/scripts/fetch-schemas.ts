@@ -37,7 +37,10 @@ function parseArgs(): CliArgs {
     if (arg.startsWith('--provider=') || arg.startsWith('--providers=')) {
       const list = arg.split('=')[1]
       if (!list) throw new Error('Provider list is empty')
-      providers = list.split(',').map((s) => s.trim()).filter(Boolean)
+      providers = list
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
     } else {
       throw new Error(`Unknown argument: ${arg}`)
     }

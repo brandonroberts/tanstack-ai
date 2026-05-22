@@ -12,7 +12,10 @@ import { loadAllProviderSpecs } from './scripts/load-all-specs.js'
 const originalWarn = console.warn
 console.warn = (...args: Array<unknown>) => {
   const message = args[0]
-  if (typeof message === 'string' && message.includes('Transformers warning:')) {
+  if (
+    typeof message === 'string' &&
+    message.includes('Transformers warning:')
+  ) {
     return
   }
   originalWarn.apply(console, args)
@@ -30,33 +33,35 @@ console.log = (...args: Array<unknown>) => {
   originalLog.apply(console, args)
 }
 
-export default loadAllProviderSpecs().map(({ providerId, category, mergedSpec }) => {
-  const outputPath = category
-    ? `./src/providers/${providerId}/${category}`
-    : `./src/providers/${providerId}`
-  return {
-    input: mergedSpec,
-    output: {
-      path: outputPath,
-      indexFile: false,
-      postProcess: ['prettier'],
-    },
-    plugins: [
-      { name: '@hey-api/schemas', type: 'json' },
-      { name: 'zod', compatibilityVersion: 4 },
-    ],
-    parser: {
-      filters: {
-        // Most providers expose Input/Output suffixes; non-matching schemas
-        // are dropped from the codegen output to keep bundles lean.
-        schemas: { include: '/Input$|Output$|Request$|Response$/' },
-        operations: {
-          include: ['/post .*/'],
-          exclude: ['/get .*/'],
-        },
-        orphans: false,
-        preserveOrder: true,
+export default loadAllProviderSpecs().map(
+  ({ providerId, category, mergedSpec }) => {
+    const outputPath = category
+      ? `./src/providers/${providerId}/${category}`
+      : `./src/providers/${providerId}`
+    return {
+      input: mergedSpec,
+      output: {
+        path: outputPath,
+        indexFile: false,
+        postProcess: ['prettier'],
       },
-    },
-  }
-})
+      plugins: [
+        { name: '@hey-api/schemas', type: 'json' },
+        { name: 'zod', compatibilityVersion: 4 },
+      ],
+      parser: {
+        filters: {
+          // Most providers expose Input/Output suffixes; non-matching schemas
+          // are dropped from the codegen output to keep bundles lean.
+          schemas: { include: '/Input$|Output$|Request$|Response$/' },
+          operations: {
+            include: ['/post .*/'],
+            exclude: ['/get .*/'],
+          },
+          orphans: false,
+          preserveOrder: true,
+        },
+      },
+    }
+  },
+)
