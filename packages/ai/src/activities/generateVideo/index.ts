@@ -14,9 +14,13 @@ import type { InternalLogger } from '../../logger/internal-logger'
 import type { DebugOption } from '../../logger/types'
 import type { VideoAdapter } from './adapter'
 import type {
+  AudioPart,
+  ImagePart,
+  MediaInputMetadata,
   StreamChunk,
   TokenUsage,
   VideoJobResult,
+  VideoPart,
   VideoStatusResult,
   VideoUrlResult,
 } from '../../types'
@@ -90,6 +94,16 @@ export type VideoCreateOptions<
   size?: VideoSizeForAdapter<TAdapter>
   /** Video duration in seconds */
   duration?: number
+  /**
+   * Image conditioning inputs (start frame, end frame, reference / character
+   * images). Use `metadata.role` (`'start_frame' | 'end_frame' | 'reference' |
+   * 'character'`) to disambiguate intent; positional fallback otherwise.
+   */
+  imageInputs?: Array<ImagePart<MediaInputMetadata>>
+  /** Video conditioning inputs (video-to-video, source clip). */
+  videoInputs?: Array<VideoPart<MediaInputMetadata>>
+  /** Audio conditioning inputs (lipsync source, voice reference). */
+  audioInputs?: Array<AudioPart<MediaInputMetadata>>
   /**
    * Whether to stream the video generation lifecycle.
    * When true, returns an AsyncIterable<StreamChunk> that handles the full
@@ -250,7 +264,16 @@ export function generateVideo<
 async function runCreateVideoJob<
   TAdapter extends VideoAdapter<string, any, any, any>,
 >(options: VideoCreateOptions<TAdapter, boolean>): Promise<VideoJobResult> {
-  const { adapter, prompt, size, duration, modelOptions } = options
+  const {
+    adapter,
+    prompt,
+    size,
+    duration,
+    modelOptions,
+    imageInputs,
+    videoInputs,
+    audioInputs,
+  } = options
   const model = adapter.model
   const logger: InternalLogger = resolveDebugOption(options.debug)
   const providerName =
@@ -270,6 +293,9 @@ async function runCreateVideoJob<
       size,
       duration,
       modelOptions,
+      imageInputs,
+      videoInputs,
+      audioInputs,
       logger,
     })
     logger.output(`activity=generateVideo jobId=${result.jobId}`, {
@@ -297,7 +323,16 @@ function sleep(ms: number): Promise<void> {
 async function* runStreamingVideoGeneration<
   TAdapter extends VideoAdapter<string, any, any, any>,
 >(options: VideoCreateOptions<TAdapter, true>): AsyncIterable<StreamChunk> {
-  const { adapter, prompt, size, duration, modelOptions } = options
+  const {
+    adapter,
+    prompt,
+    size,
+    duration,
+    modelOptions,
+    imageInputs,
+    videoInputs,
+    audioInputs,
+  } = options
   const model = adapter.model
   const runId = options.runId ?? createId('run')
   const pollingInterval = options.pollingInterval ?? 2000
@@ -333,6 +368,9 @@ async function* runStreamingVideoGeneration<
       size,
       duration,
       modelOptions,
+      imageInputs,
+      videoInputs,
+      audioInputs,
       logger,
     })
 

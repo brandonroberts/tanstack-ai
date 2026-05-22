@@ -65,6 +65,18 @@ export class OpenRouterImageAdapter<
   async generateImages(
     options: ImageGenerationOptions<OpenRouterImageProviderOptions>,
   ): Promise<ImageGenerationResult> {
+    if (
+      options.imageInputs?.length ||
+      options.videoInputs?.length ||
+      options.audioInputs?.length
+    ) {
+      throw new Error(
+        `openrouter.generateImages does not yet support imageInputs / videoInputs / audioInputs. ` +
+          `Image-conditioned generation via OpenRouter requires injecting parts into the multimodal ` +
+          `chat-completions messages array; this is tracked at https://github.com/TanStack/ai/issues/618.`,
+      )
+    }
+
     const { model, prompt, numberOfImages, size, modelOptions, logger } =
       options
     // Use provided aspect_ratio or derive from size

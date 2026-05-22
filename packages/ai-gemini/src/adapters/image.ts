@@ -1,4 +1,5 @@
 import { BaseImageAdapter } from '@tanstack/ai/adapters'
+import { arrayBufferToBase64 } from '@tanstack/ai-utils'
 import {
   createGeminiClient,
   generateId,
@@ -22,13 +23,17 @@ import type {
   GeneratedImage,
   ImageGenerationOptions,
   ImageGenerationResult,
+  ImagePart,
+  MediaInputMetadata,
 } from '@tanstack/ai'
 import type {
+  Content,
   GenerateContentConfig,
   GenerateContentResponse,
   GenerateImagesConfig,
   GenerateImagesResponse,
   GoogleGenAI,
+  Part,
 } from '@google/genai'
 import type { GeminiClientConfig } from '../utils'
 
@@ -95,8 +100,27 @@ export class GeminiImageAdapter<
     try {
       validatePrompt({ prompt, model })
 
+      if (options.videoInputs?.length) {
+        throw new Error(
+          `${this.name}.generateImages does not support videoInputs (model: ${model}).`,
+        )
+      }
+      if (options.audioInputs?.length) {
+        throw new Error(
+          `${this.name}.generateImages does not support audioInputs (model: ${model}).`,
+        )
+      }
+
       if (this.isGeminiImageModel(model)) {
         return await this.generateWithGeminiApi(options)
+      }
+
+      // Imagen does not accept image inputs — it's strictly text-to-image.
+      if (options.imageInputs?.length) {
+        throw new Error(
+          `${this.name}: model "${model}" (Imagen) does not support imageInputs. ` +
+            `Use a Gemini-native image model (e.g. gemini-2.5-flash-image, "nano-banana") for image-conditioned generation.`,
+        )
       }
 
       // Imagen models path (generateImages API)
@@ -128,7 +152,8 @@ export class GeminiImageAdapter<
   private async generateWithGeminiApi(
     options: ImageGenerationOptions<GeminiImageProviderOptions>,
   ): Promise<ImageGenerationResult> {
-    const { model, prompt, size, numberOfImages, modelOptions } = options
+    const { model, prompt, size, numberOfImages, modelOptions, imageInputs } =
+      options
 
     const parsedSize = size ? parseNativeImageSize(size) : undefined
 
@@ -170,13 +195,74 @@ export class GeminiImageAdapter<
       }),
     }
 
+    const contents = await this.buildContents(augmentedPrompt, imageInputs)
+
     const response = await this.client.models.generateContent({
       model,
-      contents: augmentedPrompt,
+      contents,
       config,
     })
 
     return this.transformGeminiResponse(model, response)
+  }
+
+  /**
+   * Build the multimodal `contents` payload. When `imageInputs` is empty the
+   * SDK accepts a plain prompt string; with inputs we hand it a single user
+   * `Content` whose `parts` interleave the inline/file image data with the
+   * text prompt last (Gemini conventionally treats the trailing text as the
+   * instruction).
+   */
+  private async buildContents(
+    prompt: string,
+    imageInputs?: ReadonlyArray<ImagePart<MediaInputMetadata>>,
+  ): Promise<string | Array<Content>> {
+    if (!imageInputs || imageInputs.length === 0) {
+      return prompt
+    }
+    const imageParts: Array<Part> = await Promise.all(
+      imageInputs.map((part) => this.imagePartToGeminiPart(part)),
+    )
+    const parts: Array<Part> = [...imageParts, { text: prompt }]
+    return [{ role: 'user', parts }]
+  }
+
+  private async imagePartToGeminiPart(
+    part: ImagePart<MediaInputMetadata>,
+  ): Promise<Part> {
+    if (part.source.type === 'data') {
+      return {
+        inlineData: {
+          mimeType: part.source.mimeType || 'image/png',
+          data: part.source.value,
+        },
+      }
+    }
+    // For URL sources, prefer passing the URL through as `fileData` when it
+    // looks like a Google Files API URI; otherwise fetch and inline as base64.
+    if (part.source.value.startsWith('gs://') || /^https?:\/\/generativelanguage\.googleapis\.com\//.test(part.source.value)) {
+      return {
+        fileData: {
+          fileUri: part.source.value,
+          ...(part.source.mimeType && { mimeType: part.source.mimeType }),
+        },
+      }
+    }
+    const response = await fetch(part.source.value)
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch image input (${response.status} ${response.statusText}): ${part.source.value}`,
+      )
+    }
+    const blob = await response.blob()
+    const buffer = await blob.arrayBuffer()
+    const base64 = arrayBufferToBase64(buffer)
+    return {
+      inlineData: {
+        mimeType: part.source.mimeType || blob.type || 'image/png',
+        data: base64,
+      },
+    }
   }
 
   private transformGeminiResponse(

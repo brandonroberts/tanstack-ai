@@ -4,6 +4,7 @@ import { toRunErrorPayload } from '@tanstack/ai/adapter-internals'
 import { buildImagesUsage } from '@tanstack/openai-base'
 import { generateId } from '@tanstack/ai-utils'
 import { getOpenAIApiKeyFromEnv } from '../utils/client'
+import { imagePartToFile } from '../image/image-input-to-file'
 import {
   validateImageSize,
   validateNumberOfImages,
@@ -13,6 +14,8 @@ import type {
   GeneratedImage,
   ImageGenerationOptions,
   ImageGenerationResult,
+  ImagePart,
+  MediaInputMetadata,
 } from '@tanstack/ai'
 import type OpenAI_SDK from 'openai'
 import type { OpenAIImageModel } from '../model-meta'
@@ -22,6 +25,15 @@ import type {
   OpenAIImageProviderOptions,
 } from '../image/image-provider-options'
 import type { OpenAIClientConfig } from '../utils/client'
+
+// Per OpenAI docs: dall-e-2 accepts 1 image to `images.edit()`; gpt-image-1
+// and gpt-image-1-mini accept up to 16; dall-e-3 does not support edit at all.
+const EDIT_MAX_IMAGES: Record<OpenAIImageModel, number> = {
+  'dall-e-2': 1,
+  'gpt-image-1': 16,
+  'gpt-image-1-mini': 16,
+  'dall-e-3': 0,
+}
 
 /**
  * Configuration for OpenAI image adapter
@@ -60,11 +72,43 @@ export class OpenAIImageAdapter<
   async generateImages(
     options: ImageGenerationOptions<OpenAIImageProviderOptions>,
   ): Promise<ImageGenerationResult> {
-    const { model, prompt, numberOfImages, size, modelOptions } = options
+    const {
+      model,
+      prompt,
+      numberOfImages,
+      size,
+      modelOptions,
+      imageInputs,
+      videoInputs,
+      audioInputs,
+    } = options
 
     validatePrompt({ prompt, model })
     validateImageSize(model, size)
     validateNumberOfImages(model, numberOfImages)
+
+    if (videoInputs?.length) {
+      throw new Error(
+        `${this.name}.generateImages does not support videoInputs (model: ${model}).`,
+      )
+    }
+    if (audioInputs?.length) {
+      throw new Error(
+        `${this.name}.generateImages does not support audioInputs (model: ${model}).`,
+      )
+    }
+
+    if (imageInputs && imageInputs.length > 0) {
+      return this.editImages({
+        model: model as OpenAIImageModel,
+        prompt,
+        numberOfImages,
+        size,
+        modelOptions,
+        imageInputs,
+        logger: options.logger,
+      })
+    }
 
     // With exactOptionalPropertyTypes, vendor SDK request shapes reject
     // `T | undefined` in optional fields. Build the request incrementally and
@@ -124,6 +168,128 @@ export class OpenAIImageAdapter<
       options.logger.errors(`${this.name}.generateImages fatal`, {
         error: toRunErrorPayload(error, `${this.name}.generateImages failed`),
         source: `${this.name}.generateImages`,
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Image-conditioned generation via OpenAI's `images.edit()` endpoint.
+   * dall-e-2 accepts 1 input image; gpt-image-1 / gpt-image-1-mini accept up
+   * to 16; dall-e-3 rejects entirely. A part with `metadata.role === 'mask'`
+   * is routed to the SDK's `mask` field (PNG with alpha channel).
+   */
+  private async editImages(args: {
+    model: OpenAIImageModel
+    prompt: string
+    numberOfImages?: number
+    size?: string
+    modelOptions?: OpenAIImageProviderOptions
+    imageInputs: ReadonlyArray<ImagePart<MediaInputMetadata>>
+    logger: ImageGenerationOptions<OpenAIImageProviderOptions>['logger']
+  }): Promise<ImageGenerationResult> {
+    const { model, prompt, numberOfImages, size, modelOptions, logger } = args
+    const maxImages = EDIT_MAX_IMAGES[model]
+    if (maxImages === 0) {
+      throw new Error(
+        `${this.name}: model "${model}" does not support imageInputs. ` +
+          `Use gpt-image-1, gpt-image-1-mini, or dall-e-2 for image-conditioned generation.`,
+      )
+    }
+
+    const maskParts = args.imageInputs.filter(
+      (part) => part.metadata?.role === 'mask',
+    )
+    const sourceParts = args.imageInputs.filter(
+      (part) => part.metadata?.role !== 'mask',
+    )
+
+    if (maskParts.length > 1) {
+      throw new Error(
+        `${this.name}: only one input with metadata.role === 'mask' is supported per request.`,
+      )
+    }
+    if (sourceParts.length === 0) {
+      throw new Error(
+        `${this.name}: imageInputs contained only mask parts; at least one source image is required.`,
+      )
+    }
+    if (sourceParts.length > maxImages) {
+      throw new Error(
+        `${this.name}: model "${model}" accepts at most ${maxImages} source image(s); received ${sourceParts.length}.`,
+      )
+    }
+
+    const sourceFiles = await Promise.all(
+      sourceParts.map((part, i) => imagePartToFile(part, `source-${i}`)),
+    )
+    const maskFile = maskParts[0]
+      ? await imagePartToFile(maskParts[0], 'mask')
+      : undefined
+
+    // `modelOptions` is typed across all four image models (including dall-e-3's
+    // `quality: 'hd' | 'standard'` which isn't valid for edit). dall-e-3 has
+    // already been rejected above, so any remaining quality value is valid for
+    // the edit endpoint — cast the spread to clear the union mismatch.
+    const request: OpenAI_SDK.Images.ImageEditParamsNonStreaming = {
+      model,
+      prompt,
+      image: sourceFiles.length === 1 ? sourceFiles[0]! : sourceFiles,
+      n: numberOfImages ?? 1,
+      stream: false,
+      ...((modelOptions ?? {}) as Partial<OpenAI_SDK.Images.ImageEditParamsNonStreaming>),
+    }
+    if (size !== undefined) {
+      request.size = size as Exclude<
+        OpenAI_SDK.Images.ImageEditParamsNonStreaming['size'],
+        undefined
+      >
+    }
+    if (maskFile) {
+      request.mask = maskFile
+    }
+
+    try {
+      logger.request(
+        `activity=imageEdit provider=${this.name} model=${model} n=${request.n ?? 1} size=${request.size ?? 'default'} sources=${sourceFiles.length}${maskFile ? ' mask' : ''}`,
+        { provider: this.name, model },
+      )
+      const response = await this.client.images.edit(request)
+
+      const images: Array<GeneratedImage> = (response.data ?? []).flatMap(
+        (item): Array<GeneratedImage> => {
+          const revisedPromptField =
+            item.revised_prompt !== undefined
+              ? { revisedPrompt: item.revised_prompt }
+              : {}
+          if (item.b64_json) {
+            return [{ b64Json: item.b64_json, ...revisedPromptField }]
+          }
+          if (item.url) {
+            return [{ url: item.url, ...revisedPromptField }]
+          }
+          return []
+        },
+      )
+
+      return {
+        id: generateId(this.name),
+        model,
+        images,
+        ...(response.usage
+          ? {
+              usage: {
+                inputTokens: response.usage.input_tokens,
+                outputTokens: response.usage.output_tokens,
+                totalTokens: response.usage.total_tokens,
+              },
+            }
+          : {}),
+      }
+    } catch (error: unknown) {
+      logger.errors(`${this.name}.editImages fatal`, {
+        error: toRunErrorPayload(error, `${this.name}.editImages failed`),
+        source: `${this.name}.editImages`,
       })
       throw error
     }

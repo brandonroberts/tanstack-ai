@@ -7,6 +7,7 @@ import {
   generateId as utilGenerateId,
 } from '../utils'
 import { mapSizeToFalFormat } from '../image/image-provider-options'
+import { mapImageInputsToFalFields } from '../image/image-inputs'
 import type { OutputType, Result } from '@fal-ai/client'
 import type { FalClientConfig } from '../utils'
 import type {
@@ -68,6 +69,17 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
       model: this.model,
     })
 
+    if (options.videoInputs?.length) {
+      throw new Error(
+        `fal.generateImages does not support videoInputs on model ${this.model}.`,
+      )
+    }
+    if (options.audioInputs?.length) {
+      throw new Error(
+        `fal.generateImages does not support audioInputs on model ${this.model}.`,
+      )
+    }
+
     try {
       const input = this.buildInput(options)
       const result = await fal.subscribe(this.model, { input })
@@ -88,9 +100,14 @@ export class FalImageAdapter<TModel extends FalModel> extends BaseImageAdapter<
     >,
   ): FalModelInput<TModel> {
     const sizeParams = mapSizeToFalFormat(options.size)
+    // Order matters: modelOptions first (so user overrides win for
+    // mask_url / control_image_url / reference_image_urls), then size,
+    // then derived image-input fields, then prompt / num_images.
+    const inputFields = mapImageInputsToFalFields(options.imageInputs)
     const input = {
       ...options.modelOptions,
       ...sizeParams,
+      ...inputFields,
       prompt: options.prompt,
       num_images: options.numberOfImages,
     } as FalModelInput<TModel>

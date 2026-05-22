@@ -366,7 +366,75 @@ And returns:
 | `prompt` | `string` | Text description of the video to generate (required) |
 | `size` | `string` | Video resolution in WIDTHxHEIGHT format |
 | `duration` | `number` | Video duration in seconds (maps to `seconds` parameter in API) |
+| `imageInputs?` | `ImagePart[]` | Image conditioning inputs — starting frame, end frame, character / reference images. See [Image-to-Video](#image-to-video) below. |
+| `videoInputs?` | `VideoPart[]` | Video conditioning inputs for video-to-video / source clip flows. Provider support varies. |
+| `audioInputs?` | `AudioPart[]` | Audio conditioning inputs for lipsync / voice cloning flows. Provider support varies. |
 | `modelOptions?` | `object` | Model-specific options (renamed from `providerOptions`) |
+
+## Image-to-Video
+
+`generateVideo()` accepts `imageInputs` for starting-frame, ending-frame,
+and reference-image conditioned video generation:
+
+```typescript
+import { generateVideo, type ImagePart } from '@tanstack/ai'
+import { openaiVideo } from '@tanstack/ai-openai'
+
+const startingFrame: ImagePart = {
+  type: 'image',
+  source: {
+    type: 'data',
+    value: base64Image,
+    mimeType: 'image/png',
+  },
+}
+
+const { jobId } = await generateVideo({
+  adapter: openaiVideo('sora-2'),
+  prompt: 'Animate this still into a slow cinematic push-in with subtle motion',
+  imageInputs: [startingFrame],
+})
+```
+
+### Role hints
+
+Each `ImagePart` can carry an optional `metadata.role` hint that the
+adapter uses to route the input to the provider-specific field:
+
+| Role            | Maps to                                                       |
+| --------------- | ------------------------------------------------------------- |
+| `'start_frame'` | fal `start_image_url` (positional default for the first input) |
+| `'end_frame'`   | fal `end_image_url` (Veo `lastFrame` when available)           |
+| `'reference'`   | fal `reference_image_urls` (Veo `referenceImages`)             |
+| `'character'`   | Same as `'reference'` — character consistency images           |
+
+```typescript
+import { falVideo } from '@tanstack/ai-fal'
+
+await generateVideo({
+  adapter: falVideo('fal-ai/kling-video/v3/pro/image-to-video'),
+  prompt: 'Slow cinematic push-in then a hard cut',
+  imageInputs: [
+    { type: 'image', source: { type: 'url', value: firstFrameUrl } },
+    {
+      type: 'image',
+      source: { type: 'url', value: lastFrameUrl },
+      metadata: { role: 'end_frame' },
+    },
+  ],
+})
+```
+
+### Provider support
+
+| Provider     | Image-to-Video Behavior                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| **OpenAI**   | Sora-2 / Sora-2-Pro → first input goes to `input_reference`. Single image only — throws if more than one. |
+| **fal.ai**   | Single input → `image_url` (start frame). `role: 'end_frame'` → `end_image_url`. `role: 'start_frame'` → `start_image_url`. `role: 'reference'` / `'character'` → `reference_image_urls`. Override per-endpoint via `modelOptions`. |
+| **Gemini**   | Veo adapter not yet implemented — `imageInputs` will be supported when Veo lands.                         |
+
+Adapters whose underlying API can't accept image inputs throw a clear
+runtime error so calls fail fast.
 
 ### Supported Sizes
 

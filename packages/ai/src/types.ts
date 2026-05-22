@@ -1471,6 +1471,31 @@ export interface SummarizationResult {
 // ============================================================================
 
 /**
+ * Optional role hint on a media input part (image / video / audio). Adapters
+ * read `metadata.role` to route the part to the provider-specific request
+ * field — e.g. `'mask'` → OpenAI `mask` / fal `mask_url`, `'end_frame'` → fal
+ * `end_image_url`, `'reference'` → fal `reference_image_urls`. When omitted
+ * the adapter falls back to positional routing.
+ */
+export type MediaInputRole =
+  | 'reference'
+  | 'mask'
+  | 'control'
+  | 'start_frame'
+  | 'end_frame'
+  | 'character'
+
+/**
+ * Metadata convention for image / video / audio inputs to media generation.
+ * Carried on `ImagePart.metadata` / `VideoPart.metadata` / `AudioPart.metadata`
+ * when used as conditioning inputs to `generateImage()` or `generateVideo()`.
+ */
+export interface MediaInputMetadata {
+  /** Optional role hint disambiguating the part's intent for the adapter */
+  role?: MediaInputRole
+}
+
+/**
  * Options for image generation.
  * These are the common options supported across providers.
  */
@@ -1486,6 +1511,25 @@ export interface ImageGenerationOptions<
   numberOfImages?: number
   /** Image size in WIDTHxHEIGHT format (e.g., "1024x1024") */
   size?: TSize
+  /**
+   * Image conditioning inputs (reference / mask / control / start frame /
+   * character). Reuses the multimodal `ImagePart` shape. Adapters map these
+   * onto the provider-native request — e.g. OpenAI `images.edit()`, Gemini
+   * multimodal `contents`, fal `image_url` / `image_urls` / `mask_url`.
+   * Adapters that do not support image-conditioned generation throw a clear
+   * runtime error when this field is non-empty.
+   */
+  imageInputs?: Array<ImagePart<MediaInputMetadata>>
+  /**
+   * Video conditioning inputs (video-to-video, edit, lipsync source).
+   * Not all providers support this; adapters throw when unsupported.
+   */
+  videoInputs?: Array<VideoPart<MediaInputMetadata>>
+  /**
+   * Audio conditioning inputs (audio reference, voice cloning, lipsync).
+   * Not all providers support this; adapters throw when unsupported.
+   */
+  audioInputs?: Array<AudioPart<MediaInputMetadata>>
   /** Model-specific options for image generation */
   modelOptions?: TProviderOptions
   /**
@@ -1608,6 +1652,24 @@ export interface VideoGenerationOptions<
   size?: TSize
   /** Video duration in seconds */
   duration?: number
+  /**
+   * Image conditioning inputs (start frame, end frame, character / reference
+   * images). Reuses the multimodal `ImagePart` shape; adapters route by
+   * `metadata.role` and array position (e.g. OpenAI Sora `input_reference`,
+   * fal `image_url` / `end_image_url`, Veo `image` / `lastFrame` /
+   * `referenceImages`). Adapters throw at runtime if unsupported.
+   */
+  imageInputs?: Array<ImagePart<MediaInputMetadata>>
+  /**
+   * Video conditioning inputs (video-to-video edit, source clip).
+   * Not all providers support this; adapters throw when unsupported.
+   */
+  videoInputs?: Array<VideoPart<MediaInputMetadata>>
+  /**
+   * Audio conditioning inputs (lipsync source, voice reference).
+   * Not all providers support this; adapters throw when unsupported.
+   */
+  audioInputs?: Array<AudioPart<MediaInputMetadata>>
   /** Model-specific options for video generation */
   modelOptions?: TProviderOptions
   /**

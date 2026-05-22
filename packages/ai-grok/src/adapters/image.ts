@@ -62,6 +62,18 @@ export class GrokImageAdapter<
   ): Promise<ImageGenerationResult> {
     const { model, prompt, numberOfImages, size, modelOptions } = options
 
+    if (
+      options.imageInputs?.length ||
+      options.videoInputs?.length ||
+      options.audioInputs?.length
+    ) {
+      throw new Error(
+        `grok.generateImages does not yet support imageInputs / videoInputs / audioInputs. ` +
+          `Image-conditioned generation requires the xAI Imagine API, which the current adapter ` +
+          `does not target (it uses the OpenAI-compat endpoint). Track progress at https://github.com/TanStack/ai/issues/618.`,
+      )
+    }
+
     validatePrompt({ prompt, model })
     validateImageSize(model, size)
     validateNumberOfImages(model, numberOfImages)

@@ -189,6 +189,91 @@ Result shape: `ImageGenerationResult` with `images` array where each entry
 has `b64Json?`, `url?`, and `revisedPrompt?`. OpenAI image URLs expire
 after 1 hour -- download or display immediately.
 
+#### Image-conditioned generation: `imageInputs` / `videoInputs` / `audioInputs`
+
+Both `generateImage()` and `generateVideo()` accept multimodal conditioning
+inputs that reuse the existing `ImagePart` / `VideoPart` / `AudioPart`
+shape used elsewhere in TanStack AI. Each input may carry an optional
+`metadata.role` hint that adapters use to route the part to the
+provider-specific field.
+
+```typescript
+import { generateImage, type ImagePart } from '@tanstack/ai'
+import { openaiImage } from '@tanstack/ai-openai'
+
+// Image-to-image (OpenAI gpt-image-1, dall-e-2)
+await generateImage({
+  adapter: openaiImage('gpt-image-1'),
+  prompt: 'Turn this into a cinematic product photo',
+  imageInputs: [
+    { type: 'image', source: { type: 'url', value: 'https://…/product.png' } },
+  ],
+})
+
+// Multi-reference (up to 16 for gpt-image-1; up to 14 for Gemini native)
+await generateImage({
+  adapter: openaiImage('gpt-image-1'),
+  prompt: 'Apply the second image as style to the first',
+  imageInputs: [
+    { type: 'image', source: { type: 'url', value: 'https://…/product.png' } },
+    { type: 'image', source: { type: 'url', value: 'https://…/style.png' } },
+  ],
+})
+
+// Inpaint via metadata.role === 'mask' (OpenAI gpt-image-1, dall-e-2; fal mask_url)
+await generateImage({
+  adapter: openaiImage('gpt-image-1'),
+  prompt: 'Replace the masked region with a tree',
+  imageInputs: [
+    { type: 'image', source: { type: 'url', value: photoUrl } },
+    { type: 'image', source: { type: 'url', value: maskUrl }, metadata: { role: 'mask' } },
+  ],
+})
+
+// Image-to-video (OpenAI Sora: single input_reference; fal: image_url + optional end_image_url)
+import { generateVideo } from '@tanstack/ai'
+import { falVideo } from '@tanstack/ai-fal'
+
+await generateVideo({
+  adapter: falVideo('fal-ai/kling-video/v3/pro/image-to-video'),
+  prompt: 'Slow cinematic push-in',
+  imageInputs: [
+    { type: 'image', source: { type: 'url', value: firstFrameUrl } },
+    {
+      type: 'image',
+      source: { type: 'url', value: lastFrameUrl },
+      metadata: { role: 'end_frame' },
+    },
+  ],
+})
+```
+
+**Role hints** (`metadata.role`):
+
+| Role            | Maps to                                                                |
+| --------------- | ---------------------------------------------------------------------- |
+| `'reference'`   | fal `reference_image_urls`; Gemini multimodal part; positional otherwise |
+| `'character'`   | Same as `'reference'`; Veo `referenceImages` slot                        |
+| `'mask'`        | OpenAI `mask` (gpt-image-1, dall-e-2); fal `mask_url`                    |
+| `'control'`     | fal `control_image_url` (ControlNet / depth / pose)                      |
+| `'start_frame'` | fal `start_image_url`; Veo `image`                                       |
+| `'end_frame'`   | fal `end_image_url`; Veo `lastFrame`                                     |
+
+**Provider support matrix:**
+
+| Provider     | `generateImage` `imageInputs`                                                    | `generateVideo` `imageInputs`                                              |
+| ------------ | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| OpenAI       | gpt-image-1 / -mini → `images.edit()` (up to 16). dall-e-2 → edit (1). dall-e-3 throws. | Sora-2 / -pro → `input_reference` (single). Throws if >1.            |
+| Gemini       | Native (gemini-\*-flash-image, "nano-banana") → multimodal `contents`. Imagen throws. | No native Veo adapter yet — deferred to a follow-up.                       |
+| fal          | 1 input → `image_url`; >1 → `image_urls`; roles → `mask_url` / `control_image_url` / `reference_image_urls`. | 1 input → `image_url`; `start_frame`/`end_frame` → `start_image_url`/`end_image_url`; `reference` → `reference_image_urls`. |
+| Grok         | Throws — adapter uses OpenAI-compat endpoint; native Imagine API rewrite pending. | n/a                                                                        |
+| OpenRouter   | Throws — multimodal injection pending.                                           | n/a                                                                        |
+| Anthropic    | n/a (no image generation API).                                                   | n/a                                                                        |
+
+`videoInputs` and `audioInputs` follow the same `metadata.role` convention
+for video-to-video and lipsync flows on fal; other providers throw when
+they're passed.
+
 ### 2. Audio Generation (Music, Sound Effects)
 
 Distinct from TTS — `generateAudio()` produces non-speech audio content.
@@ -607,7 +692,45 @@ generateSpeech({
 
 > Source: Gemini TTS adapter validation; CodeRabbit review of PR #463.
 
-### h. LOW: Writing a logging middleware to see media chunks flow through
+### h. HIGH: Passing `imageInputs` to a model that doesn't support image-conditioned generation
+
+Not every model accepts image-conditioned inputs. Adapters throw a clear
+runtime error when the caller passes `imageInputs` to a model that
+can't honor it (dall-e-3, Imagen, Grok, OpenRouter), so users learn at
+call time rather than getting silently wrong output.
+
+```typescript
+// WRONG — dall-e-3 has no edit/inputs API
+generateImage({
+  adapter: openaiImage('dall-e-3'),
+  prompt: 'Edit this',
+  imageInputs: [{ type: 'image', source: { type: 'url', value: url } }],
+}) // throws: model "dall-e-3" does not support imageInputs.
+
+// WRONG — Imagen is text-to-image only
+generateImage({
+  adapter: geminiImage('imagen-4.0-generate-001'),
+  prompt: 'Edit this',
+  imageInputs: [{ type: 'image', source: { type: 'url', value: url } }],
+}) // throws: Imagen does not support imageInputs.
+
+// CORRECT — use a model that supports edits/inputs
+generateImage({
+  adapter: openaiImage('gpt-image-1'),       // edits up to 16 images
+  prompt: 'Edit this',
+  imageInputs: [{ type: 'image', source: { type: 'url', value: url } }],
+})
+
+generateImage({
+  adapter: geminiImage('gemini-3.1-flash-image-preview'), // native multimodal
+  prompt: 'Edit this',
+  imageInputs: [{ type: 'image', source: { type: 'url', value: url } }],
+})
+```
+
+> Source: docs/media/image-generation.md, docs/media/video-generation.md.
+
+### i. LOW: Writing a logging middleware to see media chunks flow through
 
 Every media activity — `generateAudio`, `generateSpeech`,
 `generateTranscription`, `generateImage`, `generateVideo` — accepts the

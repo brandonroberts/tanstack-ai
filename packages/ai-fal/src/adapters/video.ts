@@ -7,6 +7,8 @@ import {
   generateId as utilGenerateId,
 } from '../utils'
 import { mapVideoSizeToFalFormat } from '../video/video-provider-options'
+import { mapImageInputsToFalVideoFields } from '../image/image-inputs'
+import type { AudioPart, MediaInputMetadata, VideoPart } from '@tanstack/ai'
 import type {
   VideoGenerationOptions,
   VideoJobResult,
@@ -20,6 +22,60 @@ import type {
   FalVideoProviderOptions,
 } from '../model-meta'
 import type { FalClientConfig } from '../utils'
+
+/**
+ * Map video conditioning inputs onto fal field names.
+ * Video-to-video endpoints on fal almost universally use `video_url`; the
+ * occasional model takes `video_urls` (rare). Mirror the image-input logic
+ * positionally with a `reference` role escape hatch via `reference_video_urls`.
+ */
+function mapVideoInputsToFalFields(
+  videoInputs?: ReadonlyArray<VideoPart<MediaInputMetadata>>,
+): Record<string, unknown> {
+  if (!videoInputs || videoInputs.length === 0) return {}
+  const references: Array<string> = []
+  const sources: Array<string> = []
+  for (const part of videoInputs) {
+    const url = videoPartToUrl(part)
+    if (part.metadata?.role === 'reference' || part.metadata?.role === 'character') {
+      references.push(url)
+    } else {
+      sources.push(url)
+    }
+  }
+  const out: Record<string, unknown> = {}
+  if (references.length > 0) out.reference_video_urls = references
+  if (sources.length === 1) {
+    out.video_url = sources[0]
+  } else if (sources.length > 1) {
+    out.video_urls = sources
+  }
+  return out
+}
+
+function mapAudioInputsToFalFields(
+  audioInputs?: ReadonlyArray<AudioPart<MediaInputMetadata>>,
+): Record<string, unknown> {
+  if (!audioInputs || audioInputs.length === 0) return {}
+  if (audioInputs.length > 1) {
+    throw new Error(
+      `fal: multiple audioInputs are not supported (received ${audioInputs.length}).`,
+    )
+  }
+  const part = audioInputs[0]!
+  return {
+    audio_url:
+      part.source.type === 'url'
+        ? part.source.value
+        : `data:${part.source.mimeType};base64,${part.source.value}`,
+  }
+}
+
+function videoPartToUrl(part: VideoPart<MediaInputMetadata>): string {
+  return part.source.type === 'url'
+    ? part.source.value
+    : `data:${part.source.mimeType};base64,${part.source.value}`
+}
 
 type FalQueueStatus = 'IN_QUEUE' | 'IN_PROGRESS' | 'COMPLETED'
 
@@ -85,7 +141,16 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
       FalModelVideoSize<TModel>
     >,
   ): Promise<VideoJobResult> {
-    const { prompt, size, duration, modelOptions, logger } = options
+    const {
+      prompt,
+      size,
+      duration,
+      modelOptions,
+      logger,
+      imageInputs,
+      videoInputs,
+      audioInputs,
+    } = options
 
     logger.request(`activity=generateVideo provider=fal model=${this.model}`, {
       provider: 'fal',
@@ -94,10 +159,16 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
 
     try {
       const sizeParams = mapVideoSizeToFalFormat(size)
+      const inputImageFields = mapImageInputsToFalVideoFields(imageInputs)
+      const videoFields = mapVideoInputsToFalFields(videoInputs)
+      const audioFields = mapAudioInputsToFalFields(audioInputs)
 
       const input = {
         ...modelOptions,
         ...sizeParams,
+        ...inputImageFields,
+        ...videoFields,
+        ...audioFields,
         prompt,
         ...(duration ? { duration } : {}),
       } as FalModelInput<TModel>

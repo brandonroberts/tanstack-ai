@@ -11,7 +11,14 @@ import { resolveDebugOption } from '../../logger/resolve'
 import type { InternalLogger } from '../../logger/internal-logger'
 import type { DebugOption } from '../../logger/types'
 import type { ImageAdapter } from './adapter'
-import type { ImageGenerationResult, StreamChunk } from '../../types'
+import type {
+  AudioPart,
+  ImageGenerationResult,
+  ImagePart,
+  MediaInputMetadata,
+  StreamChunk,
+  VideoPart,
+} from '../../types'
 
 // ===========================
 // Activity Kind
@@ -78,6 +85,17 @@ export type ImageActivityOptions<
   numberOfImages?: number
   /** Image size in WIDTHxHEIGHT format (e.g., "1024x1024") */
   size?: ImageSizeForModel<TAdapter, TAdapter['model']>
+  /**
+   * Image conditioning inputs for image-to-image, reference-guided, edit, or
+   * multi-reference generation. Each part may carry `metadata.role`
+   * (`'reference' | 'mask' | 'control' | 'character'`) to disambiguate intent.
+   * Adapters that don't support image-conditioned generation throw clearly.
+   */
+  imageInputs?: Array<ImagePart<MediaInputMetadata>>
+  /** Video conditioning inputs. Provider support varies; unsupported adapters throw. */
+  videoInputs?: Array<VideoPart<MediaInputMetadata>>
+  /** Audio conditioning inputs. Provider support varies; unsupported adapters throw. */
+  audioInputs?: Array<AudioPart<MediaInputMetadata>>
   /**
    * Whether to stream the image generation result.
    * When true, returns an AsyncIterable<StreamChunk> for streaming transport.
@@ -210,6 +228,9 @@ async function runGenerateImage<
     prompt: rest.prompt,
     numberOfImages: rest.numberOfImages,
     size: rest.size,
+    imageInputCount: rest.imageInputs?.length,
+    videoInputCount: rest.videoInputs?.length,
+    audioInputCount: rest.audioInputs?.length,
     modelOptions: rest.modelOptions,
     timestamp: startTime,
   })

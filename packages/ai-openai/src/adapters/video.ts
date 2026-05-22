@@ -3,6 +3,7 @@ import { BaseVideoAdapter } from '@tanstack/ai/adapters'
 import { toRunErrorPayload } from '@tanstack/ai/adapter-internals'
 import { arrayBufferToBase64 } from '@tanstack/ai-utils'
 import { getOpenAIApiKeyFromEnv } from '../utils/client'
+import { imagePartToFile } from '../image/image-input-to-file'
 import {
   toApiSeconds,
   validateVideoSeconds,
@@ -87,14 +88,37 @@ export class OpenAIVideoAdapter<
     options: VideoGenerationOptions<OpenAIVideoProviderOptions>,
   ): Promise<VideoJobResult> {
     const { model, size, duration, modelOptions } = options
+    const { imageInputs, videoInputs, audioInputs } = options
 
     validateVideoSize(model, size)
     const seconds = duration ?? modelOptions?.seconds
     validateVideoSeconds(model, seconds)
 
+    if (videoInputs?.length) {
+      throw new Error(
+        `${this.name}.createVideoJob does not support videoInputs (model: ${model}).`,
+      )
+    }
+    if (audioInputs?.length) {
+      throw new Error(
+        `${this.name}.createVideoJob does not support audioInputs (model: ${model}).`,
+      )
+    }
+    if (imageInputs && imageInputs.length > 1) {
+      throw new Error(
+        `${this.name}: Sora accepts at most one input_reference image; received ${imageInputs.length}.`,
+      )
+    }
+
     const request: OpenAI_SDK.Videos.VideoCreateParams = {
       model,
       prompt: options.prompt,
+    }
+    if (imageInputs && imageInputs[0]) {
+      // Sora's `input_reference` is a single Uploadable; convert TanStack
+      // ImagePart (URL or base64) → File before handing it to the SDK.
+      const file = await imagePartToFile(imageInputs[0], 'input-reference')
+      ;(request as { input_reference?: unknown }).input_reference = file
     }
     // `VideoCreateParams.size` is `size?: VideoSize` (no `| undefined`), so we
     // narrow before assignment instead of casting from a `T | undefined` source.

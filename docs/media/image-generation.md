@@ -79,6 +79,9 @@ All image adapters support these common options:
 | `prompt` | `string` | Text description of the image to generate (required) |
 | `numberOfImages` | `number` | Number of images to generate |
 | `size` | `string` | Size of the generated image in WIDTHxHEIGHT format |
+| `imageInputs?` | `ImagePart[]` | Image conditioning inputs for image-to-image, reference-guided, edit, or multi-reference generation. See [Image-Conditioned Generation](#image-conditioned-generation) below. |
+| `videoInputs?` | `VideoPart[]` | Video conditioning inputs. Provider support is limited; most adapters throw. |
+| `audioInputs?` | `AudioPart[]` | Audio conditioning inputs. Provider support is limited; most adapters throw. |
 | `modelOptions?` | `object` | Model-specific options (renamed from `providerOptions`) |
 
 ### Size Options
@@ -129,6 +132,114 @@ const result = await generateImage({
   }
 })
 ```
+
+## Image-Conditioned Generation
+
+`generateImage()` accepts an optional `imageInputs` field for image-to-image,
+reference-guided, multi-reference, and edit / inpaint flows. The field reuses
+the same `ImagePart` shape used elsewhere for multimodal content:
+
+```typescript
+import { generateImage, type ImagePart } from '@tanstack/ai'
+import { openaiImage } from '@tanstack/ai-openai'
+
+const reference: ImagePart = {
+  type: 'image',
+  source: { type: 'url', value: 'https://example.com/product.png' },
+}
+
+await generateImage({
+  adapter: openaiImage('gpt-image-1'),
+  prompt: 'Turn this into a cinematic product photo',
+  imageInputs: [reference],
+})
+```
+
+### Source format
+
+`ImagePart.source` is a discriminated union supporting both URLs and inline
+base64 data — pass whichever you have:
+
+```typescript
+// URL source
+{ type: 'image', source: { type: 'url', value: 'https://example.com/img.png' } }
+
+// Inline base64 data (mimeType required)
+{ type: 'image', source: { type: 'data', value: base64String, mimeType: 'image/png' } }
+```
+
+OpenAI's edit endpoint requires file uploads; the adapter fetches URL sources
+and converts base64 to a `File` automatically.
+
+### Role hints via `metadata.role`
+
+When a generation has multiple inputs with different roles (mask vs reference
+vs start/end frame), set `metadata.role` on each part. Adapters route by role
+to the provider-specific field; parts without a role fall back to positional
+mapping.
+
+| Role            | Maps to                                                                                |
+| --------------- | -------------------------------------------------------------------------------------- |
+| `'reference'`   | fal `reference_image_urls`; Gemini multimodal part; positional fallback                |
+| `'character'`   | Same as `'reference'`; Veo `referenceImages` slot                                      |
+| `'mask'`        | OpenAI `mask` (gpt-image-1, dall-e-2); fal `mask_url`                                  |
+| `'control'`     | fal `control_image_url` (ControlNet / depth / pose conditioning)                       |
+| `'start_frame'` | fal `start_image_url`; Veo `image` (used by `generateVideo`)                           |
+| `'end_frame'`   | fal `end_image_url`; Veo `lastFrame` (used by `generateVideo`)                         |
+
+#### Inpaint / edit with a mask
+
+```typescript
+await generateImage({
+  adapter: openaiImage('gpt-image-1'),
+  prompt: 'Replace the masked region with a tree',
+  imageInputs: [
+    {
+      type: 'image',
+      source: { type: 'url', value: photoUrl },
+    },
+    {
+      type: 'image',
+      source: { type: 'url', value: maskUrl },
+      metadata: { role: 'mask' },
+    },
+  ],
+})
+```
+
+#### Multi-reference composition
+
+```typescript
+const product: ImagePart = {
+  type: 'image',
+  source: { type: 'url', value: 'https://example.com/product.png' },
+}
+
+const style: ImagePart = {
+  type: 'image',
+  source: { type: 'url', value: 'https://example.com/style.png' },
+}
+
+await generateImage({
+  adapter: geminiImage('gemini-3.1-flash-image-preview'),
+  prompt: 'Generate a new image of the product using the style of the second reference',
+  imageInputs: [product, style],
+})
+```
+
+### Provider support
+
+| Provider     | Behavior                                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------------------------- |
+| **OpenAI**   | `gpt-image-1` / `gpt-image-1-mini` → routes to `images.edit()`, up to 16 source images plus optional mask.<br>`dall-e-2` → `images.edit()` with 1 source image only.<br>`dall-e-3` → throws (no edit support). |
+| **Gemini**   | Native models (`gemini-*-flash-image`, "nano-banana", etc.) → inputs become multimodal parts in `contents`. Up to ~14 input images.<br>Imagen models → throws (text-to-image only). |
+| **fal.ai**   | 1 input → `image_url`; multiple → `image_urls`. `role: 'mask'` → `mask_url`. `role: 'control'` → `control_image_url`. `role: 'reference'` / `'character'` → `reference_image_urls`. Override with `modelOptions` for endpoint-specific fields. |
+| **Grok**     | Throws — the current adapter wraps Grok's OpenAI-compat endpoint, which doesn't expose image inputs. xAI's native Imagine API support is tracked as a follow-up.                                                                                                          |
+| **OpenRouter** | Throws — multimodal injection into the chat-completions pathway is tracked as a follow-up.                                                                                                              |
+| **Anthropic** | n/a — no image generation API.                                                                                                                                                                          |
+
+Adapters that don't support image-conditioned generation throw a clear
+runtime error so calls fail fast rather than silently dropping the inputs.
 
 ## Model Options
 
