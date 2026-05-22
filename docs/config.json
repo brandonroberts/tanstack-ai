@@ -223,6 +223,10 @@
         {
           "label": "Extend Adapter",
           "to": "advanced/extend-adapter"
+        },
+        {
+          "label": "Provider Endpoint Schemas",
+          "to": "advanced/ai-schemas"
         }
       ]
     },

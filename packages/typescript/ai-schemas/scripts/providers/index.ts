@@ -1,0 +1,14 @@
+import { anthropicProvider } from './anthropic.js'
+import { elevenlabsProvider } from './elevenlabs.js'
+import { falProvider } from './fal.js'
+import { geminiProvider } from './gemini.js'
+import { openaiProvider } from './openai.js'
+import type { ProviderConfig } from '../providers.js'
+
+export const ALL_PROVIDERS: ReadonlyArray<ProviderConfig> = [
+  openaiProvider,
+  anthropicProvider,
+  geminiProvider,
+  elevenlabsProvider,
+  falProvider,
+]
