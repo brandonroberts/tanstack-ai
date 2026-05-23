@@ -49,6 +49,26 @@ const ArticleState = z.object({
   skepticReview: Review.optional(),
 })
 
+type DraftResult = z.infer<typeof Draft>
+type ReviewResult = z.infer<typeof Review>
+
+const MAX_SKEPTIC_REVISIONS = 3
+
+function reviewFindings(review: ReviewResult): Array<string> {
+  return review.findings
+    .map((finding) => finding.trim())
+    .filter((finding) => finding.length > 0)
+}
+
+function shouldReviseForReview(review: ReviewResult): boolean {
+  return review.verdict === 'block' || reviewFindings(review).length > 0
+}
+
+function formatReviewFailure(role: string, review: ReviewResult): string {
+  const findings = reviewFindings(review)
+  return `${role}: ${findings.length > 0 ? findings.join('; ') : 'blocked without findings'}`
+}
+
 // ===== Agents =====
 const writer = defineAgent({
   name: 'writer',
@@ -60,7 +80,7 @@ const writer = defineAgent({
       outputSchema: Draft,
       stream: true,
       systemPrompts: [
-        'You are a non-fiction writer. Produce a factual three-paragraph article on the topic. Reply only with valid JSON matching the schema.',
+        'You are a non-fiction writer. Produce a factual three-paragraph article on the topic. Keep claims precise and avoid unsupported cultural, medical, or historical specifics. Reply only with valid JSON matching the schema.',
       ],
       messages: [{ role: 'user', content: input.topic }],
     }),
@@ -104,7 +124,7 @@ const editor = defineAgent({
       outputSchema: Draft,
       stream: true,
       systemPrompts: [
-        'You are an editor. Polish the draft, addressing the reviewer notes. Reply with the polished JSON.',
+        'You are an editor. Rewrite the draft to address every reviewer note. Remove or narrow unsupported claims instead of inventing citations. Reply with the polished JSON.',
       ],
       messages: [
         {
@@ -127,30 +147,51 @@ export const articleWorkflow = defineWorkflow({
     skeptic: reviewerFor('skeptic'),
     editor,
   },
+  // defineWorkflow requires an AsyncGenerator; yielded agents provide the async boundaries.
+  // eslint-disable-next-line @typescript-eslint/require-await
   run: async function* ({ input, state, agents }) {
     state.phase = 'drafting'
     const draft = yield* agents.writer({ topic: input.topic })
     state.draft = draft
+    let current: DraftResult = draft
+    let revisedFromSkepticFeedback = false
 
     state.phase = 'reviewing'
     const legal = yield* agents.legal({ draft })
     state.legalReview = legal
     if (legal.verdict === 'block') {
-      return fail(`legal: ${legal.findings.join('; ')}`)
+      return fail(formatReviewFailure('legal', legal))
     }
 
-    const skeptic = yield* agents.skeptic({ draft })
+    let skeptic = yield* agents.skeptic({ draft: current })
     state.skepticReview = skeptic
-    if (skeptic.verdict === 'block') {
-      return fail(`skeptic: ${skeptic.findings.join('; ')}`)
+
+    for (let round = 0; shouldReviseForReview(skeptic); round++) {
+      if (round >= MAX_SKEPTIC_REVISIONS) {
+        return fail(formatReviewFailure('skeptic', skeptic))
+      }
+
+      state.phase = 'revising'
+      revisedFromSkepticFeedback = true
+      current = yield* agents.editor({
+        draft: current,
+        notes: [...reviewFindings(legal), ...reviewFindings(skeptic)],
+      })
+      state.draft = current
+
+      state.phase = 'reviewing'
+      skeptic = yield* agents.skeptic({ draft: current })
+      state.skepticReview = skeptic
     }
 
     state.phase = 'editing'
-    let current = yield* agents.editor({
-      draft,
-      notes: [...legal.findings, ...skeptic.findings],
-    })
-    state.draft = current
+    if (!revisedFromSkepticFeedback) {
+      current = yield* agents.editor({
+        draft,
+        notes: [...reviewFindings(legal), ...reviewFindings(skeptic)],
+      })
+      state.draft = current
+    }
 
     for (let round = 0; round < 4; round++) {
       state.phase = 'awaiting-approval'
