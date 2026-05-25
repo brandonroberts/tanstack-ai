@@ -1,5 +1,209 @@
 # @tanstack/ai-client
 
+## 0.11.7
+
+### Patch Changes
+
+- Populate server-executed tool results on the matching `tool-call` part and mark successful tool calls as `complete`. ([#596](https://github.com/TanStack/ai/pull/596))
+
+- Updated dependencies [[`e144a53`](https://github.com/TanStack/ai/commit/e144a53e4348bb0bc365dbe342c8538544242227)]:
+  - @tanstack/ai@0.21.3
+  - @tanstack/ai-event-client@0.3.10
+
+## 0.11.6
+
+### Patch Changes
+
+- Refresh package README content and npm metadata for better discoverability. ([#626](https://github.com/TanStack/ai/pull/626))
+
+- Updated dependencies [[`ebeb22e`](https://github.com/TanStack/ai/commit/ebeb22ec68f456b09e0181ac6f5d1ac25a0affd2)]:
+  - @tanstack/ai@0.21.2
+  - @tanstack/ai-event-client@0.3.9
+
+## 0.11.5
+
+### Patch Changes
+
+- Updated dependencies [[`573f12e`](https://github.com/TanStack/ai/commit/573f12eb5a3b04a2625be92900099f48d6f76632)]:
+  - @tanstack/ai@0.21.1
+  - @tanstack/ai-event-client@0.3.8
+
+## 0.11.4
+
+### Patch Changes
+
+- Expose the connection adapter primitives needed to build custom ([#597](https://github.com/TanStack/ai/pull/597))
+  transports from every framework hook package. `@tanstack/ai-client`
+  now re-exports `RunAgentInputContext` at its entry point, and
+  `@tanstack/ai-react`, `@tanstack/ai-vue`, `@tanstack/ai-solid`,
+  `@tanstack/ai-svelte`, and `@tanstack/ai-preact` now re-export
+  `rpcStream`, `ConnectConnectionAdapter`, `SubscribeConnectionAdapter`,
+  and `RunAgentInputContext` alongside the existing `stream`,
+  `fetchServerSentEvents`, and `fetchHttpStream` re-exports.
+
+  Previously, authors of WebSocket / persistent or RPC-backed adapters
+  had to import these symbols from `@tanstack/ai-client` even though
+  they were already pulling `useChat` from a framework package. No
+  runtime change.
+
+- Updated dependencies [[`ec1393d`](https://github.com/TanStack/ai/commit/ec1393db4383798e5f2574dfd87779c22c309529), [`188fe11`](https://github.com/TanStack/ai/commit/188fe11b9b9691e5a241cfc416803da5b8ce5376)]:
+  - @tanstack/ai@0.21.0
+  - @tanstack/ai-event-client@0.3.7
+
+## 0.11.3
+
+### Patch Changes
+
+- Updated dependencies [[`2ad137b`](https://github.com/TanStack/ai/commit/2ad137bd22512248bd1684cccce35ba89597cf96)]:
+  - @tanstack/ai@0.20.1
+  - @tanstack/ai-event-client@0.3.6
+
+## 0.11.2
+
+### Patch Changes
+
+- Updated dependencies [[`496db9c`](https://github.com/TanStack/ai/commit/496db9c42a7d3051a1295091eae29ae1c31ef997)]:
+  - @tanstack/ai@0.20.0
+  - @tanstack/ai-event-client@0.3.5
+
+## 0.11.1
+
+### Patch Changes
+
+- Updated dependencies [[`617b5b5`](https://github.com/TanStack/ai/commit/617b5b512a6b3989c442efa41975dacc194d882a)]:
+  - @tanstack/ai@0.19.1
+  - @tanstack/ai-event-client@0.3.4
+
+## 0.11.0
+
+### Minor Changes
+
+- feat: structured-output as a typed MessagePart on each assistant UIMessage ([#577](https://github.com/TanStack/ai/pull/577))
+
+  `useChat({ outputSchema })` (React, Vue, Solid) and `createChat({ outputSchema })` (Svelte) previously kept a single hook-level `partial`/`final` slot, so multi-turn structured chats lost every prior turn's response as soon as a new one streamed in. Each assistant turn now carries its own typed `structured-output` MessagePart on the UIMessage it belongs to. History walks `messages` and finds the typed part on each turn; the hook-level `partial` and `final` are derived from the latest assistant message's part and continue to work as before. Applies to all four framework hook packages.
+
+  The structured-output part type is generic over the schema's inferred data type:
+  - `StructuredOutputPart<TData = unknown>` in `@tanstack/ai` carries `data: TData`, `partial: DeepPartial<TData>`, `raw: string`, plus `status: 'streaming' | 'complete' | 'error'` and an optional `errorMessage`.
+  - `MessagePart<TTools, TData>` and `UIMessage<TTools, TData>` in `@tanstack/ai-client` thread the generic through the message types.
+  - Each framework hook's return (`UseChatReturn<TTools, TSchema>` for React / Vue / Solid, `CreateChatReturn<TTools, TSchema>` for Svelte) substitutes `TData = InferSchemaType<TSchema>` when a schema is supplied, so `messages[i].parts.find(p => p.type === 'structured-output').data` is typed by the schema with no cast required.
+
+  Default `TData = unknown` keeps every existing consumer that doesn't pass a schema source-compatible.
+
+  Server-side `chat({ outputSchema, stream: true })` emits a new `structured-output.start` CUSTOM event before the JSON deltas so the client processor can route them into the StructuredOutputPart instead of building a TextPart. The wire converter serializes the part's raw JSON back as assistant content, so multi-turn structured chats stay coherent (the LLM sees its own prior structured responses on follow-up turns). For adapters without native JSON-schema streaming (Anthropic, Gemini, Ollama), the existing fallback path emits one terminal `structured-output.complete` event and the same per-turn typed part lands on the message — consumer code is identical.
+
+  A new example route demonstrating the multi-turn pattern is at `/generations/structured-chat` in the `ts-react-chat` example.
+
+  **Breaking-shape note (minor, not major):** When `outputSchema` is set, `TEXT_MESSAGE_CONTENT` deltas no longer create a `TextPart` on the assistant message — they accumulate into the `StructuredOutputPart`. Consumers that iterated `message.parts` and explicitly filtered out `TextPart`s to hide raw JSON (the workaround documented prior to this change) can remove that filter; doing nothing is also safe because no `TextPart` is produced in the first place.
+
+### Patch Changes
+
+- Updated dependencies [[`2e0e2eb`](https://github.com/TanStack/ai/commit/2e0e2eb72684aac82e570d57767656e218289b49)]:
+  - @tanstack/ai@0.19.0
+  - @tanstack/ai-event-client@0.3.3
+
+## 0.10.0
+
+### Minor Changes
+
+- **Breaking:** AG-UI client-to-server compliance. ([#511](https://github.com/TanStack/ai/pull/511))
+
+  `@tanstack/ai-client` now POSTs an AG-UI `RunAgentInput` request body and `@tanstack/ai` server endpoints must use the new `chatParamsFromRequestBody` + `mergeAgentTools` helpers. Upgrade both packages together.
+
+  Highlights:
+  - **Wire format**: `{threadId, runId, state, messages, tools, context, forwardedProps}` (per AG-UI 0.0.52 `RunAgentInputSchema`) instead of `{messages, data}`.
+  - **New server helpers** exported from `@tanstack/ai`: `chatParamsFromRequestBody`, `mergeAgentTools`.
+  - **`chat()` accepts `threadId`, `runId`, `parentRunId`** as optional fields for AG-UI run correlation.
+  - **`ChatClient` accepts `threadId`** option; auto-generates and persists per session if omitted; fresh `runId` per send.
+  - **Client tools auto-advertised** to the server via `RunAgentInput.tools`.
+  - **Foreign AG-UI clients** can hit a TanStack server: `developer` collapses to `system`, `reasoning`/`activity` drop.
+
+  See `docs/migration/ag-ui-compliance.md` for full migration steps.
+
+### Patch Changes
+
+- Updated dependencies [[`a9d1916`](https://github.com/TanStack/ai/commit/a9d19165a5028515cf1d091d611c8ac4b5b86099), [`e810153`](https://github.com/TanStack/ai/commit/e810153b34e593d3f3e1bbd8050164a6ad4423ed)]:
+  - @tanstack/ai@0.18.0
+  - @tanstack/ai-event-client@0.3.2
+
+## 0.9.2
+
+### Patch Changes
+
+- Updated dependencies [[`98979f7`](https://github.com/TanStack/ai/commit/98979f7e72f4b5bfb816fb14b60a12871f8c4bec), [`02527c2`](https://github.com/TanStack/ai/commit/02527c28c3285829535cd486e529e659260b3c5d)]:
+  - @tanstack/ai@0.17.0
+  - @tanstack/ai-event-client@0.3.1
+
+## 0.9.1
+
+### Patch Changes
+
+- Updated dependencies [[`87f305c`](https://github.com/TanStack/ai/commit/87f305c9961d608fd7bea93a5100698a98aed11d)]:
+  - @tanstack/ai@0.16.0
+  - @tanstack/ai-event-client@0.3.0
+
+## 0.9.0
+
+### Minor Changes
+
+- **Fix thinking blocks getting merged across steps and lost on turn 2+ of Anthropic tool loops.** ([#391](https://github.com/TanStack/ai/pull/391))
+
+  Each thinking step emitted by the adapter now produces its own `ThinkingPart` on the `UIMessage` instead of being merged into a single part, and thinking content + Anthropic signatures are preserved in server-side message history so multi-turn tool flows with extended thinking work correctly.
+
+  This includes a public callback signature change: `StreamProcessorEvents.onThinkingUpdate` now receives `(messageId, stepId, content)` instead of `(messageId, content)`. `ChatClient` has been updated to handle the new `stepId` argument internally, but consumers implementing `StreamProcessorEvents` directly need to add the new parameter.
+
+  `@tanstack/ai`:
+  - `ThinkingPart` gains optional `stepId` and `signature` fields.
+  - `ModelMessage` gains an optional `thinking?: Array<{ content; signature? }>` field so prior thinking can be replayed in subsequent turns.
+  - `StepFinishedEvent` gains an optional `signature` field for provider-supplied thinking signatures.
+  - `StreamProcessor` tracks thinking per-step via `stepId` and keeps step ordering. `getState().thinking` / `getResult().thinking` concatenate step contents in order.
+  - The `onThinkingUpdate` callback on `StreamProcessorEvents` now receives `(messageId, stepId, content)` — consumers implementing it directly must add the `stepId` parameter.
+  - `TextEngine` accumulates thinking + signatures per iteration and includes them in assistant messages with tool calls so the next turn can replay them.
+
+  `@tanstack/ai-anthropic`:
+  - Captures `signature_delta` stream events and emits the final `STEP_FINISHED` with the signature on `content_block_stop`.
+  - Includes thinking blocks with signatures in `formatMessages` for multi-turn history.
+  - Passes `betas: ['interleaved-thinking-2025-05-14']` to the `beta.messages.create` call site when a thinking budget is configured. The beta flag is scoped to the streaming path only, so `structuredOutput` (which uses the non-beta `messages.create` endpoint) is unaffected.
+
+  `@tanstack/ai-client`:
+  - `ChatClient`'s internal `onThinkingUpdate` wiring is updated for the new `stepId` parameter.
+
+### Patch Changes
+
+- Fixes a race condition in ChatClient.streamResponse() where this.abortController.signal could reference a stale or null controller by the time it is passed to this.connection.connect() ([#377](https://github.com/TanStack/ai/pull/377))
+
+- Updated dependencies [[`a4e2c55`](https://github.com/TanStack/ai/commit/a4e2c55a79490c2245ff2de2d3e1803a533c867b), [`82078bd`](https://github.com/TanStack/ai/commit/82078bdabe28d7d4a15a2847d667f363bf0a9cbe), [`b2d3cc1`](https://github.com/TanStack/ai/commit/b2d3cc131a31c54bd1e5841f958fbe333514e508)]:
+  - @tanstack/ai@0.15.0
+  - @tanstack/ai-event-client@0.2.9
+
+## 0.8.0
+
+### Minor Changes
+
+- feat: add `useGenerateAudio` hook and streaming support for `generateAudio()` ([#463](https://github.com/TanStack/ai/pull/463))
+
+  Closes the parity gap between audio generation and the other media
+  activities (image, speech, video, transcription, summarize):
+  - `generateAudio()` now accepts `stream: true`, returning an
+    `AsyncIterable<StreamChunk>` that can be piped through
+    `toServerSentEventsResponse()`.
+  - `AudioGenerateInput` type added to `@tanstack/ai-client`.
+  - `useGenerateAudio` hook added to `@tanstack/ai-react`,
+    `@tanstack/ai-solid`, and `@tanstack/ai-vue`; matching
+    `createGenerateAudio` added to `@tanstack/ai-svelte`. All follow the same
+    `{ generate, result, isLoading, error, status, stop, reset }` shape as
+    the existing media hooks and support both `connection` (SSE) and
+    `fetcher` transports.
+
+### Patch Changes
+
+- fix(ai-client): prevent drainPostStreamActions re-entrancy stealing queued actions ([#429](https://github.com/TanStack/ai/pull/429))
+
+  When multiple client tools complete in the same round, nested `drainPostStreamActions()` calls from `streamResponse()`'s `finally` block could steal queued actions, permanently stalling the conversation. Added a re-entrancy guard and a `shouldAutoSend()` check requiring tool-call parts before triggering continuation.
+
+- Updated dependencies [[`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a), [`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a), [`af9eb7b`](https://github.com/TanStack/ai/commit/af9eb7bbb875b23b7e99b2e6b743636daad402d1), [`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a)]:
+  - @tanstack/ai@0.14.0
+  - @tanstack/ai-event-client@0.2.8
+
 ## 0.7.14
 
 ### Patch Changes

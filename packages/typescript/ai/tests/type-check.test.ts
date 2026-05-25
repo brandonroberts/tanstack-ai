@@ -51,6 +51,8 @@ const mockAdapter = {
       document: undefined as unknown,
     },
     toolCapabilities: [] as ReadonlyArray<string>,
+    toolCallMetadata: undefined as unknown,
+    systemPromptMetadata: undefined as never,
   },
   chatStream: async function* () {},
   structuredOutput: async () => ({ data: {}, rawText: '{}' }),
@@ -472,10 +474,17 @@ describe('chat() tool type inference', () => {
     expectTypeOf<Result>().toEqualTypeOf<Promise<string>>()
   })
 
-  it('should return Promise<inferred schema> when outputSchema is provided', () => {
+  it('should return Promise<inferred schema> when outputSchema is provided without explicit stream', () => {
+    // Per issue #526, schema-bearing calls default to Promise<T>.
+    // Only explicit `stream: true` opts into StructuredOutputStream.
     const schema = z.object({ summary: z.string() })
     type Result = ReturnType<
-      typeof chat<typeof mockAdapter, typeof schema, true, [typeof weatherTool]>
+      typeof chat<
+        typeof mockAdapter,
+        typeof schema,
+        boolean,
+        [typeof weatherTool]
+      >
     >
 
     expectTypeOf<Result>().toEqualTypeOf<Promise<{ summary: string }>>()
@@ -581,5 +590,90 @@ describe('backward compatibility', () => {
   it('should keep StreamChunk itself unchanged', () => {
     type Start = Extract<StreamChunk, { type: 'TOOL_CALL_START' }>
     expectTypeOf<Start['toolName']>().toEqualTypeOf<string>()
+  })
+})
+
+// ===========================
+// TypedStreamChunk: tagged custom events
+// ===========================
+
+describe('TypedStreamChunk tagged custom event narrowing', () => {
+  it('should narrow approval-requested CUSTOM event payload', () => {
+    type Chunk = TypedStreamChunk<[typeof weatherTool]>
+    type Approval = Extract<
+      Chunk,
+      { type: 'CUSTOM'; name: 'approval-requested' }
+    >
+
+    expectTypeOf<Approval['value']>().toEqualTypeOf<{
+      toolCallId: string
+      toolName: string
+      input: unknown
+      approval: { id: string; needsApproval: true }
+    }>()
+  })
+
+  it('should narrow tool-input-available CUSTOM event payload', () => {
+    type Chunk = TypedStreamChunk<[typeof weatherTool]>
+    type ToolInput = Extract<
+      Chunk,
+      { type: 'CUSTOM'; name: 'tool-input-available' }
+    >
+
+    expectTypeOf<ToolInput['value']>().toEqualTypeOf<{
+      toolCallId: string
+      toolName: string
+      input: unknown
+    }>()
+  })
+
+  it('should narrow structured-output.start CUSTOM event payload', () => {
+    type Chunk = TypedStreamChunk<[typeof weatherTool]>
+    type Start = Extract<
+      Chunk,
+      { type: 'CUSTOM'; name: 'structured-output.start' }
+    >
+
+    expectTypeOf<Start['value']>().toEqualTypeOf<{ messageId: string }>()
+  })
+
+  it('should narrow structured-output.complete CUSTOM event payload', () => {
+    type Chunk = TypedStreamChunk<[typeof weatherTool]>
+    type Complete = Extract<
+      Chunk,
+      { type: 'CUSTOM'; name: 'structured-output.complete' }
+    >
+
+    // Adapter-emitted form: T defaults to unknown, narrowed by orchestrator later
+    expectTypeOf<Complete['value']>().toEqualTypeOf<{
+      object: unknown
+      raw: string
+      reasoning?: string
+    }>()
+  })
+
+  it('should keep bare CustomEvent in the no-typed-tools fallback for back-compat', () => {
+    // Without typed tools, TypedStreamChunk collapses to plain StreamChunk —
+    // tagged narrowing requires the typed-tools branch to avoid breaking
+    // existing `AsyncIterable<StreamChunk>` consumers.
+    type Chunk = TypedStreamChunk
+    type Custom = Extract<Chunk, { type: 'CUSTOM' }>
+    // The bare CustomEvent's `name` stays `string`.
+    expectTypeOf<Custom['name']>().toEqualTypeOf<string>()
+  })
+
+  it('should not poison `value` to any across the CUSTOM union', () => {
+    // Regression test: when bare CustomEvent (`value: any`) gets unioned with
+    // tagged variants, the discriminated narrow loses type information.
+    // Picking any tagged variant must keep its `value` shape intact rather
+    // than collapsing to `any`.
+    type Chunk = TypedStreamChunk<[typeof weatherTool]>
+    type Approval = Extract<
+      Chunk,
+      { type: 'CUSTOM'; name: 'approval-requested' }
+    >
+
+    // toBeAny() inverts the assertion — this guards the regression.
+    expectTypeOf<Approval['value']>().not.toBeAny()
   })
 })

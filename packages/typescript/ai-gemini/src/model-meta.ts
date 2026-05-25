@@ -3,7 +3,6 @@ import type {
   GeminiCommonConfigOptions,
   GeminiSafetyOptions,
   GeminiStructuredOutputOptions,
-  GeminiThinkingAdvancedOptions,
   GeminiThinkingOptions,
   GeminiToolConfigOptions,
 } from './text/text-provider-options'
@@ -81,8 +80,7 @@ const GEMINI_3_1_PRO = {
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
 >
 
 const GEMINI_3_PRO = {
@@ -116,8 +114,7 @@ const GEMINI_3_PRO = {
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
 >
 
 const GEMINI_3_FLASH = {
@@ -151,8 +148,7 @@ const GEMINI_3_FLASH = {
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
 >
 
 const GEMINI_3_PRO_IMAGE = {
@@ -180,8 +176,7 @@ const GEMINI_3_PRO_IMAGE = {
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
 >
 
 const GEMINI_3_1_FLASH_IMAGE = {
@@ -970,6 +965,40 @@ const VEO_2 = {
   [VEO_2.name]: VEO_2,
 } as const */
 
+const GEMINI_3_5_FLASH = {
+  name: 'gemini-3.5-flash',
+  max_input_tokens: 1_048_576,
+  max_output_tokens: 65_536,
+  supports: {
+    input: ['text', 'image', 'video', 'document', 'audio'],
+    output: ['text'],
+    capabilities: [
+      'batch_api',
+      'caching',
+      'function_calling',
+      'structured_output',
+      'thinking',
+    ],
+    tools: ['code_execution', 'file_search', 'google_search', 'url_context'],
+  },
+  pricing: {
+    input: {
+      normal: 1.5,
+      cached: 0.15,
+    },
+    output: {
+      normal: 9,
+    },
+  },
+} as const satisfies ModelMeta<
+  GeminiToolConfigOptions &
+    GeminiSafetyOptions &
+    GeminiCommonConfigOptions &
+    GeminiCachedContentOptions &
+    GeminiStructuredOutputOptions &
+    GeminiThinkingOptions
+>
+
 export const GEMINI_MODELS = [
   GEMINI_3_1_PRO.name,
   GEMINI_3_PRO.name,
@@ -982,6 +1011,8 @@ export const GEMINI_MODELS = [
   GEMINI_2_5_FLASH_LITE_PREVIEW.name,
   GEMINI_2_FLASH.name,
   GEMINI_2_FLASH_LITE.name,
+
+  GEMINI_3_5_FLASH.name,
 ] as const
 
 export type GeminiModels = (typeof GEMINI_MODELS)[number]
@@ -1080,22 +1111,19 @@ export type GeminiChatModelProviderOptionsByName = {
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
   [GEMINI_3_PRO.name]: GeminiToolConfigOptions &
     GeminiSafetyOptions &
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
   [GEMINI_3_FLASH.name]: GeminiToolConfigOptions &
     GeminiSafetyOptions &
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions &
-    GeminiThinkingOptions &
-    GeminiThinkingAdvancedOptions
+    GeminiThinkingOptions
   [GEMINI_3_1_FLASH_LITE.name]: GeminiToolConfigOptions &
     GeminiSafetyOptions &
     GeminiCommonConfigOptions &
@@ -1143,6 +1171,12 @@ export type GeminiChatModelProviderOptionsByName = {
     GeminiCommonConfigOptions &
     GeminiCachedContentOptions &
     GeminiStructuredOutputOptions
+  [GEMINI_3_5_FLASH.name]: GeminiToolConfigOptions &
+    GeminiSafetyOptions &
+    GeminiCommonConfigOptions &
+    GeminiCachedContentOptions &
+    GeminiStructuredOutputOptions &
+    GeminiThinkingOptions
 }
 
 /**
@@ -1191,4 +1225,5 @@ export type GeminiModelInputModalitiesByName = {
   [GEMINI_2_5_FLASH_PREVIEW.name]: typeof GEMINI_2_5_FLASH_PREVIEW.supports.input
   [GEMINI_2_FLASH.name]: typeof GEMINI_2_FLASH.supports.input
   [GEMINI_2_FLASH_LITE.name]: typeof GEMINI_2_FLASH_LITE.supports.input
+  [GEMINI_3_5_FLASH.name]: typeof GEMINI_3_5_FLASH.supports.input
 }

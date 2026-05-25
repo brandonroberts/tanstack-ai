@@ -1,20 +1,20 @@
 import { describe, expect, it, vi } from 'vitest'
+import { EventType } from '@tanstack/ai'
 import { ChatClient } from '../src/chat-client'
 import {
+  createApprovalToolCallChunks,
+  createCustomEventChunks,
   createMockConnectionAdapter,
   createTextChunks,
   createThinkingChunks,
   createToolCallChunks,
-  createApprovalToolCallChunks,
-  createCustomEventChunks,
 } from './test-utils'
-import type { ConnectionAdapter } from '../src/connection-adapters'
+import type {
+  ConnectConnectionAdapter,
+  ConnectionAdapter,
+} from '../src/connection-adapters'
 import type { StreamChunk } from '@tanstack/ai'
 import type { UIMessage } from '../src/types'
-
-/** Cast an event object to StreamChunk for type compatibility with EventType enum. */
-const asChunk = (chunk: Record<string, unknown>) =>
-  chunk as unknown as StreamChunk
 
 describe('ChatClient', () => {
   describe('constructor', () => {
@@ -151,12 +151,13 @@ describe('ChatClient', () => {
     it('stop should not unsubscribe an active subscription', async () => {
       const adapter = createSubscribeAdapter([
         {
-          type: 'RUN_FINISHED',
+          type: EventType.RUN_FINISHED,
           runId: 'run-1',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
           finishReason: 'stop',
-        } as unknown as StreamChunk,
+        },
       ])
       const client = new ChatClient({ connection: adapter })
 
@@ -256,13 +257,13 @@ describe('ChatClient', () => {
     it('unsubscribe should abort in-flight requests and disconnect', async () => {
       const adapter = createSubscribeAdapter([
         {
-          type: 'TEXT_MESSAGE_CONTENT',
+          type: EventType.TEXT_MESSAGE_CONTENT,
           messageId: 'msg-1',
           model: 'test',
           timestamp: Date.now(),
           delta: 'H',
           content: 'H',
-        } as unknown as StreamChunk,
+        },
       ])
       const client = new ChatClient({ connection: adapter })
 
@@ -298,6 +299,7 @@ describe('ChatClient', () => {
 
     it('should expose connectionStatus error for subscription loop failures', async () => {
       const connection = {
+        // eslint-disable-next-line require-yield
         subscribe: async function* () {
           throw new Error('subscription failed')
         },
@@ -315,13 +317,13 @@ describe('ChatClient', () => {
     it('should remain pending without terminal run events', async () => {
       const adapter = createSubscribeAdapter([
         {
-          type: 'TEXT_MESSAGE_CONTENT',
+          type: EventType.TEXT_MESSAGE_CONTENT,
           messageId: 'msg-1',
           model: 'test',
           timestamp: Date.now(),
           delta: 'H',
           content: 'H',
-        } as unknown as StreamChunk,
+        },
       ])
       const client = new ChatClient({ connection: adapter })
 
@@ -351,26 +353,28 @@ describe('ChatClient', () => {
       it('should flip to true on RUN_STARTED and false on RUN_FINISHED', async () => {
         const chunks: Array<StreamChunk> = [
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'TEXT_MESSAGE_CONTENT',
+            type: EventType.TEXT_MESSAGE_CONTENT,
             messageId: 'msg-1',
             model: 'test',
             timestamp: Date.now(),
             delta: 'Hi',
             content: 'Hi',
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_FINISHED',
+            type: EventType.RUN_FINISHED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
             finishReason: 'stop',
-          } as unknown as StreamChunk,
+          },
         ]
         const adapter = createSubscribeAdapter(chunks)
         const generatingChanges: Array<boolean> = []
@@ -390,18 +394,20 @@ describe('ChatClient', () => {
       it('should flip to false on RUN_ERROR', async () => {
         const chunks: Array<StreamChunk> = [
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_ERROR',
+            type: EventType.RUN_ERROR,
+            message: 'something went wrong',
             runId: 'run-1',
             model: 'test',
             timestamp: Date.now(),
             error: { message: 'something went wrong' },
-          } as unknown as StreamChunk,
+          },
         ]
         const adapter = createSubscribeAdapter(chunks)
         const generatingChanges: Array<boolean> = []
@@ -421,26 +427,28 @@ describe('ChatClient', () => {
       it('should remain correct through subscribe/unsubscribe cycles', async () => {
         const chunks: Array<StreamChunk> = [
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'TEXT_MESSAGE_CONTENT',
+            type: EventType.TEXT_MESSAGE_CONTENT,
             messageId: 'msg-1',
             model: 'test',
             timestamp: Date.now(),
             delta: 'Hi',
             content: 'Hi',
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_FINISHED',
+            type: EventType.RUN_FINISHED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
             finishReason: 'stop',
-          } as unknown as StreamChunk,
+          },
         ]
         const adapter = createSubscribeAdapter(chunks)
         const client = new ChatClient({ connection: adapter })
@@ -461,12 +469,13 @@ describe('ChatClient', () => {
             while (!signal?.aborted) {
               if (!yieldedStart) {
                 yieldedStart = true
-                yield asChunk({
-                  type: 'RUN_STARTED' as const,
+                yield {
+                  type: EventType.RUN_STARTED as const,
                   runId: 'run-1',
+                  threadId: 'thread-1',
                   model: 'test',
                   timestamp: Date.now(),
-                })
+                }
               }
               await new Promise<void>((resolve) => {
                 const onAbort = () => resolve()
@@ -504,12 +513,13 @@ describe('ChatClient', () => {
             while (!signal?.aborted) {
               if (!yieldedStart) {
                 yieldedStart = true
-                yield asChunk({
-                  type: 'RUN_STARTED' as const,
+                yield {
+                  type: EventType.RUN_STARTED as const,
                   runId: 'run-1',
+                  threadId: 'thread-1',
                   model: 'test',
                   timestamp: Date.now(),
-                })
+                }
               }
               await new Promise<void>((resolve) => {
                 const onAbort = () => resolve()
@@ -543,39 +553,43 @@ describe('ChatClient', () => {
       it('should not emit duplicate callbacks on repeated same-state events', async () => {
         const chunks: Array<StreamChunk> = [
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'TEXT_MESSAGE_CONTENT',
+            type: EventType.TEXT_MESSAGE_CONTENT,
             messageId: 'msg-1',
             model: 'test',
             timestamp: Date.now(),
             delta: 'Hi',
             content: 'Hi',
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_FINISHED',
+            type: EventType.RUN_FINISHED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
             finishReason: 'stop',
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_FINISHED',
+            type: EventType.RUN_FINISHED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
             finishReason: 'stop',
-          } as unknown as StreamChunk,
+          },
         ]
         const adapter = createSubscribeAdapter(chunks)
         const generatingChanges: Array<boolean> = []
@@ -594,26 +608,28 @@ describe('ChatClient', () => {
       it('should handle interleaved multi-run events from durable subscription', async () => {
         const chunks: Array<StreamChunk> = [
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'TEXT_MESSAGE_CONTENT',
+            type: EventType.TEXT_MESSAGE_CONTENT,
             messageId: 'msg-1',
             model: 'test',
             timestamp: Date.now(),
             delta: 'A',
             content: 'A',
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_FINISHED',
+            type: EventType.RUN_FINISHED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
             finishReason: 'stop',
-          } as unknown as StreamChunk,
+          },
         ]
         const adapter = createSubscribeAdapter(chunks)
         const generatingChanges: Array<boolean> = []
@@ -668,17 +684,19 @@ describe('ChatClient', () => {
         // Simulate two concurrent runs starting
         chunks.push(
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-2',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
         )
         wake.fn?.()
         await new Promise((resolve) => setTimeout(resolve, 20))
@@ -687,12 +705,13 @@ describe('ChatClient', () => {
 
         // First run finishes — should still be generating because run-2 is active
         chunks.push({
-          type: 'RUN_FINISHED',
+          type: EventType.RUN_FINISHED,
           runId: 'run-1',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
           finishReason: 'stop',
-        } as unknown as StreamChunk)
+        })
         wake.fn?.()
         await new Promise((resolve) => setTimeout(resolve, 20))
 
@@ -700,12 +719,13 @@ describe('ChatClient', () => {
 
         // Second run finishes — now should be false
         chunks.push({
-          type: 'RUN_FINISHED',
+          type: EventType.RUN_FINISHED,
           runId: 'run-2',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
           finishReason: 'stop',
-        } as unknown as StreamChunk)
+        })
         wake.fn?.()
         await new Promise((resolve) => setTimeout(resolve, 20))
 
@@ -753,17 +773,19 @@ describe('ChatClient', () => {
         // Two runs active
         chunks.push(
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-1',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
           {
-            type: 'RUN_STARTED',
+            type: EventType.RUN_STARTED,
             runId: 'run-2',
+            threadId: 'thread-1',
             model: 'test',
             timestamp: Date.now(),
-          } as unknown as StreamChunk,
+          },
         )
         wake.fn?.()
         await new Promise((resolve) => setTimeout(resolve, 20))
@@ -772,11 +794,12 @@ describe('ChatClient', () => {
 
         // Session-level error without runId clears everything
         chunks.push({
-          type: 'RUN_ERROR',
+          type: EventType.RUN_ERROR,
+          message: 'session crashed',
           model: 'test',
           timestamp: Date.now(),
           error: { message: 'session crashed' },
-        } as unknown as StreamChunk)
+        })
         wake.fn?.()
         await new Promise((resolve) => setTimeout(resolve, 20))
 
@@ -792,12 +815,13 @@ describe('ChatClient', () => {
           subscribe: async function* (_signal?: AbortSignal) {
             if (!yieldedStart) {
               yieldedStart = true
-              yield asChunk({
-                type: 'RUN_STARTED' as const,
+              yield {
+                type: EventType.RUN_STARTED as const,
                 runId: 'run-1',
+                threadId: 'thread-1',
                 model: 'test',
                 timestamp: Date.now(),
-              })
+              }
               await new Promise((resolve) => setTimeout(resolve, 10))
             }
             throw new Error('subscription failed')
@@ -1239,6 +1263,70 @@ describe('ChatClient', () => {
     })
   })
 
+  describe('drain re-entrancy guard (fix #302)', () => {
+    it('should continue after multiple client tools complete in the same round', async () => {
+      // Round 1: two simultaneous tool calls (triggers the re-entrancy bug)
+      const round1Chunks = createToolCallChunks([
+        { id: 'tc-1', name: 'tool_one', arguments: '{}' },
+        { id: 'tc-2', name: 'tool_two', arguments: '{}' },
+      ])
+      // Round 2: final text response
+      const round2Chunks = createTextChunks('Done!', 'msg-2')
+
+      let callIndex = 0
+      const adapter: ConnectConnectionAdapter = {
+        async *connect(_messages, _data, abortSignal) {
+          callIndex++
+          const chunks = callIndex === 1 ? round1Chunks : round2Chunks
+          for (const chunk of chunks) {
+            if (abortSignal?.aborted) return
+            yield chunk
+          }
+        },
+      }
+
+      // Both tools execute immediately (synchronously resolve)
+      const client = new ChatClient({
+        connection: adapter,
+        tools: [
+          {
+            __toolSide: 'client' as const,
+            name: 'tool_one',
+            description: 'Tool one',
+            execute: async () => ({ result: 'one' }),
+          },
+          {
+            __toolSide: 'client' as const,
+            name: 'tool_two',
+            description: 'Tool two',
+            execute: async () => ({ result: 'two' }),
+          },
+        ],
+      })
+
+      // Send initial message — triggers round 1 (two tool calls, both auto-executed)
+      await client.sendMessage('Run both tools')
+
+      // Wait for loading to stop and the continuation (round 2) to complete
+      await vi.waitFor(
+        () => {
+          expect(client.getIsLoading()).toBe(false)
+          // Ensure round 2 actually fired
+          expect(callIndex).toBeGreaterThanOrEqual(2)
+        },
+        { timeout: 2000 },
+      )
+
+      // The final response "Done!" should appear in messages
+      const messages = client.getMessages()
+      const lastAssistant = [...messages]
+        .reverse()
+        .find((m) => m.role === 'assistant')
+      const textPart = lastAssistant?.parts.find((p) => p.type === 'text')
+      expect(textPart?.content).toBe('Done!')
+    })
+  })
+
   describe('error handling', () => {
     it('should set error state on connection failure', async () => {
       const error = new Error('Network error')
@@ -1282,13 +1370,13 @@ describe('ChatClient', () => {
       const noTerminalAdapter = createMockConnectionAdapter({
         chunks: [
           {
-            type: 'TEXT_MESSAGE_CONTENT',
+            type: EventType.TEXT_MESSAGE_CONTENT,
             messageId: 'msg-1',
             model: 'test',
             timestamp: Date.now(),
             delta: 'H',
             content: 'H',
-          } as unknown as StreamChunk,
+          },
         ],
         chunkDelay: 50,
       })
@@ -1314,6 +1402,7 @@ describe('ChatClient', () => {
 
     it('should surface subscription loop failures without hanging', async () => {
       const connection = {
+        // eslint-disable-next-line require-yield
         subscribe: async function* () {
           throw new Error('subscription exploded')
         },
@@ -1619,12 +1708,106 @@ describe('ChatClient', () => {
       })
 
       // Per-message body should override base body
-      expect(capturedData?.model).toBe('gpt-4-turbo')
-      expect(capturedData?.temperature).toBe(0.7) // From base body
-      expect(capturedData?.maxTokens).toBe(100) // From per-message body
+      expect(capturedData?.['model']).toBe('gpt-4-turbo')
+      expect(capturedData?.['temperature']).toBe(0.7) // From base body
+      expect(capturedData?.['maxTokens']).toBe(100) // From per-message body
     })
 
-    it('should include conversationId in merged body', async () => {
+    it('should accept forwardedProps option and merge into request body', async () => {
+      const chunks = createTextChunks('Response')
+      let capturedData: Record<string, any> | undefined
+      const adapter = createMockConnectionAdapter({
+        chunks,
+        onConnect: (_messages, data) => {
+          capturedData = data
+        },
+      })
+
+      const client = new ChatClient({
+        connection: adapter,
+        forwardedProps: { provider: 'openai', model: 'gpt-4o' },
+      })
+
+      await client.sendMessage('Hello')
+
+      expect(capturedData?.['provider']).toBe('openai')
+      expect(capturedData?.['model']).toBe('gpt-4o')
+    })
+
+    it('updateOptions({ forwardedProps }) leaves a previously-set body intact', async () => {
+      const chunks = createTextChunks('Response')
+      const captures: Array<Record<string, any> | undefined> = []
+      const adapter = createMockConnectionAdapter({
+        chunks,
+        onConnect: (_messages, data) => {
+          captures.push(data)
+        },
+      })
+
+      const client = new ChatClient({
+        connection: adapter,
+        body: { provider: 'openai' },
+        forwardedProps: { model: 'gpt-4' },
+      })
+
+      // Replace only `forwardedProps` — `body` must survive.
+      client.updateOptions({ forwardedProps: { model: 'gpt-4o' } })
+
+      await client.sendMessage('Hi')
+      expect(captures[0]?.['provider']).toBe('openai')
+      expect(captures[0]?.['model']).toBe('gpt-4o')
+    })
+
+    it('updateOptions({ body }) leaves a previously-set forwardedProps intact', async () => {
+      const chunks = createTextChunks('Response')
+      const captures: Array<Record<string, any> | undefined> = []
+      const adapter = createMockConnectionAdapter({
+        chunks,
+        onConnect: (_messages, data) => {
+          captures.push(data)
+        },
+      })
+
+      const client = new ChatClient({
+        connection: adapter,
+        body: { provider: 'openai' },
+        forwardedProps: { model: 'gpt-4' },
+      })
+
+      client.updateOptions({ body: { provider: 'anthropic' } })
+
+      await client.sendMessage('Hi')
+      expect(captures[0]?.['provider']).toBe('anthropic')
+      expect(captures[0]?.['model']).toBe('gpt-4')
+    })
+
+    it('should merge body and forwardedProps with forwardedProps winning', async () => {
+      const chunks = createTextChunks('Response')
+      let capturedData: Record<string, any> | undefined
+      const adapter = createMockConnectionAdapter({
+        chunks,
+        onConnect: (_messages, data) => {
+          capturedData = data
+        },
+      })
+
+      const client = new ChatClient({
+        connection: adapter,
+        // Legacy `body` and new `forwardedProps` declared together —
+        // simulates a mid-migration codebase.
+        body: { model: 'gpt-4', temperature: 0.7 },
+        forwardedProps: { model: 'gpt-4o' },
+      })
+
+      await client.sendMessage('Hello')
+
+      // forwardedProps wins on key collision so partial migrations are sane.
+      expect(capturedData?.['model']).toBe('gpt-4o')
+      // Non-conflicting keys from `body` are still forwarded.
+      expect(capturedData?.['temperature']).toBe(0.7)
+    })
+
+    it('should not auto-emit `conversationId` in merged body (replaced by AG-UI threadId)', async () => {
       const chunks = createTextChunks('Response')
       let capturedData: Record<string, any> | undefined
       const adapter = createMockConnectionAdapter({
@@ -1641,7 +1824,33 @@ describe('ChatClient', () => {
 
       await client.sendMessage('Hello')
 
-      expect(capturedData?.conversationId).toBe('my-conversation')
+      // `conversationId` was the pre-AG-UI auto-emitted field. The client
+      // now emits `threadId` at the wire's top level instead; the legacy
+      // auto-emit was dropped to avoid duplicating the same identifier.
+      // User-set `forwardedProps.conversationId` would still pass through.
+      expect(capturedData?.['conversationId']).toBeUndefined()
+    })
+
+    it('should pass through user-set conversationId via forwardedProps', async () => {
+      const chunks = createTextChunks('Response')
+      let capturedData: Record<string, any> | undefined
+      const adapter = createMockConnectionAdapter({
+        chunks,
+        onConnect: (_messages, data) => {
+          capturedData = data
+        },
+      })
+
+      const client = new ChatClient({
+        connection: adapter,
+        forwardedProps: { conversationId: 'user-supplied' },
+      })
+
+      await client.sendMessage('Hello')
+
+      // Backward compat: a user explicitly setting `conversationId` (e.g.
+      // because their server still reads it) still works unchanged.
+      expect(capturedData?.['conversationId']).toBe('user-supplied')
     })
 
     it('should clear per-message body after request', async () => {
@@ -1661,12 +1870,12 @@ describe('ChatClient', () => {
 
       // First message with per-message body
       await client.sendMessage('First', { temperature: 0.9 })
-      expect(capturedData?.temperature).toBe(0.9)
+      expect(capturedData?.['temperature']).toBe(0.9)
 
       // Second message without per-message body should not have temperature
       await client.sendMessage('Second')
-      expect(capturedData?.temperature).toBeUndefined()
-      expect(capturedData?.model).toBe('gpt-4')
+      expect(capturedData?.['temperature']).toBeUndefined()
+      expect(capturedData?.['model']).toBe('gpt-4')
     })
 
     it('should emit events with multimodal content', async () => {
@@ -1924,29 +2133,30 @@ describe('ChatClient', () => {
             // Yield the tool call and approval request
             const preChunks: Array<StreamChunk> = [
               {
-                type: 'TOOL_CALL_START',
+                type: EventType.TOOL_CALL_START,
                 toolCallId: 'tc-2',
                 toolName: 'dangerous_tool_2',
                 model: 'test',
                 timestamp: Date.now(),
+                toolCallName: 'dangerous_tool_call_2',
                 index: 0,
-              } as unknown as StreamChunk,
+              },
               {
-                type: 'TOOL_CALL_ARGS',
+                type: EventType.TOOL_CALL_ARGS,
                 toolCallId: 'tc-2',
                 model: 'test',
                 timestamp: Date.now(),
                 delta: '{}',
-              } as unknown as StreamChunk,
+              },
               {
-                type: 'TOOL_CALL_END',
+                type: EventType.TOOL_CALL_END,
                 toolCallId: 'tc-2',
                 toolName: 'dangerous_tool_2',
                 model: 'test',
                 timestamp: Date.now(),
-              } as unknown as StreamChunk,
+              },
               {
-                type: 'CUSTOM',
+                type: EventType.CUSTOM,
                 model: 'test',
                 timestamp: Date.now(),
                 name: 'approval-requested',
@@ -1956,7 +2166,7 @@ describe('ChatClient', () => {
                   input: {},
                   approval: { id: 'approval-2', needsApproval: true },
                 },
-              } as unknown as StreamChunk,
+              },
             ]
             for (const chunk of preChunks) yield chunk
 
@@ -1965,13 +2175,14 @@ describe('ChatClient', () => {
               resolveStreamPause = resolve
             })
 
-            yield asChunk({
-              type: 'RUN_FINISHED' as const,
+            yield {
+              type: EventType.RUN_FINISHED as const,
               runId: 'run-2',
+              threadId: 'thread-1',
               model: 'test',
               timestamp: Date.now(),
               finishReason: 'tool_calls' as const,
-            })
+            }
           } else if (streamCount === 3) {
             // Third stream (after second approval): final text response
             const chunks = createTextChunks('All done!')
@@ -2067,20 +2278,21 @@ describe('ChatClient', () => {
       // Run A starts with text message
       chunks.push(
         {
-          type: 'RUN_STARTED',
+          type: EventType.RUN_STARTED,
           runId: 'run-a',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
-        } as unknown as StreamChunk,
+        },
         {
-          type: 'TEXT_MESSAGE_START',
+          type: EventType.TEXT_MESSAGE_START,
           messageId: 'msg-a',
           role: 'assistant',
           model: 'test',
           timestamp: Date.now(),
         } as StreamChunk,
         {
-          type: 'TEXT_MESSAGE_CONTENT',
+          type: EventType.TEXT_MESSAGE_CONTENT,
           messageId: 'msg-a',
           model: 'test',
           timestamp: Date.now(),
@@ -2093,20 +2305,21 @@ describe('ChatClient', () => {
       // Run B starts concurrently
       chunks.push(
         {
-          type: 'RUN_STARTED',
+          type: EventType.RUN_STARTED,
           runId: 'run-b',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
-        } as unknown as StreamChunk,
+        },
         {
-          type: 'TEXT_MESSAGE_START',
+          type: EventType.TEXT_MESSAGE_START,
           messageId: 'msg-b',
           role: 'assistant',
           model: 'test',
           timestamp: Date.now(),
         } as StreamChunk,
         {
-          type: 'TEXT_MESSAGE_CONTENT',
+          type: EventType.TEXT_MESSAGE_CONTENT,
           messageId: 'msg-b',
           model: 'test',
           timestamp: Date.now(),
@@ -2118,18 +2331,19 @@ describe('ChatClient', () => {
 
       // Run B finishes — Run A should still be active
       chunks.push({
-        type: 'RUN_FINISHED',
+        type: EventType.RUN_FINISHED,
         runId: 'run-b',
+        threadId: 'thread-1',
         model: 'test',
         timestamp: Date.now(),
         finishReason: 'stop',
-      } as unknown as StreamChunk)
+      })
       wake.fn?.()
       await new Promise((resolve) => setTimeout(resolve, 20))
 
       // Run A continues streaming
       chunks.push({
-        type: 'TEXT_MESSAGE_CONTENT',
+        type: EventType.TEXT_MESSAGE_CONTENT,
         messageId: 'msg-a',
         model: 'test',
         timestamp: Date.now(),
@@ -2157,12 +2371,13 @@ describe('ChatClient', () => {
 
       // Finish run A
       chunks.push({
-        type: 'RUN_FINISHED',
+        type: EventType.RUN_FINISHED,
         runId: 'run-a',
+        threadId: 'thread-1',
         model: 'test',
         timestamp: Date.now(),
         finishReason: 'stop',
-      } as unknown as StreamChunk)
+      })
       wake.fn?.()
       await new Promise((resolve) => setTimeout(resolve, 20))
 
@@ -2222,25 +2437,27 @@ describe('ChatClient', () => {
       // Resumed content for in-progress message (no TEXT_MESSAGE_START)
       chunks.push(
         {
-          type: 'RUN_STARTED',
+          type: EventType.RUN_STARTED,
           runId: 'run-1',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
-        } as unknown as StreamChunk,
+        },
         {
-          type: 'TEXT_MESSAGE_CONTENT',
+          type: EventType.TEXT_MESSAGE_CONTENT,
           messageId: 'asst-1',
           model: 'test',
           timestamp: Date.now(),
           delta: 'time...',
         } as StreamChunk,
         {
-          type: 'RUN_FINISHED',
+          type: EventType.RUN_FINISHED,
           runId: 'run-1',
+          threadId: 'thread-1',
           model: 'test',
           timestamp: Date.now(),
           finishReason: 'stop',
-        } as unknown as StreamChunk,
+        },
       )
       wake.fn?.()
       await new Promise((resolve) => setTimeout(resolve, 20))

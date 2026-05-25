@@ -5,6 +5,7 @@
  */
 
 import { EventType } from '@ag-ui/core'
+import { toRunErrorPayload } from './error-payload'
 import type { StreamChunk } from '../types'
 
 function createId(prefix: string): string {
@@ -33,7 +34,7 @@ export async function* streamGenerationResult<TResult>(
     runId,
     threadId,
     timestamp: Date.now(),
-  } as StreamChunk
+  }
 
   try {
     const result = await generator()
@@ -43,7 +44,7 @@ export async function* streamGenerationResult<TResult>(
       name: 'generation:result',
       value: result as unknown,
       timestamp: Date.now(),
-    } as StreamChunk
+    }
 
     yield {
       type: EventType.RUN_FINISHED,
@@ -51,20 +52,25 @@ export async function* streamGenerationResult<TResult>(
       threadId,
       finishReason: 'stop',
       timestamp: Date.now(),
-    } as StreamChunk
-  } catch (error: any) {
+    }
+  } catch (error: unknown) {
+    const payload = toRunErrorPayload(error, 'Generation failed')
+    // `code` is omitted entirely when undefined so the event matches the
+    // AG-UI `code?: string` shape under `exactOptionalPropertyTypes`. The
+    // deprecated nested `error` form preserves the same conditional
+    // structure for backward compatibility.
+    const codeFields =
+      payload.code !== undefined ? { code: payload.code } : undefined
     yield {
       type: EventType.RUN_ERROR,
-      runId,
-      threadId,
-      message: error.message || 'Generation failed',
-      code: error.code,
+      message: payload.message,
+      ...codeFields,
       // Deprecated nested form for backward compatibility
       error: {
-        message: error.message || 'Generation failed',
-        code: error.code,
+        message: payload.message,
+        ...codeFields,
       },
       timestamp: Date.now(),
-    } as StreamChunk
+    }
   }
 }

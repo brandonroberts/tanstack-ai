@@ -1,7 +1,7 @@
 {
   "name": "@tanstack/ai-react",
-  "version": "0.7.15",
-  "description": "React hooks for TanStack AI",
+  "version": "0.11.7",
+  "description": "React hooks for TanStack AI streaming chat, realtime voice, structured outputs, and media generation.",
   "author": "",
   "license": "MIT",
   "repository": {
@@ -34,11 +34,17 @@
   },
   "keywords": [
     "ai",
+    "ai-sdk",
+    "typescript",
+    "tanstack",
     "react",
     "hooks",
-    "tanstack",
     "chat",
-    "streaming"
+    "streaming",
+    "realtime",
+    "tool-calling",
+    "structured-outputs",
+    "media-generation"
   ],
   "dependencies": {
     "@tanstack/ai-client": "workspace:*"
@@ -49,12 +55,13 @@
     "react": ">=18.0.0"
   },
   "devDependencies": {
+    "@standard-schema/spec": "^1.1.0",
     "@tanstack/ai": "workspace:*",
     "@testing-library/react": "^16.3.0",
     "@types/react": "^19.2.7",
     "@vitest/coverage-v8": "4.0.14",
     "jsdom": "^27.2.0",
     "react": "^19.2.3",
-    "vite": "^7.2.7"
+    "vite": "^7.3.3"
   }
 }

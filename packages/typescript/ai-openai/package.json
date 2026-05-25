@@ -1,7 +1,7 @@
 {
   "name": "@tanstack/ai-openai",
-  "version": "0.8.1",
-  "description": "OpenAI adapter for TanStack AI",
+  "version": "0.10.0",
+  "description": "OpenAI adapter for TanStack AI chat, tools, images, video, speech, transcription, realtime, and structured outputs.",
   "author": "",
   "license": "MIT",
   "repository": {
@@ -38,12 +38,24 @@
   },
   "keywords": [
     "ai",
+    "ai-sdk",
+    "typescript",
+    "tanstack",
     "openai",
     "gpt",
-    "tanstack",
-    "adapter"
+    "adapter",
+    "chat",
+    "tool-calling",
+    "structured-outputs",
+    "image-generation",
+    "video-generation",
+    "text-to-speech",
+    "transcription",
+    "realtime"
   ],
   "dependencies": {
+    "@tanstack/ai-utils": "workspace:*",
+    "@tanstack/openai-base": "workspace:*",
     "openai": "^6.9.1"
   },
   "peerDependencies": {
@@ -55,7 +67,7 @@
     "@tanstack/ai": "workspace:*",
     "@tanstack/ai-client": "workspace:*",
     "@vitest/coverage-v8": "4.0.14",
-    "vite": "^7.2.7",
+    "vite": "^7.3.3",
     "zod": "^4.2.0"
   }
 }

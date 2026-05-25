@@ -1,5 +1,153 @@
 # @tanstack/ai-vue-ui
 
+## 0.2.3
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.10.8
+
+## 0.2.2
+
+### Patch Changes
+
+- Refresh package README content and npm metadata for better discoverability. ([#626](https://github.com/TanStack/ai/pull/626))
+
+- Updated dependencies [[`ebeb22e`](https://github.com/TanStack/ai/commit/ebeb22ec68f456b09e0181ac6f5d1ac25a0affd2)]:
+  - @tanstack/ai-vue@0.10.7
+
+## 0.2.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.10.6
+
+## 0.2.0
+
+### Minor Changes
+
+- `TextPart` now accepts `remarkPlugins`, `rehypePlugins`, and (React/Solid) ([#599](https://github.com/TanStack/ai/pull/599))
+  `components` props, plus a `disableDefaultPlugins` escape hatch. User plugins
+  merge with the secure defaults — `rehype-sanitize` continues to run last
+  unless defaults are disabled.
+
+  This fixes [#164](https://github.com/TanStack/ai/issues/164): bold and
+  emphasis in Japanese, Chinese, and Korean text rendered incorrectly because
+  of a CommonMark spec defect. Consumers can now drop in
+  [`remark-cjk-friendly`](https://www.npmjs.com/package/remark-cjk-friendly)
+  with a single prop:
+
+  ```tsx
+  import remarkCjkFriendly from 'remark-cjk-friendly'
+  ;<TextPart content={content} remarkPlugins={[remarkCjkFriendly]} />
+  ```
+
+  Also fixes a latent bug in `@tanstack/ai-react-ui` where `remark-gfm` was
+  passed inside the rehype plugin array, silently disabling GFM features
+  (tables, strikethrough, task lists) in the React `TextPart`.
+
+  `@tanstack/ai-vue-ui` omits the `components` prop because its underlying
+  renderer (`@crazydos/vue-markdown`) does not expose component overrides;
+  use that library's slot API for custom rendering.
+
+### Patch Changes
+
+- Updated dependencies [[`a03d12b`](https://github.com/TanStack/ai/commit/a03d12b13ade93f3e262c6ffa996696ce27472ef)]:
+  - @tanstack/ai-vue@0.10.5
+
+## 0.1.40
+
+### Patch Changes
+
+- Tighten TypeScript safety: enable `noImplicitOverride`, ([#579](https://github.com/TanStack/ai/pull/579))
+  `noFallthroughCasesInSwitch`, and `useDefineForClassFields` in the
+  root `tsconfig.json`; add a typed-ESLint block scoped to
+  `packages/typescript/*/src/**` that turns on `no-floating-promises`,
+  `no-misused-promises`, `await-thenable`,
+  `switch-exhaustiveness-check`, `consistent-type-exports`,
+  `prefer-readonly`, and `no-non-null-assertion` (errors), plus
+  `no-explicit-any` (warning). `@ts-ignore` and `@ts-nocheck` are
+  disallowed in library source via `@typescript-eslint/ban-ts-comment`,
+  and `as unknown as <T>` double-casts are blocked by a
+  `no-restricted-syntax` rule (escape hatches available with an inline
+  reason). Two flags from the original five-flag set —
+  `noPropertyAccessFromIndexSignature` and `exactOptionalPropertyTypes`
+  — were tried and rolled back: they produced ~500 lines of bracket-
+  access and conditional-spread churn without catching any real bugs,
+  and `exactOptionalPropertyTypes` would have forced consumers using
+  it themselves to deal with our internals' style preferences.
+
+  User-visible API surface is unchanged; this is a hardening pass to
+  keep streaming/agent-loop correctness and discriminated-union
+  exhaustiveness honest going forward. See issue #564.
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.10.4
+
+## 0.1.39
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.10.3
+
+## 0.1.38
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.10.2
+
+## 0.1.37
+
+### Patch Changes
+
+- Updated dependencies [[`88fe80c`](https://github.com/TanStack/ai/commit/88fe80c404a218bf3e3a1ed5853a14f61248ed14)]:
+  - @tanstack/ai-vue@0.10.1
+
+## 0.1.36
+
+### Patch Changes
+
+- Updated dependencies [[`2e0e2eb`](https://github.com/TanStack/ai/commit/2e0e2eb72684aac82e570d57767656e218289b49)]:
+  - @tanstack/ai-vue@0.10.0
+
+## 0.1.35
+
+### Patch Changes
+
+- Updated dependencies [[`a9d1916`](https://github.com/TanStack/ai/commit/a9d19165a5028515cf1d091d611c8ac4b5b86099)]:
+  - @tanstack/ai-vue@0.9.0
+
+## 0.1.34
+
+### Patch Changes
+
+- Updated dependencies [[`98979f7`](https://github.com/TanStack/ai/commit/98979f7e72f4b5bfb816fb14b60a12871f8c4bec)]:
+  - @tanstack/ai-vue@0.8.0
+
+## 0.1.33
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.7.2
+
+## 0.1.32
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @tanstack/ai-vue@0.7.1
+
+## 0.1.31
+
+### Patch Changes
+
+- Updated dependencies [[`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a), [`af9eb7b`](https://github.com/TanStack/ai/commit/af9eb7bbb875b23b7e99b2e6b743636daad402d1)]:
+  - @tanstack/ai-vue@0.7.0
+
 ## 0.1.30
 
 ### Patch Changes

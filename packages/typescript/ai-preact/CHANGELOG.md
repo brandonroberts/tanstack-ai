@@ -1,5 +1,129 @@
 # @tanstack/ai-preact
 
+## 0.6.32
+
+### Patch Changes
+
+- Updated dependencies [[`e144a53`](https://github.com/TanStack/ai/commit/e144a53e4348bb0bc365dbe342c8538544242227)]:
+  - @tanstack/ai@0.21.3
+  - @tanstack/ai-client@0.11.7
+
+## 0.6.31
+
+### Patch Changes
+
+- Refresh package README content and npm metadata for better discoverability. ([#626](https://github.com/TanStack/ai/pull/626))
+
+- Updated dependencies [[`ebeb22e`](https://github.com/TanStack/ai/commit/ebeb22ec68f456b09e0181ac6f5d1ac25a0affd2)]:
+  - @tanstack/ai@0.21.2
+  - @tanstack/ai-client@0.11.6
+
+## 0.6.30
+
+### Patch Changes
+
+- Updated dependencies [[`573f12e`](https://github.com/TanStack/ai/commit/573f12eb5a3b04a2625be92900099f48d6f76632)]:
+  - @tanstack/ai@0.21.1
+  - @tanstack/ai-client@0.11.5
+
+## 0.6.29
+
+### Patch Changes
+
+- Expose the connection adapter primitives needed to build custom ([#597](https://github.com/TanStack/ai/pull/597))
+  transports from every framework hook package. `@tanstack/ai-client`
+  now re-exports `RunAgentInputContext` at its entry point, and
+  `@tanstack/ai-react`, `@tanstack/ai-vue`, `@tanstack/ai-solid`,
+  `@tanstack/ai-svelte`, and `@tanstack/ai-preact` now re-export
+  `rpcStream`, `ConnectConnectionAdapter`, `SubscribeConnectionAdapter`,
+  and `RunAgentInputContext` alongside the existing `stream`,
+  `fetchServerSentEvents`, and `fetchHttpStream` re-exports.
+
+  Previously, authors of WebSocket / persistent or RPC-backed adapters
+  had to import these symbols from `@tanstack/ai-client` even though
+  they were already pulling `useChat` from a framework package. No
+  runtime change.
+
+- Updated dependencies [[`ec1393d`](https://github.com/TanStack/ai/commit/ec1393db4383798e5f2574dfd87779c22c309529), [`a03d12b`](https://github.com/TanStack/ai/commit/a03d12b13ade93f3e262c6ffa996696ce27472ef), [`188fe11`](https://github.com/TanStack/ai/commit/188fe11b9b9691e5a241cfc416803da5b8ce5376)]:
+  - @tanstack/ai@0.21.0
+  - @tanstack/ai-client@0.11.4
+
+## 0.6.28
+
+### Patch Changes
+
+- Updated dependencies [[`2ad137b`](https://github.com/TanStack/ai/commit/2ad137bd22512248bd1684cccce35ba89597cf96)]:
+  - @tanstack/ai@0.20.1
+  - @tanstack/ai-client@0.11.3
+
+## 0.6.27
+
+### Patch Changes
+
+- Updated dependencies [[`496db9c`](https://github.com/TanStack/ai/commit/496db9c42a7d3051a1295091eae29ae1c31ef997)]:
+  - @tanstack/ai@0.20.0
+  - @tanstack/ai-client@0.11.2
+
+## 0.6.26
+
+### Patch Changes
+
+- Updated dependencies [[`617b5b5`](https://github.com/TanStack/ai/commit/617b5b512a6b3989c442efa41975dacc194d882a)]:
+  - @tanstack/ai@0.19.1
+  - @tanstack/ai-client@0.11.1
+
+## 0.6.25
+
+### Patch Changes
+
+- Updated dependencies [[`2e0e2eb`](https://github.com/TanStack/ai/commit/2e0e2eb72684aac82e570d57767656e218289b49)]:
+  - @tanstack/ai@0.19.0
+  - @tanstack/ai-client@0.11.0
+
+## 0.6.24
+
+### Patch Changes
+
+- Updated dependencies [[`a9d1916`](https://github.com/TanStack/ai/commit/a9d19165a5028515cf1d091d611c8ac4b5b86099), [`e810153`](https://github.com/TanStack/ai/commit/e810153b34e593d3f3e1bbd8050164a6ad4423ed)]:
+  - @tanstack/ai@0.18.0
+  - @tanstack/ai-client@0.10.0
+
+## 0.6.23
+
+### Patch Changes
+
+- Updated dependencies [[`98979f7`](https://github.com/TanStack/ai/commit/98979f7e72f4b5bfb816fb14b60a12871f8c4bec), [`02527c2`](https://github.com/TanStack/ai/commit/02527c28c3285829535cd486e529e659260b3c5d)]:
+  - @tanstack/ai@0.17.0
+  - @tanstack/ai-client@0.9.2
+
+## 0.6.22
+
+### Patch Changes
+
+- Updated dependencies [[`87f305c`](https://github.com/TanStack/ai/commit/87f305c9961d608fd7bea93a5100698a98aed11d)]:
+  - @tanstack/ai@0.16.0
+  - @tanstack/ai-client@0.9.1
+
+## 0.6.21
+
+### Patch Changes
+
+- Updated dependencies [[`a4e2c55`](https://github.com/TanStack/ai/commit/a4e2c55a79490c2245ff2de2d3e1803a533c867b), [`82078bd`](https://github.com/TanStack/ai/commit/82078bdabe28d7d4a15a2847d667f363bf0a9cbe), [`b2d3cc1`](https://github.com/TanStack/ai/commit/b2d3cc131a31c54bd1e5841f958fbe333514e508), [`13cceae`](https://github.com/TanStack/ai/commit/13cceaedf64e398ca15b8dbbbfe215329ea26794)]:
+  - @tanstack/ai@0.15.0
+  - @tanstack/ai-client@0.9.0
+
+## 0.6.20
+
+### Patch Changes
+
+- fix(ai-react, ai-preact, ai-vue, ai-solid): propagate `useChat` callback changes ([#465](https://github.com/TanStack/ai/pull/465))
+
+  `onResponse`, `onChunk`, and `onCustomEvent` were captured by reference at client creation time. When a parent component re-rendered with fresh closures, the `ChatClient` kept calling the originals. Every framework now wraps these callbacks so the latest `options.xxx` is read at call time (via `optionsRef.current` in React/Preact, and direct option access in Vue/Solid, matching the pattern already used for `onFinish` / `onError`). Clearing a callback (setting it to `undefined`) now correctly no-ops instead of continuing to invoke the stale handler.
+
+- Updated dependencies [[`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a), [`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a), [`af9eb7b`](https://github.com/TanStack/ai/commit/af9eb7bbb875b23b7e99b2e6b743636daad402d1), [`008f015`](https://github.com/TanStack/ai/commit/008f0154f852e7e6734d3e3d35cad47780b52b7a), [`54523f5`](https://github.com/TanStack/ai/commit/54523f5e9a9b4d4ea6c49e4551936bc2cc25593a)]:
+  - @tanstack/ai@0.14.0
+  - @tanstack/ai-client@0.8.0
+
 ## 0.6.19
 
 ### Patch Changes

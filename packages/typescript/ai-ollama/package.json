@@ -1,7 +1,7 @@
 {
   "name": "@tanstack/ai-ollama",
-  "version": "0.6.9",
-  "description": "Ollama adapter for TanStack AI",
+  "version": "0.6.21",
+  "description": "Ollama adapter for TanStack AI local LLM chat, tool calling, and structured outputs.",
   "author": "",
   "license": "MIT",
   "repository": {
@@ -34,13 +34,20 @@
   },
   "keywords": [
     "ai",
+    "ai-sdk",
+    "typescript",
+    "tanstack",
     "ollama",
+    "local-llm",
     "llama",
     "mistral",
-    "tanstack",
-    "adapter"
+    "adapter",
+    "chat",
+    "tool-calling",
+    "structured-outputs"
   ],
   "dependencies": {
+    "@tanstack/ai-utils": "workspace:*",
     "ollama": "^0.6.3"
   },
   "peerDependencies": {
@@ -49,6 +56,6 @@
   "devDependencies": {
     "@tanstack/ai": "workspace:*",
     "@vitest/coverage-v8": "4.0.14",
-    "vite": "^7.2.7"
+    "vite": "^7.3.3"
   }
 }

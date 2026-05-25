@@ -24,6 +24,22 @@ function isContentPart(part: MessagePart): part is ContentPart {
   )
 }
 
+function safeJsonStringify(value: unknown): string {
+  try {
+    return JSON.stringify(value)
+  } catch {
+    return ''
+  }
+}
+
+function parseToolResultContent(content: string): unknown {
+  try {
+    return JSON.parse(content)
+  } catch {
+    return content
+  }
+}
+
 /**
  * Collapse an array of ContentParts into the most compact ModelMessage content:
  * - Empty array → null
@@ -63,15 +79,55 @@ function getTextContent(content: string | null | Array<ContentPart>): string {
 export function convertMessagesToModelMessages(
   messages: Array<UIMessage | ModelMessage>,
 ): Array<ModelMessage> {
+  // Pre-pass: collect toolCallIds already represented in anchor UIMessage parts.
+  // Fan-out tool messages whose toolCallId matches an anchored ToolResultPart
+  // are AG-UI duplicates and must be dropped to avoid double-feeding the LLM.
+  const anchoredToolCallIds = new Set<string>()
+  for (const msg of messages) {
+    if ('parts' in msg) {
+      for (const part of msg.parts) {
+        if (part.type === 'tool-result') {
+          anchoredToolCallIds.add(part.toolCallId)
+        }
+      }
+    }
+  }
+
   const modelMessages: Array<ModelMessage> = []
   for (const msg of messages) {
     if ('parts' in msg) {
-      // UIMessage - convert to ModelMessages
+      // UIMessage anchor — existing fan-out path
       modelMessages.push(...uiMessageToModelMessages(msg))
-    } else {
-      // Already ModelMessage
-      modelMessages.push(msg)
+      continue
     }
+
+    const role = (msg as { role: string }).role
+
+    // AG-UI tool fan-out duplicate — drop if anchor already covers it
+    if (
+      role === 'tool' &&
+      msg.toolCallId &&
+      anchoredToolCallIds.has(msg.toolCallId)
+    ) {
+      continue
+    }
+
+    // AG-UI reasoning and activity — no ModelMessage equivalent today
+    if (role === 'reasoning' || role === 'activity') {
+      continue
+    }
+
+    // AG-UI developer — collapse to system
+    if (role === 'developer') {
+      modelMessages.push({
+        role: 'system' as ModelMessage['role'],
+        content: (msg as { content: string }).content,
+      })
+      continue
+    }
+
+    // Already a ModelMessage (user, assistant, system, tool with no anchor) — pass through
+    modelMessages.push(msg)
   }
   return modelMessages
 }
@@ -138,6 +194,10 @@ interface AssistantSegment {
     id: string
     type: 'function'
     function: { name: string; arguments: string }
+    /** Provider-specific metadata that round-trips with the tool call.
+     * Untyped at this framework layer; adapters narrow it via their
+     * `TToolCallMetadata` generic. */
+    metadata?: unknown
   }>
 }
 
@@ -148,6 +208,7 @@ function createSegment(): AssistantSegment {
 function isToolCallIncluded(part: ToolCallPart): boolean {
   return (
     part.state === 'input-complete' ||
+    part.state === 'complete' ||
     part.state === 'approval-responded' ||
     part.output !== undefined
   )
@@ -165,6 +226,7 @@ function isToolCallIncluded(part: ToolCallPart): boolean {
 function buildAssistantMessages(uiMessage: UIMessage): Array<ModelMessage> {
   const messageList: Array<ModelMessage> = []
   let current = createSegment()
+  let pendingThinking: Array<{ content: string; signature?: string }> = []
 
   // Track emitted tool result IDs to avoid duplicates.
   // A tool call can have BOTH an explicit tool-result part AND an output
@@ -181,7 +243,9 @@ function buildAssistantMessages(uiMessage: UIMessage): Array<ModelMessage> {
         role: 'assistant',
         content,
         ...(hasToolCalls && { toolCalls: current.toolCalls }),
+        ...(pendingThinking.length > 0 && { thinking: pendingThinking }),
       })
+      pendingThinking = []
     }
     current = createSegment()
   }
@@ -205,6 +269,7 @@ function buildAssistantMessages(uiMessage: UIMessage): Array<ModelMessage> {
               name: part.name,
               arguments: part.arguments,
             },
+            ...(part.metadata !== undefined && { metadata: part.metadata }),
           })
         }
         break
@@ -227,7 +292,33 @@ function buildAssistantMessages(uiMessage: UIMessage): Array<ModelMessage> {
         }
         break
 
-      // thinking parts are skipped - they're UI-only
+      case 'thinking':
+        if (part.content) {
+          pendingThinking.push({
+            content: part.content,
+            ...(part.signature && { signature: part.signature }),
+          })
+        }
+        break
+
+      case 'structured-output':
+        // Only emit completed structured responses into history. Streaming or
+        // errored buffers would push malformed JSON into the next LLM turn's
+        // assistant content. `raw` is the source of truth; `data` is the
+        // defensive fallback for terminal-only completes that didn't ship raw.
+        if (part.status === 'complete') {
+          const serialized =
+            part.raw !== ''
+              ? part.raw
+              : part.data !== undefined
+                ? safeJsonStringify(part.data)
+                : ''
+          if (serialized !== '') {
+            current.contentParts.push({ type: 'text', content: serialized })
+          }
+        }
+        break
+
       default:
         break
     }
@@ -306,6 +397,17 @@ export function modelMessageToUIMessage(
 ): UIMessage {
   const parts: Array<MessagePart> = []
 
+  if (modelMessage.role === 'assistant' && modelMessage.thinking?.length) {
+    for (const thinking of modelMessage.thinking) {
+      if (!thinking.content) continue
+      parts.push({
+        type: 'thinking',
+        content: thinking.content,
+        ...(thinking.signature && { signature: thinking.signature }),
+      })
+    }
+  }
+
   // Handle tool results (when role is "tool") - only produce tool-result part,
   // not a text part (the content IS the tool result, not display text)
   if (modelMessage.role === 'tool' && modelMessage.toolCallId) {
@@ -340,6 +442,7 @@ export function modelMessageToUIMessage(
         name: toolCall.function.name,
         arguments: toolCall.function.arguments,
         state: 'input-complete', // Model messages have complete arguments
+        ...(toolCall.metadata !== undefined && { metadata: toolCall.metadata }),
       })
     }
   }
@@ -369,13 +472,25 @@ export function modelMessagesToUIMessages(
     if (msg.role === 'tool') {
       // Tool result - merge into the last assistant message if possible
       if (
+        msg.toolCallId !== undefined &&
         currentAssistantMessage &&
         currentAssistantMessage.role === 'assistant'
       ) {
+        const content = getTextContent(msg.content)
+        const toolCallPart = currentAssistantMessage.parts.find(
+          (part): part is ToolCallPart =>
+            part.type === 'tool-call' && part.id === msg.toolCallId,
+        )
+
+        if (toolCallPart) {
+          toolCallPart.output = parseToolResultContent(content)
+          toolCallPart.state = 'complete'
+        }
+
         currentAssistantMessage.parts.push({
           type: 'tool-result',
-          toolCallId: msg.toolCallId!,
-          content: getTextContent(msg.content),
+          toolCallId: msg.toolCallId,
+          content,
           state: 'complete',
         })
       } else {

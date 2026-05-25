@@ -5,7 +5,7 @@ title: StepFinishedEvent
 
 # Interface: StepFinishedEvent
 
-Defined in: [packages/typescript/ai/src/types.ts:978](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L978)
+Defined in: [packages/typescript/ai/src/types.ts:1080](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L1080)
 
 Emitted when a thinking/reasoning step finishes.
 
@@ -30,7 +30,7 @@ TanStack AI adds: `model?`, `stepId?` (deprecated alias), `delta?`, `content?`
 optional content: string;
 ```
 
-Defined in: [packages/typescript/ai/src/types.ts:989](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L989)
+Defined in: [packages/typescript/ai/src/types.ts:1091](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L1091)
 
 Full accumulated thinking content (TanStack AI internal)
 
@@ -42,7 +42,7 @@ Full accumulated thinking content (TanStack AI internal)
 optional delta: string;
 ```
 
-Defined in: [packages/typescript/ai/src/types.ts:987](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L987)
+Defined in: [packages/typescript/ai/src/types.ts:1089](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L1089)
 
 Incremental thinking content (TanStack AI internal)
 
@@ -54,9 +54,21 @@ Incremental thinking content (TanStack AI internal)
 optional model: string;
 ```
 
-Defined in: [packages/typescript/ai/src/types.ts:980](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L980)
+Defined in: [packages/typescript/ai/src/types.ts:1082](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L1082)
 
 Model identifier for multi-model support
+
+***
+
+### signature?
+
+```ts
+optional signature: string;
+```
+
+Defined in: [packages/typescript/ai/src/types.ts:1093](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L1093)
+
+Provider signature for the thinking block
 
 ***
 
@@ -66,7 +78,7 @@ Model identifier for multi-model support
 optional stepId: string;
 ```
 
-Defined in: [packages/typescript/ai/src/types.ts:985](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L985)
+Defined in: [packages/typescript/ai/src/types.ts:1087](https://github.com/TanStack/ai/blob/main/packages/typescript/ai/src/types.ts#L1087)
 
 #### Deprecated
 

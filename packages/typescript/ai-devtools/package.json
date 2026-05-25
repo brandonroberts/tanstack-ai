@@ -1,7 +1,7 @@
 {
   "name": "@tanstack/ai-devtools-core",
-  "version": "0.3.24",
-  "description": "Core TanStack AI Devtools",
+  "version": "0.3.37",
+  "description": "Core TanStack AI Devtools plugin for inspecting chat messages, tool calls, streams, and errors.",
   "author": "",
   "license": "MIT",
   "repository": {
@@ -71,11 +71,15 @@
   },
   "keywords": [
     "ai",
+    "ai-sdk",
+    "typescript",
     "tanstack",
-    "sdk",
-    "llm",
+    "devtools",
+    "debugging",
+    "observability",
     "chat",
-    "embeddings"
+    "tool-calling",
+    "streaming"
   ],
   "dependencies": {
     "@tanstack/ai": "workspace:*",
@@ -90,7 +94,7 @@
     "jsdom": "^27.2.0",
     "tsup": "^8.5.1",
     "tsup-preset-solid": "^2.2.0",
-    "vite": "^7.2.7",
+    "vite": "^7.3.3",
     "vite-plugin-solid": "^2.11.10"
   }
 }

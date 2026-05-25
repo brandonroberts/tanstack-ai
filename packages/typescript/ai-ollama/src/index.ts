@@ -13,16 +13,20 @@ export {
 } from './adapters/text'
 export { OLLAMA_TEXT_MODELS as OllamaTextModels } from './model-meta'
 
-// Summarize adapter
+// Summarize - thin factory functions over @tanstack/ai's ChatStreamSummarizeAdapter
 export {
-  OllamaSummarizeAdapter,
   createOllamaSummarize,
   ollamaSummarize,
   type OllamaSummarizeAdapterOptions,
   type OllamaSummarizeModel,
-  type OllamaSummarizeProviderOptions,
 } from './adapters/summarize'
 export { OLLAMA_TEXT_MODELS as OllamaSummarizeModels } from './model-meta'
+
+// Tool converters
+export {
+  convertFunctionToolToAdapterFormat,
+  convertToolsToProviderFormat,
+} from './tools'
 
 // ===========================
 // Type Exports

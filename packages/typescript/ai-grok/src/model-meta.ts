@@ -263,6 +263,46 @@ const GROK_4_20_MULTI_AGENT = {
   },
 } as const satisfies ModelMeta
 
+const GROK_4_3 = {
+  name: 'grok-4.3',
+  context_window: 1_000_000,
+  supports: {
+    input: ['text', 'image'],
+    output: ['text'],
+    capabilities: ['reasoning', 'structured_outputs', 'tool_calling'],
+    tools: [],
+  },
+  pricing: {
+    input: {
+      normal: 1.25,
+      cached: 0.2,
+    },
+    output: {
+      normal: 2.5,
+    },
+  },
+} as const satisfies ModelMeta
+
+const GROK_BUILD_0_1 = {
+  name: 'grok-build-0.1',
+  context_window: 256_000,
+  supports: {
+    input: ['text', 'image'],
+    output: ['text'],
+    capabilities: ['reasoning', 'structured_outputs', 'tool_calling'],
+    tools: [],
+  },
+  pricing: {
+    input: {
+      normal: 1,
+      cached: 0.2,
+    },
+    output: {
+      normal: 2,
+    },
+  },
+} as const satisfies ModelMeta
+
 export const GROK_CHAT_MODELS = [
   GROK_4_1_FAST_REASONING.name,
   GROK_4_1_FAST_NON_REASONING.name,
@@ -276,6 +316,10 @@ export const GROK_CHAT_MODELS = [
 
   GROK_4_20.name,
   GROK_4_20_MULTI_AGENT.name,
+
+  GROK_4_3.name,
+
+  GROK_BUILD_0_1.name,
 ] as const
 
 /**
@@ -283,8 +327,62 @@ export const GROK_CHAT_MODELS = [
  */
 export const GROK_IMAGE_MODELS = [GROK_2_IMAGE.name] as const
 
+// xAI's `/v1/tts` endpoint is endpoint-addressed and does not take a `model`
+// parameter. This synthetic identifier satisfies the SDK's `TTSOptions.model`
+// contract and provides a stable value for logging and fixture matching.
+const GROK_TTS = {
+  name: 'grok-tts',
+  supports: {
+    input: ['text'],
+    output: ['audio'],
+  },
+} as const satisfies ModelMeta
+
+// xAI's `/v1/stt` endpoint is endpoint-addressed and does not take a `model`
+// parameter. This synthetic identifier satisfies the SDK's
+// `TranscriptionOptions.model` contract.
+const GROK_STT = {
+  name: 'grok-stt',
+  supports: {
+    input: ['audio'],
+    output: ['text'],
+  },
+} as const satisfies ModelMeta
+
+const GROK_VOICE_FAST_1 = {
+  name: 'grok-voice-fast-1.0',
+  supports: {
+    input: ['audio', 'text'],
+    output: ['audio', 'text'],
+    capabilities: ['tool_calling'],
+    tools: [] as const,
+  },
+} as const satisfies ModelMeta
+
+const GROK_VOICE_THINK_FAST_1 = {
+  name: 'grok-voice-think-fast-1.0',
+  supports: {
+    input: ['audio', 'text'],
+    output: ['audio', 'text'],
+    capabilities: ['reasoning', 'tool_calling'],
+    tools: [] as const,
+  },
+} as const satisfies ModelMeta
+
+export const GROK_TTS_MODELS = [GROK_TTS.name] as const
+
+export const GROK_TRANSCRIPTION_MODELS = [GROK_STT.name] as const
+
+export const GROK_REALTIME_MODELS = [
+  GROK_VOICE_FAST_1.name,
+  GROK_VOICE_THINK_FAST_1.name,
+] as const
+
 export type GrokChatModel = (typeof GROK_CHAT_MODELS)[number]
 export type GrokImageModel = (typeof GROK_IMAGE_MODELS)[number]
+export type GrokTTSModel = (typeof GROK_TTS_MODELS)[number]
+export type GrokTranscriptionModel = (typeof GROK_TRANSCRIPTION_MODELS)[number]
+export type GrokRealtimeModel = (typeof GROK_REALTIME_MODELS)[number]
 
 /**
  * Type-only map from Grok chat model name to its supported input modalities.
@@ -302,6 +400,8 @@ export type GrokModelInputModalitiesByName = {
   [GROK_2_VISION.name]: typeof GROK_2_VISION.supports.input
   [GROK_4_20.name]: typeof GROK_4_20.supports.input
   [GROK_4_20_MULTI_AGENT.name]: typeof GROK_4_20_MULTI_AGENT.supports.input
+  [GROK_4_3.name]: typeof GROK_4_3.supports.input
+  [GROK_BUILD_0_1.name]: typeof GROK_BUILD_0_1.supports.input
 }
 
 /**

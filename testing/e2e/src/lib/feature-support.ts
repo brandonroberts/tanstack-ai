@@ -1,6 +1,13 @@
 import type { Provider, Feature } from '@/lib/types'
 
-const matrix: Record<Feature, Set<Provider>> = {
+/**
+ * Single source of truth for provider × feature support.
+ *
+ * This matrix is imported by `tests/test-matrix.ts` (Playwright specs) and
+ * by the dev routes under `src/routes/` to decide which provider/feature
+ * combinations to render and test. Update this file only — do not fork.
+ */
+export const matrix: Record<Feature, Set<Provider>> = {
   chat: new Set([
     'openai',
     'anthropic',
@@ -73,6 +80,27 @@ const matrix: Record<Feature, Set<Provider>> = {
     'grok',
     'openrouter',
   ]),
+  // Streaming structured output: only providers with native streaming JSON
+  // schema support are listed here. Other providers fall back to the
+  // activity-layer `fallbackStructuredOutputStream` (which wraps the
+  // non-streaming `structuredOutput`) but aren't exercised by E2E yet.
+  'structured-output-stream': new Set(['openai', 'groq', 'grok', 'openrouter']),
+  // Multi-turn structured output: every turn produces its own typed
+  // `structured-output` part on the assistant message, and historical
+  // turns stay renderable. Works for every provider that supports both
+  // multi-turn and structured-output — non-native-streaming adapters
+  // (anthropic, gemini, ollama) fall back to a single
+  // `structured-output.complete` event per turn, but the per-message
+  // typed part still lands and the round-trip is identical.
+  'multi-turn-structured': new Set([
+    'openai',
+    'anthropic',
+    'gemini',
+    'ollama',
+    'groq',
+    'grok',
+    'openrouter',
+  ]),
   'agentic-structured': new Set([
     'openai',
     'anthropic',
@@ -114,8 +142,8 @@ const matrix: Record<Feature, Set<Provider>> = {
   ]),
   // Gemini excluded: aimock doesn't mock Gemini's Imagen predict endpoint format
   'image-gen': new Set(['openai', 'grok']),
-  tts: new Set(['openai']),
-  transcription: new Set(['openai']),
+  tts: new Set(['openai', 'grok']),
+  transcription: new Set(['openai', 'grok']),
   'video-gen': new Set(['openai']),
 }
 
