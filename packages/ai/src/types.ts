@@ -6,7 +6,6 @@ import type { InternalLogger } from './logger/internal-logger'
 import type { SystemPrompt } from './system-prompts'
 import type { ProviderTool } from './tools/provider-tool'
 import type {
-  BaseEvent as AGUIBaseEvent,
   CustomEvent as AGUICustomEvent,
   MessagesSnapshotEvent as AGUIMessagesSnapshotEvent,
   ReasoningEncryptedValueEvent as AGUIReasoningEncryptedValueEvent,
@@ -905,16 +904,54 @@ export type AGUIEventType = `${EventType}`
 export type StreamChunkType = AGUIEventType
 
 /**
- * Base structure for AG-UI events.
- * Extends @ag-ui/core BaseEvent with TanStack AI additions.
+ * Base structure for TanStack AI events.
+ *
+ * We deliberately do NOT `extends AGUIBaseEvent` here. @ag-ui/core's
+ * schemas use Zod's `.passthrough()` mode, which leaks an index
+ * signature into every `z.infer<typeof Schema>` event type. That index
+ * signature pollutes discriminated-union narrowing — `chunk.foo` would
+ * succeed on every variant regardless of which event it is — and
+ * collapses IntelliSense back to "every property from every variant".
+ *
+ * Instead, each event below uses `Pick<AGUI*Event, [explicit fields]>`
+ * to pull in the AGUI-spec'd fields without inheriting the index
+ * signature, then declares `type` as the matching `EventType` enum
+ * literal (e.g. `EventType.RUN_STARTED`). Because the enum's runtime
+ * value IS the string `"RUN_STARTED"`, TypeScript accepts narrowing
+ * in BOTH forms:
+ *
+ *     if (chunk.type === EventType.RUN_STARTED) { ... }   // enum
+ *     if (chunk.type === 'RUN_STARTED') { ... }           // string
+ *
+ * The per-event drift guards below fail to compile if @ag-ui/core ever
+ * changes the shape of a field we mirror — they catch field-type drift
+ * but NOT new fields, so when upgrading @ag-ui/core, re-check that the
+ * `Pick<>` field lists still match the AGUI schema.
  *
  * @ag-ui/core provides: `type`, `timestamp?`, `rawEvent?`
  * TanStack AI adds: `model?`
  */
-export interface BaseAGUIEvent extends AGUIBaseEvent {
+export interface BaseAGUIEvent {
+  /** Discriminator carried by every event variant. */
+  type: EventType
+  /** Optional event timestamp (ms since epoch). */
+  timestamp?: number
+  /** Optional opaque provider payload. */
+  rawEvent?: unknown
   /** Model identifier for multi-model support */
   model?: string
 }
+
+/**
+ * Compile-time drift guard. Errors with a descriptive type if the
+ * TanStack event's fields are not assignable to the corresponding
+ * AGUI event's `Pick`'d shape. Used to catch breaking changes when
+ * @ag-ui/core releases a new version.
+ * @internal
+ */
+type AssertSatisfiesAGUI<TanStack, AGUIShape> = TanStack extends AGUIShape
+  ? true
+  : ['DRIFT: TanStack event no longer satisfies AGUI shape', TanStack, AGUIShape]
 
 // ============================================================================
 // AG-UI Event Interfaces
@@ -927,10 +964,24 @@ export interface BaseAGUIEvent extends AGUIBaseEvent {
  * @ag-ui/core provides: `threadId`, `runId`, `parentRunId?`, `input?`
  * TanStack AI adds: `model?`
  */
-export interface RunStartedEvent extends AGUIRunStartedEvent {
+export interface RunStartedEvent
+  extends Pick<
+    AGUIRunStartedEvent,
+    'threadId' | 'runId' | 'parentRunId' | 'input' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.RUN_STARTED
   /** Model identifier for multi-model support */
   model?: string
 }
+type _RunStartedDriftCheck = AssertSatisfiesAGUI<
+  Omit<RunStartedEvent, 'type' | 'model'>,
+  Pick<
+    AGUIRunStartedEvent,
+    'threadId' | 'runId' | 'parentRunId' | 'input' | 'timestamp' | 'rawEvent'
+  >
+>
+const _runStartedDriftCheck: _RunStartedDriftCheck = true
+void _runStartedDriftCheck
 
 /**
  * Emitted when a run completes successfully.
@@ -938,7 +989,12 @@ export interface RunStartedEvent extends AGUIRunStartedEvent {
  * @ag-ui/core provides: `threadId`, `runId`, `result?`
  * TanStack AI adds: `model?`, `finishReason?`, `usage?`
  */
-export interface RunFinishedEvent extends AGUIRunFinishedEvent {
+export interface RunFinishedEvent
+  extends Pick<
+    AGUIRunFinishedEvent,
+    'threadId' | 'runId' | 'result' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.RUN_FINISHED
   /** Model identifier for multi-model support */
   model?: string
   /** Why the generation stopped */
@@ -950,6 +1006,15 @@ export interface RunFinishedEvent extends AGUIRunFinishedEvent {
     totalTokens: number
   }
 }
+type _RunFinishedDriftCheck = AssertSatisfiesAGUI<
+  Omit<RunFinishedEvent, 'type' | 'model' | 'finishReason' | 'usage'>,
+  Pick<
+    AGUIRunFinishedEvent,
+    'threadId' | 'runId' | 'result' | 'timestamp' | 'rawEvent'
+  >
+>
+const _runFinishedDriftCheck: _RunFinishedDriftCheck = true
+void _runFinishedDriftCheck
 
 /**
  * Emitted when an error occurs during a run.
@@ -957,9 +1022,21 @@ export interface RunFinishedEvent extends AGUIRunFinishedEvent {
  * @ag-ui/core provides: `message`, `code?`
  * TanStack AI adds: `model?`, `error?` (deprecated nested form)
  */
-export interface RunErrorEvent extends AGUIRunErrorEvent {
+export interface RunErrorEvent
+  extends Pick<
+    AGUIRunErrorEvent,
+    'message' | 'code' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.RUN_ERROR
   /** Model identifier for multi-model support */
   model?: string
+  /**
+   * Routing metadata the TanStack engine attaches when emitting error
+   * events. Stripped by `strip-to-spec-middleware` before going on the
+   * wire so the AG-UI consumer never sees them.
+   */
+  threadId?: string
+  runId?: string
   /**
    * @deprecated Use top-level `message` and `code` fields instead.
    * Kept for backward compatibility.
@@ -971,6 +1048,12 @@ export interface RunErrorEvent extends AGUIRunErrorEvent {
       }
     | undefined
 }
+type _RunErrorDriftCheck = AssertSatisfiesAGUI<
+  Omit<RunErrorEvent, 'type' | 'model' | 'threadId' | 'runId' | 'error'>,
+  Pick<AGUIRunErrorEvent, 'message' | 'code' | 'timestamp' | 'rawEvent'>
+>
+const _runErrorDriftCheck: _RunErrorDriftCheck = true
+void _runErrorDriftCheck
 
 /**
  * Emitted when a text message starts.
@@ -978,10 +1061,24 @@ export interface RunErrorEvent extends AGUIRunErrorEvent {
  * @ag-ui/core provides: `messageId`, `role?`, `name?`
  * TanStack AI adds: `model?`
  */
-export interface TextMessageStartEvent extends AGUITextMessageStartEvent {
+export interface TextMessageStartEvent
+  extends Pick<
+    AGUITextMessageStartEvent,
+    'messageId' | 'role' | 'name' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TEXT_MESSAGE_START
   /** Model identifier for multi-model support */
   model?: string
 }
+type _TextMessageStartDriftCheck = AssertSatisfiesAGUI<
+  Omit<TextMessageStartEvent, 'type' | 'model'>,
+  Pick<
+    AGUITextMessageStartEvent,
+    'messageId' | 'role' | 'name' | 'timestamp' | 'rawEvent'
+  >
+>
+const _textMessageStartDriftCheck: _TextMessageStartDriftCheck = true
+void _textMessageStartDriftCheck
 
 /**
  * Emitted when text content is generated (streaming tokens).
@@ -989,12 +1086,26 @@ export interface TextMessageStartEvent extends AGUITextMessageStartEvent {
  * @ag-ui/core provides: `messageId`, `delta`
  * TanStack AI adds: `model?`, `content?` (accumulated)
  */
-export interface TextMessageContentEvent extends AGUITextMessageContentEvent {
+export interface TextMessageContentEvent
+  extends Pick<
+    AGUITextMessageContentEvent,
+    'messageId' | 'delta' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TEXT_MESSAGE_CONTENT
   /** Model identifier for multi-model support */
   model?: string
   /** Full accumulated content so far (TanStack AI internal, for debugging) */
   content?: string
 }
+type _TextMessageContentDriftCheck = AssertSatisfiesAGUI<
+  Omit<TextMessageContentEvent, 'type' | 'model' | 'content'>,
+  Pick<
+    AGUITextMessageContentEvent,
+    'messageId' | 'delta' | 'timestamp' | 'rawEvent'
+  >
+>
+const _textMessageContentDriftCheck: _TextMessageContentDriftCheck = true
+void _textMessageContentDriftCheck
 
 /**
  * Emitted when a text message completes.
@@ -1002,10 +1113,21 @@ export interface TextMessageContentEvent extends AGUITextMessageContentEvent {
  * @ag-ui/core provides: `messageId`
  * TanStack AI adds: `model?`
  */
-export interface TextMessageEndEvent extends AGUITextMessageEndEvent {
+export interface TextMessageEndEvent
+  extends Pick<
+    AGUITextMessageEndEvent,
+    'messageId' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TEXT_MESSAGE_END
   /** Model identifier for multi-model support */
   model?: string
 }
+type _TextMessageEndDriftCheck = AssertSatisfiesAGUI<
+  Omit<TextMessageEndEvent, 'type' | 'model'>,
+  Pick<AGUITextMessageEndEvent, 'messageId' | 'timestamp' | 'rawEvent'>
+>
+const _textMessageEndDriftCheck: _TextMessageEndDriftCheck = true
+void _textMessageEndDriftCheck
 
 /**
  * Emitted when a tool call starts.
@@ -1029,9 +1151,12 @@ export interface TextMessageEndEvent extends AGUITextMessageEndEvent {
  * `ToolCallStartEvent<'x'>['toolCallName']` get `string` — use the
  * distributed variant (via `TypedStreamChunk`) for discriminated narrowing.
  */
-export interface ToolCallStartEvent<
-  TToolName extends string = string,
-> extends AGUIToolCallStartEvent {
+export interface ToolCallStartEvent<TToolName extends string = string>
+  extends Pick<
+    AGUIToolCallStartEvent,
+    'toolCallId' | 'toolCallName' | 'parentMessageId' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TOOL_CALL_START
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1051,6 +1176,15 @@ export interface ToolCallStartEvent<
    * `TToolCallMetadata` shape when emitting. */
   metadata?: Record<string, unknown>
 }
+type _ToolCallStartDriftCheck = AssertSatisfiesAGUI<
+  Omit<ToolCallStartEvent, 'type' | 'model' | 'toolName' | 'index' | 'metadata'>,
+  Pick<
+    AGUIToolCallStartEvent,
+    'toolCallId' | 'toolCallName' | 'parentMessageId' | 'timestamp' | 'rawEvent'
+  >
+>
+const _toolCallStartDriftCheck: _ToolCallStartDriftCheck = true
+void _toolCallStartDriftCheck
 
 /**
  * Emitted when tool call arguments are streaming.
@@ -1058,12 +1192,23 @@ export interface ToolCallStartEvent<
  * @ag-ui/core provides: `toolCallId`, `delta`
  * TanStack AI adds: `model?`, `args?` (accumulated)
  */
-export interface ToolCallArgsEvent extends AGUIToolCallArgsEvent {
+export interface ToolCallArgsEvent
+  extends Pick<
+    AGUIToolCallArgsEvent,
+    'toolCallId' | 'delta' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TOOL_CALL_ARGS
   /** Model identifier for multi-model support */
   model?: string
   /** Full accumulated arguments so far (TanStack AI internal) */
   args?: string
 }
+type _ToolCallArgsDriftCheck = AssertSatisfiesAGUI<
+  Omit<ToolCallArgsEvent, 'type' | 'model' | 'args'>,
+  Pick<AGUIToolCallArgsEvent, 'toolCallId' | 'delta' | 'timestamp' | 'rawEvent'>
+>
+const _toolCallArgsDriftCheck: _ToolCallArgsDriftCheck = true
+void _toolCallArgsDriftCheck
 
 /**
  * Emitted when a tool call completes.
@@ -1079,7 +1224,11 @@ export interface ToolCallArgsEvent extends AGUIToolCallArgsEvent {
 export interface ToolCallEndEvent<
   TToolName extends string = string,
   TInput = unknown,
-> extends AGUIToolCallEndEvent {
+> extends Pick<
+    AGUIToolCallEndEvent,
+    'toolCallId' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TOOL_CALL_END
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1104,6 +1253,15 @@ export interface ToolCallEndEvent<
   /** Tool execution result (TanStack AI internal) */
   result?: string
 }
+type _ToolCallEndDriftCheck = AssertSatisfiesAGUI<
+  Omit<
+    ToolCallEndEvent,
+    'type' | 'model' | 'toolCallName' | 'toolName' | 'input' | 'result'
+  >,
+  Pick<AGUIToolCallEndEvent, 'toolCallId' | 'timestamp' | 'rawEvent'>
+>
+const _toolCallEndDriftCheck: _ToolCallEndDriftCheck = true
+void _toolCallEndDriftCheck
 
 /**
  * Emitted when a tool call result is available.
@@ -1111,10 +1269,24 @@ export interface ToolCallEndEvent<
  * @ag-ui/core provides: `messageId`, `toolCallId`, `content`, `role?`
  * TanStack AI adds: `model?`
  */
-export interface ToolCallResultEvent extends AGUIToolCallResultEvent {
+export interface ToolCallResultEvent
+  extends Pick<
+    AGUIToolCallResultEvent,
+    'messageId' | 'toolCallId' | 'content' | 'role' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.TOOL_CALL_RESULT
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ToolCallResultDriftCheck = AssertSatisfiesAGUI<
+  Omit<ToolCallResultEvent, 'type' | 'model'>,
+  Pick<
+    AGUIToolCallResultEvent,
+    'messageId' | 'toolCallId' | 'content' | 'role' | 'timestamp' | 'rawEvent'
+  >
+>
+const _toolCallResultDriftCheck: _ToolCallResultDriftCheck = true
+void _toolCallResultDriftCheck
 
 /**
  * Emitted when a thinking/reasoning step starts.
@@ -1122,7 +1294,12 @@ export interface ToolCallResultEvent extends AGUIToolCallResultEvent {
  * @ag-ui/core provides: `stepName`
  * TanStack AI adds: `model?`, `stepId?` (deprecated alias), `stepType?`
  */
-export interface StepStartedEvent extends AGUIStepStartedEvent {
+export interface StepStartedEvent
+  extends Pick<
+    AGUIStepStartedEvent,
+    'stepName' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.STEP_STARTED
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1133,6 +1310,12 @@ export interface StepStartedEvent extends AGUIStepStartedEvent {
   /** Type of step (e.g., 'thinking', 'planning') */
   stepType?: string
 }
+type _StepStartedDriftCheck = AssertSatisfiesAGUI<
+  Omit<StepStartedEvent, 'type' | 'model' | 'stepId' | 'stepType'>,
+  Pick<AGUIStepStartedEvent, 'stepName' | 'timestamp' | 'rawEvent'>
+>
+const _stepStartedDriftCheck: _StepStartedDriftCheck = true
+void _stepStartedDriftCheck
 
 /**
  * Emitted when a thinking/reasoning step finishes.
@@ -1140,7 +1323,12 @@ export interface StepStartedEvent extends AGUIStepStartedEvent {
  * @ag-ui/core provides: `stepName`
  * TanStack AI adds: `model?`, `stepId?` (deprecated alias), `delta?`, `content?`
  */
-export interface StepFinishedEvent extends AGUIStepFinishedEvent {
+export interface StepFinishedEvent
+  extends Pick<
+    AGUIStepFinishedEvent,
+    'stepName' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.STEP_FINISHED
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1155,6 +1343,15 @@ export interface StepFinishedEvent extends AGUIStepFinishedEvent {
   /** Provider signature for the thinking block */
   signature?: string
 }
+type _StepFinishedDriftCheck = AssertSatisfiesAGUI<
+  Omit<
+    StepFinishedEvent,
+    'type' | 'model' | 'stepId' | 'delta' | 'content' | 'signature'
+  >,
+  Pick<AGUIStepFinishedEvent, 'stepName' | 'timestamp' | 'rawEvent'>
+>
+const _stepFinishedDriftCheck: _StepFinishedDriftCheck = true
+void _stepFinishedDriftCheck
 
 /**
  * Emitted to provide a snapshot of all messages in a conversation.
@@ -1168,10 +1365,21 @@ export interface StepFinishedEvent extends AGUIStepFinishedEvent {
  * Note: The `messages` field uses the @ag-ui/core Message type.
  * Use converters to transform to/from TanStack UIMessage format.
  */
-export interface MessagesSnapshotEvent extends AGUIMessagesSnapshotEvent {
+export interface MessagesSnapshotEvent
+  extends Pick<
+    AGUIMessagesSnapshotEvent,
+    'messages' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.MESSAGES_SNAPSHOT
   /** Model identifier for multi-model support */
   model?: string
 }
+type _MessagesSnapshotDriftCheck = AssertSatisfiesAGUI<
+  Omit<MessagesSnapshotEvent, 'type' | 'model'>,
+  Pick<AGUIMessagesSnapshotEvent, 'messages' | 'timestamp' | 'rawEvent'>
+>
+const _messagesSnapshotDriftCheck: _MessagesSnapshotDriftCheck = true
+void _messagesSnapshotDriftCheck
 
 /**
  * Emitted to provide a full state snapshot.
@@ -1179,7 +1387,12 @@ export interface MessagesSnapshotEvent extends AGUIMessagesSnapshotEvent {
  * @ag-ui/core provides: `snapshot` (any)
  * TanStack AI adds: `model?`, `state?` (deprecated alias for snapshot)
  */
-export interface StateSnapshotEvent extends AGUIStateSnapshotEvent {
+export interface StateSnapshotEvent
+  extends Pick<
+    AGUIStateSnapshotEvent,
+    'snapshot' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.STATE_SNAPSHOT
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1188,6 +1401,12 @@ export interface StateSnapshotEvent extends AGUIStateSnapshotEvent {
    */
   state?: Record<string, unknown>
 }
+type _StateSnapshotDriftCheck = AssertSatisfiesAGUI<
+  Omit<StateSnapshotEvent, 'type' | 'model' | 'state'>,
+  Pick<AGUIStateSnapshotEvent, 'snapshot' | 'timestamp' | 'rawEvent'>
+>
+const _stateSnapshotDriftCheck: _StateSnapshotDriftCheck = true
+void _stateSnapshotDriftCheck
 
 /**
  * Emitted to provide an incremental state update.
@@ -1195,10 +1414,18 @@ export interface StateSnapshotEvent extends AGUIStateSnapshotEvent {
  * @ag-ui/core provides: `delta` (any[] - JSON Patch RFC 6902)
  * TanStack AI adds: `model?`
  */
-export interface StateDeltaEvent extends AGUIStateDeltaEvent {
+export interface StateDeltaEvent
+  extends Pick<AGUIStateDeltaEvent, 'delta' | 'timestamp' | 'rawEvent'> {
+  type: EventType.STATE_DELTA
   /** Model identifier for multi-model support */
   model?: string
 }
+type _StateDeltaDriftCheck = AssertSatisfiesAGUI<
+  Omit<StateDeltaEvent, 'type' | 'model'>,
+  Pick<AGUIStateDeltaEvent, 'delta' | 'timestamp' | 'rawEvent'>
+>
+const _stateDeltaDriftCheck: _StateDeltaDriftCheck = true
+void _stateDeltaDriftCheck
 
 /**
  * Custom event for extensibility.
@@ -1206,10 +1433,26 @@ export interface StateDeltaEvent extends AGUIStateDeltaEvent {
  * @ag-ui/core provides: `name`, `value`
  * TanStack AI adds: `model?`
  */
-export interface CustomEvent extends AGUICustomEvent {
+export interface CustomEvent
+  extends Pick<AGUICustomEvent, 'name' | 'value' | 'timestamp' | 'rawEvent'> {
+  type: EventType.CUSTOM
   /** Model identifier for multi-model support */
   model?: string
+  /**
+   * Routing metadata the TanStack engine attaches when emitting CUSTOM
+   * events that need to be correlated with a specific thread/run.
+   * Stripped by `strip-to-spec-middleware` before going on the wire so
+   * the AG-UI consumer never sees them.
+   */
+  threadId?: string
+  runId?: string
 }
+type _CustomDriftCheck = AssertSatisfiesAGUI<
+  Omit<CustomEvent, 'type' | 'model' | 'threadId' | 'runId'>,
+  Pick<AGUICustomEvent, 'name' | 'value' | 'timestamp' | 'rawEvent'>
+>
+const _customDriftCheck: _CustomDriftCheck = true
+void _customDriftCheck
 
 /**
  * Final event of a streaming structured-output run. Carries the validated
@@ -1325,10 +1568,21 @@ export type StructuredOutputStream<T = unknown> = AsyncIterable<
  * @ag-ui/core provides: `messageId`
  * TanStack AI adds: `model?`
  */
-export interface ReasoningStartEvent extends AGUIReasoningStartEvent {
+export interface ReasoningStartEvent
+  extends Pick<
+    AGUIReasoningStartEvent,
+    'messageId' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.REASONING_START
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ReasoningStartDriftCheck = AssertSatisfiesAGUI<
+  Omit<ReasoningStartEvent, 'type' | 'model'>,
+  Pick<AGUIReasoningStartEvent, 'messageId' | 'timestamp' | 'rawEvent'>
+>
+const _reasoningStartDriftCheck: _ReasoningStartDriftCheck = true
+void _reasoningStartDriftCheck
 
 /**
  * Emitted when a reasoning message starts.
@@ -1336,10 +1590,24 @@ export interface ReasoningStartEvent extends AGUIReasoningStartEvent {
  * @ag-ui/core provides: `messageId`, `role` ("reasoning")
  * TanStack AI adds: `model?`
  */
-export interface ReasoningMessageStartEvent extends AGUIReasoningMessageStartEvent {
+export interface ReasoningMessageStartEvent
+  extends Pick<
+    AGUIReasoningMessageStartEvent,
+    'messageId' | 'role' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.REASONING_MESSAGE_START
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ReasoningMessageStartDriftCheck = AssertSatisfiesAGUI<
+  Omit<ReasoningMessageStartEvent, 'type' | 'model'>,
+  Pick<
+    AGUIReasoningMessageStartEvent,
+    'messageId' | 'role' | 'timestamp' | 'rawEvent'
+  >
+>
+const _reasoningMessageStartDriftCheck: _ReasoningMessageStartDriftCheck = true
+void _reasoningMessageStartDriftCheck
 
 /**
  * Emitted when reasoning message content is generated.
@@ -1347,10 +1615,25 @@ export interface ReasoningMessageStartEvent extends AGUIReasoningMessageStartEve
  * @ag-ui/core provides: `messageId`, `delta`
  * TanStack AI adds: `model?`
  */
-export interface ReasoningMessageContentEvent extends AGUIReasoningMessageContentEvent {
+export interface ReasoningMessageContentEvent
+  extends Pick<
+    AGUIReasoningMessageContentEvent,
+    'messageId' | 'delta' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.REASONING_MESSAGE_CONTENT
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ReasoningMessageContentDriftCheck = AssertSatisfiesAGUI<
+  Omit<ReasoningMessageContentEvent, 'type' | 'model'>,
+  Pick<
+    AGUIReasoningMessageContentEvent,
+    'messageId' | 'delta' | 'timestamp' | 'rawEvent'
+  >
+>
+const _reasoningMessageContentDriftCheck: _ReasoningMessageContentDriftCheck =
+  true
+void _reasoningMessageContentDriftCheck
 
 /**
  * Emitted when a reasoning message ends.
@@ -1358,10 +1641,21 @@ export interface ReasoningMessageContentEvent extends AGUIReasoningMessageConten
  * @ag-ui/core provides: `messageId`
  * TanStack AI adds: `model?`
  */
-export interface ReasoningMessageEndEvent extends AGUIReasoningMessageEndEvent {
+export interface ReasoningMessageEndEvent
+  extends Pick<
+    AGUIReasoningMessageEndEvent,
+    'messageId' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.REASONING_MESSAGE_END
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ReasoningMessageEndDriftCheck = AssertSatisfiesAGUI<
+  Omit<ReasoningMessageEndEvent, 'type' | 'model'>,
+  Pick<AGUIReasoningMessageEndEvent, 'messageId' | 'timestamp' | 'rawEvent'>
+>
+const _reasoningMessageEndDriftCheck: _ReasoningMessageEndDriftCheck = true
+void _reasoningMessageEndDriftCheck
 
 /**
  * Emitted when reasoning ends for a message.
@@ -1369,10 +1663,21 @@ export interface ReasoningMessageEndEvent extends AGUIReasoningMessageEndEvent {
  * @ag-ui/core provides: `messageId`
  * TanStack AI adds: `model?`
  */
-export interface ReasoningEndEvent extends AGUIReasoningEndEvent {
+export interface ReasoningEndEvent
+  extends Pick<
+    AGUIReasoningEndEvent,
+    'messageId' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.REASONING_END
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ReasoningEndDriftCheck = AssertSatisfiesAGUI<
+  Omit<ReasoningEndEvent, 'type' | 'model'>,
+  Pick<AGUIReasoningEndEvent, 'messageId' | 'timestamp' | 'rawEvent'>
+>
+const _reasoningEndDriftCheck: _ReasoningEndDriftCheck = true
+void _reasoningEndDriftCheck
 
 /**
  * Emitted for encrypted reasoning values.
@@ -1380,10 +1685,25 @@ export interface ReasoningEndEvent extends AGUIReasoningEndEvent {
  * @ag-ui/core provides: `subtype`, `entityId`, `encryptedValue`
  * TanStack AI adds: `model?`
  */
-export interface ReasoningEncryptedValueEvent extends AGUIReasoningEncryptedValueEvent {
+export interface ReasoningEncryptedValueEvent
+  extends Pick<
+    AGUIReasoningEncryptedValueEvent,
+    'subtype' | 'entityId' | 'encryptedValue' | 'timestamp' | 'rawEvent'
+  > {
+  type: EventType.REASONING_ENCRYPTED_VALUE
   /** Model identifier for multi-model support */
   model?: string
 }
+type _ReasoningEncryptedValueDriftCheck = AssertSatisfiesAGUI<
+  Omit<ReasoningEncryptedValueEvent, 'type' | 'model'>,
+  Pick<
+    AGUIReasoningEncryptedValueEvent,
+    'subtype' | 'entityId' | 'encryptedValue' | 'timestamp' | 'rawEvent'
+  >
+>
+const _reasoningEncryptedValueDriftCheck: _ReasoningEncryptedValueDriftCheck =
+  true
+void _reasoningEncryptedValueDriftCheck
 
 // ============================================================================
 // AG-UI Event Union

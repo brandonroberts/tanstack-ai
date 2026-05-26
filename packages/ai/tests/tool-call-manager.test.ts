@@ -15,11 +15,14 @@ import type {
 
 /** Helper to create a ToolCallStartEvent from plain fields (avoids EventType enum issues). */
 function toolCallStart(
-  fields: Omit<ToolCallStartEvent, 'type' | 'timestamp'>,
+  fields: Omit<ToolCallStartEvent, 'type' | 'timestamp' | 'toolName'>,
 ): ToolCallStartEvent {
   return {
     type: 'TOOL_CALL_START' as any,
     timestamp: Date.now(),
+    // `toolName` is the deprecated alias of `toolCallName`; mirror it
+    // so tests don't have to write both.
+    toolName: fields.toolCallName,
     ...fields,
   } as ToolCallStartEvent
 }
@@ -37,11 +40,14 @@ function toolCallArgs(
 
 /** Helper to create a ToolCallEndEvent from plain fields. */
 function toolCallEnd(
-  fields: Omit<ToolCallEndEvent, 'type' | 'timestamp'>,
+  fields: Omit<ToolCallEndEvent, 'type' | 'timestamp' | 'toolName'> & {
+    toolCallName: string
+  },
 ): ToolCallEndEvent {
   return {
     type: 'TOOL_CALL_END' as any,
     timestamp: Date.now(),
+    toolName: fields.toolCallName,
     ...fields,
   } as ToolCallEndEvent
 }
