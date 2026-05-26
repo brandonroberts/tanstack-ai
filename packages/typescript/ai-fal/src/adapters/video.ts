@@ -128,7 +128,9 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
     }
   }
 
-  override availableDurations(): DurationOptions<FalModelVideoDuration<TModel>> {
+  override availableDurations(): DurationOptions<
+    FalModelVideoDuration<TModel>
+  > {
     return getFalVideoDurationOptions(this.model) as DurationOptions<
       FalModelVideoDuration<TModel>
     >
@@ -137,10 +139,9 @@ export class FalVideoAdapter<TModel extends FalModel> extends BaseVideoAdapter<
   override snapDuration(
     seconds: number,
   ): FalModelVideoDuration<TModel> | undefined {
-    return snapToDurationOption(
-      seconds,
-      this.availableDurations(),
-    ) as FalModelVideoDuration<TModel> | undefined
+    return snapToDurationOption(seconds, this.availableDurations()) as
+      | FalModelVideoDuration<TModel>
+      | undefined
   }
 
   async getVideoStatus(jobId: string): Promise<VideoStatusResult> {

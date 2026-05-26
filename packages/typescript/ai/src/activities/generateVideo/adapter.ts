@@ -59,10 +59,8 @@ export interface VideoAdapter<
     string,
     string
   >,
-  TModelDurationByName extends Record<
-    string,
-    string | number | undefined
-  > = Record<string, string | number | undefined>,
+  TModelDurationByName extends Record<string, string | number | undefined> =
+    Record<string, string | number | undefined>,
 > {
   /** Discriminator for adapter kind - used to determine API shape */
   readonly kind: 'video'
@@ -140,10 +138,8 @@ export abstract class BaseVideoAdapter<
     string,
     string
   >,
-  TModelDurationByName extends Record<
-    string,
-    string | number | undefined
-  > = Record<string, string | number | undefined>,
+  TModelDurationByName extends Record<string, string | number | undefined> =
+    Record<string, string | number | undefined>,
 > implements VideoAdapter<
   TModel,
   TProviderOptions,

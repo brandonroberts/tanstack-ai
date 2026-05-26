@@ -44,7 +44,8 @@ export function snapToDurationOption<T extends string | number | undefined>(
     case 'range': {
       const step = options.step ?? 1
       const clamped = Math.min(options.max, Math.max(options.min, seconds))
-      const snapped = Math.round((clamped - options.min) / step) * step + options.min
+      const snapped =
+        Math.round((clamped - options.min) / step) * step + options.min
       return Math.min(options.max, Math.max(options.min, snapped)) as T
     }
 

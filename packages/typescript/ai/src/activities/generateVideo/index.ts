@@ -55,13 +55,7 @@ export type VideoSizeForAdapter<TAdapter> =
  * for adapters that haven't declared per-model duration constraints.
  */
 export type VideoDurationForAdapter<TAdapter> =
-  TAdapter extends VideoAdapter<
-    infer TModel,
-    any,
-    any,
-    any,
-    infer TDurationMap
-  >
+  TAdapter extends VideoAdapter<infer TModel, any, any, any, infer TDurationMap>
     ? TModel extends keyof TDurationMap
       ? TDurationMap[TModel]
       : string | number | undefined
