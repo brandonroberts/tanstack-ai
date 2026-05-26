@@ -171,16 +171,18 @@ export async function chatParamsFromRequest(
  *   `chatParamsFromRequest(...)` / `chatParamsFromRequestBody(...)`.
  * @returns A merged array suitable for `chat({ tools })`.
  */
-export function mergeAgentTools(
-  serverTools: ReadonlyArray<Tool>,
+export function mergeAgentTools<
+  const TServerTools extends ReadonlyArray<Tool<any, any, any>>,
+>(
+  serverTools: TServerTools,
   clientTools: ReadonlyArray<{
     name: string
     description: string
     parameters: JSONSchema
   }>,
-): Array<Tool> {
+): TServerTools {
   const seen = new Set(serverTools.map((t) => t.name))
-  const merged: Array<Tool> = [...serverTools]
+  const merged: Array<Tool<any, any, any>> = [...serverTools]
   for (const ct of clientTools) {
     if (seen.has(ct.name)) {
       // Server wins on name collision.
@@ -195,5 +197,12 @@ export function mergeAgentTools(
       // emits ClientToolRequest events.
     } as Tool)
   }
-  return merged
+  // The runtime array carries both server and client tools, but the
+  // return type is narrowed to just the typed server tuple so that
+  // `chat({ tools })` can discriminate `chunk.toolCallName` against the
+  // server tool names. Client tool calls still flow at runtime through
+  // the existing `ClientToolRequest` path — TypedStreamChunk just doesn't
+  // surface their names as typed literals (they appear as the bare
+  // `ToolCallStartEvent<string>` shape after narrowing).
+  return merged as unknown as TServerTools
 }

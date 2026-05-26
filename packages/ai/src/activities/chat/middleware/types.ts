@@ -74,7 +74,7 @@ export interface ChatMiddlewareContext {
 
   /** Provider name (e.g., 'openai', 'anthropic') */
   provider: string
-  /** Model identifier (e.g., 'gpt-4o') */
+  /** Model identifier (e.g., 'gpt-5.2') */
   model: string
   /** Source of the chat invocation — always 'server' for server-side chat */
   source: 'client' | 'server'

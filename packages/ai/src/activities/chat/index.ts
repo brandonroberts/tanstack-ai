@@ -95,7 +95,7 @@ export interface TextActivityOptions<
     | ProviderTool<string, TAdapter['~types']['toolCapabilities'][number]>
   >,
 > {
-  /** The text adapter to use (created by a provider function like openaiText('gpt-4o')) */
+  /** The text adapter to use (created by a provider function like openaiText('gpt-5.2')) */
   adapter: TAdapter
   /**
    * Conversation messages. Accepts:
@@ -171,7 +171,7 @@ export interface TextActivityOptions<
    * @example
    * ```ts
    * const result = await chat({
-   *   adapter: openaiText('gpt-4o'),
+   *   adapter: openaiText('gpt-5.2'),
    *   messages: [{ role: 'user', content: 'Generate a person' }],
    *   outputSchema: z.object({ name: z.string(), age: z.number() })
    * })
@@ -192,7 +192,7 @@ export interface TextActivityOptions<
    * @example Non-streaming text
    * ```ts
    * const text = await chat({
-   *   adapter: openaiText('gpt-4o'),
+   *   adapter: openaiText('gpt-5.2'),
    *   messages: [{ role: 'user', content: 'Hello!' }],
    *   stream: false
    * })
@@ -207,7 +207,7 @@ export interface TextActivityOptions<
    * @example
    * ```ts
    * const stream = chat({
-   *   adapter: openaiText('gpt-4o'),
+   *   adapter: openaiText('gpt-5.2'),
    *   messages: [...],
    *   middleware: [loggingMiddleware, redactionMiddleware],
    * })
@@ -2353,7 +2353,7 @@ class TextEngine<
  * import { openaiText } from '@tanstack/ai-openai'
  *
  * for await (const chunk of chat({
- *   adapter: openaiText('gpt-4o'),
+ *   adapter: openaiText('gpt-5.2'),
  *   messages: [{ role: 'user', content: 'What is the weather?' }],
  *   tools: [weatherTool]
  * })) {
@@ -2366,7 +2366,7 @@ class TextEngine<
  * @example One-shot text (streaming without tools)
  * ```ts
  * for await (const chunk of chat({
- *   adapter: openaiText('gpt-4o'),
+ *   adapter: openaiText('gpt-5.2'),
  *   messages: [{ role: 'user', content: 'Hello!' }]
  * })) {
  *   console.log(chunk)
@@ -2376,7 +2376,7 @@ class TextEngine<
  * @example Non-streaming text (stream: false)
  * ```ts
  * const text = await chat({
- *   adapter: openaiText('gpt-4o'),
+ *   adapter: openaiText('gpt-5.2'),
  *   messages: [{ role: 'user', content: 'Hello!' }],
  *   stream: false
  * })
@@ -2388,7 +2388,7 @@ class TextEngine<
  * import { z } from 'zod'
  *
  * const result = await chat({
- *   adapter: openaiText('gpt-4o'),
+ *   adapter: openaiText('gpt-5.2'),
  *   messages: [{ role: 'user', content: 'Research and summarize the topic' }],
  *   tools: [researchTool, analyzeTool],
  *   outputSchema: z.object({

@@ -230,7 +230,7 @@ export const Route = createFileRoute('/api/tanchat')({
 
           const stream = chat({
             ...options,
-            tools: Object.values(mergedTools),
+            tools: mergedTools,
             middleware: [loggingMiddleware],
             systemPrompts: [SYSTEM_PROMPT],
             agentLoopStrategy: maxIterations(20),
@@ -239,6 +239,7 @@ export const Route = createFileRoute('/api/tanchat')({
             runId: params.runId,
             abortController,
           })
+     
           return toServerSentEventsResponse(stream, { abortController })
         } catch (error: any) {
           console.error('[API Route] Error in chat request:', {

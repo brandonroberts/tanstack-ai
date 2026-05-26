@@ -410,7 +410,7 @@ export interface FetchConnectionOptions {
  * const connection = fetchServerSentEvents('/api/chat', async () => ({
  *   body: {
  *     provider: 'openai',
- *     model: 'gpt-4o',
+ *     model: 'gpt-5.2',
  *   }
  * }));
  * ```
@@ -516,7 +516,7 @@ export function fetchServerSentEvents(
  * const connection = fetchHttpStream('/api/chat', async () => ({
  *   body: {
  *     provider: 'openai',
- *     model: 'gpt-4o',
+ *     model: 'gpt-5.2',
  *   }
  * }));
  * ```

@@ -203,7 +203,7 @@ model: string;
 
 Defined in: [packages/ai/src/activities/chat/middleware/types.ts:78](https://github.com/TanStack/ai/blob/main/packages/ai/src/activities/chat/middleware/types.ts#L78)
 
-Model identifier (e.g., 'gpt-4o')
+Model identifier (e.g., 'gpt-5.2')
 
 ***
 

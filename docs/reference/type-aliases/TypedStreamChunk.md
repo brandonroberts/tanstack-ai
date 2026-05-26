@@ -55,7 +55,7 @@ const searchTool = toolDefinition({
 
 // Inferred from `chat()` — typed tool call events plus tagged CUSTOM events
 const stream = chat({
-  adapter: openaiText("gpt-4o"),
+  adapter: openaiText("gpt-5.2"),
   messages,
   tools: [weatherTool, searchTool],
 });
