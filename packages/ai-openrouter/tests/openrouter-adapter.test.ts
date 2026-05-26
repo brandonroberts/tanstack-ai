@@ -2055,7 +2055,7 @@ describe('OpenRouter convertMessage fail-loud guards', () => {
       events.push(evt)
     }
     const runError = events.find(
-      (e): e is Extract<StreamChunk, { type: typeof EventType.RUN_ERROR }> =>
+      (e): e is Extract<StreamChunk, { type: 'RUN_ERROR' }> =>
         e.type === EventType.RUN_ERROR,
     )
     expect(runError).toBeDefined()
@@ -2081,7 +2081,7 @@ describe('OpenRouter convertMessage fail-loud guards', () => {
       events.push(evt)
     }
     const runError = events.find(
-      (e): e is Extract<StreamChunk, { type: typeof EventType.RUN_ERROR }> =>
+      (e): e is Extract<StreamChunk, { type: 'RUN_ERROR' }> =>
         e.type === EventType.RUN_ERROR,
     )
     expect(runError).toBeDefined()

@@ -915,13 +915,16 @@ export type StreamChunkType = AGUIEventType
  *
  * Instead, each event below uses `Pick<AGUI*Event, [explicit fields]>`
  * to pull in the AGUI-spec'd fields without inheriting the index
- * signature, then declares `type` as the matching `EventType` enum
- * literal (e.g. `EventType.RUN_STARTED`). Because the enum's runtime
- * value IS the string `"RUN_STARTED"`, TypeScript accepts narrowing
- * in BOTH forms:
+ * signature, then declares `type` as a plain string literal
+ * (e.g. `'RUN_STARTED'`). This is the form TypeScript's IntelliSense
+ * uses when offering suggestions after `chunk.type === "`, so the
+ * common discriminator narrow autocompletes. Comparing against the
+ * `EventType` enum still works because each enum member's runtime
+ * value IS that same string — `EventType.RUN_STARTED` is assignable
+ * to `'RUN_STARTED'`:
  *
- *     if (chunk.type === EventType.RUN_STARTED) { ... }   // enum
- *     if (chunk.type === 'RUN_STARTED') { ... }           // string
+ *     if (chunk.type === 'RUN_STARTED') { ... }           // string (autocompletes)
+ *     if (chunk.type === EventType.RUN_STARTED) { ... }   // enum (also narrows)
  *
  * The per-event drift guards below fail to compile if @ag-ui/core ever
  * changes the shape of a field we mirror — they catch field-type drift
@@ -933,7 +936,7 @@ export type StreamChunkType = AGUIEventType
  */
 export interface BaseAGUIEvent {
   /** Discriminator carried by every event variant. */
-  type: EventType
+  type: AGUIEventType
   /** Optional event timestamp (ms since epoch). */
   timestamp?: number
   /** Optional opaque provider payload. */
@@ -969,7 +972,7 @@ export interface RunStartedEvent
     AGUIRunStartedEvent,
     'threadId' | 'runId' | 'parentRunId' | 'input' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.RUN_STARTED
+  type: 'RUN_STARTED'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -994,7 +997,7 @@ export interface RunFinishedEvent
     AGUIRunFinishedEvent,
     'threadId' | 'runId' | 'result' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.RUN_FINISHED
+  type: 'RUN_FINISHED'
   /** Model identifier for multi-model support */
   model?: string
   /** Why the generation stopped */
@@ -1027,7 +1030,7 @@ export interface RunErrorEvent
     AGUIRunErrorEvent,
     'message' | 'code' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.RUN_ERROR
+  type: 'RUN_ERROR'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1066,7 +1069,7 @@ export interface TextMessageStartEvent
     AGUITextMessageStartEvent,
     'messageId' | 'role' | 'name' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TEXT_MESSAGE_START
+  type: 'TEXT_MESSAGE_START'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1091,7 +1094,7 @@ export interface TextMessageContentEvent
     AGUITextMessageContentEvent,
     'messageId' | 'delta' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TEXT_MESSAGE_CONTENT
+  type: 'TEXT_MESSAGE_CONTENT'
   /** Model identifier for multi-model support */
   model?: string
   /** Full accumulated content so far (TanStack AI internal, for debugging) */
@@ -1118,7 +1121,7 @@ export interface TextMessageEndEvent
     AGUITextMessageEndEvent,
     'messageId' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TEXT_MESSAGE_END
+  type: 'TEXT_MESSAGE_END'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1156,7 +1159,7 @@ export interface ToolCallStartEvent<TToolName extends string = string>
     AGUIToolCallStartEvent,
     'toolCallId' | 'toolCallName' | 'parentMessageId' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TOOL_CALL_START
+  type: 'TOOL_CALL_START'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1197,7 +1200,7 @@ export interface ToolCallArgsEvent
     AGUIToolCallArgsEvent,
     'toolCallId' | 'delta' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TOOL_CALL_ARGS
+  type: 'TOOL_CALL_ARGS'
   /** Model identifier for multi-model support */
   model?: string
   /** Full accumulated arguments so far (TanStack AI internal) */
@@ -1228,7 +1231,7 @@ export interface ToolCallEndEvent<
     AGUIToolCallEndEvent,
     'toolCallId' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TOOL_CALL_END
+  type: 'TOOL_CALL_END'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1274,7 +1277,7 @@ export interface ToolCallResultEvent
     AGUIToolCallResultEvent,
     'messageId' | 'toolCallId' | 'content' | 'role' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.TOOL_CALL_RESULT
+  type: 'TOOL_CALL_RESULT'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1299,7 +1302,7 @@ export interface StepStartedEvent
     AGUIStepStartedEvent,
     'stepName' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.STEP_STARTED
+  type: 'STEP_STARTED'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1328,7 +1331,7 @@ export interface StepFinishedEvent
     AGUIStepFinishedEvent,
     'stepName' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.STEP_FINISHED
+  type: 'STEP_FINISHED'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1370,7 +1373,7 @@ export interface MessagesSnapshotEvent
     AGUIMessagesSnapshotEvent,
     'messages' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.MESSAGES_SNAPSHOT
+  type: 'MESSAGES_SNAPSHOT'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1392,7 +1395,7 @@ export interface StateSnapshotEvent
     AGUIStateSnapshotEvent,
     'snapshot' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.STATE_SNAPSHOT
+  type: 'STATE_SNAPSHOT'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1416,7 +1419,7 @@ void _stateSnapshotDriftCheck
  */
 export interface StateDeltaEvent
   extends Pick<AGUIStateDeltaEvent, 'delta' | 'timestamp' | 'rawEvent'> {
-  type: EventType.STATE_DELTA
+  type: 'STATE_DELTA'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1435,7 +1438,7 @@ void _stateDeltaDriftCheck
  */
 export interface CustomEvent
   extends Pick<AGUICustomEvent, 'name' | 'value' | 'timestamp' | 'rawEvent'> {
-  type: EventType.CUSTOM
+  type: 'CUSTOM'
   /** Model identifier for multi-model support */
   model?: string
   /**
@@ -1573,7 +1576,7 @@ export interface ReasoningStartEvent
     AGUIReasoningStartEvent,
     'messageId' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.REASONING_START
+  type: 'REASONING_START'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1595,7 +1598,7 @@ export interface ReasoningMessageStartEvent
     AGUIReasoningMessageStartEvent,
     'messageId' | 'role' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.REASONING_MESSAGE_START
+  type: 'REASONING_MESSAGE_START'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1620,7 +1623,7 @@ export interface ReasoningMessageContentEvent
     AGUIReasoningMessageContentEvent,
     'messageId' | 'delta' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.REASONING_MESSAGE_CONTENT
+  type: 'REASONING_MESSAGE_CONTENT'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1646,7 +1649,7 @@ export interface ReasoningMessageEndEvent
     AGUIReasoningMessageEndEvent,
     'messageId' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.REASONING_MESSAGE_END
+  type: 'REASONING_MESSAGE_END'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1668,7 +1671,7 @@ export interface ReasoningEndEvent
     AGUIReasoningEndEvent,
     'messageId' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.REASONING_END
+  type: 'REASONING_END'
   /** Model identifier for multi-model support */
   model?: string
 }
@@ -1690,7 +1693,7 @@ export interface ReasoningEncryptedValueEvent
     AGUIReasoningEncryptedValueEvent,
     'subtype' | 'entityId' | 'encryptedValue' | 'timestamp' | 'rawEvent'
   > {
-  type: EventType.REASONING_ENCRYPTED_VALUE
+  type: 'REASONING_ENCRYPTED_VALUE'
   /** Model identifier for multi-model support */
   model?: string
 }
