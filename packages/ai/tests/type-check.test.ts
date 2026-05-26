@@ -685,14 +685,22 @@ describe('TypedStreamChunk tagged custom event narrowing', () => {
     }>()
   })
 
-  it('should keep bare CustomEvent in the no-typed-tools fallback for back-compat', () => {
-    // Without typed tools, TypedStreamChunk collapses to plain StreamChunk —
-    // tagged narrowing requires the typed-tools branch to avoid breaking
-    // existing `AsyncIterable<StreamChunk>` consumers.
+  it('should narrow CustomEvent to the TaggedCustomEvent union even without typed tools', () => {
+    // The tagged shapes the engine emits (`structured-output.start`,
+    // `structured-output.complete`, `approval-requested`,
+    // `tool-input-available`) don't depend on the tools array, so they
+    // narrow in the fallback branch too — `chunk.type === 'CUSTOM' &&
+    // chunk.name === '...'` works whether the caller passed typed tools
+    // or not.
     type Chunk = TypedStreamChunk
     type Custom = Extract<Chunk, { type: 'CUSTOM' }>
-    // The bare CustomEvent's `name` stays `string`.
-    expectTypeOf<Custom['name']>().toEqualTypeOf<string>()
+    // `name` is the discriminated union of tagged literals.
+    expectTypeOf<Custom['name']>().toEqualTypeOf<
+      | 'structured-output.start'
+      | 'structured-output.complete'
+      | 'approval-requested'
+      | 'tool-input-available'
+    >()
   })
 
   it('should not poison `value` to any across the CUSTOM union', () => {

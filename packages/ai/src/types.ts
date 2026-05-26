@@ -1892,11 +1892,16 @@ export type TaggedCustomEvent<T = unknown> =
  * but are excluded from the type to avoid `any` poisoning the union; cast to
  * `StreamChunk` if you need to read those.
  *
- * When tools are untyped or absent, `TypedStreamChunk` falls back to plain
- * `StreamChunk` — tagged custom events are NOT narrowed in that branch.
- * This preserves back-compat with consumers that pass `chat()`'s stream as
- * `AsyncIterable<StreamChunk>` (e.g. `toServerSentEventsResponse`). To get
- * tagged narrowing, pass typed tools via `toolDefinition()`.
+ * When tools are untyped or absent, the tool-call events stay as plain
+ * `ToolCallStartEvent` / `ToolCallEndEvent` (no per-tool name narrowing),
+ * but `CUSTOM` events still narrow to `TaggedCustomEvent` — the tagged
+ * shapes the engine emits (`structured-output.start/complete`,
+ * `approval-requested`, `tool-input-available`) don't depend on the
+ * tools array, so they're available in every variant of the union.
+ *
+ * Free-form user-emitted custom events (via `emitCustomEvent`) still
+ * flow at runtime but are excluded from the type to avoid `any`
+ * poisoning the union; cast to `StreamChunk` if you need to read those.
  */
 export type TypedStreamChunk<
   TTools extends ReadonlyArray<Tool<any, any, any>> = ReadonlyArray<
@@ -1914,7 +1919,7 @@ export type TypedStreamChunk<
         | DistributedToolCallStart<TTools>
         | DistributedToolCallEnd<TTools>
         | TaggedCustomEvent
-    : StreamChunk
+    : Exclude<StreamChunk, { type: 'CUSTOM' }> | TaggedCustomEvent
 
 // Simple streaming format for basic text completions
 // Converted to StreamChunk format by convertTextCompletionStream()
