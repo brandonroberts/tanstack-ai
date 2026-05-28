@@ -1,7 +1,7 @@
 import { GENERATION_EVENTS } from './generation-types'
 import { createNoOpVideoDevtoolsBridge } from './devtools-noop'
 import { parseSSEResponse } from './sse-parser'
-import type { StreamChunk } from '@tanstack/ai'
+import type { StreamChunk } from '@tanstack/ai/client'
 import type {
   ConnectConnectionAdapter,
   RunAgentInputContext,
