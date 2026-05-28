@@ -4,10 +4,28 @@ import type {
   WorkflowClientState,
   WorkflowConnectionAdapter,
 } from '@tanstack/ai-client'
+import type { InferSchemaType, SchemaInput } from '@tanstack/ai'
 
-export interface UseWorkflowOptions {
+type InferWorkflowSchema<TSchema> = TSchema extends SchemaInput
+  ? InferSchemaType<TSchema>
+  : unknown
+type InferWorkflowState<TSchema, TFallback> = TSchema extends SchemaInput
+  ? InferSchemaType<TSchema>
+  : TFallback
+
+export interface UseWorkflowOptions<
+  TInputSchema extends SchemaInput | undefined = undefined,
+  TOutputSchema extends SchemaInput | undefined = undefined,
+  TStateSchema extends SchemaInput | undefined = undefined,
+> {
   /** Connection adapter (e.g. `fetchWorkflowEvents('/api/workflow')`). */
   connection: WorkflowConnectionAdapter
+  /** Schema matching the server workflow input. Used for client type inference. */
+  input?: TInputSchema
+  /** Schema matching the server workflow output. Used for client type inference. */
+  output?: TOutputSchema
+  /** Schema matching the server workflow state. Used for client type inference. */
+  state?: TStateSchema
   /** Optional: arbitrary extra body fields to send with every request. */
   body?: Record<string, unknown>
   /** Stable identifier for this hook instance. Auto-generated if omitted. */
@@ -15,6 +33,17 @@ export interface UseWorkflowOptions {
   onCustomEvent?: (name: string, value: Record<string, unknown>) => void
   onStateChange?: (state: WorkflowClientState) => void
 }
+
+type UseWorkflowSchemaOptions<
+  TInputSchema extends SchemaInput | undefined,
+  TOutputSchema extends SchemaInput | undefined,
+  TStateSchema extends SchemaInput | undefined,
+> = UseWorkflowOptions<TInputSchema, TOutputSchema, TStateSchema> &
+  (
+    | { input: TInputSchema }
+    | { output: TOutputSchema }
+    | { state: TStateSchema }
+  )
 
 export interface UseWorkflowReturn<
   TInput = unknown,
@@ -32,6 +61,27 @@ export interface UseWorkflowReturn<
   stop: () => void
 }
 
+export function useWorkflow<
+  TInputSchema extends SchemaInput | undefined = undefined,
+  TOutputSchema extends SchemaInput | undefined = undefined,
+  TStateSchema extends SchemaInput | undefined = undefined,
+  TState = unknown,
+>(
+  opts: UseWorkflowSchemaOptions<
+    TInputSchema,
+    TOutputSchema,
+    TStateSchema
+  >,
+): UseWorkflowReturn<
+  InferWorkflowSchema<TInputSchema>,
+  InferWorkflowSchema<TOutputSchema>,
+  InferWorkflowState<TStateSchema, TState>
+>
+export function useWorkflow<
+  TInput = unknown,
+  TOutput = unknown,
+  TState = unknown,
+>(opts: UseWorkflowOptions): UseWorkflowReturn<TInput, TOutput, TState>
 export function useWorkflow<
   TInput = unknown,
   TOutput = unknown,

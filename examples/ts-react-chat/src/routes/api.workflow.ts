@@ -10,6 +10,7 @@ import { articleWorkflow } from '@/lib/workflows/article-workflow'
 
 // Process-local store. Survives across requests; lost on restart.
 const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 })
+const abortControllers = new Map<string, AbortController>()
 
 export const Route = createFileRoute('/api/workflow')({
   server: {
@@ -18,15 +19,33 @@ export const Route = createFileRoute('/api/workflow')({
         try {
           const params = await parseWorkflowRequest(request)
           if (params.abort && params.runId) {
-            runStore.getLive(params.runId)?.abortController.abort()
+            abortControllers.get(params.runId)?.abort()
             return new Response(null, { status: 204 })
+          }
+          const abortController = new AbortController()
+          if (params.runId) {
+            abortControllers.set(params.runId, abortController)
           }
           const stream = runWorkflow({
             runStore,
             workflow: articleWorkflow,
+            signal: abortController.signal,
             ...params,
           })
-          return toServerSentEventsResponse(stream)
+          return toServerSentEventsResponse(
+            (async function* () {
+              try {
+                yield* stream
+              } finally {
+                if (
+                  params.runId &&
+                  abortControllers.get(params.runId) === abortController
+                ) {
+                  abortControllers.delete(params.runId)
+                }
+              }
+            })(),
+          )
         } catch (err) {
           const error = err as Error
           if (err instanceof WorkflowRequestParseError) {

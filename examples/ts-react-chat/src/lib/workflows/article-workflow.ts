@@ -20,9 +20,9 @@ const Review = z.object({
   findings: z.array(z.string()),
 })
 
-const ArticleInput = z.object({ topic: z.string() })
+export const ArticleInput = z.object({ topic: z.string() })
 
-const ArticleOutput = z.union([
+export const ArticleOutput = z.union([
   z.object({
     ok: z.literal(true),
     article: Draft,
@@ -33,7 +33,7 @@ const ArticleOutput = z.union([
   }),
 ])
 
-const ArticleState = z.object({
+export const ArticleState = z.object({
   phase: z
     .enum([
       'drafting',

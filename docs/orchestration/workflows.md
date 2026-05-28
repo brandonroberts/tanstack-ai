@@ -28,14 +28,14 @@ run: async function* ({ input, agents }) {
   const outline = yield* agents.draftOutline({ topics });
   const sections = [];
   for (const heading of outline.headings) {
-    const body = yield* agents.expandSection({ heading, outline });
+    const { body } = yield* agents.expandSection({ heading, outline });
     sections.push({ heading, body });
   }
   return { sections };
 }
 ```
 
-The body is plain TypeScript. `for`, `if`, `try`, `Promise.all` — they all work. The runtime cares only about what you `yield*`.
+The body is plain TypeScript. `for`, `if`, `try`, `Promise.all` — they all work. The runtime cares only about what you `yield*`; yieldable agent steps still run when the generator reaches each `yield*`, so `Promise.all` only parallelizes ordinary promises you create yourself.
 
 ## 1. Install the package
 
@@ -136,14 +136,17 @@ const expandSection = defineAgent({
 ```typescript
 import { defineWorkflow } from "@tanstack/ai-orchestration";
 
+export const ArticleInput = z.object({ text: z.string() });
+export const ArticleOutput = z.object({
+  sections: z.array(
+    z.object({ heading: z.string(), body: z.string() }),
+  ),
+});
+
 export const writeArticle = defineWorkflow({
   name: "write-article",
-  input: z.object({ text: z.string() }),
-  output: z.object({
-    sections: z.array(
-      z.object({ heading: z.string(), body: z.string() }),
-    ),
-  }),
+  input: ArticleInput,
+  output: ArticleOutput,
   agents: { extractTopics, draftOutline, expandSection },
   run: async function* ({ input, agents }) {
     const { topics } = yield* agents.extractTopics({ text: input.text });
@@ -179,21 +182,34 @@ import {
 import { writeArticle } from "./workflow";
 
 const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 });
+const abortControllers = new Map<string, AbortController>();
 
 export async function POST(request: Request) {
   const params = await parseWorkflowRequest(request);
 
   if (params.abort && params.runId) {
-    runStore.getLive(params.runId)?.abortController.abort();
+    abortControllers.get(params.runId)?.abort();
     return new Response(null, { status: 204 });
   }
+
+  const controller = new AbortController();
+  if (params.runId) abortControllers.set(params.runId, controller);
 
   const stream = runWorkflow({
     workflow: writeArticle,
     runStore,
+    signal: controller.signal,
     ...params,
   });
-  return toServerSentEventsResponse(stream);
+  return toServerSentEventsResponse((async function* () {
+    try {
+      yield* stream;
+    } finally {
+      if (params.runId && abortControllers.get(params.runId) === controller) {
+        abortControllers.delete(params.runId);
+      }
+    }
+  })());
 }
 ```
 
@@ -207,17 +223,12 @@ export async function POST(request: Request) {
 
 ```tsx
 import { fetchWorkflowEvents, useWorkflow } from "@tanstack/ai-react";
-
-interface ArticleInput {
-  text: string;
-}
-
-interface ArticleOutput {
-  sections: Array<{ heading: string; body: string }>;
-}
+import { ArticleInput, ArticleOutput } from "./workflow";
 
 function ArticleWriter() {
-  const run = useWorkflow<ArticleInput, ArticleOutput>({
+  const run = useWorkflow({
+    input: ArticleInput,
+    output: ArticleOutput,
     connection: fetchWorkflowEvents("/api/article"),
   });
 

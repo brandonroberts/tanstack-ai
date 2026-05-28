@@ -108,6 +108,10 @@ const WriterOutput = z.object({
     z.object({ heading: z.string(), body: z.string() }),
   ),
 });
+
+const ExtractTopicsOutput = z.object({ topics: z.array(z.string()) });
+const DraftOutlineOutput = z.object({ headings: z.array(z.string()) });
+const ExpandSectionOutput = z.object({ body: z.string() });
 ```
 
 `state` is mutable across router turns. The router reads it to decide what's next, and writes to it after folding in `lastResult`.
@@ -128,18 +132,26 @@ const orchestratorConfig = {
 
 const writerRouter = defineRouter(
   orchestratorConfig,
-  function* ({ agents, state, lastResult }) {
+  function* ({ input, agents, state, lastResult }) {
     // 1. Fold lastResult into state.
     // The orchestrator dispatches the agent but doesn't know which slice of
     // state its output belongs in — the router does. Without this fold,
     // state stays empty forever and triage loops on the same decision.
-    if (lastResult && typeof lastResult === "object") {
-      const r = lastResult as Record<string, unknown>;
-      if (Array.isArray(r.topics)) state.topics = r.topics as Array<string>;
-      if (Array.isArray(r.headings))
-        state.headings = r.headings as Array<string>;
-      if (typeof r.heading === "string" && typeof r.body === "string") {
-        state.sections.push({ heading: r.heading, body: r.body });
+    const topicsResult = ExtractTopicsOutput.safeParse(lastResult);
+    if (topicsResult.success) {
+      state.topics = topicsResult.data.topics;
+    }
+
+    const outlineResult = DraftOutlineOutput.safeParse(lastResult);
+    if (outlineResult.success) {
+      state.headings = outlineResult.data.headings;
+    }
+
+    const sectionResult = ExpandSectionOutput.safeParse(lastResult);
+    if (sectionResult.success) {
+      const heading = state.headings[state.sections.length];
+      if (heading) {
+        state.sections.push({ heading, body: sectionResult.data.body });
       }
     }
 
@@ -156,7 +168,7 @@ const writerRouter = defineRouter(
     }
 
     if (decision.next === "extract-topics") {
-      return { agent: "extractTopics", input: { text: /* input.text */ "" } };
+      return { agent: "extractTopics", input: { text: input.text } };
     }
 
     if (decision.next === "draft-outline") {
@@ -180,7 +192,7 @@ A few things to call out:
 
 - **`defineRouter(config, router)`** is a phantom-config helper. It exists only to let TypeScript infer the agents map, input, output, and state types when you pull the router out of the `defineOrchestrator` call. The runtime ignores the first argument; the second is the router itself, returned unchanged.
 
-- **`lastResult` is the typed return value of the agent dispatched on the *previous* turn.** On turn 0 it's `undefined`. Cast it back to the agent's output type when you fold it into state — see the example, and [Refining Across Runs](./refining-across-runs) for a cleaner pattern using `state.phase`.
+- **`lastResult` is a runtime value typed as `unknown` from the agent dispatched on the *previous* turn.** On turn 0 it's `undefined`. Parse it with the relevant output schema or narrow by `state.phase` when you fold it into state — see the example, and [Refining Across Runs](./refining-across-runs).
 
 - **`agents.triage(...)`** is `yield*`ed. The triage agent runs as a real step (emits `STEP_STARTED` / `STEP_FINISHED`), the router pauses while it streams, then resumes with the typed decision.
 
@@ -197,7 +209,7 @@ export const writeArticleOrchestrator = defineOrchestrator({
 });
 ```
 
-The orchestrator is *still* a `WorkflowDefinition` under the hood — `defineOrchestrator` wraps your router in a workflow whose `run` body is the routing loop above. That means everything in [Workflows](./workflows) carries over: same `runWorkflow` server entry point, same `useWorkflow` / `useOrchestration` client hook, same `STEP_STARTED` / `STEP_FINISHED` events.
+An orchestrator is a thin wrapper over a workflow: `defineOrchestrator` builds the workflow `run` body as the routing loop above. That means the same runtime surface carries over: same `runWorkflow` server entry point, same `useWorkflow` / `useOrchestration` client hook, same `STEP_STARTED` / `STEP_FINISHED` events.
 
 `maxTurns` defaults to 12. The engine throws if the router doesn't return `done` before then — protects against runaway loops.
 
@@ -215,19 +227,31 @@ import {
 import { writeArticleOrchestrator } from "./orchestrator";
 
 const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 });
+const abortControllers = new Map<string, AbortController>();
 
 export async function POST(request: Request) {
   const params = await parseWorkflowRequest(request);
   if (params.abort && params.runId) {
-    runStore.getLive(params.runId)?.abortController.abort();
+    abortControllers.get(params.runId)?.abort();
     return new Response(null, { status: 204 });
   }
+  const controller = new AbortController();
+  if (params.runId) abortControllers.set(params.runId, controller);
   const stream = runWorkflow({
     workflow: writeArticleOrchestrator,
     runStore,
+    signal: controller.signal,
     ...params,
   });
-  return toServerSentEventsResponse(stream);
+  return toServerSentEventsResponse((async function* () {
+    try {
+      yield* stream;
+    } finally {
+      if (params.runId && abortControllers.get(params.runId) === controller) {
+        abortControllers.delete(params.runId);
+      }
+    }
+  })());
 }
 ```
 
@@ -237,21 +261,30 @@ export async function POST(request: Request) {
 
 ```tsx
 import { fetchWorkflowEvents, useOrchestration } from "@tanstack/ai-react";
+import { z } from "zod";
 
-const orch = useOrchestration<
-  { text: string },
-  { sections: Array<{ heading: string; body: string }> },
-  { topics: Array<string>; headings: Array<string>; sections: Array<{ heading: string; body: string }> }
->({
+const WriterInput = z.object({ text: z.string() });
+const WriterOutput = z.object({
+  sections: z.array(z.object({ heading: z.string(), body: z.string() })),
+});
+const WriterState = z.object({
+  topics: z.array(z.string()).default([]),
+  headings: z.array(z.string()).default([]),
+  sections: z.array(z.object({ heading: z.string(), body: z.string() })),
+});
+
+const orch = useOrchestration({
+  input: WriterInput,
+  output: WriterOutput,
+  state: WriterState,
   connection: fetchWorkflowEvents("/api/article"),
 });
 
-// orch.state is the typed orchestrator state (snapshot of the latest
-// STATE_DELTA event the server emitted). The router writes to it; the
-// client sees it propagate on every turn.
+// orch.state is typed from WriterState when you pass the state schema.
+// It is the latest snapshot from STATE_DELTA events the server emitted.
 ```
 
-The third type parameter on `useOrchestration` is the orchestrator's `state` shape — the client receives an updated snapshot of it on every router turn via `STATE_DELTA` events the engine emits automatically.
+Passing `input`, `output`, and `state` schemas lets the hook infer `start(...)`, `output`, and `state`. The client receives an updated state snapshot on every router turn via `STATE_DELTA` events the engine emits automatically.
 
 ## What `useOrchestration` gives you
 
@@ -259,7 +292,7 @@ Same surface as `useWorkflow`:
 
 | Field | What it carries |
 |---|---|
-| `runId` | Server-assigned run ID. Sent back on resume. |
+| `runId` | Client-generated by default and echoed by the server. Sent back on resume. |
 | `status` | `'idle' \| 'running' \| 'paused' \| 'finished' \| 'error' \| 'aborted'` |
 | `steps` | Array of every step the engine has emitted, in order |
 | `currentStep` | The currently running step (or `null`) |

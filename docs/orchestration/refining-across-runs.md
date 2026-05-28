@@ -124,17 +124,14 @@ function FeatureChat() {
   const [carryover, setCarryover] = useState<Carryover | null>(null);
   const [input, setInput] = useState("");
 
-  const orch = useOrchestration<
-    {
-      userMessage: string;
-      previousSpec?: Spec;
-      previousResult?: Result;
-    },
-    /* output */ unknown,
-    /* state */ { spec?: Spec; result?: Result; phase?: string }
-  >({
+  const orch = useOrchestration({
+    input: OrchestratorInput,
+    output: OrchestratorOutput,
     connection: fetchWorkflowEvents("/api/feature"),
   });
+  const state = orch.state as
+    | { spec?: Spec; result?: Result; phase?: string }
+    | undefined;
 
   // When a run finishes, snapshot the spec + result for the next submission.
   const snapshottedRef = useRef<string | null>(null);
@@ -142,10 +139,10 @@ function FeatureChat() {
     if (orch.status !== "finished") return;
     if (!orch.runId || snapshottedRef.current === orch.runId) return;
     snapshottedRef.current = orch.runId;
-    if (orch.state?.spec) {
-      setCarryover({ spec: orch.state.spec, result: orch.state.result });
+    if (state?.spec) {
+      setCarryover({ spec: state.spec, result: state.result });
     }
-  }, [orch.status, orch.runId, orch.state]);
+  }, [orch.status, orch.runId, state]);
 
   const submit = () => {
     void orch.start({
@@ -192,7 +189,7 @@ Refinement and approval-resume both involve "continue from prior state", but the
 | | Refinement (this page) | Resume (see [Approvals](./approvals)) |
 |---|---|---|
 | Run ID | New each time | Same across pause/resume |
-| Storage | Client carries `previousX` | Server keeps the live generator |
+| Storage | Client carries `previousX` | Server stores run state and events |
 | State shape | Pre-seeded by `initialize()` | The exact state at pause |
 | Time scale | Any (minutes, days, weeks) | Bounded by run store TTL |
 | Failure mode if storage dies | None — client still has carryover | Run is lost |

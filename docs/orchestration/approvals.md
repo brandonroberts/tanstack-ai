@@ -22,12 +22,12 @@ That's the job of `approve()`. By the end of this guide you'll have a workflow t
 When user code `yield*`s `approve({ title, description })`, the engine does three things:
 
 1. Emits a `CUSTOM` chunk named `approval-requested` so the client can render an approval prompt.
-2. Persists the run state and the live generator handle in the run store.
+2. Persists the run state and append-only events in the run store.
 3. **Closes the SSE stream.** The HTTP request finishes. The server doesn't keep a socket open while waiting.
 
-The run is now *paused*. To resume, the client POSTs `{ runId, approval: { approved, approvalId, feedback? } }` to the same endpoint. The engine pulls the live generator back out of the store, sends the `ApprovalResult` into the generator via `gen.next(value)`, and continues from where it left off.
+The run is now *paused*. To resume, the client POSTs `{ runId, approval: { approved, approvalId, feedback? } }` to the same endpoint. The engine reads the run state and event log, replays to the approval point, delivers the `ApprovalResult`, and continues streaming from there.
 
-This pause/resume model means approvals can survive arbitrarily long pauses — a deploy, a server restart (with durable storage — see [Run Persistence](./run-persistence)), the user closing the browser and coming back tomorrow.
+This pause/resume model can survive arbitrarily long pauses only when the host uses durable event-log storage and routes resumes to a compatible workflow version — see [Run Persistence](./run-persistence). The default in-memory store is process-local and bounded by its TTL.
 
 ## 1. Add an approval to your workflow
 
@@ -128,9 +128,12 @@ const featureRouter = defineRouter(
     const triage = yield* agents.triage({ /* state summary */ });
 
     if (triage.next === "await-approval") {
+      if (!state.spec) {
+        return { agent: "spec", input: { userMessage: state.pendingFeedback } };
+      }
       const decision = yield* approve({
         title: "Implement spec?",
-        description: `"${state.spec?.title}"`,
+        description: `"${state.spec.title}"`,
       });
       if (decision.approved) {
         return { agent: "implement", input: { spec: state.spec } };
@@ -158,11 +161,11 @@ The next turn dispatches the spec agent with the feedback as input. The spec re-
 
 Three HTTP requests cover the typical lifecycle:
 
-**Request 1 (start):** Client POSTs `{ input }`. Server starts the run, streams `RUN_STARTED`, `STEP_STARTED`, `TEXT_MESSAGE_CONTENT` chunks, then the `approval-requested` `CUSTOM` chunk, then the response ends. The server has stored the live generator handle keyed by `runId`.
+**Request 1 (start):** Client POSTs `{ input, runId }`. Server starts the run, streams `RUN_STARTED`, `STEP_STARTED`, `TEXT_MESSAGE_CONTENT` chunks, then the `approval-requested` `CUSTOM` chunk, then the response ends. The server has stored run state and events keyed by `runId`.
 
-**Request 2 (resume):** Client POSTs `{ runId, approval: { approvalId, approved, feedback? } }`. Server looks up the live generator, calls `gen.next(approval)`, resumes streaming from where it paused. More step events, possibly another approval, eventually `RUN_FINISHED` or `RUN_ERROR`.
+**Request 2 (resume):** Client POSTs `{ runId, approval: { approvalId, approved, feedback? } }`. Server replays the stored events to the pause point, delivers the approval, and resumes streaming. More step events, possibly another approval, eventually `RUN_FINISHED` or `RUN_ERROR`.
 
-**Request 3 (optional abort):** Client POSTs `{ runId, abort: true }`. Server looks up the run, calls `abortController.abort()`, responds 204. The original SSE stream (request 1 or 2) sees an `aborted` chunk and closes.
+**Request 3 (optional abort):** Client POSTs `{ runId, abort: true }`. Server aborts the host-owned `AbortController` for the active request and responds 204. The original SSE stream (request 1 or 2) sees an `aborted` chunk and closes.
 
 `parseWorkflowRequest` + `runWorkflow` handle all three modes — you don't have to branch yourself.
 

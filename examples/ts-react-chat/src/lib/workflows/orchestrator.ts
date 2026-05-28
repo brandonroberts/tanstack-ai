@@ -10,7 +10,7 @@ import {
 } from '@tanstack/ai-orchestration'
 
 // ===== Schemas =====
-const FeatureSpec = z.object({
+export const FeatureSpec = z.object({
   title: z.string(),
   summary: z.string(),
   files: z.array(z.string()),
@@ -21,12 +21,12 @@ const FilePatch = z.object({
   patch: z.string(),
 })
 
-const ImplementResult = z.object({
+export const ImplementResult = z.object({
   patches: z.array(FilePatch),
   rationale: z.string(),
 })
 
-const OrchestratorState = z.object({
+export const OrchestratorState = z.object({
   phase: z
     .enum(['scoping', 'awaiting-approval', 'implementing', 'review', 'done'])
     .default('scoping'),
@@ -43,7 +43,7 @@ const OrchestratorState = z.object({
   pendingFeedback: z.string().default(''),
 })
 
-const OrchestratorInput = z.object({
+export const OrchestratorInput = z.object({
   userMessage: z.string(),
   /**
    * Spec carried over from a prior finished run. When provided, the
@@ -55,9 +55,13 @@ const OrchestratorInput = z.object({
   /** Implementation result carried over from a prior finished run. */
   previousResult: ImplementResult.optional(),
 })
-const OrchestratorOutput = z.object({
+export const OrchestratorOutput = z.object({
   phase: z.enum(['scoping', 'implementing', 'review', 'done']),
   result: ImplementResult.optional(),
+})
+const SpecAgentOutput = z.object({
+  spec: FeatureSpec,
+  ready: z.boolean(),
 })
 
 // ===== Agents =====
@@ -67,10 +71,7 @@ const specAgent = defineAgent({
     userMessage: z.string(),
     existingSpec: FeatureSpec.optional(),
   }),
-  output: z.object({
-    spec: FeatureSpec,
-    ready: z.boolean(),
-  }),
+  output: SpecAgentOutput,
   run: ({ input }) =>
     chat({
       adapter: openaiText('gpt-4o-mini'),
@@ -249,12 +250,12 @@ const featureRouter = defineRouter(
     // output belongs in — the router does. Without this, triage stays blind
     // to its own decisions and loops forever between "spec" and "spec".
     if (lastResult) {
-      if (
-        state.phase === 'scoping' &&
-        typeof lastResult === 'object' &&
-        'spec' in (lastResult as Record<string, unknown>)
-      ) {
-        state.spec = (lastResult as { spec: typeof state.spec }).spec
+      if (state.phase === 'scoping') {
+        const specResult = SpecAgentOutput.safeParse(lastResult)
+        if (!specResult.success) {
+          throw new Error('Spec agent returned an invalid result')
+        }
+        state.spec = specResult.data.spec
         // Spec just consumed pendingFeedback — clear it so the next triage
         // turn doesn't keep routing back to 'spec' against the same note.
         state.pendingFeedback = ''
@@ -264,7 +265,11 @@ const featureRouter = defineRouter(
         // against the refined spec.
         state.result = undefined
       } else if (state.phase === 'implementing') {
-        state.result = lastResult as typeof state.result
+        const implementResult = ImplementResult.safeParse(lastResult)
+        if (!implementResult.success) {
+          throw new Error('Implement workflow returned an invalid result')
+        }
+        state.result = implementResult.data
       }
     }
 

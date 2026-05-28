@@ -51,7 +51,7 @@ If you only need a single completion or tool call, plain `chat()` is the right t
 
 ## Workflows vs Orchestrators
 
-`defineWorkflow` and `defineOrchestrator` are the same engine, different vocabulary:
+`defineWorkflow` and `defineOrchestrator` are the same engine, different vocabulary. An orchestrator is a thin workflow wrapper that supplies the routing loop for you:
 
 | You have                      | Use                  | Shape                                           |
 | ----------------------------- | -------------------- | ----------------------------------------------- |
@@ -258,22 +258,35 @@ import {
 import { articleWorkflow } from '@/workflows/article-workflow'
 
 const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 }) // 1h
+const abortControllers = new Map<string, AbortController>()
 
 export async function POST(request: Request) {
   const params = await parseWorkflowRequest(request)
 
   // Optional: handle stop requests
   if (params.abort && params.runId) {
-    runStore.getLive(params.runId)?.abortController.abort()
+    abortControllers.get(params.runId)?.abort()
     return new Response(null, { status: 204 })
   }
+
+  const controller = new AbortController()
+  if (params.runId) abortControllers.set(params.runId, controller)
 
   const stream = runWorkflow({
     workflow: articleWorkflow,
     runStore,
+    signal: controller.signal,
     ...params,
   })
-  return toServerSentEventsResponse(stream)
+  return toServerSentEventsResponse((async function* () {
+    try {
+      yield* stream
+    } finally {
+      if (params.runId && abortControllers.get(params.runId) === controller) {
+        abortControllers.delete(params.runId)
+      }
+    }
+  })())
 }
 ```
 
@@ -281,7 +294,7 @@ export async function POST(request: Request) {
 
 ### The run store
 
-The run store holds in-flight and recently-finished runs. The default `inMemoryRunStore` is process-local — fine for single-instance servers and prototypes. It implements a documented `RunStore` interface so you can plug in a durable backend (Redis, Postgres) later without changing your workflow code.
+The run store holds in-flight and recently-finished runs. The default `inMemoryRunStore` is process-local — fine for single-instance servers and prototypes. The engine contract is `RunStore`: `getRunState`, `setRunState`, `deleteRun`, `appendEvent`, `getEvents`, and optional `subscribe`, so you can plug in a durable backend (Redis, Postgres) later without changing your workflow code.
 
 ```ts
 inMemoryRunStore({
@@ -296,13 +309,23 @@ inMemoryRunStore({
 ```tsx
 import { useWorkflow } from '@tanstack/ai-react'
 import { fetchWorkflowEvents } from '@tanstack/ai-client'
+import { z } from 'zod'
+
+const ArticleInput = z.object({ topic: z.string() })
+const ArticleOutput = z.union([
+  z.object({ ok: z.literal(true), article: Draft }),
+  z.object({ ok: z.literal(false), reason: z.string() }),
+])
+const ArticleState = z.object({
+  phase: z.enum(['drafting', 'editing', 'awaiting-approval', 'done']),
+  draft: Draft.optional(),
+})
 
 function ArticleWorkflow() {
-  const wf = useWorkflow<
-    { topic: string },                // input
-    { ok: true; article: Draft } | { ok: false; reason: string }, // output
-    ArticleState
-  >({
+  const wf = useWorkflow({
+    input: ArticleInput,
+    output: ArticleOutput,
+    state: ArticleState,
     connection: fetchWorkflowEvents('/api/workflow'),
   })
 
@@ -365,9 +388,11 @@ const featureOrchestrator = defineOrchestrator({
 
 Each turn:
 
-1. The engine calls your router with `lastResult` (the dispatched agent's output from the previous turn).
+1. The engine calls your router with `lastResult`, a runtime value typed as `unknown` from the dispatched agent's output on the previous turn.
 2. The router returns either `{ agent: 'name', input }` to dispatch, or `{ done: true, output }` to finish.
 3. The engine runs that agent and loops.
+
+Narrow `lastResult` with the previous agent's output schema or with your state phase before treating it as a specific shape.
 
 `maxTurns` (default `12`) caps runaway routers.
 
@@ -498,7 +523,7 @@ defineWorkflow({
 })
 ```
 
-Old runs (started before the patch) see `patched(...)` return `false`; new runs see `true`. The engine persists patch decisions positionally so replay alignment stays correct.
+`patches` are named migration flags for `patched(name)`: runs that started before the flag see `false`, and runs that started with the flag see `true`. The engine persists patch decisions positionally so replay alignment stays correct. Use explicit workflow versions for larger changes or deploys that need old and new code running side by side.
 
 ## What gets emitted over the wire
 

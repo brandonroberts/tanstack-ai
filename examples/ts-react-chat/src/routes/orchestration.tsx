@@ -13,20 +13,25 @@ import type { WorkflowStep } from '@tanstack/ai-client'
 import type { FileEntry } from '@/components/FileTreePanel'
 import { CodeBlock } from '@/components/CodeBlock'
 import { FileTreePanel } from '@/components/FileTreePanel'
+import {
+  FeatureSpec,
+  ImplementResult,
+  OrchestratorInput,
+  OrchestratorOutput,
+  OrchestratorState,
+} from '@/lib/workflows/orchestrator'
+import type { z } from 'zod'
 
 export const Route = createFileRoute('/orchestration')({
   component: OrchestrationPage,
 })
 
-interface OrchState {
-  phase?: string
-  spec?: { title: string; summary: string; files: Array<string> }
-  result?: {
-    patches: Array<{ filename: string; patch: string }>
-    rationale: string
-  }
-  lastUserMessage?: string
-}
+const PartialSpecStep = FeatureSpec.partial()
+const PartialSpecAgentOutput = OrchestratorState.pick({ spec: true })
+  .partial()
+  .extend({ spec: PartialSpecStep.optional() })
+const PartialPatch = ImplementResult.shape.patches.element.partial()
+type OrchState = z.infer<typeof OrchestratorState>
 
 interface SessionEntry {
   id: string
@@ -40,12 +45,6 @@ interface SessionEntry {
 }
 
 const PROMPT = '~/feature-orchestrator $'
-
-interface OrchestratorRequest {
-  userMessage: string
-  previousSpec?: OrchState['spec']
-  previousResult?: OrchState['result']
-}
 
 function OrchestrationPage() {
   const [input, setInput] = useState(
@@ -63,7 +62,10 @@ function OrchestrationPage() {
     result?: OrchState['result']
   } | null>(null)
 
-  const orch = useOrchestration<OrchestratorRequest, unknown, OrchState>({
+  const orch = useOrchestration({
+    input: OrchestratorInput,
+    output: OrchestratorOutput,
+    state: OrchestratorState,
     connection: fetchWorkflowEvents('/api/orchestration'),
   })
 
@@ -117,17 +119,16 @@ function OrchestrationPage() {
   // output fills in live as JSON arrives.
   const liveSpec = useMemo(() => {
     if (orch.currentStep?.stepName !== 'spec') return undefined
-    const parsed = parsePartialJSON(orch.currentText) as
-      | { spec?: { title?: string; summary?: string; files?: Array<string> } }
-      | undefined
-    return parsed?.spec
+    const parsed = PartialSpecAgentOutput.safeParse(
+      parsePartialJSON(orch.currentText),
+    )
+    return parsed.success ? parsed.data.spec : undefined
   }, [orch.currentStep, orch.currentText])
 
   const liveCoderPatch = useMemo(() => {
     if (orch.currentStep?.stepName !== 'coder') return undefined
-    return parsePartialJSON(orch.currentText) as
-      | { filename?: string; patch?: string }
-      | undefined
+    const parsed = PartialPatch.safeParse(parsePartialJSON(orch.currentText))
+    return parsed.success ? parsed.data : undefined
   }, [orch.currentStep, orch.currentText])
 
   // Patches that should appear in the right-side file tree: every finished
@@ -142,9 +143,16 @@ function OrchestrationPage() {
         step.result &&
         typeof step.result === 'object'
       ) {
-        const r = step.result as { filename?: string; patch?: string }
-        if (typeof r.filename === 'string' && typeof r.patch === 'string') {
-          files.push({ filename: r.filename, patch: r.patch })
+        const patch = PartialPatch.safeParse(step.result)
+        if (
+          patch.success &&
+          typeof patch.data.filename === 'string' &&
+          typeof patch.data.patch === 'string'
+        ) {
+          files.push({
+            filename: patch.data.filename,
+            patch: patch.data.patch,
+          })
         }
       }
     }
@@ -516,7 +524,7 @@ function StepBody(props: {
 
 function FinishedStepBody(props: { step: WorkflowStep }) {
   const { step } = props
-  const result = step.result as Record<string, unknown>
+  const { result } = step
 
   if (step.stepName === 'spec' && isSpecOutput(result)) {
     return <SpecLine spec={result.spec} />
@@ -908,39 +916,80 @@ function InlineTerminalInput(props: {
 // ============================================================================
 
 function isSpecOutput(
-  v: Record<string, unknown>,
+  v: unknown,
 ): v is { spec: { title: string; summary: string; files: Array<string> } } {
-  return 'spec' in v && typeof v.spec === 'object' && v.spec !== null
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'spec' in v &&
+    typeof v.spec === 'object' &&
+    v.spec !== null
+  )
 }
 
 function isPatchOutput(
-  v: Record<string, unknown>,
+  v: unknown,
 ): v is { filename: string; patch: string } {
-  return typeof v.filename === 'string' && typeof v.patch === 'string'
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'filename' in v &&
+    'patch' in v &&
+    typeof v.filename === 'string' &&
+    typeof v.patch === 'string'
+  )
 }
 
 function isPlannerOutput(
-  v: Record<string, unknown>,
+  v: unknown,
 ): v is { files: Array<string>; rationale: string } {
-  return Array.isArray(v.files) && typeof v.rationale === 'string'
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'files' in v &&
+    'rationale' in v &&
+    Array.isArray(v.files) &&
+    typeof v.rationale === 'string'
+  )
 }
 
 function isTriageOutput(
-  v: Record<string, unknown>,
+  v: unknown,
 ): v is { next: string; reason: string } {
-  return typeof v.next === 'string' && typeof v.reason === 'string'
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'next' in v &&
+    'reason' in v &&
+    typeof v.next === 'string' &&
+    typeof v.reason === 'string'
+  )
 }
 
 function isReviewOutput(
-  v: Record<string, unknown>,
+  v: unknown,
 ): v is { verdict: 'accept' | 'refine' | 'reject'; notes: string } {
-  return typeof v.verdict === 'string' && typeof v.notes === 'string'
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'verdict' in v &&
+    'notes' in v &&
+    (v.verdict === 'accept' ||
+      v.verdict === 'refine' ||
+      v.verdict === 'reject') &&
+    typeof v.notes === 'string'
+  )
 }
 
 function isApprovalOutput(
-  v: Record<string, unknown>,
+  v: unknown,
 ): v is { approved: boolean; feedback?: string } {
-  return typeof v.approved === 'boolean'
+  return (
+    typeof v === 'object' &&
+    v !== null &&
+    'approved' in v &&
+    typeof v.approved === 'boolean'
+  )
 }
 
 function stringifyResult(v: unknown): string {

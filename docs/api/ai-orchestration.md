@@ -105,7 +105,7 @@ const pipeline = defineWorkflow({
 | `name` | `string` | |
 | `description` | `string?` | |
 | `version` | `string?` | Caller-supplied version label (e.g. `'v1'`). Used by `selectWorkflowVersion` / `createWorkflowRegistry` to route resumes to the right version when running multiple versions side-by-side. |
-| `patches` | `ReadonlyArray<string>?` | Opt into patch-versioned fingerprint mode. Workflows declaring `patches` use a lighter fingerprint (name + sorted patches) so code-body changes don't trigger `workflow_version_mismatch` on resume; compatibility is enforced by the `startingPatches ⊆ current patches` check. |
+| `patches` | `ReadonlyArray<string>?` | Named migration flags read with `yield* patched(name)`. Use them to keep small additive changes compatible with runs that started before the flag existed; use explicit `version` routing for larger changes. |
 | `defaultStepRetry` | `StepRetryOptions?` | Fallback retry policy applied to `step()` calls that don't carry their own `{ retry }`. |
 | `input` | `StandardSchemaV1?` | |
 | `output` | `StandardSchemaV1?` | |
@@ -137,16 +137,23 @@ const orchestrator = defineOrchestrator({
 
 ### Config
 
-Inherits all fields from `defineWorkflow`, plus:
+`defineOrchestrator` accepts the workflow fields that apply to a router-driven loop:
 
 | Field | Type | Description |
 |---|---|---|
+| `name` | `string` | |
+| `description` | `string?` | |
+| `input` | `StandardSchemaV1?` | |
+| `output` | `StandardSchemaV1?` | |
+| `state` | `StandardSchemaV1?` | Shape of mutable state available to the router. |
+| `agents` | `AgentMap` | Record of `defineAgent(...)` or `defineWorkflow(...)` instances. |
+| `initialize` | `(args) => Partial<TState>` (optional field) | Seed initial state from input. |
 | `router` | `(args) => StepGenerator<RouterDecision>` | Routing generator. |
 | `maxTurns` | `number?` | Max router iterations before throwing. Default `12`. |
 
 ### `router` argument
 
-`{ input, state, agents, turn, lastResult }`. `turn` is the 0-indexed iteration count. `lastResult` is the typed output of the agent dispatched on the previous turn (`undefined` on turn 0).
+`{ input, state, agents, turn, lastResult }`. `turn` is the 0-indexed iteration count. `lastResult` is a runtime value typed as `unknown` from the agent dispatched on the previous turn (`undefined` on turn 0). Narrow it with the relevant output schema or your state phase before using it.
 
 ### `RouterDecision`
 
@@ -230,22 +237,40 @@ import {
 } from "@tanstack/ai-orchestration";
 
 const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 });
+const abortControllers = new Map<string, AbortController>();
 
 export async function POST(request: Request) {
   const params = await parseWorkflowRequest(request);
   if (params.abort && params.runId) {
-    runStore.getLive(params.runId)?.abortController.abort();
+    abortControllers.get(params.runId)?.abort();
     return new Response(null, { status: 204 });
   }
-  const stream = runWorkflow({ workflow, runStore, ...params });
-  return toServerSentEventsResponse(stream);
+  const controller = new AbortController();
+  if (params.runId) abortControllers.set(params.runId, controller);
+
+  const stream = runWorkflow({
+    workflow,
+    runStore,
+    signal: controller.signal,
+    ...params,
+  });
+
+  return toServerSentEventsResponse((async function* () {
+    try {
+      yield* stream;
+    } finally {
+      if (params.runId && abortControllers.get(params.runId) === controller) {
+        abortControllers.delete(params.runId);
+      }
+    }
+  })());
 }
 ```
 
 | Option | Type | |
 |---|---|---|
 | `workflow` | `WorkflowDefinition` | Required. The workflow or orchestrator. |
-| `runStore` | `InMemoryRunStore` | Required. (Engine accepts the in-memory shape today; widening to the general `RunStore` interface is on the roadmap.) |
+| `runStore` | `RunStore` | Required persistence contract. |
 | `input` | `unknown?` | Provide on the *first* call to start a run. |
 | `runId` | `string?` | Provide alongside `approval` or `signalDelivery` to resume a paused run. Also accepted on a fresh start to opt into client-supplied IDs (idempotent retry then becomes possible). |
 | `approval` | `ApprovalResult?` | Provide alongside `runId` to resume a run paused on `approve()`. |
@@ -271,7 +296,7 @@ The HTTP body field name for `signalDelivery` is `signal` — the parser renames
 
 ## `inMemoryRunStore(options)`
 
-Single-process run store. Holds `RunState`, the append-only step log, and the live generator handle so the engine can resume in-process.
+Single-process run store. Implements the current `RunStore` event/run-state contract and also exposes compatibility helpers used by older examples.
 
 ```typescript
 const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 });
@@ -279,9 +304,9 @@ const runStore = inMemoryRunStore({ ttl: 60 * 60 * 1000 });
 
 | Option | Default | |
 |---|---|---|
-| `ttl` | `60 * 60 * 1000` | TTL in ms. Resets on every `setRunState` / `appendStep`. After expiry the run state, live handle, and step log are dropped. |
+| `ttl` | `60 * 60 * 1000` | TTL in ms. Resets on store activity. After expiry the run state, events, and compatibility live handle are dropped. |
 
-Returns `InMemoryRunStore` which extends `RunStore` with `setLive` / `getLive` for the engine-internal live generator handle.
+Returns `InMemoryRunStore`, which extends the core store with compatibility helpers such as `appendStep`, `getSteps`, `setLive`, and `getLive`. The engine contract is `getRunState`, `setRunState`, `deleteRun`, `appendEvent`, `getEvents`, and optional `subscribe`.
 
 For durable persistence options see [Run Persistence](../orchestration/run-persistence).
 
@@ -334,15 +359,15 @@ try {
 | `ApprovalResult` | `{ approved, approvalId, feedback? }` |
 | `SignalResult<TPayload>` | `{ signalId, payload }` — delivered to `waitForSignal()` pauses. |
 | `RouterDecision` | `{ done: true, output } \| { done?: false, agent, input }` |
-| `RunState` | Serializable snapshot of a run. Includes `workflowVersion`, `fingerprint`, `startingPatches`, `waitingFor` for durable resume. |
+| `RunState` | Serializable snapshot of a run. Includes `workflowVersion` and `waitingFor` for durable resume. |
 | `RunStatus` | `'running' \| 'paused' \| 'finished' \| 'error' \| 'aborted'` |
-| `RunStore` | Persistence interface: `getRunState` / `setRunState` / `deleteRun` / `appendStep` / `getSteps`. |
-| `InMemoryRunStore` | Extends `RunStore` with `setLive` / `getLive` for the in-process live generator handle. |
-| `LogConflictError` | Thrown by `appendStep` when another writer has already committed at `expectedNextIndex`. Carries `runId`, `attemptedIndex`, and optionally `existing` (the conflicting record). |
+| `RunStore` | Persistence interface: `getRunState` / `setRunState` / `deleteRun` / `appendEvent` / `getEvents` / optional `subscribe`. |
+| `InMemoryRunStore` | Core in-memory store plus compatibility helpers (`appendStep`, `getSteps`, `setLive`, `getLive`). |
+| `LogConflictError` | Thrown by append operations when another writer has already committed at `expectedNextIndex`. Carries `runId`, `attemptedIndex`, and optionally `existing` (the conflicting record). |
 | `StepTimeoutError` | Thrown when a `step({ timeout })` exceeds its wall-clock budget on a given attempt. |
 | `DeleteReason` | `'finished' \| 'error' \| 'aborted'` |
 | `EmitFn` | `(name, value) => void` |
-| `LiveRun` | Engine-internal live handle (live generator, abort controller, etc). |
+| `LiveRun` | Engine-internal process-local live handle retained by `inMemoryRunStore` for compatibility. |
 
 ## Client-side hooks
 
@@ -352,6 +377,8 @@ The companion client hooks live in framework packages:
 - `useOrchestration` — same hook, re-exported under a routing-friendly name
 - `WorkflowClient` — `@tanstack/ai-client` for vanilla / non-React clients
 - `fetchWorkflowEvents(url, options?)` — connection adapter, exported from `@tanstack/ai-client` and `@tanstack/ai-react`
+
+Pass the same `input`, `output`, and optionally `state` schemas you used on the server workflow to infer the hook's `start(...)` input, `output`, and `state` types on the client.
 
 The hook exposes the following actions on the returned object:
 

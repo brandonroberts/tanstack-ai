@@ -6,37 +6,35 @@ import { ArticleModal } from '@/components/ArticleModal'
 import { DraftPreview } from '@/components/DraftPreview'
 import { StateInspector } from '@/components/StateInspector'
 import { WorkflowTimeline } from '@/components/WorkflowTimeline'
-
-interface ArticleState {
-  phase?: string
-  draft?: { title: string; paragraphs: Array<string> }
-}
+import {
+  ArticleInput,
+  ArticleOutput,
+  ArticleState,
+} from '@/lib/workflows/article-workflow'
 
 // Steps whose streaming JSON payload is shaped like a Draft. While they're
 // running we partial-parse `currentText` so the DraftPreview pane fills in
 // live, paragraph by paragraph, instead of snapping in only after the agent
 // finishes.
 const DRAFT_PRODUCING_STEPS = new Set(['writer', 'editor'])
+const PartialDraft = ArticleState.shape.draft.unwrap().partial()
 
 export const Route = createFileRoute('/workflow')({
   component: WorkflowPage,
 })
 
-type ArticleOutput =
-  | { ok: true; article: { title: string; paragraphs: Array<string> } }
-  | { ok: false; reason: string }
-
 function WorkflowPage() {
   const [topic, setTopic] = useState('the cultural history of pufferfish')
 
-  const wf = useWorkflow<{ topic: string }, ArticleOutput, ArticleState>({
+  const wf = useWorkflow({
+    input: ArticleInput,
+    output: ArticleOutput,
+    state: ArticleState,
     connection: fetchWorkflowEvents('/api/workflow'),
   })
 
   const isRunning = wf.status === 'running' || wf.status === 'paused'
-  const finalResult = (
-    wf.status === 'finished' ? wf.output : null
-  ) as ArticleOutput | null
+  const finalResult = wf.status === 'finished' ? wf.output : null
 
   // Live draft assembled from the streaming structured-output JSON deltas of
   // the active writer/editor step. Falls back to the committed `state.draft`
@@ -44,9 +42,8 @@ function WorkflowPage() {
   const liveDraft = useMemo(() => {
     const stepName = wf.currentStep?.stepName
     if (!stepName || !DRAFT_PRODUCING_STEPS.has(stepName)) return undefined
-    return parsePartialJSON(wf.currentText) as
-      | { title?: string; paragraphs?: Array<string> }
-      | undefined
+    const parsed = PartialDraft.safeParse(parsePartialJSON(wf.currentText))
+    return parsed.success ? parsed.data : undefined
   }, [wf.currentStep, wf.currentText])
   const isStreamingDraft = liveDraft !== undefined
 
@@ -109,7 +106,7 @@ function WorkflowPage() {
               State Snapshot
             </summary>
             <div className="mt-4">
-              <StateInspector state={wf.state} />
+              <StateInspector state={wf.state ?? undefined} />
             </div>
           </details>
         </div>
