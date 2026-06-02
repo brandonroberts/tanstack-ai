@@ -1174,9 +1174,16 @@ export interface TextMessageContentEvent extends Pick<
   model?: string
   /** Full accumulated content so far (TanStack AI internal, for debugging) */
   content?: string
+  /**
+   * Run-attribution metadata some adapters attach to content deltas so the
+   * client (e.g. `@tanstack/ai-client`'s persistor, via `getChunkRunId`) can
+   * correlate the delta with its run. Not part of the AG-UI spec for this
+   * event; optional because adapters may omit it.
+   */
+  runId?: string
 }
 type _TextMessageContentDriftCheck = AssertSatisfiesAGUI<
-  Omit<TextMessageContentEvent, 'type' | 'model' | 'content'>,
+  Omit<TextMessageContentEvent, 'type' | 'model' | 'content' | 'runId'>,
   Pick<
     AGUITextMessageContentEvent,
     'messageId' | 'delta' | 'timestamp' | 'rawEvent'

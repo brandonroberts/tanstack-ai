@@ -103,6 +103,10 @@
         {
           "label": "Thinking & Reasoning",
           "to": "chat/thinking-content"
+        },
+        {
+          "label": "Persistence",
+          "to": "chat/persistence"
         }
       ]
     },
