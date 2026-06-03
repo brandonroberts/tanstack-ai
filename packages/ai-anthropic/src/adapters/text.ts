@@ -302,9 +302,7 @@ export class AnthropicTextAdapter<
   private mapCommonOptionsToAnthropic(
     options: TextOptions<AnthropicTextProviderOptions>,
   ) {
-    const modelOptions = options.modelOptions as
-      | InternalTextProviderOptions
-      | undefined
+    const modelOptions = options.modelOptions
 
     const formattedMessages = this.formatMessages(options.messages)
     const tools = options.tools
@@ -313,7 +311,7 @@ export class AnthropicTextAdapter<
 
     const validProviderOptions: Partial<InternalTextProviderOptions> = {}
     if (modelOptions) {
-      const validKeys: Array<keyof InternalTextProviderOptions> = [
+      const validKeys: Array<keyof AnthropicTextProviderOptions> = [
         'container',
         'context_management',
         'effort',
@@ -324,10 +322,17 @@ export class AnthropicTextAdapter<
         'thinking',
         'tool_choice',
         'top_k',
+        'temperature',
+        'top_p',
       ]
-      const validKeySet = new Set<string>(validKeys)
+      // `max_tokens` is a legitimate public modelOptions field, but it is read
+      // via a dedicated path (defaultMaxTokens below) rather than copied into
+      // validProviderOptions. Exempt it from the dropped-key warning here so a
+      // correct `modelOptions: { max_tokens }` call doesn't log a spurious
+      // "dropped unknown key" error, while keeping it out of the copy loop.
+      const droppedKeyExemptSet = new Set<string>([...validKeys, 'max_tokens'])
       const droppedKeys = Object.keys(modelOptions).filter(
-        (key) => !validKeySet.has(key),
+        (key) => !droppedKeyExemptSet.has(key),
       )
       if (droppedKeys.length > 0) {
         // Reachable when callers cast around the public type (e.g.
@@ -364,7 +369,7 @@ export class AnthropicTextAdapter<
       validProviderOptions.thinking?.type === 'enabled'
         ? validProviderOptions.thinking.budget_tokens
         : undefined
-    const defaultMaxTokens = options.maxTokens || 1024
+    const defaultMaxTokens = modelOptions?.max_tokens ?? 1024
     const maxTokens =
       thinkingBudget && thinkingBudget >= defaultMaxTokens
         ? thinkingBudget + 1
@@ -409,18 +414,13 @@ export class AnthropicTextAdapter<
         }
       : undefined
 
-    // `InternalTextProviderOptions` declares `temperature`, `top_p`,
-    // and `tools` as `T?: ...` (no `| undefined`), so spread them
-    // conditionally rather than passing explicit `undefined` from the
-    // optional common `TextOptions` fields under
-    // exactOptionalPropertyTypes.
+    // `temperature`/`top_p` arrive via `...validProviderOptions` (sourced from
+    // `modelOptions`). `InternalTextProviderOptions` declares `system` and
+    // `tools` as `T?: ...` (no `| undefined`), so spread them conditionally
+    // rather than passing explicit `undefined` under exactOptionalPropertyTypes.
     const requestParams: InternalTextProviderOptions = {
       model: options.model,
       max_tokens: maxTokens,
-      ...(options.temperature !== undefined && {
-        temperature: options.temperature,
-      }),
-      ...(options.topP !== undefined && { top_p: options.topP }),
       messages: formattedMessages,
       ...(systemBlocks !== undefined && { system: systemBlocks }),
       ...(tools !== undefined && { tools }),
