@@ -144,7 +144,7 @@ export class GrokImageAdapter<
       ...(isImagine
         ? imagineSizeParams(size)
         : size !== undefined && {
-            size: size as OpenAI_SDK.Images.ImageGenerateParams['size'],
+            size: size,
           }),
       stream: false,
       ...modelOptions,

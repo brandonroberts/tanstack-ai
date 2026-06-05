@@ -26,12 +26,13 @@ import type {
 } from '../image/image-provider-options'
 import type { OpenAIClientConfig } from '../utils/client'
 
-// Per OpenAI docs: dall-e-2 accepts 1 image to `images.edit()`; gpt-image-1
-// and gpt-image-1-mini accept up to 16; dall-e-3 does not support edit at all.
+// Per OpenAI docs: dall-e-2 accepts 1 image to `images.edit()`; the
+// gpt-image models accept up to 16; dall-e-3 does not support edit at all.
 const EDIT_MAX_IMAGES: Record<OpenAIImageModel, number> = {
   'dall-e-2': 1,
   'gpt-image-1': 16,
   'gpt-image-1-mini': 16,
+  'gpt-image-2': 16,
   'dall-e-3': 0,
 }
 
@@ -245,10 +246,7 @@ export class OpenAIImageAdapter<
         {}) as Partial<OpenAI_SDK.Images.ImageEditParamsNonStreaming>),
     }
     if (size !== undefined) {
-      request.size = size as Exclude<
-        OpenAI_SDK.Images.ImageEditParamsNonStreaming['size'],
-        undefined
-      >
+      request.size = size
     }
     if (maskFile) {
       request.mask = maskFile
@@ -281,15 +279,10 @@ export class OpenAIImageAdapter<
         id: generateId(this.name),
         model,
         images,
-        ...(response.usage
-          ? {
-              usage: {
-                inputTokens: response.usage.input_tokens,
-                outputTokens: response.usage.output_tokens,
-                totalTokens: response.usage.total_tokens,
-              },
-            }
-          : {}),
+        ...(() => {
+          const usage = buildImagesUsage(response.usage)
+          return usage ? { usage } : {}
+        })(),
       }
     } catch (error: unknown) {
       logger.errors(`${this.name}.editImages fatal`, {

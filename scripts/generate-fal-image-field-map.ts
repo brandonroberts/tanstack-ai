@@ -5,7 +5,7 @@
  * fal endpoints use inconsistent field names for image-conditioned
  * generation (`image_url` vs `image_urls` vs `first_frame_url` vs
  * `mask_image_url`, ...). The runtime mapper in
- * `packages/typescript/ai-fal/src/image/image-inputs.ts` applies a default
+ * `packages/ai-fal/src/image/image-inputs.ts` applies a default
  * field per input role; this script walks every endpoint's input type with
  * the TypeScript checker and records, per role, the field the endpoint
  * actually accepts whenever it differs from that default. Endpoints that
@@ -31,7 +31,7 @@ import ts from 'typescript'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = resolve(__dirname, '..')
-const FAL_PKG = resolve(ROOT, 'packages/typescript/ai-fal')
+const FAL_PKG = resolve(ROOT, 'packages/ai-fal')
 const ENDPOINTS_DTS = resolve(
   FAL_PKG,
   'node_modules/@fal-ai/client/src/types/endpoints.d.ts',
