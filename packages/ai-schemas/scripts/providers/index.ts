@@ -4,6 +4,7 @@ import { falProvider } from './fal.js'
 import { geminiProvider } from './gemini.js'
 import { grokProvider } from './grok.js'
 import { openaiProvider } from './openai.js'
+import { openrouterProvider } from './openrouter.js'
 import type { ProviderConfig } from '../providers.js'
 
 export const ALL_PROVIDERS: ReadonlyArray<ProviderConfig> = [
@@ -13,4 +14,5 @@ export const ALL_PROVIDERS: ReadonlyArray<ProviderConfig> = [
   grokProvider,
   elevenlabsProvider,
   falProvider,
+  openrouterProvider,
 ]

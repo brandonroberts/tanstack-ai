@@ -21,6 +21,7 @@ pnpm add zod
 | Gemini     | `generativelanguage.googleapis.com/$discovery/rest?version=v1beta`          | Google Discovery doc converted to OpenAPI in-pipeline. |
 | ElevenLabs | `api.elevenlabs.io/openapi.json`                                            | Public.                                                |
 | xAI Grok   | `docs.x.ai/openapi.json`                                                    | Public.                                                |
+| OpenRouter | `openrouter.ai/openapi.json`                                                | Public.                                                |
 | FAL        | `api.fal.ai/v1/models?status=active&expand=openapi-3.0` (per-model OpenAPI) | Needs `FAL_KEY` to fetch.                              |
 
 Other OpenAI-compatible providers (e.g. Groq) reuse the OpenAI schemas.

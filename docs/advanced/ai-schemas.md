@@ -3,7 +3,7 @@ title: '@tanstack/ai-schemas: provider endpoint schemas'
 id: ai-schemas
 ---
 
-`@tanstack/ai-schemas` is a separate package that ships **JSON Schema** and **Zod** schemas for the generation endpoints of every supported provider (OpenAI, Anthropic, Gemini, ElevenLabs, xAI Grok, FAL). The schemas are generated nightly from each provider's official OpenAPI spec, so they track upstream changes automatically.
+`@tanstack/ai-schemas` is a separate package that ships **JSON Schema** and **Zod** schemas for the generation endpoints of every supported provider (OpenAI, Anthropic, Gemini, ElevenLabs, xAI Grok, OpenRouter, FAL). The schemas are generated nightly from each provider's official OpenAPI spec, so they track upstream changes automatically.
 
 It complements the `model-meta.ts` shipped with each provider adapter: where `model-meta` describes coarse facts (context window, modalities, pricing), `ai-schemas` describes the rich per-endpoint constraint surface — allowed video durations, image sizes, voice IDs, prompt-length caps, etc.
 
@@ -121,4 +121,5 @@ Provider sources:
 | Gemini     | `generativelanguage.googleapis.com/$discovery/rest?version=v1beta`              | Google Discovery doc converted to OpenAPI in pipeline. |
 | ElevenLabs | `api.elevenlabs.io/openapi.json`                                                | Public.                                              |
 | xAI Grok   | `docs.x.ai/openapi.json`                                                        | Public.                                              |
+| OpenRouter | `openrouter.ai/openapi.json`                                                    | Public.                                              |
 | FAL        | `api.fal.ai/v1/models?status=active&expand=openapi-3.0` (per-model)             | Needs `FAL_KEY`. Model categories regroup into the shared activities. |
