@@ -4,6 +4,7 @@ import { resolveDebugOption } from '@tanstack/ai/adapter-internals'
 
 import { falVideo } from '../src/adapters/video'
 import { recordBillableUnitsFromResponse } from '../src/utils/billing'
+import type { FalVideoProviderOptions } from '../src/model-meta'
 
 function seedBillableUnits(requestId: string, units: string) {
   recordBillableUnitsFromResponse(
@@ -17,6 +18,13 @@ function seedBillableUnits(requestId: string, units: string) {
 }
 
 const testLogger = resolveDebugOption(false)
+
+// Compile-time: the kling i2v endpoint declares `image_url` as a REQUIRED
+// input, but it's demoted to optional in provider options because the start
+// frame usually arrives as a prompt part instead of modelOptions.
+const emptyI2vOptions: FalVideoProviderOptions<'fal-ai/kling-video/v3/pro/image-to-video'> =
+  {}
+void emptyI2vOptions
 
 // Declare mocks at module level
 let mockQueueSubmit: any

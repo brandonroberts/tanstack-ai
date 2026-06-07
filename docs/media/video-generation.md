@@ -444,7 +444,7 @@ await generateVideo({
 | Provider     | Image-to-Video Behavior                                                                                  |
 | ------------ | -------------------------------------------------------------------------------------------------------- |
 | **OpenAI**   | Sora-2 / Sora-2-Pro → the image part goes to `input_reference`; flattened text is the prompt. Single image only — throws if more than one. |
-| **fal.ai**   | Field names resolve per endpoint from a map generated from the fal SDK's endpoint types — e.g. `role: 'start_frame'` lands on `image_url` for Kling/Veo image-to-video, `first_frame_url` for first-last-frame endpoints, and `start_image_url` otherwise. Defaults: single input → `image_url` (start frame); `role: 'end_frame'` → `end_image_url`; `role: 'reference'` / `'character'` → `reference_image_urls`. Override per-endpoint via `modelOptions`. |
+| **fal.ai**   | Field names resolve per endpoint from a map generated from the fal SDK's endpoint types — e.g. `role: 'start_frame'` lands on `image_url` for Kling/Veo image-to-video, `first_frame_url` for first-last-frame endpoints, and `start_image_url` otherwise. Defaults: single input → `image_url` (start frame); `role: 'end_frame'` → `end_image_url`; `role: 'reference'` / `'character'` → `reference_image_urls`. Override per-endpoint via `modelOptions` — the media-conditioning fields are typed optional there (even when the endpoint requires them) since they usually arrive as prompt parts. |
 | **Gemini**   | Veo adapter not yet implemented — image prompt parts will be supported when Veo lands.                    |
 
 Adapters whose underlying API can't accept image inputs throw a clear

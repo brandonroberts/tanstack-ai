@@ -92,6 +92,19 @@ function registerMediaFixtures(mock: LLMock) {
     },
   })
 
+  // Image-to-video: the Sora adapter uploads the image part as
+  // `input_reference`, which makes the OpenAI SDK switch to a multipart
+  // POST /v1/videos. aimock 1.29 extracts the `prompt` form field from
+  // multipart bodies, so matching works the same as the JSON case above.
+  mock.onVideo('animate this product photo', {
+    video: {
+      url: 'https://example.com/product-animated.mp4',
+      duration: 5,
+      id: 'video-job-i2v-e2e',
+      status: 'completed',
+    },
+  })
+
   // ElevenLabs music (/v1/music/*) and SFX (/v1/sound-generation) are
   // covered natively by aimock 1.17 — fixtures live under
   // fixtures/audio-gen/ and fixtures/sound-effects/ and are loaded by the
