@@ -417,10 +417,10 @@ adapter uses to route the input to the provider-specific field:
 
 | Role            | Maps to                                                       |
 | --------------- | ------------------------------------------------------------- |
-| `'start_frame'` | fal `start_image_url` (positional default for the first input) |
-| `'end_frame'`   | fal `end_image_url` (Veo `lastFrame` when available)           |
-| `'reference'`   | fal `reference_image_urls` (Veo `referenceImages`)             |
-| `'character'`   | Same as `'reference'` — character consistency images           |
+| `'start_frame'` | fal `start_image_url` (positional default for the first input)         |
+| `'end_frame'`   | fal `end_image_url` (Veo `lastFrame` planned — no Veo adapter yet)      |
+| `'reference'`   | fal `reference_image_urls` (Veo `referenceImages` planned)              |
+| `'character'`   | Same as `'reference'` — character consistency images                    |
 
 ```typescript
 import { falVideo } from '@tanstack/ai-fal'

@@ -360,6 +360,32 @@ describe('OpenAI Image Adapter', () => {
       expect(editArgs.image).toBeInstanceOf(File)
     })
 
+    it('throws when the edit response contains no usable images', async () => {
+      const adapter = new TestOpenAIImageAdapter(
+        { apiKey: 'test-api-key' },
+        'gpt-image-1',
+      )
+      // Items with neither b64_json nor url (e.g. moderation blocks) must
+      // surface as an error, not resolve to `{ images: [] }`.
+      adapter
+        .spyOnImagesEdit()
+        .mockResolvedValueOnce({ created: 0, data: [{}] })
+
+      await expect(
+        adapter.generateImages({
+          model: 'gpt-image-1',
+          prompt: [
+            { type: 'text', content: 'edit' },
+            {
+              type: 'image',
+              source: { type: 'data', value: 'aGk=', mimeType: 'image/png' },
+            },
+          ],
+          logger: testLogger,
+        }),
+      ).rejects.toThrow(/image edit response contained no images/)
+    })
+
     it('rejects video or audio prompt parts', async () => {
       const adapter = new TestOpenAIImageAdapter(
         { apiKey: 'test-api-key' },

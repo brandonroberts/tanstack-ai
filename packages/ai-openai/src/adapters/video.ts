@@ -122,8 +122,10 @@ export class OpenAIVideoAdapter<
     if (inputReference) {
       // Sora's `input_reference` is a single Uploadable; convert TanStack
       // ImagePart (URL or base64) → File before handing it to the SDK.
-      const file = await imagePartToFile(inputReference, 'input-reference')
-      ;(request as { input_reference?: unknown }).input_reference = file
+      request.input_reference = await imagePartToFile(
+        inputReference,
+        'input-reference',
+      )
     }
     // `VideoCreateParams.size` is `size?: VideoSize` (no `| undefined`), so we
     // narrow before assignment instead of casting from a `T | undefined` source.

@@ -189,7 +189,8 @@ export function mapImageInputsToFalFields<TModel extends FalModel>(
  * - `metadata.role === 'start_frame'`              → spec.start
  * - `metadata.role === 'end_frame'`                → spec.end
  * - `metadata.role === 'reference' | 'character'`  → spec.reference
- * - remaining parts (any other / no role)          → spec.single / spec.multi
+ * - `metadata.role === 'mask' | 'control'`         → throws (no video routing)
+ * - remaining parts (no role)                      → spec.single / spec.multi
  */
 export function mapImageInputsToFalVideoFields<TModel extends FalModel>(
   model: TModel,
@@ -200,8 +201,15 @@ export function mapImageInputsToFalVideoFields<TModel extends FalModel>(
   const spec = fieldSpecFor(model)
   const { sources, masks, controls, references, starts, ends } =
     bucketByRole(imageInputs)
-  // Mask / control roles have no video-specific routing; treat as sources.
-  const allSources = [...sources, ...masks, ...controls]
+  // Mask / control roles have no video-specific routing; silently repurposing
+  // them as source frames would hide the problem, so reject them instead.
+  if (masks.length > 0 || controls.length > 0) {
+    const role = masks.length > 0 ? 'mask' : 'control'
+    throw new Error(
+      `fal: metadata.role === '${role}' is not supported for video generation on model ${model}. ` +
+        `Remove the role or pass the field explicitly via modelOptions.`,
+    )
+  }
 
   if (starts.length > 1) {
     throw new Error(
@@ -215,8 +223,8 @@ export function mapImageInputsToFalVideoFields<TModel extends FalModel>(
   }
 
   const fields: Record<string, unknown> = {}
-  const sourceField = allSources.length > 1 ? spec.multi : spec.single
-  assignField(fields, sourceField, allSources, model, 'source')
+  const sourceField = sources.length > 1 ? spec.multi : spec.single
+  assignField(fields, sourceField, sources, model, 'source')
   assignField(fields, spec.reference, references, model, 'reference')
   // Frame roles assign last: when an endpoint routes the start frame to its
   // generic source field (e.g. Kling image-to-video) and an unroled source

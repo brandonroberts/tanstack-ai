@@ -173,9 +173,10 @@ export class OpenAIImageAdapter<
 
   /**
    * Image-conditioned generation via OpenAI's `images.edit()` endpoint.
-   * dall-e-2 accepts 1 input image; gpt-image-1 / gpt-image-1-mini accept up
-   * to 16; dall-e-3 rejects entirely. A part with `metadata.role === 'mask'`
-   * is routed to the SDK's `mask` field (PNG with alpha channel).
+   * dall-e-2 accepts 1 input image; gpt-image-2 / gpt-image-1 /
+   * gpt-image-1-mini accept up to 16; dall-e-3 rejects entirely. A part with
+   * `metadata.role === 'mask'` is routed to the SDK's `mask` field (PNG with
+   * alpha channel).
    */
   private async editImages(args: {
     model: OpenAIImageModel
@@ -191,7 +192,7 @@ export class OpenAIImageAdapter<
     if (maxImages === 0) {
       throw new Error(
         `${this.name}: model "${model}" does not support image prompt parts. ` +
-          `Use gpt-image-1, gpt-image-1-mini, or dall-e-2 for image-conditioned generation.`,
+          `Use gpt-image-2, gpt-image-1, gpt-image-1-mini, or dall-e-2 for image-conditioned generation.`,
       )
     }
 
@@ -271,6 +272,12 @@ export class OpenAIImageAdapter<
           return []
         },
       )
+
+      // Surface empty responses (e.g. moderation blocks returning items with
+      // neither b64_json nor url) instead of resolving to `{ images: [] }`.
+      if (images.length === 0) {
+        throw new Error(`${this.name}: image edit response contained no images`)
+      }
 
       return {
         id: generateId(this.name),

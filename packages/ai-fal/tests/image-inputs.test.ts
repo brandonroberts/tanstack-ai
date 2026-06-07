@@ -185,6 +185,20 @@ describe('mapImageInputsToFalVideoFields', () => {
     })
   })
 
+  it('throws on mask/control roles instead of repurposing them as sources', () => {
+    expect(() =>
+      mapImageInputsToFalVideoFields(UNKNOWN_MODEL, [
+        urlPart('https://example.com/start.png'),
+        urlPart('https://example.com/mask.png', { role: 'mask' }),
+      ]),
+    ).toThrow(/'mask' is not supported for video generation/)
+    expect(() =>
+      mapImageInputsToFalVideoFields(UNKNOWN_MODEL, [
+        urlPart('https://example.com/depth.png', { role: 'control' }),
+      ]),
+    ).toThrow(/'control' is not supported for video generation/)
+  })
+
   describe('generated endpoint overrides', () => {
     it('routes role=start_frame to the source field on image-to-video endpoints', () => {
       // Kling i2v takes the start frame as plain image_url, the end frame

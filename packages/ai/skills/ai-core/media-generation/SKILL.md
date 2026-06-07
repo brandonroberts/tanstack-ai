@@ -208,18 +208,19 @@ compile time via the adapter's input-modality map.
 import { generateImage } from '@tanstack/ai'
 import { openaiImage } from '@tanstack/ai-openai'
 
-// Image-to-image (OpenAI gpt-image-1, dall-e-2)
+// Image-to-image (OpenAI gpt-image-2 / gpt-image-1, dall-e-2)
 await generateImage({
-  adapter: openaiImage('gpt-image-1'),
+  adapter: openaiImage('gpt-image-2'),
   prompt: [
     { type: 'text', content: 'Turn this into a cinematic product photo' },
     { type: 'image', source: { type: 'url', value: 'https://…/product.png' } },
   ],
 })
 
-// Multi-reference (up to 16 for gpt-image-1; up to 14 for Gemini native)
+// Multi-reference (up to 16 for gpt-image models; up to ~14 for Gemini native
+// — a provider limit, not enforced by the SDK)
 await generateImage({
-  adapter: openaiImage('gpt-image-1'),
+  adapter: openaiImage('gpt-image-2'),
   prompt: [
     { type: 'text', content: 'Apply the second image as style to the first' },
     { type: 'image', source: { type: 'url', value: 'https://…/product.png' } },
@@ -227,9 +228,9 @@ await generateImage({
   ],
 })
 
-// Inpaint via metadata.role === 'mask' (OpenAI gpt-image-1, dall-e-2; fal mask_url)
+// Inpaint via metadata.role === 'mask' (OpenAI gpt-image models, dall-e-2; fal mask_url)
 await generateImage({
-  adapter: openaiImage('gpt-image-1'),
+  adapter: openaiImage('gpt-image-2'),
   prompt: [
     { type: 'text', content: 'Replace the masked region with a tree' },
     { type: 'image', source: { type: 'url', value: photoUrl } },
@@ -261,20 +262,20 @@ await generateVideo({
 
 **Role hints** (`metadata.role`):
 
-| Role            | Maps to                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------- |
-| `'reference'`   | fal `reference_image_urls`; Gemini multimodal part; positional otherwise                    |
-| `'character'`   | Same as `'reference'`; Veo `referenceImages` slot                                           |
-| `'mask'`        | OpenAI `mask` (gpt-image-1, dall-e-2); fal `mask_url`                                       |
-| `'control'`     | fal `control_image_url` (ControlNet / depth / pose)                                         |
-| `'start_frame'` | fal `start_image_url` (or the endpoint's field, e.g. `image_url` on Kling i2v); Veo `image` |
-| `'end_frame'`   | fal `end_image_url` (or e.g. `tail_image_url` / `last_frame_url`); Veo `lastFrame`          |
+| Role            | Maps to                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------- |
+| `'reference'`   | fal `reference_image_urls`; Gemini multimodal part; positional otherwise                              |
+| `'character'`   | Same as `'reference'`; Veo `referenceImages` slot (planned — no Veo adapter yet)                      |
+| `'mask'`        | OpenAI `mask` (gpt-image-2, gpt-image-1, dall-e-2); fal `mask_url`                                    |
+| `'control'`     | fal `control_image_url` (ControlNet / depth / pose)                                                   |
+| `'start_frame'` | fal `start_image_url` (or the endpoint's field, e.g. `image_url` on Kling i2v); Veo `image` (planned) |
+| `'end_frame'`   | fal `end_image_url` (or e.g. `tail_image_url` / `last_frame_url`); Veo `lastFrame` (planned)          |
 
 **Provider support matrix:**
 
 | Provider   | `generateImage` image parts                                                                                                                                                                              | `generateVideo` image parts                                                                                                                                                                        |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| OpenAI     | gpt-image-1 / -mini → `images.edit()` (up to 16). dall-e-2 → edit (1). dall-e-3 throws.                                                                                                                  | Sora-2 / -pro → `input_reference` (single). Throws if >1.                                                                                                                                          |
+| OpenAI     | gpt-image-2 / gpt-image-1 / -mini → `images.edit()` (up to 16). dall-e-2 → edit (1). dall-e-3 throws.                                                                                                    | Sora-2 / -pro → `input_reference` (single). Throws if >1.                                                                                                                                          |
 | Gemini     | Native (gemini-\*-flash-image, "nano-banana") → multimodal `contents`. Imagen throws.                                                                                                                    | No native Veo adapter yet — deferred to a follow-up.                                                                                                                                               |
 | fal        | Per-endpoint field names from a generated map (`pnpm generate:fal-image-fields`). Defaults: 1 input → `image_url`; >1 → `image_urls`; roles → `mask_url` / `control_image_url` / `reference_image_urls`. | Per-endpoint map (e.g. Kling i2v start frame → `image_url`). Defaults: 1 input → `image_url`; `start_frame`/`end_frame` → `start_image_url`/`end_image_url`; `reference` → `reference_image_urls`. |
 | Grok       | grok-imagine models → `/v1/images/edits` JSON endpoint (≤3 sources, addressed by xAI in request order; prompt sent verbatim; mask/control throw). grok-2-image-1212 throws.                              | n/a                                                                                                                                                                                                |
@@ -732,7 +733,7 @@ generateImage({
 
 // CORRECT — use a model that supports image-conditioned generation
 generateImage({
-  adapter: openaiImage('gpt-image-1'), // edits up to 16 images
+  adapter: openaiImage('gpt-image-2'), // edits up to 16 images
   prompt: [
     { type: 'text', content: 'Edit this' },
     { type: 'image', source: { type: 'url', value: url } },

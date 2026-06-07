@@ -22,7 +22,7 @@ TanStack AI provides support for image generation through dedicated image adapte
 
 Image generation is handled by image adapters that follow the same tree-shakeable architecture as other adapters in TanStack AI. The image adapters support:
 
-- **OpenAI**: DALL-E 2, DALL-E 3, GPT-Image-1, and GPT-Image-1-Mini models
+- **OpenAI**: DALL-E 2, DALL-E 3, GPT-Image-1, GPT-Image-1-Mini, and GPT-Image-2 models
 - **Gemini**: Gemini native image models (NanoBanana) and Imagen 3/4 models
 - **fal.ai**: 600+ models including Nano Banana Pro, FLUX, and more
 
@@ -141,7 +141,7 @@ import { generateImage } from '@tanstack/ai'
 import { openaiImage } from '@tanstack/ai-openai'
 
 await generateImage({
-  adapter: openaiImage('gpt-image-1'),
+  adapter: openaiImage('gpt-image-2'),
   prompt: [
     { type: 'text', content: 'Turn this into a cinematic product photo' },
     {
@@ -230,17 +230,17 @@ mapping.
 | Role            | Maps to                                                                                |
 | --------------- | -------------------------------------------------------------------------------------- |
 | `'reference'`   | fal `reference_image_urls`; Gemini multimodal part; positional fallback                |
-| `'character'`   | Same as `'reference'`; Veo `referenceImages` slot                                      |
-| `'mask'`        | OpenAI `mask` (gpt-image-1, dall-e-2); fal `mask_url`                                  |
+| `'character'`   | Same as `'reference'`; Veo `referenceImages` slot (planned — no Veo adapter yet)       |
+| `'mask'`        | OpenAI `mask` (gpt-image-2, gpt-image-1, dall-e-2); fal `mask_url`                     |
 | `'control'`     | fal `control_image_url` (ControlNet / depth / pose conditioning)                       |
-| `'start_frame'` | fal `start_image_url`; Veo `image` (used by `generateVideo`)                           |
-| `'end_frame'`   | fal `end_image_url`; Veo `lastFrame` (used by `generateVideo`)                         |
+| `'start_frame'` | fal `start_image_url`; Veo `image` (planned) (used by `generateVideo`)                 |
+| `'end_frame'`   | fal `end_image_url`; Veo `lastFrame` (planned) (used by `generateVideo`)               |
 
 #### Inpaint / edit with a mask
 
 ```typescript
 await generateImage({
-  adapter: openaiImage('gpt-image-1'),
+  adapter: openaiImage('gpt-image-2'),
   prompt: [
     { type: 'text', content: 'Replace the masked region with a tree' },
     {
@@ -283,8 +283,8 @@ await generateImage({
 
 | Provider     | Behavior                                                                                                  |
 | ------------ | --------------------------------------------------------------------------------------------------------- |
-| **OpenAI**   | `gpt-image-1` / `gpt-image-1-mini` → routes to `images.edit()`, up to 16 source images plus optional mask.<br>`dall-e-2` → `images.edit()` with 1 source image only.<br>`dall-e-3` → throws (no edit support). |
-| **Gemini**   | Native models (`gemini-*-flash-image`, "nano-banana", etc.) → prompt parts map 1:1 onto multimodal `contents`, preserving interleaved order. Up to ~14 input images.<br>Imagen models → throws (text-to-image only). |
+| **OpenAI**   | `gpt-image-2` / `gpt-image-1` / `gpt-image-1-mini` → routes to `images.edit()`, up to 16 source images plus optional mask.<br>`dall-e-2` → `images.edit()` with 1 source image only.<br>`dall-e-3` → throws (no edit support). |
+| **Gemini**   | Native models (`gemini-*-flash-image`, "nano-banana", etc.) → prompt parts map 1:1 onto multimodal `contents`, preserving interleaved order. Up to ~14 input images (provider limit, not enforced by the SDK).<br>Imagen models → throws (text-to-image only). |
 | **fal.ai**   | Field names resolve per endpoint from a map generated from the fal SDK's endpoint types (e.g. nano-banana edit gets `image_urls`, Fooocus masks get `mask_image_url`). Defaults for unknown endpoints: 1 input → `image_url`; multiple → `image_urls`; `role: 'mask'` → `mask_url`; `role: 'control'` → `control_image_url`; `role: 'reference'` / `'character'` → `reference_image_urls`. Override with `modelOptions` for endpoint-specific fields. |
 | **Grok**     | grok-imagine models → xAI's `/v1/images/edits` (up to 3 source images, addressed by xAI in request order; prompt sent verbatim). `role: 'mask'` / `'control'` throw (no Imagine API equivalent). `grok-2-image-1212` throws (text-to-image only). |
 | **OpenRouter** | Prompt parts map 1:1 onto multimodal `image_url` / `text` content parts, preserving interleaved order, and are forwarded to the underlying image model.                                                                                    |
