@@ -3,6 +3,177 @@
 // scripts/generate-endpoint-maps.ts to embed each schema's $defs closure.
 
 export const AceStepAudioInpaintInputSchema = {
+  title: 'ACEStepAudioInpaintRequest',
+  required: ['tags', 'audio_url'],
+  properties: {
+    start_time: {
+      examples: [0],
+      minimum: 0,
+      default: 0,
+      description: 'start time in seconds for the inpainting process.',
+      title: 'Start Time',
+      maximum: 240,
+      type: 'number',
+    },
+    end_time: {
+      examples: [30],
+      minimum: 0,
+      default: 30,
+      description: 'end time in seconds for the inpainting process.',
+      title: 'End Time',
+      maximum: 240,
+      type: 'number',
+    },
+    end_time_relative_to: {
+      examples: ['start'],
+      description:
+        'Whether the end time is relative to the start or end of the audio.',
+      enum: ['start', 'end'],
+      default: 'start',
+      title: 'End Time Relative To',
+      type: 'string',
+    },
+    guidance_scale: {
+      examples: [15],
+      description: 'Guidance scale for the generation.',
+      title: 'Guidance Scale',
+      default: 15,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    minimum_guidance_scale: {
+      examples: [3],
+      description: 'Minimum guidance scale for the generation after the decay.',
+      title: 'Minimum Guidance Scale',
+      default: 3,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        'Random seed for reproducibility. If not provided, a random seed will be used.',
+      title: 'Seed',
+    },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description:
+        'Comma-separated list of genre tags to control the style of the generated audio.',
+      title: 'Tags',
+      type: 'string',
+    },
+    audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/ace-step-audio-to-audio.wav',
+      ],
+      description: 'URL of the audio file to be inpainted.',
+      title: 'Audio Url',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    guidance_interval_decay: {
+      examples: [0],
+      description:
+        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
+      title: 'Guidance Interval Decay',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    start_time_relative_to: {
+      examples: ['start'],
+      description:
+        'Whether the start time is relative to the start or end of the audio.',
+      enum: ['start', 'end'],
+      default: 'start',
+      title: 'Start Time Relative To',
+      type: 'string',
+    },
+    lyrics: {
+      description:
+        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
+      title: 'Lyrics',
+      default: '',
+      type: 'string',
+    },
+    tag_guidance_scale: {
+      examples: [5],
+      description: 'Tag guidance scale for the generation.',
+      title: 'Tag Guidance Scale',
+      default: 5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    scheduler: {
+      examples: ['euler'],
+      description: 'Scheduler to use for the generation process.',
+      enum: ['euler', 'heun'],
+      default: 'euler',
+      title: 'Scheduler',
+      type: 'string',
+    },
+    lyric_guidance_scale: {
+      examples: [1.5],
+      description: 'Lyric guidance scale for the generation.',
+      title: 'Lyric Guidance Scale',
+      default: 1.5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    guidance_type: {
+      examples: ['apg'],
+      description: 'Type of CFG to use for the generation process.',
+      enum: ['cfg', 'apg', 'cfg_star'],
+      default: 'apg',
+      title: 'Guidance Type',
+      type: 'string',
+    },
+    guidance_interval: {
+      examples: [0.5],
+      description:
+        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
+      title: 'Guidance Interval',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    number_of_steps: {
+      examples: [27],
+      description: 'Number of steps to generate the audio.',
+      title: 'Number Of Steps',
+      default: 27,
+      maximum: 60,
+      minimum: 3,
+      type: 'integer',
+    },
+    variance: {
+      examples: [0.5],
+      description:
+        'Variance for the inpainting process. Higher values can lead to more diverse results.',
+      title: 'Variance',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    granularity_scale: {
+      examples: [10],
+      description:
+        'Granularity scale for the generation process. Higher values can reduce artifacts.',
+      title: 'Granularity Scale',
+      default: 10,
+      maximum: 100,
+      minimum: -100,
+      type: 'integer',
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'start_time_relative_to',
@@ -24,201 +195,17 @@ export const AceStepAudioInpaintInputSchema = {
     'tag_guidance_scale',
     'lyric_guidance_scale',
   ],
-  title: 'ACEStepAudioInpaintRequest',
-  type: 'object',
-  properties: {
-    lyrics: {
-      title: 'Lyrics',
-      type: 'string',
-      description:
-        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
-      default: '',
-    },
-    guidance_type: {
-      title: 'Guidance Type',
-      examples: ['apg'],
-      enum: ['cfg', 'apg', 'cfg_star'],
-      type: 'string',
-      description: 'Type of CFG to use for the generation process.',
-      default: 'apg',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
-      type: 'string',
-      description:
-        'Comma-separated list of genre tags to control the style of the generated audio.',
-    },
-    variance: {
-      title: 'Variance',
-      examples: [0.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0.5,
-      description:
-        'Variance for the inpainting process. Higher values can lead to more diverse results.',
-    },
-    scheduler: {
-      title: 'Scheduler',
-      examples: ['euler'],
-      enum: ['euler', 'heun'],
-      type: 'string',
-      description: 'Scheduler to use for the generation process.',
-      default: 'euler',
-    },
-    guidance_interval_decay: {
-      title: 'Guidance Interval Decay',
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0,
-      description:
-        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
-    },
-    start_time: {
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 240,
-      title: 'Start Time',
-      description: 'start time in seconds for the inpainting process.',
-      default: 0,
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      examples: [15],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 15,
-      description: 'Guidance scale for the generation.',
-    },
-    granularity_scale: {
-      title: 'Granularity Scale',
-      examples: [10],
-      minimum: -100,
-      type: 'integer',
-      maximum: 100,
-      default: 10,
-      description:
-        'Granularity scale for the generation process. Higher values can reduce artifacts.',
-    },
-    end_time_relative_to: {
-      title: 'End Time Relative To',
-      examples: ['start'],
-      enum: ['start', 'end'],
-      type: 'string',
-      description:
-        'Whether the end time is relative to the start or end of the audio.',
-      default: 'start',
-    },
-    start_time_relative_to: {
-      title: 'Start Time Relative To',
-      examples: ['start'],
-      enum: ['start', 'end'],
-      type: 'string',
-      description:
-        'Whether the start time is relative to the start or end of the audio.',
-      default: 'start',
-    },
-    audio_url: {
-      title: 'Audio Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/ace-step-audio-to-audio.wav',
-      ],
-      type: 'string',
-      description: 'URL of the audio file to be inpainted.',
-      'x-fal-file-input': true,
-    },
-    number_of_steps: {
-      title: 'Number Of Steps',
-      examples: [27],
-      minimum: 3,
-      type: 'integer',
-      maximum: 60,
-      default: 27,
-      description: 'Number of steps to generate the audio.',
-    },
-    guidance_interval: {
-      title: 'Guidance Interval',
-      examples: [0.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0.5,
-      description:
-        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
-    },
-    tag_guidance_scale: {
-      title: 'Tag Guidance Scale',
-      examples: [5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 5,
-      description: 'Tag guidance scale for the generation.',
-    },
-    end_time: {
-      examples: [30],
-      minimum: 0,
-      type: 'number',
-      maximum: 240,
-      title: 'End Time',
-      description: 'end time in seconds for the inpainting process.',
-      default: 30,
-    },
-    lyric_guidance_scale: {
-      title: 'Lyric Guidance Scale',
-      examples: [1.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 1.5,
-      description: 'Lyric guidance scale for the generation.',
-    },
-    minimum_guidance_scale: {
-      title: 'Minimum Guidance Scale',
-      examples: [3],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 3,
-      description: 'Minimum guidance scale for the generation after the decay.',
-    },
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducibility. If not provided, a random seed will be used.',
-    },
-  },
-  required: ['tags', 'audio_url'],
 } as const
 
 export const AceStepAudioInpaintOutputSchema = {
-  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   title: 'ACEStepAudioInpaintResponse',
-  type: 'object',
+  required: ['audio', 'seed', 'tags', 'lyrics'],
   properties: {
     lyrics: {
-      title: 'Lyrics',
       examples: ['[inst]'],
-      type: 'string',
       description: 'The lyrics used in the generation process.',
-    },
-    seed: {
-      title: 'Seed',
-      examples: [42],
-      type: 'integer',
-      description: 'The random seed used for the generation process.',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      title: 'Lyrics',
       type: 'string',
-      description: 'The genre tags used in the generation process.',
     },
     audio: {
       examples: [
@@ -229,24 +216,36 @@ export const AceStepAudioInpaintOutputSchema = {
       description: 'The generated audio file.',
       $ref: '#/$defs/File',
     },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description: 'The genre tags used in the generation process.',
+      title: 'Tags',
+      type: 'string',
+    },
+    seed: {
+      examples: [42],
+      description: 'The random seed used for the generation process.',
+      title: 'Seed',
+      type: 'integer',
+    },
   },
-  required: ['audio', 'seed', 'tags', 'lyrics'],
+  type: 'object',
+  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -255,11 +254,10 @@ export const AceStepAudioInpaintOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -268,11 +266,156 @@ export const AceStepAudioInpaintOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const AceStepAudioOutpaintInputSchema = {
+  title: 'ACEStepAudioOutpaintRequest',
+  required: ['tags', 'audio_url'],
+  properties: {
+    granularity_scale: {
+      examples: [10],
+      description:
+        'Granularity scale for the generation process. Higher values can reduce artifacts.',
+      title: 'Granularity Scale',
+      default: 10,
+      maximum: 100,
+      minimum: -100,
+      type: 'integer',
+    },
+    guidance_scale: {
+      examples: [15],
+      description: 'Guidance scale for the generation.',
+      title: 'Guidance Scale',
+      default: 15,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    minimum_guidance_scale: {
+      examples: [3],
+      description: 'Minimum guidance scale for the generation after the decay.',
+      title: 'Minimum Guidance Scale',
+      default: 3,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        'Random seed for reproducibility. If not provided, a random seed will be used.',
+      title: 'Seed',
+    },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description:
+        'Comma-separated list of genre tags to control the style of the generated audio.',
+      title: 'Tags',
+      type: 'string',
+    },
+    audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/ace-step-audio-to-audio.wav',
+      ],
+      description: 'URL of the audio file to be outpainted.',
+      title: 'Audio Url',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    scheduler: {
+      examples: ['euler'],
+      description: 'Scheduler to use for the generation process.',
+      enum: ['euler', 'heun'],
+      default: 'euler',
+      title: 'Scheduler',
+      type: 'string',
+    },
+    guidance_interval_decay: {
+      examples: [0],
+      description:
+        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
+      title: 'Guidance Interval Decay',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    lyrics: {
+      description:
+        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
+      title: 'Lyrics',
+      default: '',
+      type: 'string',
+    },
+    tag_guidance_scale: {
+      examples: [5],
+      description: 'Tag guidance scale for the generation.',
+      title: 'Tag Guidance Scale',
+      default: 5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    lyric_guidance_scale: {
+      examples: [1.5],
+      description: 'Lyric guidance scale for the generation.',
+      title: 'Lyric Guidance Scale',
+      default: 1.5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    extend_before_duration: {
+      examples: [0],
+      minimum: 0,
+      default: 0,
+      description: 'Duration in seconds to extend the audio from the start.',
+      title: 'Extend Before Duration',
+      maximum: 240,
+      type: 'number',
+    },
+    guidance_type: {
+      examples: ['apg'],
+      description: 'Type of CFG to use for the generation process.',
+      enum: ['cfg', 'apg', 'cfg_star'],
+      default: 'apg',
+      title: 'Guidance Type',
+      type: 'string',
+    },
+    guidance_interval: {
+      examples: [0.5],
+      description:
+        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
+      title: 'Guidance Interval',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    number_of_steps: {
+      examples: [27],
+      description: 'Number of steps to generate the audio.',
+      title: 'Number Of Steps',
+      default: 27,
+      maximum: 60,
+      minimum: 3,
+      type: 'integer',
+    },
+    extend_after_duration: {
+      examples: [30],
+      minimum: 0,
+      default: 30,
+      description: 'Duration in seconds to extend the audio from the end.',
+      title: 'Extend After Duration',
+      maximum: 240,
+      type: 'number',
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'extend_before_duration',
@@ -291,173 +434,17 @@ export const AceStepAudioOutpaintInputSchema = {
     'tag_guidance_scale',
     'lyric_guidance_scale',
   ],
-  title: 'ACEStepAudioOutpaintRequest',
-  type: 'object',
-  properties: {
-    lyrics: {
-      title: 'Lyrics',
-      type: 'string',
-      description:
-        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
-      default: '',
-    },
-    guidance_type: {
-      title: 'Guidance Type',
-      examples: ['apg'],
-      enum: ['cfg', 'apg', 'cfg_star'],
-      type: 'string',
-      description: 'Type of CFG to use for the generation process.',
-      default: 'apg',
-    },
-    extend_before_duration: {
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 240,
-      title: 'Extend Before Duration',
-      description: 'Duration in seconds to extend the audio from the start.',
-      default: 0,
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
-      type: 'string',
-      description:
-        'Comma-separated list of genre tags to control the style of the generated audio.',
-    },
-    scheduler: {
-      title: 'Scheduler',
-      examples: ['euler'],
-      enum: ['euler', 'heun'],
-      type: 'string',
-      description: 'Scheduler to use for the generation process.',
-      default: 'euler',
-    },
-    guidance_interval_decay: {
-      title: 'Guidance Interval Decay',
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0,
-      description:
-        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      examples: [15],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 15,
-      description: 'Guidance scale for the generation.',
-    },
-    granularity_scale: {
-      title: 'Granularity Scale',
-      examples: [10],
-      minimum: -100,
-      type: 'integer',
-      maximum: 100,
-      default: 10,
-      description:
-        'Granularity scale for the generation process. Higher values can reduce artifacts.',
-    },
-    audio_url: {
-      title: 'Audio Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/ace-step-audio-to-audio.wav',
-      ],
-      type: 'string',
-      description: 'URL of the audio file to be outpainted.',
-      'x-fal-file-input': true,
-    },
-    number_of_steps: {
-      title: 'Number Of Steps',
-      examples: [27],
-      minimum: 3,
-      type: 'integer',
-      maximum: 60,
-      default: 27,
-      description: 'Number of steps to generate the audio.',
-    },
-    guidance_interval: {
-      title: 'Guidance Interval',
-      examples: [0.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0.5,
-      description:
-        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
-    },
-    extend_after_duration: {
-      examples: [30],
-      minimum: 0,
-      type: 'number',
-      maximum: 240,
-      title: 'Extend After Duration',
-      description: 'Duration in seconds to extend the audio from the end.',
-      default: 30,
-    },
-    tag_guidance_scale: {
-      title: 'Tag Guidance Scale',
-      examples: [5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 5,
-      description: 'Tag guidance scale for the generation.',
-    },
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducibility. If not provided, a random seed will be used.',
-    },
-    lyric_guidance_scale: {
-      title: 'Lyric Guidance Scale',
-      examples: [1.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 1.5,
-      description: 'Lyric guidance scale for the generation.',
-    },
-    minimum_guidance_scale: {
-      title: 'Minimum Guidance Scale',
-      examples: [3],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 3,
-      description: 'Minimum guidance scale for the generation after the decay.',
-    },
-  },
-  required: ['tags', 'audio_url'],
 } as const
 
 export const AceStepAudioOutpaintOutputSchema = {
-  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   title: 'ACEStepResponse',
-  type: 'object',
+  required: ['audio', 'seed', 'tags', 'lyrics'],
   properties: {
     lyrics: {
-      title: 'Lyrics',
       examples: ['[inst]'],
-      type: 'string',
       description: 'The lyrics used in the generation process.',
-    },
-    seed: {
-      title: 'Seed',
-      examples: [42],
-      type: 'integer',
-      description: 'The random seed used for the generation process.',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      title: 'Lyrics',
       type: 'string',
-      description: 'The genre tags used in the generation process.',
     },
     audio: {
       examples: [
@@ -468,24 +455,36 @@ export const AceStepAudioOutpaintOutputSchema = {
       description: 'The generated audio file.',
       $ref: '#/$defs/File',
     },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description: 'The genre tags used in the generation process.',
+      title: 'Tags',
+      type: 'string',
+    },
+    seed: {
+      examples: [42],
+      description: 'The random seed used for the generation process.',
+      title: 'Seed',
+      type: 'integer',
+    },
   },
-  required: ['audio', 'seed', 'tags', 'lyrics'],
+  type: 'object',
+  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -494,11 +493,10 @@ export const AceStepAudioOutpaintOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -507,11 +505,164 @@ export const AceStepAudioOutpaintOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const AceStepAudioToAudioInputSchema = {
+  title: 'ACEStepAudioToAudioRequest',
+  required: ['tags', 'audio_url', 'original_tags'],
+  properties: {
+    original_lyrics: {
+      description: 'Original lyrics of the audio file.',
+      title: 'Original Lyrics',
+      default: '',
+      examples: [''],
+      type: 'string',
+    },
+    guidance_scale: {
+      examples: [15],
+      description: 'Guidance scale for the generation.',
+      title: 'Guidance Scale',
+      default: 15,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    minimum_guidance_scale: {
+      examples: [3],
+      description: 'Minimum guidance scale for the generation after the decay.',
+      title: 'Minimum Guidance Scale',
+      default: 3,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        'Random seed for reproducibility. If not provided, a random seed will be used.',
+      title: 'Seed',
+    },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description:
+        'Comma-separated list of genre tags to control the style of the generated audio.',
+      title: 'Tags',
+      type: 'string',
+    },
+    audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/ace-step-audio-to-audio.wav',
+      ],
+      description: 'URL of the audio file to be outpainted.',
+      title: 'Audio Url',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    lyrics: {
+      description:
+        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
+      title: 'Lyrics',
+      default: '',
+      type: 'string',
+    },
+    guidance_interval_decay: {
+      examples: [0],
+      description:
+        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
+      title: 'Guidance Interval Decay',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    tag_guidance_scale: {
+      examples: [5],
+      description: 'Tag guidance scale for the generation.',
+      title: 'Tag Guidance Scale',
+      default: 5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    scheduler: {
+      examples: ['euler'],
+      description: 'Scheduler to use for the generation process.',
+      enum: ['euler', 'heun'],
+      default: 'euler',
+      title: 'Scheduler',
+      type: 'string',
+    },
+    lyric_guidance_scale: {
+      examples: [1.5],
+      description: 'Lyric guidance scale for the generation.',
+      title: 'Lyric Guidance Scale',
+      default: 1.5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    edit_mode: {
+      examples: ['remix'],
+      description: 'Whether to edit the lyrics only or remix the audio.',
+      enum: ['lyrics', 'remix'],
+      default: 'remix',
+      title: 'Edit Mode',
+      type: 'string',
+    },
+    original_seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Original seed of the audio file.',
+      title: 'Original Seed',
+    },
+    guidance_interval: {
+      examples: [0.5],
+      description:
+        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
+      title: 'Guidance Interval',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    guidance_type: {
+      examples: ['apg'],
+      description: 'Type of CFG to use for the generation process.',
+      enum: ['cfg', 'apg', 'cfg_star'],
+      default: 'apg',
+      title: 'Guidance Type',
+      type: 'string',
+    },
+    number_of_steps: {
+      examples: [27],
+      description: 'Number of steps to generate the audio.',
+      title: 'Number Of Steps',
+      default: 27,
+      maximum: 60,
+      minimum: 3,
+      type: 'integer',
+    },
+    original_tags: {
+      description: 'Original tags of the audio file.',
+      title: 'Original Tags',
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      type: 'string',
+    },
+    granularity_scale: {
+      examples: [10],
+      description:
+        'Granularity scale for the generation process. Higher values can reduce artifacts.',
+      title: 'Granularity Scale',
+      default: 10,
+      maximum: 100,
+      minimum: -100,
+      type: 'integer',
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'edit_mode',
@@ -532,181 +683,17 @@ export const AceStepAudioToAudioInputSchema = {
     'lyric_guidance_scale',
     'original_seed',
   ],
-  title: 'ACEStepAudioToAudioRequest',
-  type: 'object',
-  properties: {
-    lyrics: {
-      title: 'Lyrics',
-      type: 'string',
-      description:
-        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
-      default: '',
-    },
-    guidance_type: {
-      title: 'Guidance Type',
-      examples: ['apg'],
-      enum: ['cfg', 'apg', 'cfg_star'],
-      type: 'string',
-      description: 'Type of CFG to use for the generation process.',
-      default: 'apg',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
-      type: 'string',
-      description:
-        'Comma-separated list of genre tags to control the style of the generated audio.',
-    },
-    edit_mode: {
-      title: 'Edit Mode',
-      examples: ['remix'],
-      enum: ['lyrics', 'remix'],
-      type: 'string',
-      description: 'Whether to edit the lyrics only or remix the audio.',
-      default: 'remix',
-    },
-    scheduler: {
-      title: 'Scheduler',
-      examples: ['euler'],
-      enum: ['euler', 'heun'],
-      type: 'string',
-      description: 'Scheduler to use for the generation process.',
-      default: 'euler',
-    },
-    guidance_interval_decay: {
-      title: 'Guidance Interval Decay',
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0,
-      description:
-        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
-    },
-    original_tags: {
-      title: 'Original Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
-      type: 'string',
-      description: 'Original tags of the audio file.',
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      examples: [15],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 15,
-      description: 'Guidance scale for the generation.',
-    },
-    granularity_scale: {
-      title: 'Granularity Scale',
-      examples: [10],
-      minimum: -100,
-      type: 'integer',
-      maximum: 100,
-      default: 10,
-      description:
-        'Granularity scale for the generation process. Higher values can reduce artifacts.',
-    },
-    audio_url: {
-      title: 'Audio Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/ace-step-audio-to-audio.wav',
-      ],
-      type: 'string',
-      description: 'URL of the audio file to be outpainted.',
-      'x-fal-file-input': true,
-    },
-    original_seed: {
-      title: 'Original Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Original seed of the audio file.',
-    },
-    guidance_interval: {
-      title: 'Guidance Interval',
-      examples: [0.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0.5,
-      description:
-        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
-    },
-    original_lyrics: {
-      title: 'Original Lyrics',
-      examples: [''],
-      type: 'string',
-      description: 'Original lyrics of the audio file.',
-      default: '',
-    },
-    number_of_steps: {
-      title: 'Number Of Steps',
-      examples: [27],
-      minimum: 3,
-      type: 'integer',
-      maximum: 60,
-      default: 27,
-      description: 'Number of steps to generate the audio.',
-    },
-    tag_guidance_scale: {
-      title: 'Tag Guidance Scale',
-      examples: [5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 5,
-      description: 'Tag guidance scale for the generation.',
-    },
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducibility. If not provided, a random seed will be used.',
-    },
-    lyric_guidance_scale: {
-      title: 'Lyric Guidance Scale',
-      examples: [1.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 1.5,
-      description: 'Lyric guidance scale for the generation.',
-    },
-    minimum_guidance_scale: {
-      title: 'Minimum Guidance Scale',
-      examples: [3],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 3,
-      description: 'Minimum guidance scale for the generation after the decay.',
-    },
-  },
-  required: ['tags', 'audio_url', 'original_tags'],
 } as const
 
 export const AceStepAudioToAudioOutputSchema = {
-  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   title: 'ACEStepAudioToAudioResponse',
-  type: 'object',
+  required: ['audio', 'seed', 'tags', 'lyrics'],
   properties: {
     lyrics: {
-      title: 'Lyrics',
       examples: ['[inst]'],
-      type: 'string',
       description: 'The lyrics used in the generation process.',
-    },
-    seed: {
-      title: 'Seed',
-      examples: [42],
-      type: 'integer',
-      description: 'The random seed used for the generation process.',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      title: 'Lyrics',
       type: 'string',
-      description: 'The genre tags used in the generation process.',
     },
     audio: {
       examples: [
@@ -717,24 +704,36 @@ export const AceStepAudioToAudioOutputSchema = {
       description: 'The generated audio file.',
       $ref: '#/$defs/File',
     },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description: 'The genre tags used in the generation process.',
+      title: 'Tags',
+      type: 'string',
+    },
+    seed: {
+      examples: [42],
+      description: 'The random seed used for the generation process.',
+      title: 'Seed',
+      type: 'integer',
+    },
   },
-  required: ['audio', 'seed', 'tags', 'lyrics'],
+  type: 'object',
+  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -743,11 +742,10 @@ export const AceStepAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -756,11 +754,137 @@ export const AceStepAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const AceStepInputSchema = {
+  title: 'ACEStepTextToAudioRequest',
+  required: ['tags'],
+  properties: {
+    guidance_interval_decay: {
+      examples: [0],
+      description:
+        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
+      title: 'Guidance Interval Decay',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    lyrics: {
+      description:
+        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
+      title: 'Lyrics',
+      default: '',
+      type: 'string',
+    },
+    lyric_guidance_scale: {
+      examples: [1.5],
+      description: 'Lyric guidance scale for the generation.',
+      title: 'Lyric Guidance Scale',
+      default: 1.5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    guidance_scale: {
+      examples: [15],
+      description: 'Guidance scale for the generation.',
+      title: 'Guidance Scale',
+      default: 15,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    minimum_guidance_scale: {
+      examples: [3],
+      description: 'Minimum guidance scale for the generation after the decay.',
+      title: 'Minimum Guidance Scale',
+      default: 3,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        'Random seed for reproducibility. If not provided, a random seed will be used.',
+      title: 'Seed',
+    },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description:
+        'Comma-separated list of genre tags to control the style of the generated audio.',
+      title: 'Tags',
+      type: 'string',
+    },
+    guidance_type: {
+      examples: ['apg'],
+      description: 'Type of CFG to use for the generation process.',
+      enum: ['cfg', 'apg', 'cfg_star'],
+      default: 'apg',
+      title: 'Guidance Type',
+      type: 'string',
+    },
+    scheduler: {
+      examples: ['euler'],
+      description: 'Scheduler to use for the generation process.',
+      enum: ['euler', 'heun'],
+      default: 'euler',
+      title: 'Scheduler',
+      type: 'string',
+    },
+    guidance_interval: {
+      examples: [0.5],
+      description:
+        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
+      title: 'Guidance Interval',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    duration: {
+      description: 'The duration of the generated audio in seconds.',
+      minimum: 5,
+      default: 60,
+      maximum: 240,
+      title: 'Duration',
+      type: 'number',
+    },
+    number_of_steps: {
+      examples: [27],
+      description: 'Number of steps to generate the audio.',
+      title: 'Number Of Steps',
+      default: 27,
+      maximum: 60,
+      minimum: 3,
+      type: 'integer',
+    },
+    tag_guidance_scale: {
+      examples: [5],
+      description: 'Tag guidance scale for the generation.',
+      title: 'Tag Guidance Scale',
+      default: 5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    granularity_scale: {
+      examples: [10],
+      description:
+        'Granularity scale for the generation process. Higher values can reduce artifacts.',
+      title: 'Granularity Scale',
+      default: 10,
+      maximum: 100,
+      minimum: -100,
+      type: 'integer',
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'tags',
     'lyrics',
@@ -777,154 +901,17 @@ export const AceStepInputSchema = {
     'tag_guidance_scale',
     'lyric_guidance_scale',
   ],
-  title: 'ACEStepTextToAudioRequest',
-  type: 'object',
-  properties: {
-    lyrics: {
-      title: 'Lyrics',
-      type: 'string',
-      description:
-        'Lyrics to be sung in the audio. If not provided or if [inst] or [instrumental] is the content of this field, no lyrics will be sung. Use control structures like [verse], [chorus] and [bridge] to control the structure of the song.',
-      default: '',
-    },
-    guidance_type: {
-      title: 'Guidance Type',
-      examples: ['apg'],
-      enum: ['cfg', 'apg', 'cfg_star'],
-      type: 'string',
-      description: 'Type of CFG to use for the generation process.',
-      default: 'apg',
-    },
-    granularity_scale: {
-      title: 'Granularity Scale',
-      examples: [10],
-      minimum: -100,
-      type: 'integer',
-      maximum: 100,
-      default: 10,
-      description:
-        'Granularity scale for the generation process. Higher values can reduce artifacts.',
-    },
-    duration: {
-      title: 'Duration',
-      minimum: 5,
-      type: 'number',
-      maximum: 240,
-      default: 60,
-      description: 'The duration of the generated audio in seconds.',
-    },
-    number_of_steps: {
-      title: 'Number Of Steps',
-      examples: [27],
-      minimum: 3,
-      type: 'integer',
-      maximum: 60,
-      default: 27,
-      description: 'Number of steps to generate the audio.',
-    },
-    guidance_interval: {
-      title: 'Guidance Interval',
-      examples: [0.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0.5,
-      description:
-        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
-      type: 'string',
-      description:
-        'Comma-separated list of genre tags to control the style of the generated audio.',
-    },
-    tag_guidance_scale: {
-      title: 'Tag Guidance Scale',
-      examples: [5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 5,
-      description: 'Tag guidance scale for the generation.',
-    },
-    guidance_interval_decay: {
-      title: 'Guidance Interval Decay',
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0,
-      description:
-        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
-    },
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducibility. If not provided, a random seed will be used.',
-    },
-    lyric_guidance_scale: {
-      title: 'Lyric Guidance Scale',
-      examples: [1.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 1.5,
-      description: 'Lyric guidance scale for the generation.',
-    },
-    minimum_guidance_scale: {
-      title: 'Minimum Guidance Scale',
-      examples: [3],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 3,
-      description: 'Minimum guidance scale for the generation after the decay.',
-    },
-    scheduler: {
-      title: 'Scheduler',
-      examples: ['euler'],
-      enum: ['euler', 'heun'],
-      type: 'string',
-      description: 'Scheduler to use for the generation process.',
-      default: 'euler',
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      examples: [15],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 15,
-      description: 'Guidance scale for the generation.',
-    },
-  },
-  required: ['tags'],
 } as const
 
 export const AceStepOutputSchema = {
-  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   title: 'ACEStepResponse',
-  type: 'object',
+  required: ['audio', 'seed', 'tags', 'lyrics'],
   properties: {
     lyrics: {
-      title: 'Lyrics',
       examples: ['[inst]'],
-      type: 'string',
       description: 'The lyrics used in the generation process.',
-    },
-    seed: {
-      title: 'Seed',
-      examples: [42],
-      type: 'integer',
-      description: 'The random seed used for the generation process.',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      title: 'Lyrics',
       type: 'string',
-      description: 'The genre tags used in the generation process.',
     },
     audio: {
       examples: [
@@ -935,24 +922,36 @@ export const AceStepOutputSchema = {
       description: 'The generated audio file.',
       $ref: '#/$defs/File',
     },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description: 'The genre tags used in the generation process.',
+      title: 'Tags',
+      type: 'string',
+    },
+    seed: {
+      examples: [42],
+      description: 'The random seed used for the generation process.',
+      title: 'Seed',
+      type: 'integer',
+    },
   },
-  required: ['audio', 'seed', 'tags', 'lyrics'],
+  type: 'object',
+  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -961,11 +960,10 @@ export const AceStepOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -974,11 +972,139 @@ export const AceStepOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const AceStepPromptToAudioInputSchema = {
+  title: 'ACEStepPromptToAudioRequest',
+  required: ['prompt'],
+  properties: {
+    tag_guidance_scale: {
+      examples: [5],
+      description: 'Tag guidance scale for the generation.',
+      title: 'Tag Guidance Scale',
+      default: 5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    granularity_scale: {
+      examples: [10],
+      description:
+        'Granularity scale for the generation process. Higher values can reduce artifacts.',
+      title: 'Granularity Scale',
+      default: 10,
+      maximum: 100,
+      minimum: -100,
+      type: 'integer',
+    },
+    guidance_interval_decay: {
+      examples: [0],
+      description:
+        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
+      title: 'Guidance Interval Decay',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    lyric_guidance_scale: {
+      examples: [1.5],
+      description: 'Lyric guidance scale for the generation.',
+      title: 'Lyric Guidance Scale',
+      default: 1.5,
+      maximum: 10,
+      minimum: 0,
+      type: 'number',
+    },
+    guidance_scale: {
+      examples: [15],
+      description: 'Guidance scale for the generation.',
+      title: 'Guidance Scale',
+      default: 15,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    minimum_guidance_scale: {
+      examples: [3],
+      description: 'Minimum guidance scale for the generation after the decay.',
+      title: 'Minimum Guidance Scale',
+      default: 3,
+      maximum: 200,
+      minimum: 0,
+      type: 'number',
+    },
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        'Random seed for reproducibility. If not provided, a random seed will be used.',
+      title: 'Seed',
+    },
+    prompt: {
+      examples: [
+        'A lofi hiphop song with a chill vibe about a sunny day on the boardwalk.',
+      ],
+      description:
+        'Prompt to control the style of the generated audio. This will be used to generate tags and lyrics.',
+      title: 'Prompt',
+      type: 'string',
+    },
+    scheduler: {
+      examples: ['euler'],
+      description: 'Scheduler to use for the generation process.',
+      enum: ['euler', 'heun'],
+      default: 'euler',
+      title: 'Scheduler',
+      type: 'string',
+    },
+    guidance_interval: {
+      examples: [0.5],
+      description:
+        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
+      title: 'Guidance Interval',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      type: 'number',
+    },
+    duration: {
+      description: 'The duration of the generated audio in seconds.',
+      minimum: 5,
+      default: 60,
+      maximum: 240,
+      title: 'Duration',
+      type: 'number',
+    },
+    number_of_steps: {
+      examples: [27],
+      description: 'Number of steps to generate the audio.',
+      title: 'Number Of Steps',
+      default: 27,
+      maximum: 60,
+      minimum: 3,
+      type: 'integer',
+    },
+    guidance_type: {
+      examples: ['apg'],
+      description: 'Type of CFG to use for the generation process.',
+      enum: ['cfg', 'apg', 'cfg_star'],
+      default: 'apg',
+      title: 'Guidance Type',
+      type: 'string',
+    },
+    instrumental: {
+      description: 'Whether to generate an instrumental version of the audio.',
+      title: 'Instrumental',
+      default: false,
+      examples: [false],
+      type: 'boolean',
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'prompt',
     'instrumental',
@@ -995,156 +1121,17 @@ export const AceStepPromptToAudioInputSchema = {
     'tag_guidance_scale',
     'lyric_guidance_scale',
   ],
-  title: 'ACEStepPromptToAudioRequest',
-  type: 'object',
-  properties: {
-    instrumental: {
-      title: 'Instrumental',
-      examples: [false],
-      type: 'boolean',
-      description: 'Whether to generate an instrumental version of the audio.',
-      default: false,
-    },
-    guidance_type: {
-      title: 'Guidance Type',
-      examples: ['apg'],
-      enum: ['cfg', 'apg', 'cfg_star'],
-      type: 'string',
-      description: 'Type of CFG to use for the generation process.',
-      default: 'apg',
-    },
-    granularity_scale: {
-      title: 'Granularity Scale',
-      examples: [10],
-      minimum: -100,
-      type: 'integer',
-      maximum: 100,
-      default: 10,
-      description:
-        'Granularity scale for the generation process. Higher values can reduce artifacts.',
-    },
-    duration: {
-      title: 'Duration',
-      minimum: 5,
-      type: 'number',
-      maximum: 240,
-      default: 60,
-      description: 'The duration of the generated audio in seconds.',
-    },
-    number_of_steps: {
-      title: 'Number Of Steps',
-      examples: [27],
-      minimum: 3,
-      type: 'integer',
-      maximum: 60,
-      default: 27,
-      description: 'Number of steps to generate the audio.',
-    },
-    guidance_interval: {
-      title: 'Guidance Interval',
-      examples: [0.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0.5,
-      description:
-        'Guidance interval for the generation. 0.5 means only apply guidance in the middle steps (0.25 * infer_steps to 0.75 * infer_steps)',
-    },
-    tag_guidance_scale: {
-      title: 'Tag Guidance Scale',
-      examples: [5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 5,
-      description: 'Tag guidance scale for the generation.',
-    },
-    guidance_interval_decay: {
-      title: 'Guidance Interval Decay',
-      examples: [0],
-      minimum: 0,
-      type: 'number',
-      maximum: 1,
-      default: 0,
-      description:
-        'Guidance interval decay for the generation. Guidance scale will decay from guidance_scale to min_guidance_scale in the interval. 0.0 means no decay.',
-    },
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducibility. If not provided, a random seed will be used.',
-    },
-    lyric_guidance_scale: {
-      title: 'Lyric Guidance Scale',
-      examples: [1.5],
-      minimum: 0,
-      type: 'number',
-      maximum: 10,
-      default: 1.5,
-      description: 'Lyric guidance scale for the generation.',
-    },
-    minimum_guidance_scale: {
-      title: 'Minimum Guidance Scale',
-      examples: [3],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 3,
-      description: 'Minimum guidance scale for the generation after the decay.',
-    },
-    prompt: {
-      title: 'Prompt',
-      examples: [
-        'A lofi hiphop song with a chill vibe about a sunny day on the boardwalk.',
-      ],
-      type: 'string',
-      description:
-        'Prompt to control the style of the generated audio. This will be used to generate tags and lyrics.',
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      examples: [15],
-      minimum: 0,
-      type: 'number',
-      maximum: 200,
-      default: 15,
-      description: 'Guidance scale for the generation.',
-    },
-    scheduler: {
-      title: 'Scheduler',
-      examples: ['euler'],
-      enum: ['euler', 'heun'],
-      type: 'string',
-      description: 'Scheduler to use for the generation process.',
-      default: 'euler',
-    },
-  },
-  required: ['prompt'],
 } as const
 
 export const AceStepPromptToAudioOutputSchema = {
-  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   title: 'ACEStepResponse',
-  type: 'object',
+  required: ['audio', 'seed', 'tags', 'lyrics'],
   properties: {
     lyrics: {
-      title: 'Lyrics',
       examples: ['[inst]'],
-      type: 'string',
       description: 'The lyrics used in the generation process.',
-    },
-    seed: {
-      title: 'Seed',
-      examples: [42],
-      type: 'integer',
-      description: 'The random seed used for the generation process.',
-    },
-    tags: {
-      title: 'Tags',
-      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      title: 'Lyrics',
       type: 'string',
-      description: 'The genre tags used in the generation process.',
     },
     audio: {
       examples: [
@@ -1155,24 +1142,36 @@ export const AceStepPromptToAudioOutputSchema = {
       description: 'The generated audio file.',
       $ref: '#/$defs/File',
     },
+    tags: {
+      examples: ['lofi, hiphop, drum and bass, trap, chill'],
+      description: 'The genre tags used in the generation process.',
+      title: 'Tags',
+      type: 'string',
+    },
+    seed: {
+      examples: [42],
+      description: 'The random seed used for the generation process.',
+      title: 'Seed',
+      type: 'integer',
+    },
   },
-  required: ['audio', 'seed', 'tags', 'lyrics'],
+  type: 'object',
+  'x-fal-order-properties': ['audio', 'seed', 'tags', 'lyrics'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -1181,11 +1180,10 @@ export const AceStepPromptToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -1194,6 +1192,8 @@ export const AceStepPromptToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -1232,55 +1232,7 @@ export const AudioSchema = {
 } as const
 
 export const AudioFileSchema = {
-  required: ['url'],
-  properties: {
-    sample_rate: {
-      description: 'The sample rate of the audio',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Sample Rate',
-    },
-    file_size: {
-      description: 'The size of the file in bytes.',
-      examples: [4404019],
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'File Size',
-    },
-    url: {
-      description: 'The URL where the file can be downloaded from.',
-      type: 'string',
-      title: 'Url',
-    },
-    channels: {
-      description: 'The number of channels in the audio',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Channels',
-    },
-    bitrate: {
-      description: "The bitrate of the audio (e.g., '192k' or 192000)",
-      anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-      title: 'Bitrate',
-    },
-    duration: {
-      description: 'The duration of the audio',
-      anyOf: [{ type: 'number' }, { type: 'null' }],
-      title: 'Duration',
-    },
-    file_name: {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-      examples: ['z9RV14K95DvU.png'],
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'File Name',
-    },
-    content_type: {
-      description: 'The mime type of the file.',
-      examples: ['image/png'],
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Content Type',
-    },
-  },
   type: 'object',
-  title: 'AudioFile',
   'x-fal-order-properties': [
     'url',
     'content_type',
@@ -1291,66 +1243,114 @@ export const AudioFileSchema = {
     'sample_rate',
     'bitrate',
   ],
-} as const
-
-export const AudioFileType2Schema = {
+  required: ['url'],
   properties: {
-    file_size: {
-      type: 'integer',
-      title: 'File Size',
-      description: 'Size of the audio file in bytes',
-    },
-    file_name: {
-      type: 'string',
-      title: 'File Name',
-      description: 'Name of the audio file',
-    },
-    content_type: {
-      type: 'string',
-      title: 'Content Type',
-      description: 'Content type of the audio file',
-    },
-    url: { type: 'string', title: 'Url', description: 'URL of the audio file' },
-  },
-  type: 'object',
-  'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
-  title: 'AudioFile',
-  required: ['url', 'content_type', 'file_name', 'file_size'],
-  description: 'Audio file with url field',
-} as const
-
-export const AudioFileType3Schema = {
-  type: 'object',
-  title: 'AudioFile',
-  'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
-  properties: {
-    file_size: {
-      description: 'The size of the file in bytes.',
-      title: 'File Size',
+    channels: {
+      description: 'The number of channels in the audio',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
-      examples: [4404019],
+      title: 'Channels',
     },
     content_type: {
-      type: 'string',
+      examples: ['image/png'],
+      description: 'The mime type of the file.',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Content Type',
-      default: 'audio/wav',
-      examples: ['audio/wav'],
     },
-    file_name: {
-      type: 'string',
-      title: 'File Name',
-      default: '8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
-      examples: ['8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav'],
+    bitrate: {
+      description: "The bitrate of the audio (e.g., '192k' or 192000)",
+      anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+      title: 'Bitrate',
+    },
+    file_size: {
+      examples: [4404019],
+      description: 'The size of the file in bytes.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'File Size',
     },
     url: {
       type: 'string',
+      description: 'The URL where the file can be downloaded from.',
       title: 'Url',
+    },
+    duration: {
+      description: 'The duration of the audio',
+      anyOf: [{ type: 'number' }, { type: 'null' }],
+      title: 'Duration',
+    },
+    sample_rate: {
+      description: 'The sample rate of the audio',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Sample Rate',
+    },
+    file_name: {
+      examples: ['z9RV14K95DvU.png'],
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'File Name',
+    },
+  },
+  title: 'AudioFile',
+} as const
+
+export const AudioFileType2Schema = {
+  description: 'Audio file with url field',
+  type: 'object',
+  properties: {
+    file_size: {
+      description: 'Size of the audio file in bytes',
+      type: 'integer',
+      title: 'File Size',
+    },
+    content_type: {
+      description: 'Content type of the audio file',
+      type: 'string',
+      title: 'Content Type',
+    },
+    url: { description: 'URL of the audio file', type: 'string', title: 'Url' },
+    file_name: {
+      description: 'Name of the audio file',
+      type: 'string',
+      title: 'File Name',
+    },
+  },
+  required: ['url', 'content_type', 'file_name', 'file_size'],
+  'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
+  title: 'AudioFile',
+} as const
+
+export const AudioFileType3Schema = {
+  title: 'AudioFile',
+  required: ['url'],
+  properties: {
+    file_size: {
+      examples: [4404019],
+      description: 'The size of the file in bytes.',
+      title: 'File Size',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    content_type: {
+      examples: ['audio/wav'],
+      title: 'Content Type',
+      default: 'audio/wav',
+      type: 'string',
+    },
+    file_name: {
+      examples: ['8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav'],
+      title: 'File Name',
+      default: '8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
+      type: 'string',
+    },
+    url: {
       examples: [
         'https://v2.fal.media/files/8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
       ],
+      title: 'Url',
+      type: 'string',
     },
   },
-  required: ['url'],
+  type: 'object',
+  'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
 } as const
 
 export const AudioSegmentSpecSchema = {
@@ -1380,128 +1380,128 @@ export const AudioSegmentSpecSchema = {
 } as const
 
 export const AudioSettingSchema = {
+  'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
   type: 'object',
   properties: {
-    channel: {
-      type: 'integer',
-      description: 'Number of audio channels (1=mono, 2=stereo)',
-      default: 1,
-      enum: [1, 2],
-      title: 'Channel',
-    },
-    sample_rate: {
-      type: 'integer',
-      description: 'Sample rate of generated audio',
-      default: 32000,
-      enum: [8000, 16000, 22050, 24000, 32000, 44100],
-      title: 'Sample Rate',
-    },
     bitrate: {
-      type: 'integer',
-      description: 'Bitrate of generated audio',
-      default: 128000,
       enum: [32000, 64000, 128000, 256000],
+      description: 'Bitrate of generated audio',
+      type: 'integer',
+      default: 128000,
       title: 'Bitrate',
     },
+    channel: {
+      enum: [1, 2],
+      description: 'Number of audio channels (1=mono, 2=stereo)',
+      type: 'integer',
+      default: 1,
+      title: 'Channel',
+    },
     format: {
-      type: 'string',
-      description: 'Audio format',
-      default: 'mp3',
       enum: ['mp3', 'pcm', 'flac'],
+      description: 'Audio format',
+      type: 'string',
+      default: 'mp3',
       title: 'Format',
     },
+    sample_rate: {
+      enum: [8000, 16000, 22050, 24000, 32000, 44100],
+      description: 'Sample rate of generated audio',
+      type: 'integer',
+      default: 32000,
+      title: 'Sample Rate',
+    },
   },
-  'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
   title: 'AudioSetting',
 } as const
 
 export const AudioSetting25Schema = {
+  type: 'object',
+  'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
   properties: {
-    bitrate: {
-      default: 256000,
-      type: 'integer',
-      title: 'Bitrate',
-      description: 'Bitrate of generated audio',
-      enum: [32000, 64000, 128000, 256000],
-    },
     sample_rate: {
       default: 44100,
-      type: 'integer',
-      title: 'Sample Rate',
       description: 'Sample rate of generated audio',
+      type: 'integer',
       enum: [16000, 24000, 32000, 44100],
+      title: 'Sample Rate',
+    },
+    bitrate: {
+      default: 256000,
+      description: 'Bitrate of generated audio',
+      type: 'integer',
+      enum: [32000, 64000, 128000, 256000],
+      title: 'Bitrate',
     },
     format: {
       default: 'mp3',
-      type: 'string',
-      title: 'Format',
       description: 'Audio format',
+      type: 'string',
       enum: ['mp3', 'wav', 'pcm'],
+      title: 'Format',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
   title: 'AudioSetting25',
 } as const
 
 export const AudioSettingType2Schema = {
+  type: 'object',
+  'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
   properties: {
-    bitrate: {
-      default: 256000,
-      type: 'integer',
-      title: 'Bitrate',
-      description: 'Bitrate of generated audio',
-      enum: [32000, 64000, 128000, 256000],
-    },
     sample_rate: {
       default: 44100,
-      type: 'integer',
-      title: 'Sample Rate',
       description: 'Sample rate of generated audio',
+      type: 'integer',
       enum: [8000, 16000, 22050, 24000, 32000, 44100],
+      title: 'Sample Rate',
+    },
+    bitrate: {
+      default: 256000,
+      description: 'Bitrate of generated audio',
+      type: 'integer',
+      enum: [32000, 64000, 128000, 256000],
+      title: 'Bitrate',
     },
     format: {
       default: 'mp3',
-      type: 'string',
-      title: 'Format',
       description: 'Audio format',
+      type: 'string',
       enum: ['mp3', 'pcm', 'flac'],
+      title: 'Format',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
   title: 'AudioSetting',
 } as const
 
 export const AudioTimeSpanSchema = {
-  description: 'A time span indicating where the target sound occurs.',
-  required: ['start', 'end'],
   properties: {
-    end: {
-      description: 'End time of the span in seconds',
-      examples: [1.5, 4],
-      minimum: 0,
-      type: 'number',
-      title: 'End',
-    },
     include: {
+      title: 'Include',
+      type: 'boolean',
+      default: true,
       description:
         'Whether to include (True) or exclude (False) sounds in this span',
-      type: 'boolean',
-      title: 'Include',
-      default: true,
     },
-    start: {
-      description: 'Start time of the span in seconds',
-      examples: [0.5, 2],
+    end: {
+      examples: [1.5, 4],
+      title: 'End',
       minimum: 0,
       type: 'number',
+      description: 'End time of the span in seconds',
+    },
+    start: {
+      examples: [0.5, 2],
       title: 'Start',
+      minimum: 0,
+      type: 'number',
+      description: 'Start time of the span in seconds',
     },
   },
-  type: 'object',
+  required: ['start', 'end'],
   title: 'AudioTimeSpan',
+  type: 'object',
   'x-fal-order-properties': ['start', 'end', 'include'],
+  description: 'A time span indicating where the target sound occurs.',
 } as const
 
 export const AudioType2Schema = {
@@ -1550,56 +1550,56 @@ export const AudioType2Schema = {
 } as const
 
 export const AudioUnderstandingInputSchema = {
+  title: 'AudioUnderstandingInput',
+  required: ['audio_url', 'prompt'],
+  type: 'object',
   properties: {
+    detailed_analysis: {
+      title: 'Detailed Analysis',
+      type: 'boolean',
+      default: false,
+      description: 'Whether to request a more detailed analysis of the audio',
+    },
     prompt: {
+      description: 'The question or prompt about the audio content.',
+      maxLength: 10000,
       title: 'Prompt',
-      type: 'string',
       minLength: 1,
+      type: 'string',
       examples: [
         'What is being discussed in this audio?',
         'What emotions are expressed in this audio?',
         'What is the main topic of this conversation?',
       ],
-      description: 'The question or prompt about the audio content.',
-      maxLength: 10000,
     },
     audio_url: {
-      type: 'string',
+      description: 'URL of the audio file to analyze',
       title: 'Audio Url',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/audio-understanding/Title_%20Running%20on%20Fal.mp3',
       ],
-      description: 'URL of the audio file to analyze',
       'x-fal-file-input': true,
     },
-    detailed_analysis: {
-      default: false,
-      type: 'boolean',
-      title: 'Detailed Analysis',
-      description: 'Whether to request a more detailed analysis of the audio',
-    },
   },
-  type: 'object',
   'x-fal-order-properties': ['audio_url', 'prompt', 'detailed_analysis'],
-  title: 'AudioUnderstandingInput',
-  required: ['audio_url', 'prompt'],
 } as const
 
 export const AudioUnderstandingOutputSchema = {
+  title: 'AudioUnderstandingOutput',
+  required: ['output'],
+  type: 'object',
   properties: {
     output: {
-      type: 'string',
+      description: 'The analysis of the audio content based on the prompt',
       title: 'Output',
+      type: 'string',
       examples: [
         'Based on the audio, this appears to be a business meeting discussing quarterly sales results. The speakers are analyzing performance metrics and discussing strategies for the upcoming quarter. The tone is professional and collaborative, with multiple participants contributing to the discussion.',
       ],
-      description: 'The analysis of the audio content based on the prompt',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['output'],
-  title: 'AudioUnderstandingOutput',
-  required: ['output'],
 } as const
 
 export const Audio_OutputSchema = {
@@ -1649,26 +1649,43 @@ export const BytedanceSeedSpeechTtsV2InputSchema = {
     speed: {
       description:
         'Speech speed. 1.0 is normal speed, 0.5 is half speed, 2.0 is double speed.',
-      title: 'Speed',
+      minimum: 0.5,
       default: 1,
       maximum: 2,
-      minimum: 0.5,
+      title: 'Speed',
       type: 'number',
     },
     volume: {
       description: 'Volume. 1.0 is normal volume, 0.5 is half, 2.0 is double.',
-      title: 'Volume',
+      minimum: 0.5,
       default: 1,
       maximum: 2,
-      minimum: 0.5,
+      title: 'Volume',
       type: 'number',
     },
     sample_rate: {
       description: 'Sample rate of the output audio in Hz.',
-      title: 'Sample Rate',
-      default: 24000,
       enum: [8000, 16000, 22050, 24000, 32000, 44100, 48000],
+      default: 24000,
+      title: 'Sample Rate',
       type: 'integer',
+    },
+    output_format: {
+      description:
+        "Output audio format. 'mp3' returns MP3 audio; 'opus' returns Opus audio in an Ogg container.",
+      enum: ['mp3', 'opus'],
+      default: 'mp3',
+      title: 'Output Format',
+      type: 'string',
+    },
+    text: {
+      examples: [
+        'Hello, this is a test of ByteDance TTS 2.0 speech synthesis.',
+      ],
+      description: 'The text to synthesize into speech.',
+      title: 'Text',
+      maxLength: 5000,
+      type: 'string',
     },
     language: {
       anyOf: [
@@ -1693,38 +1710,19 @@ export const BytedanceSeedSpeechTtsV2InputSchema = {
         'Force the text to be read as a single language, disabling automatic language detection. Leave unset for automatic detection (including seamless Chinese/English mixing on bilingual voices). Codes: zh (Chinese), en (English), ja (Japanese), es-mx (Mexican Spanish), id (Indonesian), pt-br (Brazilian Portuguese), ko (Korean), it (Italian), de (German), fr (French).',
       title: 'Language',
     },
-    text: {
-      examples: [
-        'Hello, this is a test of ByteDance TTS 2.0 speech synthesis.',
-      ],
-      description: 'The text to synthesize into speech.',
-      title: 'Text',
-      maxLength: 5000,
-      type: 'string',
-    },
-    output_format: {
-      description:
-        "Output audio format. 'mp3' returns MP3 audio; 'opus' returns Opus audio in an Ogg container.",
-      title: 'Output Format',
-      default: 'mp3',
-      enum: ['mp3', 'opus'],
-      type: 'string',
-    },
     pitch: {
       description:
         'Voice pitch shift in semitones. 0 is normal pitch, -12 lowers by one octave, 12 raises by one octave.',
-      title: 'Pitch',
+      minimum: -12,
       default: 0,
       maximum: 12,
-      minimum: -12,
+      title: 'Pitch',
       type: 'integer',
     },
     voice: {
       examples: ['stokie_en'],
       description:
         "Voice to use for synthesis. The preset name encodes the voice and its supported language codes. 'mixed_en_zh' means the voice can seamlessly blend English and Chinese; separate codes (e.g. 'en_zh') mean the voice supports each language independently.",
-      title: 'Voice',
-      default: 'stokie_en',
       enum: [
         'vivi_mixed_en_zh_ja_es_id',
         'mindy_en_es_id_pt_zh',
@@ -1768,6 +1766,8 @@ export const BytedanceSeedSpeechTtsV2InputSchema = {
         'celeste_zh',
         'monkey_king_zh',
       ],
+      default: 'stokie_en',
+      title: 'Voice',
       type: 'string',
     },
   },
@@ -1803,20 +1803,19 @@ export const BytedanceSeedSpeechTtsV2OutputSchema = {
   'x-fal-order-properties': ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -1825,11 +1824,10 @@ export const BytedanceSeedSpeechTtsV2OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -1838,68 +1836,69 @@ export const BytedanceSeedSpeechTtsV2OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ChatterboxSpeechToSpeechInputSchema = {
+  title: 'ChatterboxVCRequest',
+  'x-fal-order-properties': ['source_audio_url', 'target_voice_audio_url'],
   properties: {
     source_audio_url: {
-      type: 'string',
       title: 'Source Audio Url',
       examples: [
         'https://storage.googleapis.com/chatterbox-demo-samples/samples/duff_stewie.wav',
       ],
+      type: 'string',
       'x-fal-file-input': true,
     },
     target_voice_audio_url: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Target Voice Audio Url',
+      description:
+        'Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.',
       examples: [
         'https://v3.fal.media/files/tiger/0XODRhebRLiBdu8MqgZc5_tmpljqsylwu.wav',
       ],
-      description:
-        'Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['source_audio_url', 'target_voice_audio_url'],
   required: ['source_audio_url'],
-  title: 'ChatterboxVCRequest',
+  type: 'object',
 } as const
 
 export const ChatterboxSpeechToSpeechOutputSchema = {
+  title: 'ChatterboxOutput',
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
+      description: 'The generated speech audio',
       examples: [
         {
           url: 'https://v3.fal.media/files/kangaroo/RQ_pxc7oPdueYqWUqEbPE_tmpjnzvvzx_.wav',
         },
       ],
-      description: 'The generated speech audio',
+      $ref: '#/$defs/File',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   required: ['audio'],
-  title: 'ChatterboxOutput',
+  type: 'object',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -1908,11 +1907,10 @@ export const ChatterboxSpeechToSpeechOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -1921,61 +1919,14 @@ export const ChatterboxSpeechToSpeechOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ChatterboxTextToSpeechInputSchema = {
-  properties: {
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        "Useful to control the reproducibility of the generated audio. Assuming all other properties didn't change, a fixed seed should always generate the exact same audio file. Set to 0 for random seed..",
-    },
-    audio_url: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      default:
-        'https://storage.googleapis.com/chatterbox-demo-samples/prompts/male_rickmorty.mp3',
-      title: 'Audio Url',
-      description:
-        'Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.',
-    },
-    exaggeration: {
-      default: 0.25,
-      type: 'number',
-      title: 'Exaggeration',
-      minimum: 0,
-      description:
-        'Exaggeration factor for the generated speech (0.0 = no exaggeration, 1.0 = maximum exaggeration).',
-      maximum: 1,
-    },
-    text: {
-      type: 'string',
-      title: 'Text',
-      examples: [
-        'I just found a hidden treasure in the backyard! Check it out!',
-      ],
-      description:
-        'The text to be converted to speech (maximum 5000 characters). You can additionally add the following emotive tags: <laugh>, <chuckle>, <sigh>, <cough>, <sniffle>, <groan>, <yawn>, <gasp>',
-    },
-    temperature: {
-      default: 0.7,
-      type: 'number',
-      title: 'Temperature',
-      minimum: 0.05,
-      description: 'Temperature for generation (higher = more creative).',
-      maximum: 2,
-    },
-    cfg: {
-      default: 0.5,
-      type: 'number',
-      title: 'Cfg',
-      minimum: 0.1,
-      maximum: 1,
-    },
-  },
-  type: 'object',
+  title: 'ChatterboxRequest',
   'x-fal-order-properties': [
     'text',
     'audio_url',
@@ -1984,31 +1935,77 @@ export const ChatterboxTextToSpeechInputSchema = {
     'cfg',
     'seed',
   ],
+  properties: {
+    text: {
+      title: 'Text',
+      description:
+        'The text to be converted to speech (maximum 5000 characters). You can additionally add the following emotive tags: <laugh>, <chuckle>, <sigh>, <cough>, <sniffle>, <groan>, <yawn>, <gasp>',
+      type: 'string',
+      examples: [
+        'I just found a hidden treasure in the backyard! Check it out!',
+      ],
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description:
+        'Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.',
+      default:
+        'https://storage.googleapis.com/chatterbox-demo-samples/prompts/male_rickmorty.mp3',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    cfg: {
+      title: 'Cfg',
+      minimum: 0.1,
+      type: 'number',
+      default: 0.5,
+      maximum: 1,
+    },
+    temperature: {
+      title: 'Temperature',
+      minimum: 0.05,
+      description: 'Temperature for generation (higher = more creative).',
+      type: 'number',
+      default: 0.7,
+      maximum: 2,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        "Useful to control the reproducibility of the generated audio. Assuming all other properties didn't change, a fixed seed should always generate the exact same audio file. Set to 0 for random seed..",
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    exaggeration: {
+      title: 'Exaggeration',
+      minimum: 0,
+      description:
+        'Exaggeration factor for the generated speech (0.0 = no exaggeration, 1.0 = maximum exaggeration).',
+      type: 'number',
+      default: 0.25,
+      maximum: 1,
+    },
+  },
   required: ['text'],
-  title: 'ChatterboxRequest',
+  type: 'object',
 } as const
 
 export const ChatterboxTextToSpeechMultilingualInputSchema = {
+  title: 'ChatterboxMultilingualRequest',
+  'x-fal-order-properties': [
+    'text',
+    'voice',
+    'custom_audio_language',
+    'exaggeration',
+    'temperature',
+    'cfg_scale',
+    'seed',
+  ],
   properties: {
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        'Random seed for reproducible results. Set to 0 for random generation, or provide a specific number for consistent outputs.',
-    },
-    exaggeration: {
-      default: 0.5,
-      type: 'number',
-      title: 'Exaggeration',
-      minimum: 0.25,
-      description:
-        'Controls speech expressiveness and emotional intensity (0.25-2.0). 0.5 is neutral, higher values increase expressiveness. Extreme values may be unstable.',
-      maximum: 2,
-    },
     voice: {
-      default: 'english',
-      type: 'string',
       title: 'Voice',
+      description:
+        'Language code for synthesis. In case using custom please provide audio url and select custom_audio_language. ',
+      type: 'string',
+      default: 'english',
       examples: [
         'english',
         'arabic',
@@ -2034,42 +2031,33 @@ export const ChatterboxTextToSpeechMultilingualInputSchema = {
         'turkish',
         'chinese',
       ],
-      description:
-        'Language code for synthesis. In case using custom please provide audio url and select custom_audio_language. ',
-    },
-    cfg_scale: {
-      default: 0.5,
-      type: 'number',
-      title: 'CFG Scale',
-      minimum: 0,
-      description:
-        'Configuration/pace weight controlling generation guidance (0.0-1.0). Use 0.0 for language transfer to mitigate accent inheritance.',
-      maximum: 1,
     },
     text: {
+      title: 'Text',
+      description:
+        'The text to be converted to speech (maximum 300 characters). Supports 23 languages including English, French, German, Spanish, Italian, Portuguese, Hindi, Arabic, Chinese, Japanese, Korean, and more.',
       type: 'string',
       maxLength: 300,
       examples: [
         'Last month, we reached a new milestone with two billion views on our YouTube channel.',
         'Le mois dernier, nous avons atteint un nouveau jalon avec deux milliards de vues sur notre chaîne YouTube.',
       ],
-      description:
-        'The text to be converted to speech (maximum 300 characters). Supports 23 languages including English, French, German, Spanish, Italian, Portuguese, Hindi, Arabic, Chinese, Japanese, Korean, and more.',
-      title: 'Text',
     },
-    temperature: {
-      default: 0.8,
-      type: 'number',
-      title: 'Temperature',
-      minimum: 0.05,
+    cfg_scale: {
+      title: 'CFG Scale',
+      minimum: 0,
       description:
-        'Controls randomness and variation in generation (0.05-5.0). Higher values create more varied speech patterns.',
-      maximum: 5,
+        'Configuration/pace weight controlling generation guidance (0.0-1.0). Use 0.0 for language transfer to mitigate accent inheritance.',
+      type: 'number',
+      default: 0.5,
+      maximum: 1,
     },
     custom_audio_language: {
+      title: 'Custom Audio Language',
+      description:
+        'If using a custom audio URL, specify the language of the audio here. Ignored if voice is not a custom url.',
       anyOf: [
         {
-          type: 'string',
           enum: [
             'english',
             'arabic',
@@ -2095,60 +2083,71 @@ export const ChatterboxTextToSpeechMultilingualInputSchema = {
             'turkish',
             'chinese',
           ],
+          type: 'string',
         },
         { type: 'null' },
       ],
-      title: 'Custom Audio Language',
+    },
+    temperature: {
+      title: 'Temperature',
+      minimum: 0.05,
       description:
-        'If using a custom audio URL, specify the language of the audio here. Ignored if voice is not a custom url.',
+        'Controls randomness and variation in generation (0.05-5.0). Higher values create more varied speech patterns.',
+      type: 'number',
+      default: 0.8,
+      maximum: 5,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible results. Set to 0 for random generation, or provide a specific number for consistent outputs.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    exaggeration: {
+      title: 'Exaggeration',
+      minimum: 0.25,
+      description:
+        'Controls speech expressiveness and emotional intensity (0.25-2.0). 0.5 is neutral, higher values increase expressiveness. Extreme values may be unstable.',
+      type: 'number',
+      default: 0.5,
+      maximum: 2,
     },
   },
-  type: 'object',
-  'x-fal-order-properties': [
-    'text',
-    'voice',
-    'custom_audio_language',
-    'exaggeration',
-    'temperature',
-    'cfg_scale',
-    'seed',
-  ],
   required: ['text'],
-  title: 'ChatterboxMultilingualRequest',
+  type: 'object',
 } as const
 
 export const ChatterboxTextToSpeechMultilingualOutputSchema = {
+  title: 'ChatterboxMultilingualOutput',
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
+      description: 'The generated multilingual speech audio file',
       examples: [
         {
           url: 'https://v3.fal.media/files/example/multilingual_speech_output.wav',
         },
       ],
-      description: 'The generated multilingual speech audio file',
+      $ref: '#/$defs/File',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   required: ['audio'],
-  title: 'ChatterboxMultilingualOutput',
+  type: 'object',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -2157,11 +2156,10 @@ export const ChatterboxTextToSpeechMultilingualOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -2170,42 +2168,43 @@ export const ChatterboxTextToSpeechMultilingualOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ChatterboxTextToSpeechOutputSchema = {
+  title: 'ChatterboxOutput',
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
+      description: 'The generated speech audio',
       examples: [
         {
           url: 'https://v3.fal.media/files/kangaroo/RQ_pxc7oPdueYqWUqEbPE_tmpjnzvvzx_.wav',
         },
       ],
-      description: 'The generated speech audio',
+      $ref: '#/$defs/File',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   required: ['audio'],
-  title: 'ChatterboxOutput',
+  type: 'object',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -2214,11 +2213,10 @@ export const ChatterboxTextToSpeechOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -2227,6 +2225,8 @@ export const ChatterboxTextToSpeechOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -2520,30 +2520,22 @@ export const ChatterboxhdTextToSpeechOutputSchema = {
 } as const
 
 export const CohereTranscribeInputSchema = {
-  type: 'object',
   required: ['audio_url'],
   properties: {
-    max_new_tokens: {
-      type: 'integer',
-      default: 256,
-      description: 'Maximum number of tokens to generate per audio chunk.',
-      minimum: 1,
-      maximum: 1024,
-      title: 'Max New Tokens',
-    },
-    punctuation: {
-      type: 'boolean',
-      default: true,
+    audio_url: {
+      title: 'Audio Url',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/whisper/dinner_conversation.mp3',
+      ],
       description:
-        'Whether to include punctuation and capitalization in the output.',
-      title: 'Punctuation',
+        'URL of the audio file to transcribe. Supported formats: mp3, mp4, mpeg, mpga, m4a, wav, webm, ogg, flac.',
+      'x-fal-file-input': true,
     },
     language: {
-      type: 'string',
       default: 'en',
-      description:
-        'Language of the audio (ISO 639-1 code). Supported: en, fr, de, it, es, pt, el, nl, pl, zh, ja, ko, vi, ar.',
       title: 'Language',
+      type: 'string',
       enum: [
         'en',
         'fr',
@@ -2560,16 +2552,23 @@ export const CohereTranscribeInputSchema = {
         'vi',
         'ar',
       ],
-    },
-    audio_url: {
-      type: 'string',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/whisper/dinner_conversation.mp3',
-      ],
-      title: 'Audio Url',
       description:
-        'URL of the audio file to transcribe. Supported formats: mp3, mp4, mpeg, mpga, m4a, wav, webm, ogg, flac.',
-      'x-fal-file-input': true,
+        'Language of the audio (ISO 639-1 code). Supported: en, fr, de, it, es, pt, el, nl, pl, zh, ja, ko, vi, ar.',
+    },
+    punctuation: {
+      default: true,
+      title: 'Punctuation',
+      type: 'boolean',
+      description:
+        'Whether to include punctuation and capitalization in the output.',
+    },
+    max_new_tokens: {
+      default: 256,
+      minimum: 1,
+      type: 'integer',
+      title: 'Max New Tokens',
+      maximum: 1014,
+      description: 'Maximum number of tokens to generate per audio chunk.',
     },
   },
   title: 'TranscribeInput',
@@ -2579,60 +2578,35 @@ export const CohereTranscribeInputSchema = {
     'punctuation',
     'max_new_tokens',
   ],
+  type: 'object',
 } as const
 
 export const CohereTranscribeOutputSchema = {
-  type: 'object',
   required: ['text'],
   properties: {
     text: {
+      title: 'Text',
       type: 'string',
       description: 'Transcribed text from the audio file.',
-      title: 'Text',
     },
     timings: {
+      additionalProperties: { type: 'number' },
+      title: 'Timings',
       type: 'object',
       description: 'Performance timing breakdown in seconds.',
-      title: 'Timings',
-      additionalProperties: { type: 'number' },
     },
   },
   title: 'TranscribeOutput',
   'x-fal-order-properties': ['text', 'timings'],
+  type: 'object',
 } as const
 
 export const Csm1bInputSchema = {
-  type: 'object',
-  title: 'Input',
+  required: ['scene'],
   'x-fal-order-properties': ['scene', 'context'],
   properties: {
-    context: {
-      description: 'The context to generate an audio from.',
-      title: 'Context',
-      examples: [
-        [
-          {
-            audio_url:
-              'https://huggingface.co/spaces/sesame/csm-1b/resolve/main/prompts/conversational_a.wav',
-            speaker_id: 0,
-            prompt:
-              "like revising for an exam I'd have to try and like keep up the momentum because I'd start really early I'd be like okay I'm gonna start revising now and then like you're revising for ages and then I just like start losing steam I didn't do that for the exam we had recently to be fair that was a more of a last minute scenario but like yeah I'm trying to like yeah I noticed this yesterday that like Mondays I sort of start the day with this not like a panic but like a",
-          },
-          {
-            audio_url:
-              'https://huggingface.co/spaces/sesame/csm-1b/resolve/main/prompts/conversational_b.wav',
-            speaker_id: 1,
-            prompt:
-              "like a super Mario level. Like it's very like high detail. And like, once you get into the park, it just like, everything looks like a computer game and they have all these, like, you know, if, if there's like a, you know, like in a Mario game, they will have like a question block. And if you like, you know, punch it, a coin will come out. So like everyone, when they come into the park, they get like this little bracelet and then you can go punching question blocks around.",
-          },
-        ],
-      ],
-      type: 'array',
-      items: { $ref: '#/$defs/Speaker' },
-    },
     scene: {
-      description: 'The text to generate an audio from.',
-      title: 'Scene',
+      items: { $ref: '#/$defs/Turn' },
       examples: [
         [
           { text: 'Hey how are you doing.', speaker_id: 0 },
@@ -2640,64 +2614,89 @@ export const Csm1bInputSchema = {
           { text: "I'm great, so happy to be speaking to you.", speaker_id: 0 },
         ],
       ],
+      description: 'The text to generate an audio from.',
+      title: 'Scene',
       type: 'array',
-      items: { $ref: '#/$defs/Turn' },
+    },
+    context: {
+      items: { $ref: '#/$defs/Speaker' },
+      examples: [
+        [
+          {
+            prompt:
+              "like revising for an exam I'd have to try and like keep up the momentum because I'd start really early I'd be like okay I'm gonna start revising now and then like you're revising for ages and then I just like start losing steam I didn't do that for the exam we had recently to be fair that was a more of a last minute scenario but like yeah I'm trying to like yeah I noticed this yesterday that like Mondays I sort of start the day with this not like a panic but like a",
+            audio_url:
+              'https://huggingface.co/spaces/sesame/csm-1b/resolve/main/prompts/conversational_a.wav',
+            speaker_id: 0,
+          },
+          {
+            prompt:
+              "like a super Mario level. Like it's very like high detail. And like, once you get into the park, it just like, everything looks like a computer game and they have all these, like, you know, if, if there's like a, you know, like in a Mario game, they will have like a question block. And if you like, you know, punch it, a coin will come out. So like everyone, when they come into the park, they get like this little bracelet and then you can go punching question blocks around.",
+            audio_url:
+              'https://huggingface.co/spaces/sesame/csm-1b/resolve/main/prompts/conversational_b.wav',
+            speaker_id: 1,
+          },
+        ],
+      ],
+      description: 'The context to generate an audio from.',
+      title: 'Context',
+      type: 'array',
     },
   },
-  required: ['scene'],
+  title: 'Input',
+  type: 'object',
   $defs: {
     Speaker: {
-      type: 'object',
-      title: 'Speaker',
+      required: ['prompt', 'speaker_id', 'audio_url'],
       'x-fal-order-properties': ['prompt', 'speaker_id', 'audio_url'],
       properties: {
-        audio_url: { type: 'string', title: 'Audio Url' },
-        speaker_id: { type: 'integer', title: 'Speaker Id' },
-        prompt: { type: 'string', title: 'Prompt' },
+        prompt: { title: 'Prompt', type: 'string' },
+        audio_url: { title: 'Audio Url', type: 'string' },
+        speaker_id: { title: 'Speaker Id', type: 'integer' },
       },
-      required: ['prompt', 'speaker_id', 'audio_url'],
+      title: 'Speaker',
+      type: 'object',
     },
     Turn: {
-      type: 'object',
-      title: 'Turn',
+      required: ['speaker_id', 'text'],
       'x-fal-order-properties': ['speaker_id', 'text'],
       properties: {
-        text: { type: 'string', title: 'Text' },
-        speaker_id: { type: 'integer', title: 'Speaker Id' },
+        text: { title: 'Text', type: 'string' },
+        speaker_id: { title: 'Speaker Id', type: 'integer' },
       },
-      required: ['speaker_id', 'text'],
+      title: 'Turn',
+      type: 'object',
     },
   },
 } as const
 
 export const Csm1bOutputSchema = {
-  type: 'object',
-  title: 'Output',
+  required: ['audio'],
   'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      description: 'The generated audio.',
+      anyOf: [{ $ref: '#/$defs/File' }, { format: 'binary', type: 'string' }],
       title: 'Audio',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'string', format: 'binary' }],
+      description: 'The generated audio.',
     },
   },
-  required: ['audio'],
+  title: 'Output',
+  type: 'object',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -2706,11 +2705,10 @@ export const Csm1bOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -2719,154 +2717,108 @@ export const Csm1bOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const DeepFilterNetTimingsSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['preprocess', 'inference', 'postprocess'],
   required: ['preprocess', 'inference', 'postprocess'],
   properties: {
-    postprocess: {
-      description: 'Postprocessing time.',
+    preprocess: {
       type: 'number',
+      description: 'Preprocessing time.',
+      title: 'Preprocess',
+    },
+    postprocess: {
+      type: 'number',
+      description: 'Postprocessing time.',
       title: 'Postprocess',
     },
     inference: {
-      description: 'Inference time.',
       type: 'number',
+      description: 'Inference time.',
       title: 'Inference',
     },
-    preprocess: {
-      description: 'Preprocessing time.',
-      type: 'number',
-      title: 'Preprocess',
-    },
   },
-  type: 'object',
   title: 'DeepFilterNetTimings',
-  'x-fal-order-properties': ['preprocess', 'inference', 'postprocess'],
 } as const
 
 export const Deepfilternet3InputSchema = {
-  required: ['audio_url'],
-  properties: {
-    bitrate: {
-      description: 'The bitrate of the output audio.',
-      type: 'string',
-      title: 'Bitrate',
-      default: '192k',
-    },
-    audio_url: {
-      description: 'The URL of the audio to enhance.',
-      examples: [
-        'https://v3b.fal.media/files/b/0a8a4022/DLoZhabKeVjd3urncoRE4_dirty.mp3',
-      ],
-      type: 'string',
-      title: 'Audio URL',
-      'x-fal-file-input': true,
-    },
-    audio_format: {
-      enum: ['mp3', 'aac', 'm4a', 'ogg', 'opus', 'flac', 'wav'],
-      description: 'The format for the output audio.',
-      type: 'string',
-      title: 'Audio Format',
-      default: 'mp3',
-    },
-    sync_mode: {
-      description:
-        "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      type: 'boolean',
-      title: 'Sync Mode',
-      default: false,
-    },
-  },
   type: 'object',
-  title: 'DeepFilterNet3Input',
   'x-fal-order-properties': [
     'audio_url',
     'sync_mode',
     'audio_format',
     'bitrate',
   ],
+  required: ['audio_url'],
+  properties: {
+    bitrate: {
+      default: '192k',
+      description: 'The bitrate of the output audio.',
+      type: 'string',
+      title: 'Bitrate',
+    },
+    sync_mode: {
+      default: false,
+      description:
+        "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      type: 'boolean',
+      title: 'Sync Mode',
+    },
+    audio_url: {
+      type: 'string',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8a4022/DLoZhabKeVjd3urncoRE4_dirty.mp3',
+      ],
+      description: 'The URL of the audio to enhance.',
+      title: 'Audio URL',
+      'x-fal-file-input': true,
+    },
+    audio_format: {
+      default: 'mp3',
+      description: 'The format for the output audio.',
+      type: 'string',
+      enum: ['mp3', 'aac', 'm4a', 'ogg', 'opus', 'flac', 'wav'],
+      title: 'Audio Format',
+    },
+  },
+  title: 'DeepFilterNet3Input',
 } as const
 
 export const Deepfilternet3OutputSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['audio_file', 'timings'],
   required: ['audio_file', 'timings'],
   properties: {
-    audio_file: {
-      description: 'The audio file that was enhanced.',
-      examples: [
-        {
-          bitrate: '192k',
-          file_name: '-2cD9CyGEjYsyVQ5lEERh_9qwIkJjf.mp3',
-          channels: 1,
-          url: 'https://v3b.fal.media/files/b/0a8a4024/-2cD9CyGEjYsyVQ5lEERh_9qwIkJjf.mp3',
-          sample_rate: 48000,
-          duration: 6.9544375,
-          content_type: 'audio/mpeg',
-        },
-      ],
-      $ref: '#/$defs/AudioFile',
-    },
     timings: {
       description: 'Timings for each step in the pipeline.',
       $ref: '#/$defs/DeepFilterNetTimings',
     },
+    audio_file: {
+      examples: [
+        {
+          duration: 6.9544375,
+          channels: 1,
+          content_type: 'audio/mpeg',
+          sample_rate: 48000,
+          bitrate: '192k',
+          file_name: '-2cD9CyGEjYsyVQ5lEERh_9qwIkJjf.mp3',
+          url: 'https://v3b.fal.media/files/b/0a8a4024/-2cD9CyGEjYsyVQ5lEERh_9qwIkJjf.mp3',
+        },
+      ],
+      $ref: '#/$defs/AudioFile',
+      description: 'The audio file that was enhanced.',
+    },
   },
-  type: 'object',
   title: 'DeepFilterNet3Output',
-  'x-fal-order-properties': ['audio_file', 'timings'],
   $defs: {
     AudioFile: {
-      required: ['url'],
-      properties: {
-        sample_rate: {
-          description: 'The sample rate of the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Sample Rate',
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'File Size',
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-          title: 'Url',
-        },
-        channels: {
-          description: 'The number of channels in the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Channels',
-        },
-        bitrate: {
-          description: "The bitrate of the audio (e.g., '192k' or 192000)",
-          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-          title: 'Bitrate',
-        },
-        duration: {
-          description: 'The duration of the audio',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Duration',
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-        },
-      },
       type: 'object',
-      title: 'AudioFile',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -2877,37 +2829,82 @@ export const Deepfilternet3OutputSchema = {
         'sample_rate',
         'bitrate',
       ],
+      required: ['url'],
+      properties: {
+        channels: {
+          description: 'The number of channels in the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Channels',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+        },
+        bitrate: {
+          description: "The bitrate of the audio (e.g., '192k' or 192000)",
+          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+          title: 'Bitrate',
+        },
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+        },
+        url: {
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+        },
+        duration: {
+          description: 'The duration of the audio',
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Duration',
+        },
+        sample_rate: {
+          description: 'The sample rate of the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Sample Rate',
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+        },
+      },
+      title: 'AudioFile',
     },
     DeepFilterNetTimings: {
+      type: 'object',
+      'x-fal-order-properties': ['preprocess', 'inference', 'postprocess'],
       required: ['preprocess', 'inference', 'postprocess'],
       properties: {
-        postprocess: {
-          description: 'Postprocessing time.',
+        preprocess: {
           type: 'number',
+          description: 'Preprocessing time.',
+          title: 'Preprocess',
+        },
+        postprocess: {
+          type: 'number',
+          description: 'Postprocessing time.',
           title: 'Postprocess',
         },
         inference: {
-          description: 'Inference time.',
           type: 'number',
+          description: 'Inference time.',
           title: 'Inference',
         },
-        preprocess: {
-          description: 'Preprocessing time.',
-          type: 'number',
-          title: 'Preprocess',
-        },
       },
-      type: 'object',
       title: 'DeepFilterNetTimings',
-      'x-fal-order-properties': ['preprocess', 'inference', 'postprocess'],
     },
   },
 } as const
 
 export const DemucsInputSchema = {
-  type: 'object',
-  required: ['audio_url'],
-  title: 'DemucsInput',
   'x-fal-order-properties': [
     'audio_url',
     'model',
@@ -2917,33 +2914,36 @@ export const DemucsInputSchema = {
     'overlap',
     'output_format',
   ],
+  type: 'object',
   properties: {
-    stems: {
-      default: ['vocals', 'drums', 'bass', 'other', 'guitar', 'piano'],
-      examples: [['vocals', 'drums', 'bass', 'other', 'guitar', 'piano']],
+    shifts: {
+      default: 1,
+      maximum: 10,
+      minimum: 1,
       description:
-        'Specific stems to extract. If None, extracts all available stems. Available stems depend on model: vocals, drums, bass, other, guitar, piano (for 6s model)',
-      title: 'Stems',
-      anyOf: [
-        {
-          items: {
-            enum: ['vocals', 'drums', 'bass', 'other', 'guitar', 'piano'],
-            type: 'string',
-          },
-          type: 'array',
-        },
-        { type: 'null' },
-      ],
+        'Number of random shifts for equivariant stabilization. Higher values improve quality but increase processing time.',
+      title: 'Shifts',
+      type: 'integer',
+    },
+    overlap: {
+      default: 0.25,
+      maximum: 1,
+      minimum: 0,
+      description:
+        'Overlap between segments (0.0 to 1.0). Higher values may improve quality but increase processing time.',
+      title: 'Overlap',
+      type: 'number',
     },
     output_format: {
-      enum: ['wav', 'mp3'],
       default: 'mp3',
+      enum: ['wav', 'mp3'],
       examples: ['mp3'],
       description: 'Output audio format for the separated stems',
       title: 'Output Format',
       type: 'string',
     },
     model: {
+      default: 'htdemucs_6s',
       enum: [
         'htdemucs',
         'htdemucs_ft',
@@ -2954,29 +2954,16 @@ export const DemucsInputSchema = {
         'mdx_q',
         'mdx_extra_q',
       ],
-      default: 'htdemucs_6s',
       examples: ['htdemucs_6s'],
       description: 'Demucs model to use for separation',
       title: 'Model',
       type: 'string',
     },
-    shifts: {
-      minimum: 1,
+    segment_length: {
       description:
-        'Number of random shifts for equivariant stabilization. Higher values improve quality but increase processing time.',
-      maximum: 10,
-      title: 'Shifts',
-      default: 1,
-      type: 'integer',
-    },
-    overlap: {
-      minimum: 0,
-      description:
-        'Overlap between segments (0.0 to 1.0). Higher values may improve quality but increase processing time.',
-      maximum: 1,
-      title: 'Overlap',
-      default: 0.25,
-      type: 'number',
+        'Length in seconds of each segment for processing. Smaller values use less memory but may reduce quality. Default is model-specific.',
+      title: 'Segment Length',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
     audio_url: {
       examples: [
@@ -2987,17 +2974,56 @@ export const DemucsInputSchema = {
       type: 'string',
       'x-fal-file-input': true,
     },
-    segment_length: {
+    stems: {
+      default: ['vocals', 'drums', 'bass', 'other', 'guitar', 'piano'],
+      anyOf: [
+        {
+          items: {
+            enum: ['vocals', 'drums', 'bass', 'other', 'guitar', 'piano'],
+            type: 'string',
+          },
+          type: 'array',
+        },
+        { type: 'null' },
+      ],
+      examples: [['vocals', 'drums', 'bass', 'other', 'guitar', 'piano']],
       description:
-        'Length in seconds of each segment for processing. Smaller values use less memory but may reduce quality. Default is model-specific.',
-      title: 'Segment Length',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
+        'Specific stems to extract. If None, extracts all available stems. Available stems depend on model: vocals, drums, bass, other, guitar, piano (for 6s model)',
+      title: 'Stems',
     },
   },
+  title: 'DemucsInput',
+  required: ['audio_url'],
 } as const
 
 export const DemucsOutputSchema = {
   type: 'object',
+  properties: {
+    bass: {
+      description: 'Separated bass audio file',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    guitar: {
+      description: 'Separated guitar audio file (only available for 6s models)',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    vocals: {
+      description: 'Separated vocals audio file',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    piano: {
+      description: 'Separated piano audio file (only available for 6s models)',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    other: {
+      description: 'Separated other instruments audio file',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    drums: {
+      description: 'Separated drums audio file',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+  },
   title: 'DemucsOutput',
   'x-fal-order-properties': [
     'vocals',
@@ -3007,48 +3033,21 @@ export const DemucsOutputSchema = {
     'guitar',
     'piano',
   ],
-  properties: {
-    other: {
-      description: 'Separated other instruments audio file',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    vocals: {
-      description: 'Separated vocals audio file',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    guitar: {
-      description: 'Separated guitar audio file (only available for 6s models)',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    bass: {
-      description: 'Separated bass audio file',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    piano: {
-      description: 'Separated piano audio file (only available for 6s models)',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    drums: {
-      description: 'Separated drums audio file',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-  },
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3057,11 +3056,10 @@ export const DemucsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3070,59 +3068,60 @@ export const DemucsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const DiaTtsInputSchema = {
+  title: 'DiaRequest',
+  type: 'object',
   properties: {
     text: {
+      title: 'Text',
+      type: 'string',
       examples: [
         '[S1] Dia is an open weights text to dialogue model. [S2] You get full control over scripts and voices. [S1] Wow. Amazing. (laughs) [S2] Try it now on Fal.',
       ],
-      type: 'string',
-      title: 'Text',
       description: 'The text to be converted to speech.',
     },
   },
-  type: 'object',
-  title: 'DiaRequest',
-  'x-fal-order-properties': ['text'],
   required: ['text'],
+  'x-fal-order-properties': ['text'],
 } as const
 
 export const DiaTtsOutputSchema = {
+  title: 'DiaOutput',
+  type: 'object',
   properties: {
     audio: {
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/elephant/d5lORit2npFfBykcAtyUr_tmplacfh8oa.mp3',
         },
       ],
-      $ref: '#/$defs/File',
       description: 'The generated speech audio',
     },
   },
-  type: 'object',
-  title: 'DiaOutput',
-  'x-fal-order-properties': ['audio'],
   required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3131,11 +3130,10 @@ export const DiaTtsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3144,59 +3142,60 @@ export const DiaTtsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const DiaTtsVoiceCloneInputSchema = {
+  title: 'CloneRequest',
+  type: 'object',
   properties: {
     text: {
+      title: 'Text',
+      type: 'string',
       examples: [
         "[S1] Hello, how are you? [S2] I'm good, thank you. [S1] What's your name? [S2] My name is Dia. [S1] Nice to meet you. [S2] Nice to meet you too.",
       ],
-      type: 'string',
-      title: 'Text',
       description: 'The text to be converted to speech.',
     },
   },
-  type: 'object',
-  title: 'CloneRequest',
-  'x-fal-order-properties': ['text'],
   required: ['text'],
+  'x-fal-order-properties': ['text'],
 } as const
 
 export const DiaTtsVoiceCloneOutputSchema = {
+  title: 'DiaCloneOutput',
+  type: 'object',
   properties: {
     audio: {
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/tiger/smL9a_mr1PRIvZxDSVppk_output.wav',
         },
       ],
-      $ref: '#/$defs/File',
       description: 'The generated speech audio',
     },
   },
-  type: 'object',
-  title: 'DiaCloneOutput',
-  'x-fal-order-properties': ['audio'],
   required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3205,11 +3204,10 @@ export const DiaTtsVoiceCloneOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3218,19 +3216,18 @@ export const DiaTtsVoiceCloneOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const DialogueBlockSchema = {
-  title: 'DialogueBlock',
+  required: ['text', 'voice'],
   properties: {
-    text: { title: 'Text', description: 'The dialogue text', type: 'string' },
     voice: {
-      type: 'string',
       title: 'Voice',
-      description:
-        'The name or the ID of the voice to be used for the generation.',
+      type: 'string',
       examples: [
         'Aria',
         'Roger',
@@ -3253,11 +3250,14 @@ export const DialogueBlockSchema = {
         'Lily',
         'Bill',
       ],
+      description:
+        'The name or the ID of the voice to be used for the generation.',
     },
+    text: { title: 'Text', type: 'string', description: 'The dialogue text' },
   },
-  required: ['text', 'voice'],
-  'x-fal-order-properties': ['text', 'voice'],
+  title: 'DialogueBlock',
   type: 'object',
+  'x-fal-order-properties': ['text', 'voice'],
 } as const
 
 export const DiffrhythmInputSchema = {
@@ -3271,79 +3271,78 @@ export const DiffrhythmInputSchema = {
     'scheduler',
     'num_inference_steps',
   ],
-  type: 'object',
   properties: {
+    num_inference_steps: {
+      title: 'Number of Inference Steps',
+      minimum: 10,
+      description:
+        'The number of inference steps to use for the music generation.',
+      type: 'integer',
+      default: 32,
+      maximum: 100,
+    },
+    music_duration: {
+      title: 'Music Duration',
+      enum: ['95s', '285s'],
+      description: 'The duration of the music to generate.',
+      type: 'string',
+      default: '95s',
+    },
+    cfg_strength: {
+      title: 'CFG Strength',
+      minimum: 1,
+      description: 'The CFG strength to use for the music generation.',
+      type: 'number',
+      default: 4,
+      maximum: 10,
+    },
+    scheduler: {
+      title: 'Scheduler',
+      enum: ['euler', 'midpoint', 'rk4', 'implicit_adams'],
+      description: 'The scheduler to use for the music generation.',
+      type: 'string',
+      default: 'euler',
+    },
+    style_prompt: {
+      title: 'Style Prompt',
+      examples: ['pop'],
+      type: 'string',
+      description: 'The style prompt to use for the music generation.',
+    },
+    lyrics: {
+      title: 'Lyrics',
+      examples: [
+        "[00:10.00]Moonlight spills through broken blinds\n[00:13.20]Your shadow dances on the dashboard shrine\n[00:16.85]Neon ghosts in gasoline rain\n[00:20.40]I hear your laughter down the midnight train\n[00:24.15]Static whispers through frayed wires\n[00:27.65]Guitar strings hum our cathedral choirs\n[00:31.30]Flicker screens show reruns of June\n[00:34.90]I'm drowning in this mercury lagoon\n[00:38.55]Electric veins pulse through concrete skies\n[00:42.10]Your name echoes in the hollow where my heartbeat lies\n[00:45.75]We're satellites trapped in parallel light\n[00:49.25]Burning through the atmosphere of endless night\n[01:00.00]Dusty vinyl spins reverse\n[01:03.45]Our polaroid timeline bleeds through the verse\n[01:07.10]Telescope aimed at dead stars\n[01:10.65]Still tracing constellations through prison bars\n[01:14.30]Electric veins pulse through concrete skies\n[01:17.85]Your name echoes in the hollow where my heartbeat lies\n[01:21.50]We're satellites trapped in parallel light\n[01:25.05]Burning through the atmosphere of endless night\n[02:10.00]Clockwork gears grind moonbeams to rust\n[02:13.50]Our fingerprint smudged by interstellar dust\n[02:17.15]Velvet thunder rolls through my veins\n[02:20.70]Chasing phantom trains through solar plane\n[02:24.35]Electric veins pulse through concrete skies\n[02:27.90]Your name echoes in the hollow where my heartbeat lies\n",
+      ],
+      type: 'string',
+      description:
+        'The prompt to generate the song from. Must have two sections. Sections start with either [chorus] or a [verse].',
+    },
     reference_audio_url: {
+      title: 'Reference Audio URL',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
       ],
-      title: 'Reference Audio URL',
       type: 'string',
       description:
         'The URL of the reference audio to use for the music generation.',
       'x-fal-file-input': true,
     },
-    music_duration: {
-      title: 'Music Duration',
-      enum: ['95s', '285s'],
-      type: 'string',
-      description: 'The duration of the music to generate.',
-      default: '95s',
-    },
-    lyrics: {
-      examples: [
-        "[00:10.00]Moonlight spills through broken blinds\n[00:13.20]Your shadow dances on the dashboard shrine\n[00:16.85]Neon ghosts in gasoline rain\n[00:20.40]I hear your laughter down the midnight train\n[00:24.15]Static whispers through frayed wires\n[00:27.65]Guitar strings hum our cathedral choirs\n[00:31.30]Flicker screens show reruns of June\n[00:34.90]I'm drowning in this mercury lagoon\n[00:38.55]Electric veins pulse through concrete skies\n[00:42.10]Your name echoes in the hollow where my heartbeat lies\n[00:45.75]We're satellites trapped in parallel light\n[00:49.25]Burning through the atmosphere of endless night\n[01:00.00]Dusty vinyl spins reverse\n[01:03.45]Our polaroid timeline bleeds through the verse\n[01:07.10]Telescope aimed at dead stars\n[01:10.65]Still tracing constellations through prison bars\n[01:14.30]Electric veins pulse through concrete skies\n[01:17.85]Your name echoes in the hollow where my heartbeat lies\n[01:21.50]We're satellites trapped in parallel light\n[01:25.05]Burning through the atmosphere of endless night\n[02:10.00]Clockwork gears grind moonbeams to rust\n[02:13.50]Our fingerprint smudged by interstellar dust\n[02:17.15]Velvet thunder rolls through my veins\n[02:20.70]Chasing phantom trains through solar plane\n[02:24.35]Electric veins pulse through concrete skies\n[02:27.90]Your name echoes in the hollow where my heartbeat lies\n",
-      ],
-      title: 'Lyrics',
-      type: 'string',
-      description:
-        'The prompt to generate the song from. Must have two sections. Sections start with either [chorus] or a [verse].',
-    },
-    scheduler: {
-      title: 'Scheduler',
-      enum: ['euler', 'midpoint', 'rk4', 'implicit_adams'],
-      type: 'string',
-      description: 'The scheduler to use for the music generation.',
-      default: 'euler',
-    },
-    cfg_strength: {
-      title: 'CFG Strength',
-      minimum: 1,
-      maximum: 10,
-      type: 'number',
-      default: 4,
-      description: 'The CFG strength to use for the music generation.',
-    },
-    style_prompt: {
-      examples: ['pop'],
-      title: 'Style Prompt',
-      type: 'string',
-      description: 'The style prompt to use for the music generation.',
-    },
-    num_inference_steps: {
-      title: 'Number of Inference Steps',
-      minimum: 10,
-      maximum: 100,
-      type: 'integer',
-      default: 32,
-      description:
-        'The number of inference steps to use for the music generation.',
-    },
   },
   required: ['lyrics'],
+  type: 'object',
 } as const
 
 export const DiffrhythmOutputSchema = {
   title: 'Output',
   'x-fal-order-properties': ['audio'],
-  type: 'object',
   properties: {
     audio: {
       examples: [
         {
+          content_type: 'application/octet-stream',
           url: 'https://v3.fal.media/files/elephant/VV4wtKXBpZL1bNv6en36t_output.wav',
           file_size: 33554520,
-          content_type: 'application/octet-stream',
           file_name: 'output.wav',
         },
       ],
@@ -3352,22 +3351,22 @@ export const DiffrhythmOutputSchema = {
     },
   },
   required: ['audio'],
+  type: 'object',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3376,11 +3375,10 @@ export const DiffrhythmOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3389,70 +3387,71 @@ export const DiffrhythmOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsAudioIsolationInputSchema = {
-  title: 'AudioIsolationRequest',
   properties: {
-    video_url: {
-      description:
-        'Video file to use for audio isolation. Either `audio_url` or `video_url` must be provided.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Video Url',
-    },
     audio_url: {
-      description: 'URL of the audio file to isolate voice from',
       anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Audio Url',
       examples: [
         'https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3',
       ],
-      title: 'Audio Url',
+      description: 'URL of the audio file to isolate voice from',
+    },
+    video_url: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Video Url',
+      description:
+        'Video file to use for audio isolation. Either `audio_url` or `video_url` must be provided.',
     },
   },
-  'x-fal-order-properties': ['audio_url', 'video_url'],
+  title: 'AudioIsolationRequest',
   type: 'object',
+  'x-fal-order-properties': ['audio_url', 'video_url'],
 } as const
 
 export const ElevenlabsAudioIsolationOutputSchema = {
-  title: 'TTSOutput',
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated audio file',
       examples: [
         {
           url: 'https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated audio file',
     },
     timestamps: {
+      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
+      title: 'Timestamps',
       description:
         'Timestamps for each word in the generated speech. Only returned if `timestamps` is set to True in the request.',
-      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
-      title: 'Timestamps',
     },
   },
-  required: ['audio'],
-  'x-fal-order-properties': ['audio', 'timestamps'],
+  title: 'TTSOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio', 'timestamps'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3461,11 +3460,10 @@ export const ElevenlabsAudioIsolationOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3474,19 +3472,25 @@ export const ElevenlabsAudioIsolationOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsMusicInputSchema = {
-  title: 'MusicRequest',
-  description: 'Request format for Elevenlabs Music API',
   properties: {
+    respect_sections_durations: {
+      default: true,
+      title: 'Respect Sections Durations',
+      type: 'boolean',
+      description:
+        "Controls how strictly section durations in the composition_plan are enforced. It will only have an effect if it is used with composition_plan. When set to true, the model will precisely respect each section's duration_ms from the plan. When set to false, the model may adjust individual section durations which will generally lead to better generation quality and improved latency, while always preserving the total song duration from the plan.",
+    },
     output_format: {
       default: 'mp3_44100_128',
       title: 'Output Format',
-      description:
-        'Output format of the generated audio. Formatted as codec_sample_rate_bitrate. So an mp3 with 22.05kHz sample rate at 32kbs is represented as mp3_22050_32. MP3 with 192kbps bitrate requires you to be subscribed to Creator tier or above. PCM with 44.1kHz sample rate requires you to be subscribed to Pro tier or above. Note that the μ-law format (sometimes written mu-law, often approximated as u-law) is commonly used for Twilio audio inputs.',
+      type: 'string',
       enum: [
         'mp3_22050_32',
         'mp3_44100_32',
@@ -3508,44 +3512,40 @@ export const ElevenlabsMusicInputSchema = {
         'opus_48000_128',
         'opus_48000_192',
       ],
-      type: 'string',
+      description:
+        'Output format of the generated audio. Formatted as codec_sample_rate_bitrate. So an mp3 with 22.05kHz sample rate at 32kbs is represented as mp3_22050_32. MP3 with 192kbps bitrate requires you to be subscribed to Creator tier or above. PCM with 44.1kHz sample rate requires you to be subscribed to Pro tier or above. Note that the μ-law format (sometimes written mu-law, often approximated as u-law) is commonly used for Twilio audio inputs.',
+    },
+    prompt: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Prompt',
+      examples: [
+        'Mysterious original soundtrack, themes of jungle, rainforest, nature, woodwinds, busy rhythmic tribal percussion.',
+      ],
+      description: 'The text prompt describing the music to generate',
     },
     force_instrumental: {
       default: false,
       title: 'Force Instrumental',
+      type: 'boolean',
       description:
         'If true, guarantees that the generated song will be instrumental. If false, the song may or may not be instrumental depending on the prompt. Can only be used with prompt.',
-      type: 'boolean',
-    },
-    prompt: {
-      description: 'The text prompt describing the music to generate',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: [
-        'Mysterious original soundtrack, themes of jungle, rainforest, nature, woodwinds, busy rhythmic tribal percussion.',
-      ],
-      title: 'Prompt',
-    },
-    composition_plan: {
-      description: 'The composition plan for the music',
-      anyOf: [{ $ref: '#/$defs/MusicCompositionPlan' }, { type: 'null' }],
     },
     music_length_ms: {
-      description:
-        'The length of the song to generate in milliseconds. Used only in conjunction with prompt. Must be between 3000ms and 600000ms. Optional - if not provided, the model will choose a length based on the prompt.',
       anyOf: [
-        { maximum: 600000, minimum: 3000, type: 'integer' },
+        { minimum: 3000, type: 'integer', maximum: 600000 },
         { type: 'null' },
       ],
       title: 'Music Length Ms',
-    },
-    respect_sections_durations: {
-      default: true,
-      title: 'Respect Sections Durations',
       description:
-        "Controls how strictly section durations in the composition_plan are enforced. It will only have an effect if it is used with composition_plan. When set to true, the model will precisely respect each section's duration_ms from the plan. When set to false, the model may adjust individual section durations which will generally lead to better generation quality and improved latency, while always preserving the total song duration from the plan.",
-      type: 'boolean',
+        'The length of the song to generate in milliseconds. Used only in conjunction with prompt. Must be between 3000ms and 600000ms. Optional - if not provided, the model will choose a length based on the prompt.',
+    },
+    composition_plan: {
+      anyOf: [{ $ref: '#/$defs/MusicCompositionPlan' }, { type: 'null' }],
+      description: 'The composition plan for the music',
     },
   },
+  title: 'MusicRequest',
+  type: 'object',
   'x-fal-order-properties': [
     'prompt',
     'composition_plan',
@@ -3554,89 +3554,90 @@ export const ElevenlabsMusicInputSchema = {
     'respect_sections_durations',
     'output_format',
   ],
-  type: 'object',
+  description: 'Request format for Elevenlabs Music API',
   $defs: {
     MusicCompositionPlan: {
-      title: 'MusicCompositionPlan',
+      required: [
+        'positive_global_styles',
+        'negative_global_styles',
+        'sections',
+      ],
       properties: {
         positive_global_styles: {
           title: 'Positive Global Styles',
+          type: 'array',
           items: { type: 'string' },
           description: 'The styles that should be present in the entire song.',
-          type: 'array',
-        },
-        negative_global_styles: {
-          title: 'Negative Global Styles',
-          items: { type: 'string' },
-          description:
-            'The styles that should not be present in the entire song.',
-          type: 'array',
         },
         sections: {
           title: 'Sections',
+          type: 'array',
           items: { $ref: '#/$defs/MusicSection' },
           description: 'The sections of the song.',
+        },
+        negative_global_styles: {
+          title: 'Negative Global Styles',
           type: 'array',
+          items: { type: 'string' },
+          description:
+            'The styles that should not be present in the entire song.',
         },
       },
-      required: [
-        'positive_global_styles',
-        'negative_global_styles',
-        'sections',
-      ],
+      title: 'MusicCompositionPlan',
+      type: 'object',
       'x-fal-order-properties': [
         'positive_global_styles',
         'negative_global_styles',
         'sections',
       ],
-      type: 'object',
     },
     MusicSection: {
-      title: 'MusicSection',
+      required: [
+        'section_name',
+        'positive_local_styles',
+        'negative_local_styles',
+        'duration_ms',
+        'lines',
+      ],
       properties: {
-        section_name: {
-          minLength: 1,
-          title: 'Section Name',
-          maxLength: 100,
-          description:
-            'The name of the section. Must be between 1 and 100 characters.',
-          type: 'string',
-        },
-        duration_ms: {
-          maximum: 120000,
-          minimum: 3000,
-          title: 'Duration Ms',
-          description:
-            'The duration of the section in milliseconds. Must be between 3000ms and 120000ms.',
-          type: 'integer',
-        },
-        positive_local_styles: {
-          title: 'Positive Local Styles',
-          items: { type: 'string' },
-          description: 'The styles that should be present in this section.',
+        negative_local_styles: {
+          title: 'Negative Local Styles',
           type: 'array',
+          items: { type: 'string' },
+          description: 'The styles that should not be present in this section.',
         },
         lines: {
           title: 'Lines',
+          type: 'array',
           items: { type: 'string' },
           description:
             'The lyrics of the section. Each line must be at most 200 characters long.',
-          type: 'array',
         },
-        negative_local_styles: {
-          title: 'Negative Local Styles',
-          items: { type: 'string' },
-          description: 'The styles that should not be present in this section.',
+        duration_ms: {
+          minimum: 3000,
+          type: 'integer',
+          title: 'Duration Ms',
+          maximum: 120000,
+          description:
+            'The duration of the section in milliseconds. Must be between 3000ms and 120000ms.',
+        },
+        positive_local_styles: {
+          title: 'Positive Local Styles',
           type: 'array',
+          items: { type: 'string' },
+          description: 'The styles that should be present in this section.',
+        },
+        section_name: {
+          minLength: 1,
+          type: 'string',
+          maxLength: 100,
+          title: 'Section Name',
+          description:
+            'The name of the section. Must be between 1 and 100 characters.',
         },
       },
-      required: [
-        'section_name',
-        'positive_local_styles',
-        'negative_local_styles',
-        'duration_ms',
-        'lines',
-      ],
+      title: 'MusicSection',
+      type: 'object',
       'x-fal-order-properties': [
         'section_name',
         'positive_local_styles',
@@ -3644,45 +3645,43 @@ export const ElevenlabsMusicInputSchema = {
         'duration_ms',
         'lines',
       ],
-      type: 'object',
     },
   },
 } as const
 
 export const ElevenlabsMusicOutputSchema = {
-  title: 'MusicOutput',
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated music audio file in MP3 format',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/elevenlabs/music_generated.mp3',
-          content_type: 'audio/mpeg',
           file_name: 'music_generated.mp3',
+          content_type: 'audio/mpeg',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated music audio file in MP3 format',
     },
   },
-  required: ['audio'],
-  'x-fal-order-properties': ['audio'],
+  title: 'MusicOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3691,11 +3690,10 @@ export const ElevenlabsMusicOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3704,36 +3702,19 @@ export const ElevenlabsMusicOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsSoundEffectsV2InputSchema = {
-  title: 'SoundEffectRequestV2',
+  required: ['text'],
   properties: {
-    prompt_influence: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Prompt Influence',
-      description:
-        'How closely to follow the prompt (0-1). Higher values mean less variation.',
-      default: 0.3,
-      type: 'number',
-    },
-    text: {
-      title: 'Text',
-      description: 'The text describing the sound effect to generate',
-      examples: [
-        'Spacious braam suitable for high-impact movie trailer moments',
-        'A gentle wind chime tinkling in a soft breeze',
-      ],
-      type: 'string',
-    },
     output_format: {
       default: 'mp3_44100_128',
       title: 'Output Format',
-      description:
-        'Output format of the generated audio. Formatted as codec_sample_rate_bitrate.',
+      type: 'string',
       enum: [
         'mp3_22050_32',
         'mp3_44100_32',
@@ -3755,22 +3736,42 @@ export const ElevenlabsSoundEffectsV2InputSchema = {
         'opus_48000_128',
         'opus_48000_192',
       ],
+      description:
+        'Output format of the generated audio. Formatted as codec_sample_rate_bitrate.',
+    },
+    duration_seconds: {
+      anyOf: [{ minimum: 0.5, type: 'number', maximum: 22 }, { type: 'null' }],
+      title: 'Duration Seconds',
+      description:
+        'Duration in seconds (0.5-22). If None, optimal duration will be determined from prompt.',
+    },
+    prompt_influence: {
+      default: 0.3,
+      minimum: 0,
+      type: 'number',
+      title: 'Prompt Influence',
+      maximum: 1,
+      description:
+        'How closely to follow the prompt (0-1). Higher values mean less variation.',
+    },
+    text: {
+      title: 'Text',
       type: 'string',
+      examples: [
+        'Spacious braam suitable for high-impact movie trailer moments',
+        'A gentle wind chime tinkling in a soft breeze',
+      ],
+      description: 'The text describing the sound effect to generate',
     },
     loop: {
       default: false,
       title: 'Loop',
-      description: 'Whether to create a sound effect that loops smoothly.',
       type: 'boolean',
-    },
-    duration_seconds: {
-      description:
-        'Duration in seconds (0.5-22). If None, optimal duration will be determined from prompt.',
-      anyOf: [{ maximum: 22, minimum: 0.5, type: 'number' }, { type: 'null' }],
-      title: 'Duration Seconds',
+      description: 'Whether to create a sound effect that loops smoothly.',
     },
   },
-  required: ['text'],
+  title: 'SoundEffectRequestV2',
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'duration_seconds',
@@ -3778,42 +3779,40 @@ export const ElevenlabsSoundEffectsV2InputSchema = {
     'output_format',
     'loop',
   ],
-  type: 'object',
 } as const
 
 export const ElevenlabsSoundEffectsV2OutputSchema = {
-  description: 'Output format for generated sound effects',
-  title: 'SoundEffectOutput',
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated sound effect audio file in MP3 format',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/WgnO-jy6WduosuG_Ibobx_sound_effect.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated sound effect audio file in MP3 format',
     },
   },
-  required: ['audio'],
-  'x-fal-order-properties': ['audio'],
+  title: 'SoundEffectOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio'],
+  description: 'Output format for generated sound effects',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -3822,11 +3821,10 @@ export const ElevenlabsSoundEffectsV2OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -3835,162 +3833,165 @@ export const ElevenlabsSoundEffectsV2OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsSpeechToTextInputSchema = {
-  title: 'SpeechToTextRequest',
+  required: ['audio_url'],
   properties: {
-    language_code: {
-      description: 'Language code of the audio',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: ['eng', 'spa', 'fra', 'deu', 'jpn'],
-      title: 'Language Code',
-    },
     diarize: {
       default: true,
       title: 'Diarize',
-      description: 'Whether to annotate who is speaking',
       type: 'boolean',
+      description: 'Whether to annotate who is speaking',
     },
     audio_url: {
       title: 'Audio Url',
-      description: 'URL of the audio file to transcribe',
+      type: 'string',
       examples: [
         'https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3',
       ],
-      type: 'string',
+      description: 'URL of the audio file to transcribe',
       'x-fal-file-input': true,
     },
     tag_audio_events: {
       default: true,
       title: 'Tag Audio Events',
-      description: 'Tag audio events like laughter, applause, etc.',
       type: 'boolean',
+      description: 'Tag audio events like laughter, applause, etc.',
+    },
+    language_code: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Language Code',
+      examples: ['eng', 'spa', 'fra', 'deu', 'jpn'],
+      description: 'Language code of the audio',
     },
   },
-  required: ['audio_url'],
+  title: 'SpeechToTextRequest',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'language_code',
     'tag_audio_events',
     'diarize',
   ],
-  type: 'object',
 } as const
 
 export const ElevenlabsSpeechToTextOutputSchema = {
-  title: 'TranscriptionOutput',
+  required: ['text', 'language_code', 'language_probability', 'words'],
   properties: {
+    language_probability: {
+      title: 'Language Probability',
+      type: 'number',
+      description: 'Confidence in language detection',
+    },
     text: {
       title: 'Text',
-      description: 'The full transcribed text',
       type: 'string',
+      description: 'The full transcribed text',
     },
     words: {
       title: 'Words',
+      type: 'array',
       items: { $ref: '#/$defs/TranscriptionWord' },
       description: 'Word-level transcription details',
-      type: 'array',
-    },
-    language_probability: {
-      title: 'Language Probability',
-      description: 'Confidence in language detection',
-      type: 'number',
     },
     language_code: {
       title: 'Language Code',
-      description: 'Detected or specified language code',
       type: 'string',
+      description: 'Detected or specified language code',
     },
   },
-  required: ['text', 'language_code', 'language_probability', 'words'],
+  title: 'TranscriptionOutput',
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'language_code',
     'language_probability',
     'words',
   ],
-  type: 'object',
   $defs: {
     TranscriptionWord: {
-      title: 'TranscriptionWord',
+      required: ['text', 'type'],
       properties: {
-        start: {
-          description: 'Start time in seconds',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Start',
-        },
         text: {
           title: 'Text',
-          description: 'The transcribed word or audio event',
           type: 'string',
-        },
-        end: {
-          description: 'End time in seconds',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'End',
-        },
-        speaker_id: {
-          description: 'Speaker identifier if diarization was enabled',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Speaker Id',
+          description: 'The transcribed word or audio event',
         },
         type: {
           title: 'Type',
-          description: 'Type of element (word, spacing, or audio_event)',
           type: 'string',
+          description: 'Type of element (word, spacing, or audio_event)',
+        },
+        speaker_id: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Speaker Id',
+          description: 'Speaker identifier if diarization was enabled',
+        },
+        start: {
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Start',
+          description: 'Start time in seconds',
+        },
+        end: {
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'End',
+          description: 'End time in seconds',
         },
       },
-      required: ['text', 'type'],
-      'x-fal-order-properties': ['text', 'start', 'end', 'type', 'speaker_id'],
+      title: 'TranscriptionWord',
       type: 'object',
+      'x-fal-order-properties': ['text', 'start', 'end', 'type', 'speaker_id'],
     },
   },
 } as const
 
 export const ElevenlabsSpeechToTextScribeV2InputSchema = {
-  title: 'SpeechToTextRequestScribeV2',
+  required: ['audio_url'],
   properties: {
-    language_code: {
-      description: 'Language code of the audio',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: ['eng', 'spa', 'fra', 'deu', 'jpn'],
-      title: 'Language Code',
-    },
     diarize: {
       default: true,
       title: 'Diarize',
-      description: 'Whether to annotate who is speaking',
       type: 'boolean',
-    },
-    keyterms: {
-      default: [],
-      type: 'array',
-      title: 'Keyterms',
-      items: { type: 'string' },
-      maxItems: 100,
-      description:
-        'Words or sentences to bias the model towards transcribing. Up to 100 keyterms, max 50 characters each. Adds 30% premium over base transcription price.',
+      description: 'Whether to annotate who is speaking',
     },
     audio_url: {
       title: 'Audio Url',
-      description: 'URL of the audio file to transcribe',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/example_inputs/elevenlabs/scribe_v2_in.mp3',
       ],
-      type: 'string',
+      description: 'URL of the audio file to transcribe',
       'x-fal-file-input': true,
     },
     tag_audio_events: {
       default: true,
       title: 'Tag Audio Events',
-      description: 'Tag audio events like laughter, applause, etc.',
       type: 'boolean',
+      description: 'Tag audio events like laughter, applause, etc.',
+    },
+    keyterms: {
+      default: [],
+      maxItems: 100,
+      title: 'Keyterms',
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'Words or sentences to bias the model towards transcribing. Up to 100 keyterms, max 50 characters each. Adds 30% premium over base transcription price.',
+    },
+    language_code: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Language Code',
+      examples: ['eng', 'spa', 'fra', 'deu', 'jpn'],
+      description: 'Language code of the audio',
     },
   },
-  required: ['audio_url'],
+  title: 'SpeechToTextRequestScribeV2',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'language_code',
@@ -3998,358 +3999,358 @@ export const ElevenlabsSpeechToTextScribeV2InputSchema = {
     'diarize',
     'keyterms',
   ],
-  type: 'object',
 } as const
 
 export const ElevenlabsSpeechToTextScribeV2OutputSchema = {
-  title: 'TranscriptionOutputV2',
+  required: ['text', 'language_code', 'language_probability', 'words'],
   properties: {
+    language_probability: {
+      title: 'Language Probability',
+      type: 'number',
+      examples: [1],
+      description: 'Confidence in language detection',
+    },
     text: {
       title: 'Text',
-      description: 'The full transcribed text',
+      type: 'string',
       examples: [
         'Hey, this is a test recording for Scribe version two, which is now available on fal.ai.',
       ],
-      type: 'string',
+      description: 'The full transcribed text',
     },
     words: {
       title: 'Words',
+      type: 'array',
       items: { $ref: '#/$defs/TranscriptionWord' },
       examples: [
         {
-          start: 0.079,
           text: 'Hey,',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 0.079,
           end: 0.539,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 0.539,
-          text: ' ',
           end: 0.599,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 0.599,
           text: 'this',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 0.599,
           end: 0.679,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 0.679,
-          text: ' ',
           end: 0.739,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
+          text: 'is',
+          type: 'word',
+          speaker_id: 'speaker_0',
           start: 0.739,
-          text: 'is',
           end: 0.799,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 0.799,
-          text: ' ',
           end: 0.939,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 0.939,
           text: 'a',
-          end: 0.939,
-          speaker_id: 'speaker_0',
           type: 'word',
-        },
-        {
+          speaker_id: 'speaker_0',
           start: 0.939,
+          end: 0.939,
+        },
+        {
           text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
+          start: 0.939,
           end: 0.959,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 0.959,
           text: 'test',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 0.959,
           end: 1.179,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 1.179,
-          text: ' ',
           end: 1.219,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 1.22,
           text: 'recording',
-          end: 1.719,
-          speaker_id: 'speaker_0',
           type: 'word',
-        },
-        {
-          start: 1.719,
-          text: ' ',
-          end: 1.719,
           speaker_id: 'speaker_0',
-          type: 'spacing',
+          start: 1.22,
+          end: 1.719,
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 1.719,
+          end: 1.719,
+        },
+        {
           text: 'for',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 1.719,
           end: 1.86,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 1.86,
-          text: ' ',
           end: 1.879,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 1.879,
           text: 'Scribe',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 1.879,
           end: 2.24,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 2.24,
-          text: ' ',
           end: 2.319,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 2.319,
           text: 'version',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 2.319,
           end: 2.759,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 2.759,
-          text: ' ',
           end: 2.779,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 2.779,
           text: 'two,',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 2.779,
           end: 3.379,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 3.379,
-          text: ' ',
           end: 3.399,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 3.399,
           text: 'which',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 3.399,
           end: 3.519,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 3.519,
-          text: ' ',
           end: 3.539,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 3.539,
           text: 'is',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 3.539,
           end: 3.659,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 3.659,
-          text: ' ',
           end: 3.699,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 3.699,
           text: 'now',
-          end: 3.839,
-          speaker_id: 'speaker_0',
           type: 'word',
-        },
-        {
-          start: 3.839,
-          text: ' ',
-          end: 3.839,
           speaker_id: 'speaker_0',
-          type: 'spacing',
+          start: 3.699,
+          end: 3.839,
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 3.839,
+          end: 3.839,
+        },
+        {
           text: 'available',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 3.839,
           end: 4.319,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
+          text: ' ',
+          type: 'spacing',
+          speaker_id: 'speaker_0',
           start: 4.319,
-          text: ' ',
           end: 4.339,
-          speaker_id: 'speaker_0',
-          type: 'spacing',
         },
         {
-          start: 4.339,
           text: 'on',
+          type: 'word',
+          speaker_id: 'speaker_0',
+          start: 4.339,
           end: 4.579,
-          speaker_id: 'speaker_0',
-          type: 'word',
         },
         {
-          start: 4.579,
           text: ' ',
-          end: 4.599,
-          speaker_id: 'speaker_0',
           type: 'spacing',
+          speaker_id: 'speaker_0',
+          start: 4.579,
+          end: 4.599,
         },
         {
-          start: 4.599,
           text: 'fal.ai.',
-          end: 5.699,
-          speaker_id: 'speaker_0',
           type: 'word',
+          speaker_id: 'speaker_0',
+          start: 4.599,
+          end: 5.699,
         },
       ],
       description: 'Word-level transcription details',
-      type: 'array',
-    },
-    language_probability: {
-      title: 'Language Probability',
-      description: 'Confidence in language detection',
-      examples: [1],
-      type: 'number',
     },
     language_code: {
       title: 'Language Code',
-      description: 'Detected or specified language code',
-      examples: ['eng'],
       type: 'string',
+      examples: ['eng'],
+      description: 'Detected or specified language code',
     },
   },
-  required: ['text', 'language_code', 'language_probability', 'words'],
+  title: 'TranscriptionOutputV2',
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'language_code',
     'language_probability',
     'words',
   ],
-  type: 'object',
   $defs: {
     TranscriptionWord: {
-      title: 'TranscriptionWord',
+      required: ['text', 'type'],
       properties: {
-        start: {
-          description: 'Start time in seconds',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Start',
-        },
         text: {
           title: 'Text',
-          description: 'The transcribed word or audio event',
           type: 'string',
-        },
-        end: {
-          description: 'End time in seconds',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'End',
-        },
-        speaker_id: {
-          description: 'Speaker identifier if diarization was enabled',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Speaker Id',
+          description: 'The transcribed word or audio event',
         },
         type: {
           title: 'Type',
-          description: 'Type of element (word, spacing, or audio_event)',
           type: 'string',
+          description: 'Type of element (word, spacing, or audio_event)',
+        },
+        speaker_id: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Speaker Id',
+          description: 'Speaker identifier if diarization was enabled',
+        },
+        start: {
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Start',
+          description: 'Start time in seconds',
+        },
+        end: {
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'End',
+          description: 'End time in seconds',
         },
       },
-      required: ['text', 'type'],
-      'x-fal-order-properties': ['text', 'start', 'end', 'type', 'speaker_id'],
+      title: 'TranscriptionWord',
       type: 'object',
+      'x-fal-order-properties': ['text', 'start', 'end', 'type', 'speaker_id'],
     },
   },
 } as const
 
 export const ElevenlabsTextToDialogueElevenV3InputSchema = {
-  title: 'TextToDialogueRequest',
+  required: ['inputs'],
   properties: {
-    use_speaker_boost: {
-      description:
-        'This setting boosts the similarity to the original speaker. Using this setting requires a slightly higher computational load, which in turn increases latency.',
-      anyOf: [{ type: 'boolean' }, { type: 'null' }],
-      title: 'Use Speaker Boost',
-    },
     seed: {
-      description: 'Random seed for reproducibility.',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
       title: 'Seed',
+      description: 'Random seed for reproducibility.',
     },
     inputs: {
       title: 'Inputs',
+      type: 'array',
       items: { $ref: '#/$defs/DialogueBlock' },
       examples: [
         [
           {
-            text: '[applause] Thank you all for coming tonight! Today we have a very special guest with us.',
             voice: 'Aria',
+            text: '[applause] Thank you all for coming tonight! Today we have a very special guest with us.',
           },
           {
-            text: '[gulps] ... [strong canadian accent] [excited] Hello everyone! Thank you all for having me tonight on this special day.',
             voice: 'Charlotte',
+            text: '[gulps] ... [strong canadian accent] [excited] Hello everyone! Thank you all for having me tonight on this special day.',
           },
         ],
       ],
       description:
         'A list of dialogue inputs, each containing text and a voice ID which will be converted into speech.',
-      type: 'array',
     },
     pronunciation_dictionary_locators: {
       default: [],
       title: 'Pronunciation Dictionary Locators',
+      type: 'array',
       items: { $ref: '#/$defs/PronunciationDictionaryLocator' },
       description:
         'A list of pronunciation dictionary locators (id, version_id) to be applied to the text. They will be applied in order. You may have up to 3 locators per request',
-      type: 'array',
     },
     stability: {
+      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
+      title: 'Stability',
       description:
         'Determines how stable the voice is and the randomness between each generation. Lower values introduce broader emotional range for the voice. Higher values can result in a monotonous voice with limited emotion. Must be one of 0.0, 0.5, 1.0, else it will be rounded to the nearest value.',
-      anyOf: [{ maximum: 1, minimum: 0, type: 'number' }, { type: 'null' }],
-      title: 'Stability',
+    },
+    use_speaker_boost: {
+      anyOf: [{ type: 'boolean' }, { type: 'null' }],
+      title: 'Use Speaker Boost',
+      description:
+        'This setting boosts the similarity to the original speaker. Using this setting requires a slightly higher computational load, which in turn increases latency.',
     },
     language_code: {
-      description:
-        'Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.',
       anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Language Code',
+      description:
+        'Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.',
     },
   },
-  required: ['inputs'],
+  title: 'TextToDialogueRequest',
+  type: 'object',
   'x-fal-order-properties': [
     'inputs',
     'stability',
@@ -4358,21 +4359,13 @@ export const ElevenlabsTextToDialogueElevenV3InputSchema = {
     'seed',
     'language_code',
   ],
-  type: 'object',
   $defs: {
     DialogueBlock: {
-      title: 'DialogueBlock',
+      required: ['text', 'voice'],
       properties: {
-        text: {
-          title: 'Text',
-          description: 'The dialogue text',
-          type: 'string',
-        },
         voice: {
-          type: 'string',
           title: 'Voice',
-          description:
-            'The name or the ID of the voice to be used for the generation.',
+          type: 'string',
           examples: [
             'Aria',
             'Roger',
@@ -4395,70 +4388,76 @@ export const ElevenlabsTextToDialogueElevenV3InputSchema = {
             'Lily',
             'Bill',
           ],
+          description:
+            'The name or the ID of the voice to be used for the generation.',
+        },
+        text: {
+          title: 'Text',
+          type: 'string',
+          description: 'The dialogue text',
         },
       },
-      required: ['text', 'voice'],
-      'x-fal-order-properties': ['text', 'voice'],
+      title: 'DialogueBlock',
       type: 'object',
+      'x-fal-order-properties': ['text', 'voice'],
     },
     PronunciationDictionaryLocator: {
-      title: 'PronunciationDictionaryLocator',
       properties: {
         pronunciation_dictionary_id: {
-          description: 'The ID of the pronunciation dictionary.',
           anyOf: [{ type: 'string' }, { type: 'null' }],
           title: 'Pronunciation Dictionary Id',
+          description: 'The ID of the pronunciation dictionary.',
         },
         version_id: {
-          description:
-            'The ID of the version of the pronunciation dictionary. If not provided, the latest version will be used.',
           anyOf: [{ type: 'string' }, { type: 'null' }],
           title: 'Version Id',
+          description:
+            'The ID of the version of the pronunciation dictionary. If not provided, the latest version will be used.',
         },
       },
-      'x-fal-order-properties': ['pronunciation_dictionary_id', 'version_id'],
+      title: 'PronunciationDictionaryLocator',
       type: 'object',
+      'x-fal-order-properties': ['pronunciation_dictionary_id', 'version_id'],
     },
   },
 } as const
 
 export const ElevenlabsTextToDialogueElevenV3OutputSchema = {
-  title: 'TextToDialogueOutput',
+  required: ['audio', 'seed'],
   properties: {
     seed: {
       title: 'Seed',
-      description: 'Random seed for reproducibility.',
       type: 'integer',
+      description: 'Random seed for reproducibility.',
     },
     audio: {
-      description: 'The generated audio file',
       examples: [
         {
           url: 'https://v3.fal.media/files/zebra/XFeGS8Fq-q1eAPG2sSAo__output.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated audio file',
     },
   },
-  required: ['audio', 'seed'],
-  'x-fal-order-properties': ['audio', 'seed'],
+  title: 'TextToDialogueOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio', 'seed'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -4467,11 +4466,10 @@ export const ElevenlabsTextToDialogueElevenV3OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -4480,51 +4478,19 @@ export const ElevenlabsTextToDialogueElevenV3OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsTtsElevenV3InputSchema = {
-  description:
-    "Request model for eleven_v3 which doesn't support previous_text/next_text",
-  title: 'TextToSpeechRequestV3',
+  required: ['text'],
   properties: {
-    stability: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Stability',
-      description: 'Voice stability (0-1)',
-      default: 0.5,
-      type: 'number',
-    },
-    text: {
-      minLength: 1,
-      title: 'Text',
-      maxLength: 5000,
-      examples: [
-        'Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?',
-      ],
-      description: 'The text to convert to speech',
-      type: 'string',
-    },
-    timestamps: {
-      default: false,
-      title: 'Timestamps',
-      description:
-        'Whether to return timestamps for each word in the generated speech',
-      type: 'boolean',
-    },
-    language_code: {
-      description:
-        'Language code (ISO 639-1) used to enforce a language for the model.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Language Code',
-    },
     voice: {
       default: 'Rachel',
-      type: 'string',
       title: 'Voice',
-      description: 'The voice to use for speech generation',
+      type: 'string',
       examples: [
         'Aria',
         'Roger',
@@ -4547,17 +4513,50 @@ export const ElevenlabsTtsElevenV3InputSchema = {
         'Lily',
         'Bill',
       ],
+      description: 'The voice to use for speech generation',
+    },
+    language_code: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Language Code',
+      description:
+        'Language code (ISO 639-1) used to enforce a language for the model.',
+    },
+    stability: {
+      default: 0.5,
+      minimum: 0,
+      type: 'number',
+      title: 'Stability',
+      maximum: 1,
+      description: 'Voice stability (0-1)',
+    },
+    text: {
+      examples: [
+        'Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?',
+      ],
+      minLength: 1,
+      type: 'string',
+      title: 'Text',
+      maxLength: 5000,
+      description: 'The text to convert to speech',
+    },
+    timestamps: {
+      default: false,
+      title: 'Timestamps',
+      type: 'boolean',
+      description:
+        'Whether to return timestamps for each word in the generated speech',
     },
     apply_text_normalization: {
       default: 'auto',
       title: 'Apply Text Normalization',
+      type: 'string',
+      enum: ['auto', 'on', 'off'],
       description:
         "This parameter controls text normalization with three modes: 'auto', 'on', and 'off'. When set to 'auto', the system will automatically decide whether to apply text normalization (e.g., spelling out numbers). With 'on', text normalization will always be applied, while with 'off', it will be skipped.",
-      enum: ['auto', 'on', 'off'],
-      type: 'string',
     },
   },
-  required: ['text'],
+  title: 'TextToSpeechRequestV3',
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'voice',
@@ -4566,47 +4565,47 @@ export const ElevenlabsTtsElevenV3InputSchema = {
     'language_code',
     'apply_text_normalization',
   ],
-  type: 'object',
+  description:
+    "Request model for eleven_v3 which doesn't support previous_text/next_text",
 } as const
 
 export const ElevenlabsTtsElevenV3OutputSchema = {
-  title: 'TTSOutput',
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated audio file',
       examples: [
         {
           url: 'https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated audio file',
     },
     timestamps: {
+      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
+      title: 'Timestamps',
       description:
         'Timestamps for each word in the generated speech. Only returned if `timestamps` is set to True in the request.',
-      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
-      title: 'Timestamps',
     },
   },
-  required: ['audio'],
-  'x-fal-order-properties': ['audio', 'timestamps'],
+  title: 'TTSOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio', 'timestamps'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -4615,11 +4614,10 @@ export const ElevenlabsTtsElevenV3OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -4628,56 +4626,19 @@ export const ElevenlabsTtsElevenV3OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsTtsMultilingualV2InputSchema = {
-  title: 'TextToSpeechRequest',
+  required: ['text'],
   properties: {
-    next_text: {
-      description:
-        "The text that comes after the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Next Text',
-    },
-    stability: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Stability',
-      description: 'Voice stability (0-1)',
-      default: 0.5,
-      type: 'number',
-    },
-    text: {
-      minLength: 1,
-      title: 'Text',
-      description: 'The text to convert to speech',
-      examples: [
-        'Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?',
-      ],
-      type: 'string',
-    },
-    timestamps: {
-      default: false,
-      title: 'Timestamps',
-      description:
-        'Whether to return timestamps for each word in the generated speech',
-      type: 'boolean',
-    },
-    style: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Style',
-      description: 'Style exaggeration (0-1)',
-      default: 0,
-      type: 'number',
-    },
     voice: {
       default: 'Rachel',
-      type: 'string',
       title: 'Voice',
-      description: 'The voice to use for speech generation',
+      type: 'string',
       examples: [
         'Aria',
         'Roger',
@@ -4700,46 +4661,86 @@ export const ElevenlabsTtsMultilingualV2InputSchema = {
         'Lily',
         'Bill',
       ],
-    },
-    similarity_boost: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Similarity Boost',
-      description: 'Similarity boost (0-1)',
-      default: 0.75,
-      type: 'number',
+      description: 'The voice to use for speech generation',
     },
     previous_text: {
-      description:
-        "The text that came before the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
       anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Previous Text',
-    },
-    language_code: {
       description:
-        'Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Language Code',
+        "The text that came before the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
     },
     speed: {
-      maximum: 1.2,
+      default: 1,
       minimum: 0.7,
+      type: 'number',
       title: 'Speed',
+      maximum: 1.2,
       description:
         'Speech speed (0.7-1.2). Values below 1.0 slow down the speech, above 1.0 speed it up. Extreme values may affect quality.',
-      default: 1,
-      type: 'number',
+    },
+    text: {
+      minLength: 1,
+      type: 'string',
+      title: 'Text',
+      examples: [
+        'Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?',
+      ],
+      description: 'The text to convert to speech',
     },
     apply_text_normalization: {
       default: 'auto',
       title: 'Apply Text Normalization',
+      type: 'string',
+      enum: ['auto', 'on', 'off'],
       description:
         "This parameter controls text normalization with three modes: 'auto', 'on', and 'off'. When set to 'auto', the system will automatically decide whether to apply text normalization (e.g., spelling out numbers). With 'on', text normalization will always be applied, while with 'off', it will be skipped.",
-      enum: ['auto', 'on', 'off'],
-      type: 'string',
+    },
+    next_text: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Next Text',
+      description:
+        "The text that comes after the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
+    },
+    similarity_boost: {
+      default: 0.75,
+      minimum: 0,
+      type: 'number',
+      title: 'Similarity Boost',
+      maximum: 1,
+      description: 'Similarity boost (0-1)',
+    },
+    style: {
+      default: 0,
+      minimum: 0,
+      type: 'number',
+      title: 'Style',
+      maximum: 1,
+      description: 'Style exaggeration (0-1)',
+    },
+    stability: {
+      default: 0.5,
+      minimum: 0,
+      type: 'number',
+      title: 'Stability',
+      maximum: 1,
+      description: 'Voice stability (0-1)',
+    },
+    timestamps: {
+      default: false,
+      title: 'Timestamps',
+      type: 'boolean',
+      description:
+        'Whether to return timestamps for each word in the generated speech',
+    },
+    language_code: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Language Code',
+      description:
+        'Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.',
     },
   },
-  required: ['text'],
+  title: 'TextToSpeechRequest',
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'voice',
@@ -4753,47 +4754,45 @@ export const ElevenlabsTtsMultilingualV2InputSchema = {
     'language_code',
     'apply_text_normalization',
   ],
-  type: 'object',
 } as const
 
 export const ElevenlabsTtsMultilingualV2OutputSchema = {
-  title: 'TTSOutput',
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated audio file',
       examples: [
         {
           url: 'https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated audio file',
     },
     timestamps: {
+      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
+      title: 'Timestamps',
       description:
         'Timestamps for each word in the generated speech. Only returned if `timestamps` is set to True in the request.',
-      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
-      title: 'Timestamps',
     },
   },
-  required: ['audio'],
-  'x-fal-order-properties': ['audio', 'timestamps'],
+  title: 'TTSOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio', 'timestamps'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -4802,11 +4801,10 @@ export const ElevenlabsTtsMultilingualV2OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -4815,56 +4813,19 @@ export const ElevenlabsTtsMultilingualV2OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsTtsTurboV25InputSchema = {
-  title: 'TextToSpeechRequest',
+  required: ['text'],
   properties: {
-    next_text: {
-      description:
-        "The text that comes after the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Next Text',
-    },
-    stability: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Stability',
-      description: 'Voice stability (0-1)',
-      default: 0.5,
-      type: 'number',
-    },
-    text: {
-      minLength: 1,
-      title: 'Text',
-      description: 'The text to convert to speech',
-      examples: [
-        'Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?',
-      ],
-      type: 'string',
-    },
-    timestamps: {
-      default: false,
-      title: 'Timestamps',
-      description:
-        'Whether to return timestamps for each word in the generated speech',
-      type: 'boolean',
-    },
-    style: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Style',
-      description: 'Style exaggeration (0-1)',
-      default: 0,
-      type: 'number',
-    },
     voice: {
       default: 'Rachel',
-      type: 'string',
       title: 'Voice',
-      description: 'The voice to use for speech generation',
+      type: 'string',
       examples: [
         'Aria',
         'Roger',
@@ -4887,46 +4848,86 @@ export const ElevenlabsTtsTurboV25InputSchema = {
         'Lily',
         'Bill',
       ],
-    },
-    similarity_boost: {
-      maximum: 1,
-      minimum: 0,
-      title: 'Similarity Boost',
-      description: 'Similarity boost (0-1)',
-      default: 0.75,
-      type: 'number',
+      description: 'The voice to use for speech generation',
     },
     previous_text: {
-      description:
-        "The text that came before the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
       anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Previous Text',
-    },
-    language_code: {
       description:
-        'Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Language Code',
+        "The text that came before the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
     },
     speed: {
-      maximum: 1.2,
+      default: 1,
       minimum: 0.7,
+      type: 'number',
       title: 'Speed',
+      maximum: 1.2,
       description:
         'Speech speed (0.7-1.2). Values below 1.0 slow down the speech, above 1.0 speed it up. Extreme values may affect quality.',
-      default: 1,
-      type: 'number',
+    },
+    text: {
+      minLength: 1,
+      type: 'string',
+      title: 'Text',
+      examples: [
+        'Hello! This is a test of the text to speech system, powered by ElevenLabs. How does it sound?',
+      ],
+      description: 'The text to convert to speech',
     },
     apply_text_normalization: {
       default: 'auto',
       title: 'Apply Text Normalization',
+      type: 'string',
+      enum: ['auto', 'on', 'off'],
       description:
         "This parameter controls text normalization with three modes: 'auto', 'on', and 'off'. When set to 'auto', the system will automatically decide whether to apply text normalization (e.g., spelling out numbers). With 'on', text normalization will always be applied, while with 'off', it will be skipped.",
-      enum: ['auto', 'on', 'off'],
-      type: 'string',
+    },
+    next_text: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Next Text',
+      description:
+        "The text that comes after the text of the current request. Can be used to improve the speech's continuity when concatenating together multiple generations or to influence the speech's continuity in the current generation.",
+    },
+    similarity_boost: {
+      default: 0.75,
+      minimum: 0,
+      type: 'number',
+      title: 'Similarity Boost',
+      maximum: 1,
+      description: 'Similarity boost (0-1)',
+    },
+    style: {
+      default: 0,
+      minimum: 0,
+      type: 'number',
+      title: 'Style',
+      maximum: 1,
+      description: 'Style exaggeration (0-1)',
+    },
+    stability: {
+      default: 0.5,
+      minimum: 0,
+      type: 'number',
+      title: 'Stability',
+      maximum: 1,
+      description: 'Voice stability (0-1)',
+    },
+    timestamps: {
+      default: false,
+      title: 'Timestamps',
+      type: 'boolean',
+      description:
+        'Whether to return timestamps for each word in the generated speech',
+    },
+    language_code: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Language Code',
+      description:
+        'Language code (ISO 639-1) used to enforce a language for the model. An error will be returned if language code is not supported by the model.',
     },
   },
-  required: ['text'],
+  title: 'TextToSpeechRequest',
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'voice',
@@ -4940,47 +4941,45 @@ export const ElevenlabsTtsTurboV25InputSchema = {
     'language_code',
     'apply_text_normalization',
   ],
-  type: 'object',
 } as const
 
 export const ElevenlabsTtsTurboV25OutputSchema = {
-  title: 'TTSOutput',
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated audio file',
       examples: [
         {
           url: 'https://v3.fal.media/files/zebra/zJL_oRY8h5RWwjoK1w7tx_output.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated audio file',
     },
     timestamps: {
+      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
+      title: 'Timestamps',
       description:
         'Timestamps for each word in the generated speech. Only returned if `timestamps` is set to True in the request.',
-      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
-      title: 'Timestamps',
     },
   },
-  required: ['audio'],
-  'x-fal-order-properties': ['audio', 'timestamps'],
+  title: 'TTSOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio', 'timestamps'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -4989,11 +4988,10 @@ export const ElevenlabsTtsTurboV25OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -5002,25 +5000,19 @@ export const ElevenlabsTtsTurboV25OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const ElevenlabsVoiceChangerInputSchema = {
-  title: 'VoiceChangerRequest',
+  required: ['audio_url'],
   properties: {
-    remove_background_noise: {
-      default: false,
-      title: 'Remove Background Noise',
-      description:
-        'If set, will remove the background noise from your audio input using our audio isolation model.',
-      type: 'boolean',
-    },
     output_format: {
       default: 'mp3_44100_128',
       title: 'Output Format',
-      description:
-        'Output format of the generated audio. Formatted as codec_sample_rate_bitrate.',
+      type: 'string',
       enum: [
         'mp3_22050_32',
         'mp3_44100_32',
@@ -5042,27 +5034,18 @@ export const ElevenlabsVoiceChangerInputSchema = {
         'opus_48000_128',
         'opus_48000_192',
       ],
-      type: 'string',
+      description:
+        'Output format of the generated audio. Formatted as codec_sample_rate_bitrate.',
     },
     seed: {
       title: 'Seed',
-      description: 'Random seed for reproducibility.',
       type: 'integer',
-    },
-    audio_url: {
-      title: 'Audio Url',
-      description: 'The input audio file',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/elevenlabs/voice_change_in.mp3',
-      ],
-      type: 'string',
-      'x-fal-file-input': true,
+      description: 'Random seed for reproducibility.',
     },
     voice: {
       default: 'Rachel',
-      type: 'string',
       title: 'Voice',
-      description: 'The voice to use for speech generation',
+      type: 'string',
       examples: [
         'Aria',
         'Roger',
@@ -5085,9 +5068,27 @@ export const ElevenlabsVoiceChangerInputSchema = {
         'Lily',
         'Bill',
       ],
+      description: 'The voice to use for speech generation',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/elevenlabs/voice_change_in.mp3',
+      ],
+      description: 'The input audio file',
+      'x-fal-file-input': true,
+    },
+    remove_background_noise: {
+      default: false,
+      title: 'Remove Background Noise',
+      type: 'boolean',
+      description:
+        'If set, will remove the background noise from your audio input using our audio isolation model.',
     },
   },
-  required: ['audio_url'],
+  title: 'VoiceChangerRequest',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'voice',
@@ -5095,47 +5096,45 @@ export const ElevenlabsVoiceChangerInputSchema = {
     'seed',
     'output_format',
   ],
-  type: 'object',
 } as const
 
 export const ElevenlabsVoiceChangerOutputSchema = {
-  title: 'VoiceChangerOutput',
+  required: ['audio', 'seed'],
   properties: {
     seed: {
       title: 'Seed',
-      description: 'Random seed for reproducibility.',
-      examples: [1902083897],
       type: 'integer',
+      examples: [1902083897],
+      description: 'Random seed for reproducibility.',
     },
     audio: {
-      description: 'The generated audio file',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/elevenlabs/voice_change_out.mp3',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated audio file',
     },
   },
-  required: ['audio', 'seed'],
-  'x-fal-order-properties': ['audio', 'seed'],
+  title: 'VoiceChangerOutput',
   type: 'object',
+  'x-fal-order-properties': ['audio', 'seed'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -5144,11 +5143,10 @@ export const ElevenlabsVoiceChangerOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -5157,79 +5155,13 @@ export const ElevenlabsVoiceChangerOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const EmotionalStrengthsSchema = {
-  type: 'object',
-  title: 'EmotionalStrengths',
-  properties: {
-    happy: {
-      type: 'number',
-      maximum: 1,
-      title: 'Happy',
-      minimum: 0,
-      description: 'Strength of happiness emotion',
-      default: 0,
-    },
-    calm: {
-      type: 'number',
-      maximum: 1,
-      title: 'Calm',
-      minimum: 0,
-      description: 'Strength of calm emotion',
-      default: 0,
-    },
-    disgusted: {
-      type: 'number',
-      maximum: 1,
-      title: 'Disgusted',
-      minimum: 0,
-      description: 'Strength of disgust emotion',
-      default: 0,
-    },
-    sad: {
-      type: 'number',
-      maximum: 1,
-      title: 'Sad',
-      minimum: 0,
-      description: 'Strength of sadness emotion',
-      default: 0,
-    },
-    melancholic: {
-      type: 'number',
-      maximum: 1,
-      title: 'Melancholic',
-      minimum: 0,
-      description: 'Strength of melancholic emotion',
-      default: 0,
-    },
-    angry: {
-      type: 'number',
-      maximum: 1,
-      title: 'Angry',
-      minimum: 0,
-      description: 'Strength of anger emotion',
-      default: 0,
-    },
-    afraid: {
-      type: 'number',
-      maximum: 1,
-      title: 'Afraid',
-      minimum: 0,
-      description: 'Strength of fear emotion',
-      default: 0,
-    },
-    surprised: {
-      type: 'number',
-      maximum: 1,
-      title: 'Surprised',
-      minimum: 0,
-      description: 'Strength of surprise emotion',
-      default: 0,
-    },
-  },
   'x-fal-order-properties': [
     'happy',
     'angry',
@@ -5240,11 +5172,120 @@ export const EmotionalStrengthsSchema = {
     'surprised',
     'calm',
   ],
+  type: 'object',
+  properties: {
+    sad: {
+      description: 'Strength of sadness emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Sad',
+    },
+    happy: {
+      description: 'Strength of happiness emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Happy',
+    },
+    calm: {
+      description: 'Strength of calm emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Calm',
+    },
+    melancholic: {
+      description: 'Strength of melancholic emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Melancholic',
+    },
+    afraid: {
+      description: 'Strength of fear emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Afraid',
+    },
+    disgusted: {
+      description: 'Strength of disgust emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Disgusted',
+    },
+    surprised: {
+      description: 'Strength of surprise emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Surprised',
+    },
+    angry: {
+      description: 'Strength of anger emotion',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0,
+      title: 'Angry',
+    },
+  },
+  title: 'EmotionalStrengths',
 } as const
 
 export const F5TtsInputSchema = {
-  type: 'object',
   title: 'TTSInput',
+  required: ['gen_text', 'ref_audio_url', 'model_type'],
+  properties: {
+    remove_silence: {
+      description: 'Whether to remove the silence from the audio file.',
+      title: 'Remove Silence',
+      default: true,
+      type: 'boolean',
+    },
+    gen_text: {
+      examples: [
+        "I don't really care what you call me. I've been a silent spectator, watching species evolve, empires rise and fall. But always remember, I am mighty and enduring. Respect me and I'll nurture you; ignore me and you shall face the consequences.",
+      ],
+      description:
+        'The text to be converted to speech. Maximum 5000 characters.',
+      title: 'Text to be converted to speech',
+      type: 'string',
+    },
+    ref_audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/reference_audio.wav',
+      ],
+      description: 'The URL of the reference audio file.',
+      title: 'Reference Audio URL',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    model_type: {
+      description: 'The name of the model to be used for TTS.',
+      enum: ['F5-TTS', 'E2-TTS'],
+      title: 'Model Type',
+      type: 'string',
+    },
+    ref_text: {
+      examples: ['Some call me nature, others call me mother nature.'],
+      description:
+        'The reference text to be used for TTS. If not provided, an ASR (Automatic Speech Recognition) model will be used to generate the reference text.',
+      title: 'Reference Text for the Reference Audio',
+      default: '',
+      type: 'string',
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'gen_text',
     'ref_audio_url',
@@ -5252,99 +5293,58 @@ export const F5TtsInputSchema = {
     'model_type',
     'remove_silence',
   ],
-  properties: {
-    gen_text: {
-      type: 'string',
-      title: 'Text to be converted to speech',
-      description:
-        'The text to be converted to speech. Maximum 5000 characters.',
-      examples: [
-        "I don't really care what you call me. I've been a silent spectator, watching species evolve, empires rise and fall. But always remember, I am mighty and enduring. Respect me and I'll nurture you; ignore me and you shall face the consequences.",
-      ],
-    },
-    model_type: {
-      type: 'string',
-      title: 'Model Type',
-      description: 'The name of the model to be used for TTS.',
-      enum: ['F5-TTS', 'E2-TTS'],
-    },
-    remove_silence: {
-      type: 'boolean',
-      title: 'Remove Silence',
-      description: 'Whether to remove the silence from the audio file.',
-      default: true,
-    },
-    ref_audio_url: {
-      type: 'string',
-      title: 'Reference Audio URL',
-      description: 'The URL of the reference audio file.',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/reference_audio.wav',
-      ],
-      'x-fal-file-input': true,
-    },
-    ref_text: {
-      type: 'string',
-      title: 'Reference Text for the Reference Audio',
-      description:
-        'The reference text to be used for TTS. If not provided, an ASR (Automatic Speech Recognition) model will be used to generate the reference text.',
-      default: '',
-      examples: ['Some call me nature, others call me mother nature.'],
-    },
-  },
-  required: ['gen_text', 'ref_audio_url', 'model_type'],
 } as const
 
 export const F5TtsOutputSchema = {
-  type: 'object',
   title: 'TTSOutput',
-  'x-fal-order-properties': ['audio_url'],
+  required: ['audio_url'],
   properties: {
     audio_url: {
+      $ref: '#/$defs/AudioFileType3',
       description: 'The audio file containing the generated speech.',
       title: 'Generated Speech',
-      $ref: '#/$defs/AudioFileType3',
     },
   },
-  required: ['audio_url'],
+  type: 'object',
+  'x-fal-order-properties': ['audio_url'],
   $defs: {
     AudioFileType3: {
-      type: 'object',
       title: 'AudioFile',
+      required: ['url'],
+      properties: {
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+        content_type: {
+          examples: ['audio/wav'],
+          title: 'Content Type',
+          default: 'audio/wav',
+          type: 'string',
+        },
+        file_name: {
+          examples: ['8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav'],
+          title: 'File Name',
+          default: '8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
+          type: 'string',
+        },
+        url: {
+          examples: [
+            'https://v2.fal.media/files/8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
+          ],
+          title: 'Url',
+          type: 'string',
+        },
+      },
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
-      properties: {
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          examples: [4404019],
-        },
-        content_type: {
-          type: 'string',
-          title: 'Content Type',
-          default: 'audio/wav',
-          examples: ['audio/wav'],
-        },
-        file_name: {
-          type: 'string',
-          title: 'File Name',
-          default: '8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
-          examples: ['8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav'],
-        },
-        url: {
-          type: 'string',
-          title: 'Url',
-          examples: [
-            'https://v2.fal.media/files/8535dd59e911496a947daa35c07e67a3_tmplkcy6tut.wav',
-          ],
-        },
-      },
-      required: ['url'],
     },
   },
 } as const
@@ -5426,20 +5426,19 @@ export const FfmpegApiMergeAudiosOutputSchema = {
   title: 'MergeAudiosOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -5448,11 +5447,10 @@ export const FfmpegApiMergeAudiosOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -5461,20 +5459,21 @@ export const FfmpegApiMergeAudiosOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const FileSchema = {
-  type: 'object',
-  required: ['url'],
-  title: 'File',
   'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
+  type: 'object',
   properties: {
-    url: {
-      description: 'The URL where the file can be downloaded from.',
-      title: 'Url',
-      type: 'string',
+    file_size: {
+      examples: [4404019],
+      description: 'The size of the file in bytes.',
+      title: 'File Size',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
     file_name: {
       examples: ['z9RV14K95DvU.png'],
@@ -5483,11 +5482,10 @@ export const FileSchema = {
       title: 'File Name',
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
-    file_size: {
-      examples: [4404019],
-      description: 'The size of the file in bytes.',
-      title: 'File Size',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    url: {
+      description: 'The URL where the file can be downloaded from.',
+      title: 'Url',
+      type: 'string',
     },
     content_type: {
       examples: ['image/png'],
@@ -5496,6 +5494,8 @@ export const FileSchema = {
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
   },
+  title: 'File',
+  required: ['url'],
 } as const
 
 export const FileType2Schema = {
@@ -5537,57 +5537,75 @@ export const FileType2Schema = {
 
 export const Gemini31FlashTtsInputSchema = {
   description: 'Input for Gemini 3.1 Flash TTS preview speech generation.',
-  required: ['prompt'],
   title: 'Gemini31FlashTTSInput',
-  type: 'object',
-  'x-fal-order-properties': [
-    'prompt',
-    'style_instructions',
-    'voice',
-    'language_code',
-    'speakers',
-    'temperature',
-    'output_format',
-  ],
+  required: ['prompt'],
   properties: {
-    speakers: {
+    output_format: {
       description:
-        'Multi-speaker voice configuration. When set, enables multi-speaker synthesis where different parts of the text are spoken by different voices. Each speaker needs a voice and a speaker_id (alias) that matches prefixes in the prompt.',
+        'Audio output format. mp3: compressed, small file size (recommended). wav: uncompressed PCM wrapped in WAV (24 kHz, 16-bit mono). ogg_opus: Ogg container with Opus codec, good quality-to-size ratio.',
+      enum: ['wav', 'mp3', 'ogg_opus'],
+      default: 'mp3',
+      title: 'Output Format',
+      type: 'string',
+    },
+    prompt: {
+      examples: [
+        "I can't believe it worked! [laughing] After all those hours of debugging [sigh] it was just a missing semicolon.",
+      ],
+      description:
+        "The text to convert to speech. Gemini 3.1 Flash TTS supports natural-language prompting for style, pace, accent, and emotional expression — include delivery instructions inline with the text (e.g. 'Say cheerfully: Have a wonderful day!'). Supports expressive audio tags like [sigh], [laughing], [whispering], [short pause] for fine-grained control over delivery. For multi-speaker synthesis, prefix lines with speaker aliases defined in the speakers field (e.g. 'Alice: Hello!\\nBob: Hi!').",
+      title: 'Prompt',
+      minLength: 1,
+      maxLength: 50000,
+      type: 'string',
+    },
+    speakers: {
       examples: [
         [
           { speaker_id: 'Host', voice: 'Charon' },
           { speaker_id: 'DrChen', voice: 'Kore' },
         ],
       ],
+      description:
+        'Multi-speaker voice configuration. When set, enables multi-speaker synthesis where different parts of the text are spoken by different voices. Each speaker needs a voice and a speaker_id (alias) that matches prefixes in the prompt.',
+      title: 'Speakers',
       anyOf: [
         {
           items: { $ref: '#/$defs/SpeakerConfig' },
+          minItems: 2,
           maxItems: 10,
           type: 'array',
-          minItems: 2,
         },
         { type: 'null' },
       ],
-      title: 'Speakers',
     },
-    prompt: {
-      maxLength: 50000,
+    temperature: {
       description:
-        "The text to convert to speech. Gemini 3.1 Flash TTS supports natural-language prompting for style, pace, accent, and emotional expression — include delivery instructions inline with the text (e.g. 'Say cheerfully: Have a wonderful day!'). Supports expressive audio tags like [sigh], [laughing], [whispering], [short pause] for fine-grained control over delivery. For multi-speaker synthesis, prefix lines with speaker aliases defined in the speakers field (e.g. 'Alice: Hello!\\nBob: Hi!').",
+        'Controls the randomness of the speech output. Higher values produce more creative and varied delivery, while lower values make the output more predictable and focused.',
+      title: 'Temperature',
+      default: 1,
+      maximum: 2,
+      minimum: 0,
+      type: 'number',
+    },
+    style_instructions: {
       examples: [
-        "I can't believe it worked! [laughing] After all those hours of debugging [sigh] it was just a missing semicolon.",
+        'Say the following in a warm, conversational tone',
+        'Read this as a dramatic newscast with gravitas',
+        'Speak with a British accent, cheerfully and energetically',
       ],
-      minLength: 1,
-      title: 'Prompt',
-      type: 'string',
+      description:
+        "Optional style and delivery instructions prepended to the prompt. Controls expressiveness, accent, pace, tone, and emotional expression using natural language. Use this to separate style control from the text content. Examples: 'Speak warmly and slowly', 'Read this as a dramatic newscast', 'Use a British accent with a cheerful tone', 'Whisper mysteriously'.",
+      title: 'Style Instructions',
+      anyOf: [{ maxLength: 4000, type: 'string' }, { type: 'null' }],
     },
     language_code: {
+      examples: ['English (US)', 'French (France)', 'Japanese (Japan)'],
       description:
         'Language for multilingual synthesis. When set, steers the model to speak in the specified language. If not set, the model auto-detects the language from the text.',
-      examples: ['English (US)', 'French (France)', 'Japanese (Japan)'],
+      title: 'Language Code',
       anyOf: [
         {
-          type: 'string',
           enum: [
             'Arabic (Egypt)',
             'Bangla (Bangladesh)',
@@ -5677,25 +5695,14 @@ export const Gemini31FlashTtsInputSchema = {
             'Swedish (Sweden)',
             'Urdu (Pakistan)',
           ],
+          type: 'string',
         },
         { type: 'null' },
       ],
-      title: 'Language Code',
-    },
-    output_format: {
-      description:
-        'Audio output format. mp3: compressed, small file size (recommended). wav: uncompressed PCM wrapped in WAV (24 kHz, 16-bit mono). ogg_opus: Ogg container with Opus codec, good quality-to-size ratio.',
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-      enum: ['wav', 'mp3', 'ogg_opus'],
     },
     voice: {
       description:
         'Voice preset for single-speaker synthesis. 30 distinct voices are available. Ignored when speakers is set. Popular choices: Kore (strong, firm female), Puck (upbeat, lively male), Charon (calm, professional male), Zephyr (bright, clear female), Aoede (warm, melodic female).',
-      default: 'Kore',
-      title: 'Voice',
-      type: 'string',
       enum: [
         'Achernar',
         'Achird',
@@ -5728,47 +5735,29 @@ export const Gemini31FlashTtsInputSchema = {
         'Zephyr',
         'Zubenelgenubi',
       ],
-    },
-    style_instructions: {
-      description:
-        "Optional style and delivery instructions prepended to the prompt. Controls expressiveness, accent, pace, tone, and emotional expression using natural language. Use this to separate style control from the text content. Examples: 'Speak warmly and slowly', 'Read this as a dramatic newscast', 'Use a British accent with a cheerful tone', 'Whisper mysteriously'.",
-      examples: [
-        'Say the following in a warm, conversational tone',
-        'Read this as a dramatic newscast with gravitas',
-        'Speak with a British accent, cheerfully and energetically',
-      ],
-      anyOf: [{ maxLength: 4000, type: 'string' }, { type: 'null' }],
-      title: 'Style Instructions',
-    },
-    temperature: {
-      maximum: 2,
-      minimum: 0,
-      description:
-        'Controls the randomness of the speech output. Higher values produce more creative and varied delivery, while lower values make the output more predictable and focused.',
-      default: 1,
-      title: 'Temperature',
-      type: 'number',
+      default: 'Kore',
+      title: 'Voice',
+      type: 'string',
     },
   },
+  type: 'object',
+  'x-fal-order-properties': [
+    'prompt',
+    'style_instructions',
+    'voice',
+    'language_code',
+    'speakers',
+    'temperature',
+    'output_format',
+  ],
   $defs: {
     SpeakerConfig: {
       type: 'object',
-      required: ['voice', 'speaker_id'],
-      description:
-        'Voice configuration for a single speaker in multi-speaker synthesis.',
       properties: {
-        speaker_id: {
-          pattern: '^\\w+$',
-          type: 'string',
-          examples: ['Speaker1', 'Alice', 'Narrator'],
-          description:
-            "Alias used to identify this speaker in the prompt. Use this alias as a prefix in the prompt field, e.g. 'Alice: Hello! Bob: Hi there!'. Must be alphanumeric with no whitespace.",
-          title: 'Speaker Id',
-        },
         voice: {
           type: 'string',
-          description: 'Voice preset for this speaker.',
           title: 'Voice',
+          description: 'Voice preset for this speaker.',
           enum: [
             'Achernar',
             'Achird',
@@ -5802,46 +5791,56 @@ export const Gemini31FlashTtsInputSchema = {
             'Zubenelgenubi',
           ],
         },
+        speaker_id: {
+          pattern: '^\\w+$',
+          examples: ['Speaker1', 'Alice', 'Narrator'],
+          type: 'string',
+          title: 'Speaker Id',
+          description:
+            "Alias used to identify this speaker in the prompt. Use this alias as a prefix in the prompt field, e.g. 'Alice: Hello! Bob: Hi there!'. Must be alphanumeric with no whitespace.",
+        },
       },
-      title: 'SpeakerConfig',
       'x-fal-order-properties': ['voice', 'speaker_id'],
+      title: 'SpeakerConfig',
+      description:
+        'Voice configuration for a single speaker in multi-speaker synthesis.',
+      required: ['voice', 'speaker_id'],
     },
   },
 } as const
 
 export const Gemini31FlashTtsOutputSchema = {
   description: 'Output for Gemini text-to-speech generation.',
-  required: ['audio'],
   title: 'GeminiTTSOutput',
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated audio file.',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a935d4f/Ez4NpcnFTuGsu2FHDaJTR_gemini_tts_output.mp3',
         },
       ],
+      description: 'The generated audio file.',
       $ref: '#/$defs/File',
     },
   },
+  type: 'object',
+  'x-fal-order-properties': ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -5850,11 +5849,10 @@ export const Gemini31FlashTtsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -5863,19 +5861,69 @@ export const Gemini31FlashTtsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const GeminiTtsInputSchema = {
   type: 'object',
-  required: ['prompt'],
-  description: 'Input for Gemini text-to-speech generation.',
   properties: {
+    prompt: {
+      type: 'string',
+      examples: [
+        "Host: Welcome back to AI Frontiers, the podcast where we explore the latest breakthroughs in artificial intelligence. Today we have a very special guest. Doctor Chen, thank you for joining us!\nDrChen: Thanks for having me! I'm excited to be here.\nHost: So, let's dive right in. Your recent paper on neural architecture search has been making waves. Can you tell our listeners what inspired this research?\nDrChen: Absolutely. It all started when we noticed that most existing approaches were optimizing for the wrong metrics. We asked ourselves, what if we could let the model design itself?",
+      ],
+      minLength: 1,
+      title: 'Prompt',
+      description:
+        "The text to convert to speech. Gemini TTS supports natural-language prompting for style, pace, accent, and emotional expression — include delivery instructions inline with the text (e.g. 'Say cheerfully: Have a wonderful day!'). For multi-speaker synthesis, prefix lines with speaker aliases defined in the speakers field (e.g. 'Alice: Hello!\\nBob: Hi!'). Supports inline pace/style markers like [slowly], [whispering], [excited], [extremely fast].",
+      maxLength: 50000,
+    },
+    style_instructions: {
+      examples: [
+        'Say the following in a warm, conversational tone',
+        'Read this as a dramatic newscast with gravitas',
+        'Speak with a British accent, cheerfully and energetically',
+        'This is a podcast conversation. The host is enthusiastic and curious, the guest is knowledgeable and articulate',
+      ],
+      title: 'Style Instructions',
+      anyOf: [{ type: 'string', maxLength: 4000 }, { type: 'null' }],
+      description:
+        "Optional style and delivery instructions prepended to the prompt. Controls expressiveness, accent, pace, tone, and emotional expression using natural language. Use this to separate style control from the text content. Examples: 'Speak warmly and slowly', 'Read this as a dramatic newscast', 'Use a British accent with a cheerful tone', 'Whisper mysteriously'.",
+    },
+    speakers: {
+      examples: [
+        [
+          { voice: 'Charon', speaker_id: 'Host' },
+          { voice: 'Kore', speaker_id: 'DrChen' },
+        ],
+      ],
+      title: 'Speakers',
+      anyOf: [
+        {
+          minItems: 2,
+          type: 'array',
+          maxItems: 10,
+          items: { $ref: '#/$defs/SpeakerConfig' },
+        },
+        { type: 'null' },
+      ],
+      description:
+        'Multi-speaker voice configuration. When set, enables multi-speaker synthesis where different parts of the text are spoken by different voices. Each speaker needs a voice and a speaker_id (alias) that matches prefixes in the prompt. Requires gemini-2.5-pro-tts or gemini-2.5-flash-tts model. Not supported with gemini-2.5-flash-lite-preview-tts.',
+    },
+    temperature: {
+      type: 'number',
+      maximum: 2,
+      minimum: 0,
+      title: 'Temperature',
+      default: 1,
+      description:
+        'Controls the randomness of the speech output. Higher values produce more creative and varied delivery, while lower values make the output more predictable and focused.',
+    },
     language_code: {
       examples: ['English (US)', 'French (France)', 'Japanese (Japan)'],
-      description:
-        'Language for multilingual synthesis. When set, steers the model to speak in the specified language. Supports 24 GA languages and 60+ Preview languages. If not set, the model auto-detects the language from the text.',
       title: 'Language Code',
       anyOf: [
         {
@@ -5972,81 +6020,15 @@ export const GeminiTtsInputSchema = {
         },
         { type: 'null' },
       ],
-    },
-    output_format: {
-      type: 'string',
-      default: 'mp3',
       description:
-        'Audio output format. mp3: compressed, small file size (recommended). wav: uncompressed PCM wrapped in WAV (24 kHz, 16-bit mono). ogg_opus: Ogg container with Opus codec, good quality-to-size ratio.',
-      title: 'Output Format',
-      enum: ['wav', 'mp3', 'ogg_opus'],
-    },
-    temperature: {
-      type: 'number',
-      maximum: 2,
-      description:
-        'Controls the randomness of the speech output. Higher values produce more creative and varied delivery, while lower values make the output more predictable and focused.',
-      minimum: 0,
-      title: 'Temperature',
-      default: 1,
-    },
-    model: {
-      type: 'string',
-      default: 'gemini-2.5-flash-tts',
-      description:
-        'Which Gemini TTS model to use. gemini-2.5-flash-tts: low latency, cost-efficient for everyday applications (recommended). gemini-2.5-pro-tts: highest quality, best for structured workflows like podcasts, audiobooks, and customer support.',
-      title: 'Model',
-      enum: ['gemini-2.5-flash-tts', 'gemini-2.5-pro-tts'],
-    },
-    speakers: {
-      examples: [
-        [
-          { speaker_id: 'Host', voice: 'Charon' },
-          { speaker_id: 'DrChen', voice: 'Kore' },
-        ],
-      ],
-      description:
-        'Multi-speaker voice configuration. When set, enables multi-speaker synthesis where different parts of the text are spoken by different voices. Each speaker needs a voice and a speaker_id (alias) that matches prefixes in the prompt. Requires gemini-2.5-pro-tts or gemini-2.5-flash-tts model. Not supported with gemini-2.5-flash-lite-preview-tts.',
-      title: 'Speakers',
-      anyOf: [
-        {
-          type: 'array',
-          maxItems: 10,
-          items: { $ref: '#/$defs/SpeakerConfig' },
-          minItems: 2,
-        },
-        { type: 'null' },
-      ],
-    },
-    style_instructions: {
-      examples: [
-        'Say the following in a warm, conversational tone',
-        'Read this as a dramatic newscast with gravitas',
-        'Speak with a British accent, cheerfully and energetically',
-        'This is a podcast conversation. The host is enthusiastic and curious, the guest is knowledgeable and articulate',
-      ],
-      description:
-        "Optional style and delivery instructions prepended to the prompt. Controls expressiveness, accent, pace, tone, and emotional expression using natural language. Use this to separate style control from the text content. Examples: 'Speak warmly and slowly', 'Read this as a dramatic newscast', 'Use a British accent with a cheerful tone', 'Whisper mysteriously'.",
-      title: 'Style Instructions',
-      anyOf: [{ type: 'string', maxLength: 4000 }, { type: 'null' }],
-    },
-    prompt: {
-      type: 'string',
-      minLength: 1,
-      examples: [
-        "Host: Welcome back to AI Frontiers, the podcast where we explore the latest breakthroughs in artificial intelligence. Today we have a very special guest. Doctor Chen, thank you for joining us!\nDrChen: Thanks for having me! I'm excited to be here.\nHost: So, let's dive right in. Your recent paper on neural architecture search has been making waves. Can you tell our listeners what inspired this research?\nDrChen: Absolutely. It all started when we noticed that most existing approaches were optimizing for the wrong metrics. We asked ourselves, what if we could let the model design itself?",
-      ],
-      description:
-        "The text to convert to speech. Gemini TTS supports natural-language prompting for style, pace, accent, and emotional expression — include delivery instructions inline with the text (e.g. 'Say cheerfully: Have a wonderful day!'). For multi-speaker synthesis, prefix lines with speaker aliases defined in the speakers field (e.g. 'Alice: Hello!\\nBob: Hi!'). Supports inline pace/style markers like [slowly], [whispering], [excited], [extremely fast].",
-      title: 'Prompt',
-      maxLength: 50000,
+        'Language for multilingual synthesis. When set, steers the model to speak in the specified language. Supports 24 GA languages and 60+ Preview languages. If not set, the model auto-detects the language from the text.',
     },
     voice: {
       type: 'string',
+      title: 'Voice',
       default: 'Kore',
       description:
         'Voice preset for single-speaker synthesis. 30 distinct voices are available. Ignored when speakers is set. Popular choices: Kore (strong, firm female), Puck (upbeat, lively male), Charon (calm, professional male), Zephyr (bright, clear female), Aoede (warm, melodic female).',
-      title: 'Voice',
       enum: [
         'Achernar',
         'Achird',
@@ -6080,8 +6062,23 @@ export const GeminiTtsInputSchema = {
         'Zubenelgenubi',
       ],
     },
+    output_format: {
+      type: 'string',
+      title: 'Output Format',
+      default: 'mp3',
+      description:
+        'Audio output format. mp3: compressed, small file size (recommended). wav: uncompressed PCM wrapped in WAV (24 kHz, 16-bit mono). ogg_opus: Ogg container with Opus codec, good quality-to-size ratio.',
+      enum: ['wav', 'mp3', 'ogg_opus'],
+    },
+    model: {
+      type: 'string',
+      title: 'Model',
+      default: 'gemini-2.5-flash-tts',
+      description:
+        'Which Gemini TTS model to use. gemini-2.5-flash-tts: low latency, cost-efficient for everyday applications (recommended). gemini-2.5-pro-tts: highest quality, best for structured workflows like podcasts, audiobooks, and customer support.',
+      enum: ['gemini-2.5-flash-tts', 'gemini-2.5-pro-tts'],
+    },
   },
-  title: 'GeminiTTSInput',
   'x-fal-order-properties': [
     'prompt',
     'style_instructions',
@@ -6092,25 +6089,17 @@ export const GeminiTtsInputSchema = {
     'temperature',
     'output_format',
   ],
+  title: 'GeminiTTSInput',
+  description: 'Input for Gemini text-to-speech generation.',
+  required: ['prompt'],
   $defs: {
     SpeakerConfig: {
       type: 'object',
-      required: ['voice', 'speaker_id'],
-      description:
-        'Voice configuration for a single speaker in multi-speaker synthesis.',
       properties: {
-        speaker_id: {
-          pattern: '^\\w+$',
-          type: 'string',
-          examples: ['Speaker1', 'Alice', 'Narrator'],
-          description:
-            "Alias used to identify this speaker in the prompt. Use this alias as a prefix in the prompt field, e.g. 'Alice: Hello! Bob: Hi there!'. Must be alphanumeric with no whitespace.",
-          title: 'Speaker Id',
-        },
         voice: {
           type: 'string',
-          description: 'Voice preset for this speaker.',
           title: 'Voice',
+          description: 'Voice preset for this speaker.',
           enum: [
             'Achernar',
             'Achird',
@@ -6144,17 +6133,26 @@ export const GeminiTtsInputSchema = {
             'Zubenelgenubi',
           ],
         },
+        speaker_id: {
+          pattern: '^\\w+$',
+          examples: ['Speaker1', 'Alice', 'Narrator'],
+          type: 'string',
+          title: 'Speaker Id',
+          description:
+            "Alias used to identify this speaker in the prompt. Use this alias as a prefix in the prompt field, e.g. 'Alice: Hello! Bob: Hi there!'. Must be alphanumeric with no whitespace.",
+        },
       },
-      title: 'SpeakerConfig',
       'x-fal-order-properties': ['voice', 'speaker_id'],
+      title: 'SpeakerConfig',
+      description:
+        'Voice configuration for a single speaker in multi-speaker synthesis.',
+      required: ['voice', 'speaker_id'],
     },
   },
 } as const
 
 export const GeminiTtsOutputSchema = {
   type: 'object',
-  required: ['audio'],
-  description: 'Output for Gemini text-to-speech generation.',
   properties: {
     audio: {
       examples: [
@@ -6162,28 +6160,29 @@ export const GeminiTtsOutputSchema = {
           url: 'https://v3b.fal.media/files/b/0a935d4f/Ez4NpcnFTuGsu2FHDaJTR_gemini_tts_output.mp3',
         },
       ],
-      description: 'The generated audio file.',
       $ref: '#/$defs/File',
+      description: 'The generated audio file.',
     },
   },
-  title: 'GeminiTTSOutput',
   'x-fal-order-properties': ['audio'],
+  title: 'GeminiTTSOutput',
+  description: 'Output for Gemini text-to-speech generation.',
+  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -6192,11 +6191,10 @@ export const GeminiTtsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -6205,67 +6203,13 @@ export const GeminiTtsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const IndexTts2TextToSpeechInputSchema = {
-  type: 'object',
-  required: ['audio_url', 'prompt'],
-  title: 'IndexTTS2Input',
-  properties: {
-    emotional_audio_url: {
-      title: 'Emotional Audio Url',
-      description:
-        'The emotional reference audio file to extract the style from.',
-      anyOf: [{ type: 'string', ui: { field: 'audio' } }, { type: 'null' }],
-    },
-    emotion_prompt: {
-      examples: ['You scared me to death! What are you, a ghost?'],
-      title: 'Emotion Prompt',
-      description:
-        'The emotional prompt to influence the emotional style. Must be used together with should_use_prompt_for_emotion.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-    },
-    emotional_strengths: {
-      examples: [null],
-      description:
-        'The strengths of individual emotions for fine-grained control. ',
-      anyOf: [{ $ref: '#/$defs/EmotionalStrengths' }, { type: 'null' }],
-    },
-    prompt: {
-      type: 'string',
-      examples: ["Hide! He's coming! He's coming to get us!"],
-      title: 'Prompt',
-      description: 'The speech prompt to generate',
-    },
-    strength: {
-      type: 'number',
-      maximum: 1,
-      title: 'Strength',
-      minimum: 0,
-      description:
-        'The strength of the emotional style transfer. Higher values result in stronger emotional influence.',
-      default: 1,
-    },
-    should_use_prompt_for_emotion: {
-      type: 'boolean',
-      default: false,
-      title: 'Should Use Prompt For Emotion',
-      description:
-        'Whether to use the `prompt` to calculate emotional strengths, if enabled it will overwrite the `emotional_strengths` values. If `emotion_prompt` is provided, it will be used to instead of `prompt` to extract the emotional style.',
-      examples: [true],
-    },
-    audio_url: {
-      type: 'string',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/index-tts-2/tts_in.mp3',
-      ],
-      title: 'Audio Url',
-      description: 'The audio file to generate the speech from.',
-      'x-fal-file-input': true,
-    },
-  },
   'x-fal-order-properties': [
     'audio_url',
     'prompt',
@@ -6275,76 +6219,64 @@ export const IndexTts2TextToSpeechInputSchema = {
     'should_use_prompt_for_emotion',
     'emotion_prompt',
   ],
+  type: 'object',
+  properties: {
+    prompt: {
+      description: 'The speech prompt to generate',
+      examples: ["Hide! He's coming! He's coming to get us!"],
+      type: 'string',
+      title: 'Prompt',
+    },
+    should_use_prompt_for_emotion: {
+      description:
+        'Whether to use the `prompt` to calculate emotional strengths, if enabled it will overwrite the `emotional_strengths` values. If `emotion_prompt` is provided, it will be used to instead of `prompt` to extract the emotional style.',
+      examples: [true],
+      type: 'boolean',
+      default: false,
+      title: 'Should Use Prompt For Emotion',
+    },
+    audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/index-tts-2/tts_in.mp3',
+      ],
+      description: 'The audio file to generate the speech from.',
+      type: 'string',
+      title: 'Audio Url',
+      'x-fal-file-input': true,
+    },
+    emotional_strengths: {
+      description:
+        'The strengths of individual emotions for fine-grained control. ',
+      examples: [null],
+      anyOf: [{ $ref: '#/$defs/EmotionalStrengths' }, { type: 'null' }],
+    },
+    emotion_prompt: {
+      description:
+        'The emotional prompt to influence the emotional style. Must be used together with should_use_prompt_for_emotion.',
+      examples: ['You scared me to death! What are you, a ghost?'],
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Emotion Prompt',
+    },
+    emotional_audio_url: {
+      description:
+        'The emotional reference audio file to extract the style from.',
+      anyOf: [{ ui: { field: 'audio' }, type: 'string' }, { type: 'null' }],
+      title: 'Emotional Audio Url',
+    },
+    strength: {
+      description:
+        'The strength of the emotional style transfer. Higher values result in stronger emotional influence.',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 1,
+      title: 'Strength',
+    },
+  },
+  required: ['audio_url', 'prompt'],
+  title: 'IndexTTS2Input',
   $defs: {
     EmotionalStrengths: {
-      type: 'object',
-      title: 'EmotionalStrengths',
-      properties: {
-        happy: {
-          type: 'number',
-          maximum: 1,
-          title: 'Happy',
-          minimum: 0,
-          description: 'Strength of happiness emotion',
-          default: 0,
-        },
-        calm: {
-          type: 'number',
-          maximum: 1,
-          title: 'Calm',
-          minimum: 0,
-          description: 'Strength of calm emotion',
-          default: 0,
-        },
-        disgusted: {
-          type: 'number',
-          maximum: 1,
-          title: 'Disgusted',
-          minimum: 0,
-          description: 'Strength of disgust emotion',
-          default: 0,
-        },
-        sad: {
-          type: 'number',
-          maximum: 1,
-          title: 'Sad',
-          minimum: 0,
-          description: 'Strength of sadness emotion',
-          default: 0,
-        },
-        melancholic: {
-          type: 'number',
-          maximum: 1,
-          title: 'Melancholic',
-          minimum: 0,
-          description: 'Strength of melancholic emotion',
-          default: 0,
-        },
-        angry: {
-          type: 'number',
-          maximum: 1,
-          title: 'Angry',
-          minimum: 0,
-          description: 'Strength of anger emotion',
-          default: 0,
-        },
-        afraid: {
-          type: 'number',
-          maximum: 1,
-          title: 'Afraid',
-          minimum: 0,
-          description: 'Strength of fear emotion',
-          default: 0,
-        },
-        surprised: {
-          type: 'number',
-          maximum: 1,
-          title: 'Surprised',
-          minimum: 0,
-          description: 'Strength of surprise emotion',
-          default: 0,
-        },
-      },
       'x-fal-order-properties': [
         'happy',
         'angry',
@@ -6355,40 +6287,107 @@ export const IndexTts2TextToSpeechInputSchema = {
         'surprised',
         'calm',
       ],
+      type: 'object',
+      properties: {
+        sad: {
+          description: 'Strength of sadness emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Sad',
+        },
+        happy: {
+          description: 'Strength of happiness emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Happy',
+        },
+        calm: {
+          description: 'Strength of calm emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Calm',
+        },
+        melancholic: {
+          description: 'Strength of melancholic emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Melancholic',
+        },
+        afraid: {
+          description: 'Strength of fear emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Afraid',
+        },
+        disgusted: {
+          description: 'Strength of disgust emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Disgusted',
+        },
+        surprised: {
+          description: 'Strength of surprise emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Surprised',
+        },
+        angry: {
+          description: 'Strength of anger emotion',
+          type: 'number',
+          maximum: 1,
+          minimum: 0,
+          default: 0,
+          title: 'Angry',
+        },
+      },
+      title: 'EmotionalStrengths',
     },
   },
 } as const
 
 export const IndexTts2TextToSpeechOutputSchema = {
+  'x-fal-order-properties': ['audio'],
   type: 'object',
-  required: ['audio'],
-  title: 'IndexTTS2Output',
   properties: {
     audio: {
+      description: 'The generated audio file in base64 format.',
       examples: [
         'https://storage.googleapis.com/falserverless/example_outputs/index-tts-2/tts_out.mp3',
       ],
-      description: 'The generated audio file in base64 format.',
       $ref: '#/$defs/File',
     },
   },
-  'x-fal-order-properties': ['audio'],
+  required: ['audio'],
+  title: 'IndexTTS2Output',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -6397,11 +6396,10 @@ export const IndexTts2TextToSpeechOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -6410,27 +6408,31 @@ export const IndexTts2TextToSpeechOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const InworldTtsInputSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['text', 'voice', 'sample_rate_hertz'],
   required: ['text'],
   properties: {
-    text: {
-      maxLength: 2000,
-      description:
-        'The text to synthesize into speech. Maximum 2000 characters.',
-      examples: ["Hello! This is a demo of Inworld's TTS."],
-      type: 'string',
-      title: 'Text',
-    },
     sample_rate_hertz: {
       enum: [8000, 16000, 24000, 32000, 40000, 48000],
       description: 'The sample rate in Hz for the output audio.',
       type: 'integer',
-      title: 'Sample Rate Hertz',
       default: 48000,
+      title: 'Sample Rate Hertz',
+    },
+    text: {
+      description:
+        'The text to synthesize into speech. Maximum 2000 characters.',
+      type: 'string',
+      examples: ["Hello! This is a demo of Inworld's TTS."],
+      maxLength: 2000,
+      title: 'Text',
     },
     voice: {
       enum: [
@@ -6550,47 +6552,44 @@ export const InworldTtsInputSchema = {
       ],
       description: 'The voice to use for synthesis.',
       type: 'string',
-      title: 'Voice',
       default: 'Craig (en)',
+      title: 'Voice',
     },
   },
-  type: 'object',
   title: 'InworldTTSInput',
-  'x-fal-order-properties': ['text', 'voice', 'sample_rate_hertz'],
 } as const
 
 export const InworldTtsOutputSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['audio'],
   required: ['audio'],
   properties: {
     audio: {
       description: 'Generated audio file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a920730/38aud4s6sF7bOWFoQHaJk_tmpvv2htrpc.wav',
         },
       ],
+      $ref: '#/$defs/File',
     },
   },
-  type: 'object',
   title: 'Output',
-  'x-fal-order-properties': ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -6599,11 +6598,10 @@ export const InworldTtsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -6612,68 +6610,54 @@ export const InworldTtsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const KlingVideoCreateVoiceInputSchema = {
-  description: 'Request model for creating a custom voice.',
-  title: 'CreateVoiceInput',
   required: ['voice_url'],
+  type: 'object',
   properties: {
     voice_url: {
       description:
         'URL of the voice audio file. Supports .mp3/.wav audio or .mp4/.mov video. Duration must be 5-30 seconds with clean, single-voice audio.',
-      title: 'Voice Url',
+      type: 'string',
+      _fal_ui_field: 'audio',
       examples: [
         'https://v3b.fal.media/files/b/0a867736/_Wo19V-XrOVYZt6jKE8t5_kling_video.wav',
       ],
-      _fal_ui_field: 'audio',
-      type: 'string',
+      title: 'Voice Url',
       'x-fal-file-input': true,
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['voice_url'],
+  description: 'Request model for creating a custom voice.',
+  title: 'CreateVoiceInput',
 } as const
 
 export const KlingVideoCreateVoiceOutputSchema = {
-  description: 'Response model for creating a custom voice.',
-  title: 'CreateVoiceOutput',
   required: ['voice_id'],
+  type: 'object',
   properties: {
     voice_id: {
-      examples: ['829877809978941442'],
       description: 'Unique identifier for the created voice',
-      title: 'Voice Id',
       type: 'string',
+      examples: ['829877809978941442'],
+      title: 'Voice Id',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['voice_id'],
+  description: 'Response model for creating a custom voice.',
+  title: 'CreateVoiceOutput',
 } as const
 
 export const KlingVideoV1TtsInputSchema = {
-  title: 'TTSInput',
   required: ['text'],
+  type: 'object',
   properties: {
-    voice_speed: {
-      description: 'Rate of speech',
-      minimum: 0.8,
-      default: 1,
-      maximum: 2,
-      title: 'Voice Speed',
-      type: 'number',
-    },
-    text: {
-      examples: ['Hello world! Kling TTS is available on FAL!'],
-      description: 'The text to be converted to speech',
-      title: 'Text',
-      maxLength: 500,
-      type: 'string',
-    },
     voice_id: {
-      description: 'The voice ID to use for speech synthesis',
       enum: [
         'genshin_vindi2',
         'zhinen_xuesheng',
@@ -6722,47 +6706,62 @@ export const KlingVideoV1TtsInputSchema = {
         'daopianyansang-v1',
         'mengwa-v1',
       ],
+      description: 'The voice ID to use for speech synthesis',
+      type: 'string',
       default: 'genshin_vindi2',
       title: 'Voice Id',
+    },
+    text: {
+      maxLength: 500,
+      description: 'The text to be converted to speech',
       type: 'string',
+      examples: ['Hello world! Kling TTS is available on FAL!'],
+      title: 'Text',
+    },
+    voice_speed: {
+      description: 'Rate of speech',
+      type: 'number',
+      minimum: 0.8,
+      maximum: 2,
+      default: 1,
+      title: 'Voice Speed',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['text', 'voice_id', 'voice_speed'],
+  title: 'TTSInput',
 } as const
 
 export const KlingVideoV1TtsOutputSchema = {
-  title: 'TTSOutput',
   required: ['audio'],
+  type: 'object',
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       description: 'The generated audio',
       examples: [
         {
           url: 'https://v3.fal.media/files/monkey/O-ekVTtYqeDblD1oSf2uv_output.mp3',
         },
       ],
+      $ref: '#/$defs/File',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['audio'],
+  title: 'TTSOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -6771,11 +6770,10 @@ export const KlingVideoV1TtsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -6784,95 +6782,96 @@ export const KlingVideoV1TtsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const KlingVideoVideoToAudioInputSchema = {
-  title: 'VideoToAudioInput',
   required: ['video_url'],
+  type: 'object',
   properties: {
-    sound_effect_prompt: {
+    asmr_mode: {
+      description:
+        'Enable ASMR mode. This mode enhances detailed sound effects and is suitable for highly immersive content scenarios.',
+      type: 'boolean',
+      default: false,
+      title: 'Asmr Mode',
+    },
+    background_music_prompt: {
+      description: 'Background music prompt. Cannot exceed 200 characters.',
       anyOf: [{ maxLength: 200, type: 'string' }, { type: 'null' }],
-      description: 'Sound effect prompt. Cannot exceed 200 characters.',
-      title: 'Sound Effect Prompt',
-      default: 'Car tires screech as they accelerate in a drag race',
+      default: 'intense car race',
+      title: 'Background Music Prompt',
     },
     video_url: {
       description:
         'The video URL to extract audio from. Only .mp4/.mov formats are supported. File size does not exceed 100MB. Video duration between 3.0s and 20.0s.',
-      title: 'Video Url',
+      type: 'string',
+      _fal_ui_field: 'video',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/kling/kling-v2.5-turbo-pro-image-to-video-output.mp4',
       ],
-      _fal_ui_field: 'video',
-      type: 'string',
+      title: 'Video Url',
       'x-fal-file-input': true,
     },
-    asmr_mode: {
-      description:
-        'Enable ASMR mode. This mode enhances detailed sound effects and is suitable for highly immersive content scenarios.',
-      title: 'Asmr Mode',
-      default: false,
-      type: 'boolean',
-    },
-    background_music_prompt: {
+    sound_effect_prompt: {
+      description: 'Sound effect prompt. Cannot exceed 200 characters.',
       anyOf: [{ maxLength: 200, type: 'string' }, { type: 'null' }],
-      description: 'Background music prompt. Cannot exceed 200 characters.',
-      title: 'Background Music Prompt',
-      default: 'intense car race',
+      default: 'Car tires screech as they accelerate in a drag race',
+      title: 'Sound Effect Prompt',
     },
   },
-  type: 'object',
   'x-fal-order-properties': [
     'video_url',
     'sound_effect_prompt',
     'background_music_prompt',
     'asmr_mode',
   ],
+  title: 'VideoToAudioInput',
 } as const
 
 export const KlingVideoVideoToAudioOutputSchema = {
-  title: 'VideoToAudioOutput',
   required: ['video', 'audio'],
+  type: 'object',
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       description: 'The extracted/generated audio from the video in MP3 format',
       examples: [
         {
           url: 'https://v3.fal.media/files/monkey/O-ekVTtYqeDblD1oSf2uv_extracted_audio.mp3',
         },
       ],
+      $ref: '#/$defs/File',
     },
     video: {
-      $ref: '#/$defs/File',
       description: 'The original video with dubbed audio applied',
       examples: [
         {
           url: 'https://v3.fal.media/files/monkey/O-ekVTtYqeDblD1oSf2uv_dubbed_video.mp4',
         },
       ],
+      $ref: '#/$defs/File',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['video', 'audio'],
+  title: 'VideoToAudioOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -6881,11 +6880,10 @@ export const KlingVideoVideoToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -6894,6 +6892,8 @@ export const KlingVideoVideoToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -6969,20 +6969,19 @@ export const KokoroAmericanEnglishOutputSchema = {
   title: 'AmEngOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -6991,11 +6990,10 @@ export const KokoroAmericanEnglishOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7004,6 +7002,8 @@ export const KokoroAmericanEnglishOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7057,20 +7057,19 @@ export const KokoroBrazilianPortugueseOutputSchema = {
   title: 'BrPortugeseOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7079,11 +7078,10 @@ export const KokoroBrazilianPortugueseOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7092,6 +7090,8 @@ export const KokoroBrazilianPortugueseOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7154,20 +7154,19 @@ export const KokoroBritishEnglishOutputSchema = {
   title: 'BrEngOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7176,11 +7175,10 @@ export const KokoroBritishEnglishOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7189,6 +7187,8 @@ export const KokoroBritishEnglishOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7242,20 +7242,19 @@ export const KokoroFrenchOutputSchema = {
   title: 'FrenchOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7264,11 +7263,10 @@ export const KokoroFrenchOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7277,6 +7275,8 @@ export const KokoroFrenchOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7330,20 +7330,19 @@ export const KokoroHindiOutputSchema = {
   title: 'HindiOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7352,11 +7351,10 @@ export const KokoroHindiOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7365,6 +7363,8 @@ export const KokoroHindiOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7418,20 +7418,19 @@ export const KokoroItalianOutputSchema = {
   title: 'ItalianOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7440,11 +7439,10 @@ export const KokoroItalianOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7453,6 +7451,8 @@ export const KokoroItalianOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7512,20 +7512,19 @@ export const KokoroJapaneseOutputSchema = {
   title: 'JapaneseOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7534,11 +7533,10 @@ export const KokoroJapaneseOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7547,6 +7545,8 @@ export const KokoroJapaneseOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7609,20 +7609,19 @@ export const KokoroMandarinChineseOutputSchema = {
   title: 'MandarinOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7631,11 +7630,10 @@ export const KokoroMandarinChineseOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7644,6 +7642,8 @@ export const KokoroMandarinChineseOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7697,20 +7697,19 @@ export const KokoroSpanishOutputSchema = {
   title: 'SpanishOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7719,11 +7718,10 @@ export const KokoroSpanishOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7732,117 +7730,118 @@ export const KokoroSpanishOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const LoudnessNormalizationSettingSchema = {
-  type: 'object',
-  properties: {
-    target_range: {
-      maximum: 20,
-      description: 'Target loudness range in LU (default 8.0)',
-      type: 'number',
-      default: 8,
-      minimum: 0,
-      title: 'Target Range',
-    },
-    enabled: {
-      type: 'boolean',
-      description: 'Enable loudness normalization for the audio',
-      default: true,
-      title: 'Enabled',
-    },
-    target_peak: {
-      maximum: 0,
-      description: 'Target peak level in dBTP (default -0.5).',
-      type: 'number',
-      default: -0.5,
-      minimum: -3,
-      title: 'Target Peak',
-    },
-    target_loudness: {
-      maximum: -10,
-      description: 'Target loudness in LUFS (default -18.0)',
-      type: 'number',
-      default: -18,
-      minimum: -70,
-      title: 'Target Loudness',
-    },
-  },
   'x-fal-order-properties': [
     'enabled',
     'target_loudness',
     'target_range',
     'target_peak',
   ],
+  type: 'object',
+  properties: {
+    target_peak: {
+      description: 'Target peak level in dBTP (default -0.5).',
+      type: 'number',
+      minimum: -3,
+      maximum: 0,
+      default: -0.5,
+      title: 'Target Peak',
+    },
+    target_loudness: {
+      description: 'Target loudness in LUFS (default -18.0)',
+      type: 'number',
+      minimum: -70,
+      maximum: -10,
+      default: -18,
+      title: 'Target Loudness',
+    },
+    target_range: {
+      description: 'Target loudness range in LU (default 8.0)',
+      type: 'number',
+      minimum: 0,
+      maximum: 20,
+      default: 8,
+      title: 'Target Range',
+    },
+    enabled: {
+      description: 'Enable loudness normalization for the audio',
+      type: 'boolean',
+      default: true,
+      title: 'Enabled',
+    },
+  },
   title: 'LoudnessNormalizationSetting',
 } as const
 
 export const Lyria2InputSchema = {
+  type: 'object',
   properties: {
-    negative_prompt: {
-      default: 'low quality',
-      description: 'A description of what to exclude from the generated audio',
-      examples: ['vocals, slow tempo', 'low quality'],
-      title: 'Negative Prompt',
-      type: 'string',
-    },
     prompt: {
-      description: 'The text prompt describing the music you want to generate',
-      maxLength: 2000,
-      minLength: 1,
-      title: 'Prompt',
+      type: 'string',
       examples: [
         'A lush, ambient soundscape featuring the serene sounds of a flowing river, complemented by the distant chirping of birds, and a gentle, melancholic piano melody that slowly unfolds.',
       ],
+      minLength: 1,
+      title: 'Prompt',
+      description: 'The text prompt describing the music you want to generate',
+      maxLength: 2000,
+    },
+    negative_prompt: {
       type: 'string',
+      examples: ['vocals, slow tempo', 'low quality'],
+      title: 'Negative Prompt',
+      default: 'low quality',
+      description: 'A description of what to exclude from the generated audio',
     },
     seed: {
-      description:
-        'A seed for deterministic generation. If provided, the model will attempt to produce the same audio given the same prompt and other parameters.',
       title: 'Seed',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        'A seed for deterministic generation. If provided, the model will attempt to produce the same audio given the same prompt and other parameters.',
     },
   },
-  required: ['prompt'],
-  title: 'TextToMusicInput',
   'x-fal-order-properties': ['prompt', 'negative_prompt', 'seed'],
-  type: 'object',
+  title: 'TextToMusicInput',
+  required: ['prompt'],
 } as const
 
 export const Lyria2OutputSchema = {
+  type: 'object',
   properties: {
     audio: {
-      description: 'The generated music',
       examples: [
         {
           url: 'https://v3.fal.media/files/koala/9V6ADhxcZrZr2FcaiNA7H_output.wav',
         },
       ],
       $ref: '#/$defs/File',
+      description: 'The generated music',
     },
   },
-  required: ['audio'],
-  title: 'TextToMusicOutput',
   'x-fal-order-properties': ['audio'],
-  type: 'object',
+  title: 'TextToMusicOutput',
+  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7851,11 +7850,10 @@ export const Lyria2OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7864,6 +7862,8 @@ export const Lyria2OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7871,78 +7871,77 @@ export const Lyria2OutputSchema = {
 export const Lyria3InputSchema = {
   type: 'object',
   properties: {
-    image_url: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Image Url',
-      description:
-        'Optional image URL to use as inspiration for music generation. The model will create music that matches the mood and theme of the image.',
-      examples: [
-        'https://v3b.fal.media/files/b/0a93b559/qjT9o0CId1B65PbD6Yp06_9c94501900464c5aa98f302fa4b00375.png',
-      ],
-    },
-    negative_prompt: {
-      default: '',
-      description: 'A description of what to exclude from the generated audio.',
-      title: 'Negative Prompt',
-      type: 'string',
-      examples: ['low quality, distorted', 'vocals, slow tempo'],
-    },
     prompt: {
       type: 'string',
-      minLength: 1,
-      maxLength: 5000,
-      title: 'Prompt',
       examples: [
         "An energetic electronic dance track with soaring synth leads, punchy four-on-the-floor kick drums, and a catchy vocal hook singing 'Feel the rhythm, feel the night'. 128 BPM.",
       ],
+      minLength: 1,
+      title: 'Prompt',
       description:
         'The text prompt describing the music you want to generate. Include genre, mood, instrumentation, tempo, and vocal style for best results. Lyria 3 supports vocals, lyrics, and multi-language generation.',
+      maxLength: 5000,
+    },
+    image_url: {
+      examples: [
+        'https://v3b.fal.media/files/b/0a93b559/qjT9o0CId1B65PbD6Yp06_9c94501900464c5aa98f302fa4b00375.png',
+      ],
+      title: 'Image Url',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        'Optional image URL to use as inspiration for music generation. The model will create music that matches the mood and theme of the image.',
+    },
+    negative_prompt: {
+      type: 'string',
+      examples: ['low quality, distorted', 'vocals, slow tempo'],
+      title: 'Negative Prompt',
+      default: '',
+      description: 'A description of what to exclude from the generated audio.',
     },
   },
-  title: 'TextToMusicInput',
   'x-fal-order-properties': ['prompt', 'negative_prompt', 'image_url'],
+  title: 'TextToMusicInput',
   required: ['prompt'],
 } as const
 
 export const Lyria3OutputSchema = {
   type: 'object',
   properties: {
-    lyrics: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Lyrics',
-      description:
-        'The generated or provided lyrics for the track, if applicable.',
-      examples: [
-        "Caption: This is a high-energy Progressive House anthem, a subgenre of EDM defined by its massive scale and uplifting melodic content, all polished with a clean, powerful, and wide stereo production aesthetic. The rhythmic foundation is a punchy, heavily compressed four-on-the-floor kick drum, modeled after a classic Roland TR-909, providing a relentless pulse at 128 BPM. Supporting the kick are crisp, bright open hi-hats on the off-beats and a thick clap/snare layer on beats 2 and 4. The harmonic and melodic core is built from multiple synth layers: vast, shimmering supersaw synth pads play a soaring major-key chord progression; a powerful, monophonic sawtooth bassline plays the root notes and is aggressively side-chained to the kick drum to create the genre's signature 'pumping' effect. Above it all, a soaring supersaw lead synth—composed of multiple detuned sawtooth waves to create a thick, wide sound—plays a memorable, uplifting arpeggiated melody. A powerful, clean female vocal delivers the catchy hook, processed with significant hall reverb and delay to make it feel enormous and seamlessly blend with the synths. The entire instrumental bed (pads, lead, bass) is also heavily side-chained to the kick, ensuring every element ducks in volume with each beat to maximize the kick's punch and drive the track forward.\nMosic: 4.5\nBPM: 128.0",
-      ],
-    },
     audio: {
-      $ref: '#/$defs/File',
-      description: 'The generated music as an MP3 file.',
       examples: [
         'https://v3b.fal.media/files/b/0a93b550/klduxmeWsmi304M3zsAlr_output.mp3',
       ],
+      $ref: '#/$defs/File',
+      description: 'The generated music as an MP3 file.',
+    },
+    lyrics: {
+      examples: [
+        "Caption: This is a high-energy Progressive House anthem, a subgenre of EDM defined by its massive scale and uplifting melodic content, all polished with a clean, powerful, and wide stereo production aesthetic. The rhythmic foundation is a punchy, heavily compressed four-on-the-floor kick drum, modeled after a classic Roland TR-909, providing a relentless pulse at 128 BPM. Supporting the kick are crisp, bright open hi-hats on the off-beats and a thick clap/snare layer on beats 2 and 4. The harmonic and melodic core is built from multiple synth layers: vast, shimmering supersaw synth pads play a soaring major-key chord progression; a powerful, monophonic sawtooth bassline plays the root notes and is aggressively side-chained to the kick drum to create the genre's signature 'pumping' effect. Above it all, a soaring supersaw lead synth—composed of multiple detuned sawtooth waves to create a thick, wide sound—plays a memorable, uplifting arpeggiated melody. A powerful, clean female vocal delivers the catchy hook, processed with significant hall reverb and delay to make it feel enormous and seamlessly blend with the synths. The entire instrumental bed (pads, lead, bass) is also heavily side-chained to the kick, ensuring every element ducks in volume with each beat to maximize the kick's punch and drive the track forward.\nMosic: 4.5\nBPM: 128.0",
+      ],
+      title: 'Lyrics',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        'The generated or provided lyrics for the track, if applicable.',
     },
   },
-  title: 'TextToMusicOutput',
   'x-fal-order-properties': ['audio', 'lyrics'],
+  title: 'TextToMusicOutput',
   required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -7951,11 +7950,10 @@ export const Lyria3OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -7964,6 +7962,8 @@ export const Lyria3OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -7971,78 +7971,77 @@ export const Lyria3OutputSchema = {
 export const Lyria3ProInputSchema = {
   type: 'object',
   properties: {
-    image_url: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Image Url',
-      description:
-        'Optional image URL to use as inspiration for music generation. The model will create music that matches the mood and theme of the image.',
-      examples: [
-        'https://v3b.fal.media/files/b/0a93b559/qjT9o0CId1B65PbD6Yp06_9c94501900464c5aa98f302fa4b00375.png',
-      ],
-    },
-    negative_prompt: {
-      default: '',
-      description: 'A description of what to exclude from the generated audio.',
-      title: 'Negative Prompt',
-      type: 'string',
-      examples: ['low quality, distorted', 'vocals, slow tempo'],
-    },
     prompt: {
       type: 'string',
-      minLength: 1,
-      maxLength: 5000,
-      title: 'Prompt',
       examples: [
         "An energetic electronic dance track with soaring synth leads, punchy four-on-the-floor kick drums, and a catchy vocal hook singing 'Feel the rhythm, feel the night'. 128 BPM.",
       ],
+      minLength: 1,
+      title: 'Prompt',
       description:
         'The text prompt describing the music you want to generate. Include genre, mood, instrumentation, tempo, and vocal style for best results. Lyria 3 supports vocals, lyrics, and multi-language generation.',
+      maxLength: 5000,
+    },
+    image_url: {
+      examples: [
+        'https://v3b.fal.media/files/b/0a93b559/qjT9o0CId1B65PbD6Yp06_9c94501900464c5aa98f302fa4b00375.png',
+      ],
+      title: 'Image Url',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        'Optional image URL to use as inspiration for music generation. The model will create music that matches the mood and theme of the image.',
+    },
+    negative_prompt: {
+      type: 'string',
+      examples: ['low quality, distorted', 'vocals, slow tempo'],
+      title: 'Negative Prompt',
+      default: '',
+      description: 'A description of what to exclude from the generated audio.',
     },
   },
-  title: 'TextToMusicInput',
   'x-fal-order-properties': ['prompt', 'negative_prompt', 'image_url'],
+  title: 'TextToMusicInput',
   required: ['prompt'],
 } as const
 
 export const Lyria3ProOutputSchema = {
   type: 'object',
   properties: {
-    lyrics: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Lyrics',
-      description:
-        'The generated or provided lyrics for the track, if applicable.',
-      examples: [
-        "Caption: This is a high-energy Progressive House anthem, a subgenre of EDM defined by its massive scale and uplifting melodic content, all polished with a clean, powerful, and wide stereo production aesthetic. The rhythmic foundation is a punchy, heavily compressed four-on-the-floor kick drum, modeled after a classic Roland TR-909, providing a relentless pulse at 128 BPM. Supporting the kick are crisp, bright open hi-hats on the off-beats and a thick clap/snare layer on beats 2 and 4. The harmonic and melodic core is built from multiple synth layers: vast, shimmering supersaw synth pads play a soaring major-key chord progression; a powerful, monophonic sawtooth bassline plays the root notes and is aggressively side-chained to the kick drum to create the genre's signature 'pumping' effect. Above it all, a soaring supersaw lead synth—composed of multiple detuned sawtooth waves to create a thick, wide sound—plays a memorable, uplifting arpeggiated melody. A powerful, clean female vocal delivers the catchy hook, processed with significant hall reverb and delay to make it feel enormous and seamlessly blend with the synths. The entire instrumental bed (pads, lead, bass) is also heavily side-chained to the kick, ensuring every element ducks in volume with each beat to maximize the kick's punch and drive the track forward.\nMosic: 4.5\nBPM: 128.0",
-      ],
-    },
     audio: {
-      $ref: '#/$defs/File',
-      description: 'The generated music as an MP3 file.',
       examples: [
         'https://v3b.fal.media/files/b/0a93b550/klduxmeWsmi304M3zsAlr_output.mp3',
       ],
+      $ref: '#/$defs/File',
+      description: 'The generated music as an MP3 file.',
+    },
+    lyrics: {
+      examples: [
+        "Caption: This is a high-energy Progressive House anthem, a subgenre of EDM defined by its massive scale and uplifting melodic content, all polished with a clean, powerful, and wide stereo production aesthetic. The rhythmic foundation is a punchy, heavily compressed four-on-the-floor kick drum, modeled after a classic Roland TR-909, providing a relentless pulse at 128 BPM. Supporting the kick are crisp, bright open hi-hats on the off-beats and a thick clap/snare layer on beats 2 and 4. The harmonic and melodic core is built from multiple synth layers: vast, shimmering supersaw synth pads play a soaring major-key chord progression; a powerful, monophonic sawtooth bassline plays the root notes and is aggressively side-chained to the kick drum to create the genre's signature 'pumping' effect. Above it all, a soaring supersaw lead synth—composed of multiple detuned sawtooth waves to create a thick, wide sound—plays a memorable, uplifting arpeggiated melody. A powerful, clean female vocal delivers the catchy hook, processed with significant hall reverb and delay to make it feel enormous and seamlessly blend with the synths. The entire instrumental bed (pads, lead, bass) is also heavily side-chained to the kick, ensuring every element ducks in volume with each beat to maximize the kick's punch and drive the track forward.\nMosic: 4.5\nBPM: 128.0",
+      ],
+      title: 'Lyrics',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        'The generated or provided lyrics for the track, if applicable.',
     },
   },
-  title: 'TextToMusicOutput',
   'x-fal-order-properties': ['audio', 'lyrics'],
+  title: 'TextToMusicOutput',
   required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8051,11 +8050,10 @@ export const Lyria3ProOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -8064,82 +8062,82 @@ export const Lyria3ProOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MayaBatchInputSchema = {
-  title: 'MayaVoiceBatchInput',
   required: ['texts', 'prompts'],
   type: 'object',
-  description: 'Input schema for batch Maya-1-Voice TTS generation',
   properties: {
     output_format: {
-      title: 'Output Format',
       enum: ['wav', 'mp3'],
-      type: 'string',
       description: 'Output audio format for all generated speech files',
+      type: 'string',
       examples: ['wav', 'mp3'],
       default: 'wav',
+      title: 'Output Format',
     },
-    sample_rate: {
-      title: 'Sample Rate',
-      enum: ['48 kHz', '24 kHz'],
-      type: 'string',
-      description:
-        'Output audio sample rate for all generations. 48 kHz provides higher quality, 24 kHz is faster.',
-      examples: ['48 kHz', '24 kHz'],
-      default: '48 kHz',
+    repetition_penalty: {
+      description: 'Repetition penalty for all generations.',
+      type: 'number',
+      maximum: 2,
+      minimum: 1,
+      default: 1.1,
+      title: 'Repetition Penalty',
     },
-    max_tokens: {
-      title: 'Max Tokens',
-      minimum: 28,
-      type: 'integer',
-      description: 'Maximum SNAC tokens per generation.',
-      default: 2000,
-      maximum: 4000,
+    temperature: {
+      description: 'Sampling temperature for all generations.',
+      type: 'number',
+      maximum: 2,
+      minimum: 0,
+      default: 0.4,
+      title: 'Temperature',
     },
     prompts: {
       title: 'Prompts',
-      items: { type: 'string' },
-      type: 'array',
+      minItems: 1,
       description:
         'List of voice descriptions for each text. Must match the length of texts list. Each describes the voice/character attributes.',
-      minItems: 1,
+      type: 'array',
       maxItems: 100,
+      items: { type: 'string' },
     },
     texts: {
       title: 'Texts',
-      items: { type: 'string' },
-      type: 'array',
+      minItems: 1,
       description:
         'List of texts to synthesize into speech. You can embed emotion tags in each text using the format <emotion_name>.',
-      minItems: 1,
+      type: 'array',
       maxItems: 100,
-    },
-    temperature: {
-      title: 'Temperature',
-      minimum: 0,
-      type: 'number',
-      description: 'Sampling temperature for all generations.',
-      default: 0.4,
-      maximum: 2,
+      items: { type: 'string' },
     },
     top_p: {
-      title: 'Top P',
-      minimum: 0,
-      type: 'number',
       description: 'Nucleus sampling parameter for all generations.',
-      default: 0.9,
-      maximum: 1,
-    },
-    repetition_penalty: {
-      title: 'Repetition Penalty',
-      minimum: 1,
       type: 'number',
-      description: 'Repetition penalty for all generations.',
-      default: 1.1,
-      maximum: 2,
+      maximum: 1,
+      minimum: 0,
+      default: 0.9,
+      title: 'Top P',
+    },
+    sample_rate: {
+      enum: ['48 kHz', '24 kHz'],
+      description:
+        'Output audio sample rate for all generations. 48 kHz provides higher quality, 24 kHz is faster.',
+      type: 'string',
+      examples: ['48 kHz', '24 kHz'],
+      default: '48 kHz',
+      title: 'Sample Rate',
+    },
+    max_tokens: {
+      description: 'Maximum SNAC tokens per generation.',
+      type: 'integer',
+      maximum: 4000,
+      minimum: 28,
+      default: 2000,
+      title: 'Max Tokens',
     },
   },
   'x-fal-order-properties': [
@@ -8152,10 +8150,11 @@ export const MayaBatchInputSchema = {
     'sample_rate',
     'output_format',
   ],
+  description: 'Input schema for batch Maya-1-Voice TTS generation',
+  title: 'MayaVoiceBatchInput',
 } as const
 
 export const MayaBatchOutputSchema = {
-  title: 'MayaVoiceBatchOutput',
   required: [
     'audios',
     'durations',
@@ -8164,37 +8163,36 @@ export const MayaBatchOutputSchema = {
     'average_rtf',
   ],
   type: 'object',
-  description: 'Output schema for batch Maya-1-Voice TTS generation',
   properties: {
+    durations: {
+      title: 'Durations',
+      description: 'Duration of each generated audio in seconds',
+      type: 'array',
+      items: { type: 'number' },
+    },
     average_rtf: {
-      title: 'Average Rtf',
-      type: 'number',
       description: 'Average real-time factor across all generations',
+      type: 'number',
       examples: [0.15],
+      title: 'Average Rtf',
     },
     total_generation_time: {
-      title: 'Total Generation Time',
-      type: 'number',
       description: 'Total time taken to generate all audio files in seconds',
+      type: 'number',
       examples: [5.7],
+      title: 'Total Generation Time',
     },
     sample_rate: {
-      title: 'Sample Rate',
-      type: 'string',
       description: 'Sample rate of all generated audio files',
+      type: 'string',
       examples: ['48 kHz', '24 kHz'],
+      title: 'Sample Rate',
     },
     audios: {
       title: 'Audios',
-      items: { $ref: '#/$defs/File' },
-      type: 'array',
       description: 'List of generated audio files',
-    },
-    durations: {
-      title: 'Durations',
-      items: { type: 'number' },
       type: 'array',
-      description: 'Duration of each generated audio in seconds',
+      items: { $ref: '#/$defs/File' },
     },
   },
   'x-fal-order-properties': [
@@ -8204,22 +8202,23 @@ export const MayaBatchOutputSchema = {
     'total_generation_time',
     'average_rtf',
   ],
+  description: 'Output schema for batch Maya-1-Voice TTS generation',
+  title: 'MayaVoiceBatchOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8228,11 +8227,10 @@ export const MayaBatchOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -8241,92 +8239,92 @@ export const MayaBatchOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MayaInputSchema = {
-  title: 'MayaVoiceInput',
   required: ['text', 'prompt'],
   type: 'object',
-  description: 'Input schema for Maya-1-Voice TTS generation',
   properties: {
-    output_format: {
-      title: 'Output Format',
-      enum: ['wav', 'mp3'],
+    prompt: {
+      maxLength: 500,
+      description:
+        'Description of the voice/character. Includes attributes like age, accent, pitch, timbre, pacing, tone, and intensity. See examples for format.',
       type: 'string',
+      examples: [
+        'Realistic male voice in the 30s age with american accent. Normal pitch, warm timbre, conversational pacing, neutral tone delivery at med intensity.',
+        'Creative, dark_villain character. Male voice in their 40s with british accent. Low pitch, gravelly timbre, slow pacing, angry tone at high intensity.',
+      ],
+      title: 'Prompt',
+    },
+    output_format: {
+      enum: ['wav', 'mp3'],
       description: 'Output audio format for the generated speech',
+      type: 'string',
       examples: ['wav', 'mp3'],
       default: 'wav',
+      title: 'Output Format',
     },
-    sample_rate: {
-      title: 'Sample Rate',
-      enum: ['48 kHz', '24 kHz'],
-      type: 'string',
+    repetition_penalty: {
       description:
-        'Output audio sample rate. 48 kHz provides higher quality audio, 24 kHz is faster.',
-      examples: ['48 kHz', '24 kHz'],
-      default: '48 kHz',
+        'Penalty for repeating tokens. Higher values reduce repetition artifacts.',
+      type: 'number',
+      maximum: 2,
+      minimum: 1,
+      default: 1.1,
+      title: 'Repetition Penalty',
+    },
+    temperature: {
+      description:
+        'Sampling temperature. Lower values (0.2-0.5) produce more stable/consistent audio. Higher values add variation.',
+      type: 'number',
+      maximum: 2,
+      minimum: 0,
+      default: 0.4,
+      title: 'Temperature',
     },
     text: {
-      title: 'Text',
-      type: 'string',
+      maxLength: 5000,
       description:
         "The text to synthesize into speech. You can embed emotion tags anywhere in the text using the format <emotion_name>. Available emotions: laugh, laugh_harder, sigh, chuckle, gasp, angry, excited, whisper, cry, scream, sing, snort, exhale, gulp, giggle, sarcastic, curious. Example: 'Hello world! <excited> This is amazing!' or 'I can't believe this <sigh> happened again.'",
-      maxLength: 5000,
+      type: 'string',
       examples: [
         'Hello world! This is a test of the Maya-1-Voice text-to-speech system.',
         "The darkness isn't coming... <angry> it's already here!",
         "That's hilarious! <laugh> I can't stop <laugh_harder> thinking about it!",
         "<whisper> I have a secret to tell you. <excited> You won't believe what happened!",
       ],
-    },
-    temperature: {
-      title: 'Temperature',
-      minimum: 0,
-      type: 'number',
-      description:
-        'Sampling temperature. Lower values (0.2-0.5) produce more stable/consistent audio. Higher values add variation.',
-      default: 0.4,
-      maximum: 2,
-    },
-    max_tokens: {
-      title: 'Max Tokens',
-      minimum: 28,
-      type: 'integer',
-      description:
-        'Maximum number of SNAC tokens to generate (7 tokens per frame). Controls maximum audio length.',
-      default: 2000,
-      maximum: 4000,
-    },
-    prompt: {
-      title: 'Prompt',
-      type: 'string',
-      description:
-        'Description of the voice/character. Includes attributes like age, accent, pitch, timbre, pacing, tone, and intensity. See examples for format.',
-      maxLength: 500,
-      examples: [
-        'Realistic male voice in the 30s age with american accent. Normal pitch, warm timbre, conversational pacing, neutral tone delivery at med intensity.',
-        'Creative, dark_villain character. Male voice in their 40s with british accent. Low pitch, gravelly timbre, slow pacing, angry tone at high intensity.',
-      ],
+      title: 'Text',
     },
     top_p: {
-      title: 'Top P',
-      minimum: 0,
-      type: 'number',
       description:
         'Nucleus sampling parameter. Controls diversity of token selection.',
-      default: 0.9,
-      maximum: 1,
-    },
-    repetition_penalty: {
-      title: 'Repetition Penalty',
-      minimum: 1,
       type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0.9,
+      title: 'Top P',
+    },
+    sample_rate: {
+      enum: ['48 kHz', '24 kHz'],
       description:
-        'Penalty for repeating tokens. Higher values reduce repetition artifacts.',
-      default: 1.1,
-      maximum: 2,
+        'Output audio sample rate. 48 kHz provides higher quality audio, 24 kHz is faster.',
+      type: 'string',
+      examples: ['48 kHz', '24 kHz'],
+      default: '48 kHz',
+      title: 'Sample Rate',
+    },
+    max_tokens: {
+      description:
+        'Maximum number of SNAC tokens to generate (7 tokens per frame). Controls maximum audio length.',
+      type: 'integer',
+      maximum: 4000,
+      minimum: 28,
+      default: 2000,
+      title: 'Max Tokens',
     },
   },
   'x-fal-order-properties': [
@@ -8339,43 +8337,43 @@ export const MayaInputSchema = {
     'sample_rate',
     'output_format',
   ],
+  description: 'Input schema for Maya-1-Voice TTS generation',
+  title: 'MayaVoiceInput',
 } as const
 
 export const MayaOutputSchema = {
-  title: 'MayaVoiceOutput',
   required: ['audio', 'duration', 'sample_rate', 'generation_time', 'rtf'],
   type: 'object',
-  description: 'Output schema for Maya-1-Voice TTS generation',
   properties: {
-    generation_time: {
-      title: 'Generation Time',
-      type: 'number',
-      description: 'Time taken to generate the audio in seconds',
-      examples: [2.3],
-    },
-    sample_rate: {
-      title: 'Sample Rate',
-      type: 'string',
-      description: 'Sample rate of the generated audio',
-      examples: ['48 kHz', '24 kHz'],
-    },
     audio: {
-      $ref: '#/$defs/File',
       description:
         'The generated audio file containing the speech (WAV or MP3 format, 24kHz or 48kHz mono depending on upsampler)',
+      $ref: '#/$defs/File',
     },
     rtf: {
-      title: 'Rtf',
-      type: 'number',
       description:
         'Real-time factor (generation_time / audio_duration). Lower is better.',
+      type: 'number',
       examples: [0.51],
+      title: 'Rtf',
+    },
+    sample_rate: {
+      description: 'Sample rate of the generated audio',
+      type: 'string',
+      examples: ['48 kHz', '24 kHz'],
+      title: 'Sample Rate',
     },
     duration: {
-      title: 'Duration',
-      type: 'number',
       description: 'Duration of the generated audio in seconds',
+      type: 'number',
       examples: [4.5],
+      title: 'Duration',
+    },
+    generation_time: {
+      description: 'Time taken to generate the audio in seconds',
+      type: 'number',
+      examples: [2.3],
+      title: 'Generation Time',
     },
   },
   'x-fal-order-properties': [
@@ -8385,22 +8383,23 @@ export const MayaOutputSchema = {
     'generation_time',
     'rtf',
   ],
+  description: 'Output schema for Maya-1-Voice TTS generation',
+  title: 'MayaVoiceOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8409,11 +8408,10 @@ export const MayaOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -8422,91 +8420,91 @@ export const MayaOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MayaStreamInputSchema = {
-  title: 'MayaVoiceStreamingInput',
   required: ['text', 'prompt'],
   type: 'object',
-  description: 'Input schema for Maya-1-Voice streaming TTS generation',
   properties: {
-    output_format: {
-      title: 'Output Format',
-      enum: ['mp3', 'wav', 'pcm'],
-      type: 'string',
-      description:
-        "Output audio format. 'mp3' for browser-playable audio, 'wav' for uncompressed audio, 'pcm' for raw PCM (lowest latency, requires client-side decoding).",
-      examples: ['mp3', 'wav', 'pcm'],
-      default: 'mp3',
-    },
-    sample_rate: {
-      title: 'Sample Rate',
-      enum: ['48 kHz', '24 kHz'],
-      type: 'string',
-      description:
-        'Output audio sample rate. 48 kHz uses upsampling for higher quality audio, 24 kHz is native SNAC output (faster, lower latency).',
-      examples: ['48 kHz', '24 kHz'],
-      default: '24 kHz',
-    },
-    text: {
-      title: 'Text',
-      type: 'string',
-      description:
-        "The text to synthesize into speech. You can embed emotion tags anywhere in the text using the format <emotion_name>. Available emotions: laugh, laugh_harder, sigh, chuckle, gasp, angry, excited, whisper, cry, scream, sing, snort, exhale, gulp, giggle, sarcastic, curious. Example: 'Hello world! <excited> This is amazing!' or 'I can't believe this <sigh> happened again.'",
-      maxLength: 5000,
-      examples: [
-        'Hello world! This is a test of the Maya-1-Voice text-to-speech system.',
-        "The darkness isn't coming... <angry> it's already here!",
-      ],
-    },
-    temperature: {
-      title: 'Temperature',
-      minimum: 0,
-      type: 'number',
-      description:
-        'Sampling temperature. Lower values (0.2-0.5) produce more stable/consistent audio. Higher values add variation.',
-      default: 0.4,
-      maximum: 2,
-    },
-    max_tokens: {
-      title: 'Max Tokens',
-      minimum: 28,
-      type: 'integer',
-      description:
-        'Maximum number of SNAC tokens to generate (7 tokens per frame). Controls maximum audio length.',
-      default: 2000,
-      maximum: 4000,
-    },
     prompt: {
-      title: 'Prompt',
-      type: 'string',
+      maxLength: 500,
       description:
         'Description of the voice/character. Includes attributes like age, accent, pitch, timbre, pacing, tone, and intensity. See examples for format.',
-      maxLength: 500,
+      type: 'string',
       examples: [
         'Realistic male voice in the 30s age with american accent. Normal pitch, warm timbre, conversational pacing, neutral tone delivery at med intensity.',
         'Creative, dark_villain character. Male voice in their 40s with british accent. Low pitch, gravelly timbre, slow pacing, angry tone at high intensity.',
       ],
+      title: 'Prompt',
     },
-    top_p: {
-      title: 'Top P',
-      minimum: 0,
-      type: 'number',
+    output_format: {
+      enum: ['mp3', 'wav', 'pcm'],
       description:
-        'Nucleus sampling parameter. Controls diversity of token selection.',
-      default: 0.9,
-      maximum: 1,
+        "Output audio format. 'mp3' for browser-playable audio, 'wav' for uncompressed audio, 'pcm' for raw PCM (lowest latency, requires client-side decoding).",
+      type: 'string',
+      examples: ['mp3', 'wav', 'pcm'],
+      default: 'mp3',
+      title: 'Output Format',
     },
     repetition_penalty: {
-      title: 'Repetition Penalty',
-      minimum: 1,
-      type: 'number',
       description:
         'Penalty for repeating tokens. Higher values reduce repetition artifacts.',
-      default: 1.1,
+      type: 'number',
       maximum: 2,
+      minimum: 1,
+      default: 1.1,
+      title: 'Repetition Penalty',
+    },
+    temperature: {
+      description:
+        'Sampling temperature. Lower values (0.2-0.5) produce more stable/consistent audio. Higher values add variation.',
+      type: 'number',
+      maximum: 2,
+      minimum: 0,
+      default: 0.4,
+      title: 'Temperature',
+    },
+    text: {
+      maxLength: 5000,
+      description:
+        "The text to synthesize into speech. You can embed emotion tags anywhere in the text using the format <emotion_name>. Available emotions: laugh, laugh_harder, sigh, chuckle, gasp, angry, excited, whisper, cry, scream, sing, snort, exhale, gulp, giggle, sarcastic, curious. Example: 'Hello world! <excited> This is amazing!' or 'I can't believe this <sigh> happened again.'",
+      type: 'string',
+      examples: [
+        'Hello world! This is a test of the Maya-1-Voice text-to-speech system.',
+        "The darkness isn't coming... <angry> it's already here!",
+      ],
+      title: 'Text',
+    },
+    top_p: {
+      description:
+        'Nucleus sampling parameter. Controls diversity of token selection.',
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      default: 0.9,
+      title: 'Top P',
+    },
+    sample_rate: {
+      enum: ['48 kHz', '24 kHz'],
+      description:
+        'Output audio sample rate. 48 kHz uses upsampling for higher quality audio, 24 kHz is native SNAC output (faster, lower latency).',
+      type: 'string',
+      examples: ['48 kHz', '24 kHz'],
+      default: '24 kHz',
+      title: 'Sample Rate',
+    },
+    max_tokens: {
+      description:
+        'Maximum number of SNAC tokens to generate (7 tokens per frame). Controls maximum audio length.',
+      type: 'integer',
+      maximum: 4000,
+      minimum: 28,
+      default: 2000,
+      title: 'Max Tokens',
     },
   },
   'x-fal-order-properties': [
@@ -8519,70 +8517,71 @@ export const MayaStreamInputSchema = {
     'sample_rate',
     'output_format',
   ],
+  description: 'Input schema for Maya-1-Voice streaming TTS generation',
+  title: 'MayaVoiceStreamingInput',
 } as const
 
 export const MayaStreamOutputSchema = {} as const
 
 export const MinimaxMusicInputSchema = {
+  type: 'object',
+  required: ['prompt', 'reference_audio_url'],
+  'x-fal-order-properties': ['prompt', 'reference_audio_url'],
   properties: {
     prompt: {
-      minLength: 1,
       type: 'string',
-      title: 'Prompt',
       examples: [
         "## Fast and Limitless   \n In the heart of the code, where dreams collide,   \n\nFAL's the name, taking tech for a ride.    \nGenerative media, blazing the trail,   \n\nFast inference power, we'll never fail.\n##",
       ],
       description:
         'Lyrics with optional formatting. You can use a newline to separate each line of lyrics. You can use two newlines to add a pause between lines. You can use double hash marks (##) at the beginning and end of the lyrics to add accompaniment. Maximum 600 characters.',
+      minLength: 1,
       maxLength: 600,
+      title: 'Prompt',
     },
     reference_audio_url: {
       type: 'string',
-      title: 'Reference Audio Url',
       examples: ['https://fal.media/files/lion/OOTBTSlxKMH_E8H6hoSlb.mpga'],
       description:
         'Reference song, should contain music and vocals. Must be a .wav or .mp3 file longer than 15 seconds.',
+      title: 'Reference Audio Url',
       'x-fal-file-input': true,
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['prompt', 'reference_audio_url'],
   title: 'TextToMusicRequest',
-  required: ['prompt', 'reference_audio_url'],
 } as const
 
 export const MinimaxMusicOutputSchema = {
+  type: 'object',
+  required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://fal.media/files/elephant/N5UNLCwkC2y8v7a3LQLFE_output.mp3',
         },
       ],
+      $ref: '#/$defs/File',
       description: 'The generated music',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   title: 'MusicOutput',
-  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8591,11 +8590,10 @@ export const MinimaxMusicOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -8604,104 +8602,105 @@ export const MinimaxMusicOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxMusicV15InputSchema = {
+  type: 'object',
+  required: ['prompt', 'lyrics_prompt'],
+  'x-fal-order-properties': ['prompt', 'audio_setting', 'lyrics_prompt'],
   properties: {
     prompt: {
-      minLength: 10,
       type: 'string',
-      title: 'Prompt',
       examples: [
         "[verse]\n Fast and Limitless   \n In the heart of the code, where dreams collide,   \n\nFAL's the name, taking tech for a ride.    \nGenerative media, blazing the trail,   \n\nFast inference power, we'll never fail.\n##",
       ],
       description:
         'Lyrics, supports [intro][verse][chorus][bridge][outro] sections. 10-600 characters.',
-      maxLength: 600,
-    },
-    lyrics_prompt: {
       minLength: 10,
-      type: 'string',
-      title: 'Lyrics Prompt',
-      examples: ['R&B, energetic'],
-      description: 'Control music generation. 10-3000 characters.',
-      maxLength: 3000,
+      maxLength: 600,
+      title: 'Prompt',
     },
     audio_setting: {
-      $ref: '#/$defs/AudioSettingType2',
       description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSettingType2',
+    },
+    lyrics_prompt: {
+      type: 'string',
+      examples: ['R&B, energetic'],
+      description: 'Control music generation. 10-3000 characters.',
+      minLength: 10,
+      maxLength: 3000,
+      title: 'Lyrics Prompt',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['prompt', 'audio_setting', 'lyrics_prompt'],
   title: 'TextToMusic15Request',
-  required: ['prompt', 'lyrics_prompt'],
   $defs: {
     AudioSettingType2: {
+      type: 'object',
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       properties: {
-        bitrate: {
-          default: 256000,
-          type: 'integer',
-          title: 'Bitrate',
-          description: 'Bitrate of generated audio',
-          enum: [32000, 64000, 128000, 256000],
-        },
         sample_rate: {
           default: 44100,
-          type: 'integer',
-          title: 'Sample Rate',
           description: 'Sample rate of generated audio',
+          type: 'integer',
           enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          title: 'Sample Rate',
+        },
+        bitrate: {
+          default: 256000,
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          enum: [32000, 64000, 128000, 256000],
+          title: 'Bitrate',
         },
         format: {
           default: 'mp3',
-          type: 'string',
-          title: 'Format',
           description: 'Audio format',
+          type: 'string',
           enum: ['mp3', 'pcm', 'flac'],
+          title: 'Format',
         },
       },
-      type: 'object',
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       title: 'AudioSetting',
     },
   },
 } as const
 
 export const MinimaxMusicV15OutputSchema = {
+  type: 'object',
+  required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/b3-wJ5bbmVo8S-KPqDBMK_output.mp3',
         },
       ],
+      $ref: '#/$defs/File',
       description: 'The generated music',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   title: 'MusicV15Output',
-  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8710,11 +8709,10 @@ export const MinimaxMusicV15OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -8723,53 +8721,15 @@ export const MinimaxMusicV15OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxMusicV25InputSchema = {
-  properties: {
-    lyrics_optimizer: {
-      default: false,
-      type: 'boolean',
-      title: 'Lyrics Optimizer',
-      description:
-        'When true and lyrics is empty, auto-generates lyrics from the prompt.',
-    },
-    prompt: {
-      minLength: 1,
-      type: 'string',
-      title: 'Prompt',
-      examples: [
-        'Indie folk, melancholic, introspective, longing, solitary walk, coffee shop',
-      ],
-      description:
-        'A description of the music style, mood, genre, and scenario. Max 2000 characters.',
-      maxLength: 2000,
-    },
-    is_instrumental: {
-      default: false,
-      type: 'boolean',
-      title: 'Is Instrumental',
-      description: 'When true, generates vocal-free instrumental music.',
-    },
-    lyrics: {
-      default: '',
-      type: 'string',
-      title: 'Lyrics',
-      examples: [
-        '[verse]\nStreetlights flicker, the night breeze sighs\nShadows stretch as I walk alone\n[chorus]\nWandering, longing, where should I go',
-      ],
-      description:
-        'Lyrics of the song. Use \\n to separate lines. Supports structure tags: [Intro], [Verse], [Pre Chorus], [Chorus], [Bridge], [Outro], [Interlude], [Hook], [Break], [Solo], [Inst]. Max 3500 characters. Required when is_instrumental is false and lyrics_optimizer is false.',
-      maxLength: 3500,
-    },
-    audio_setting: {
-      $ref: '#/$defs/AudioSetting25',
-      description: 'Audio configuration settings',
-    },
-  },
   type: 'object',
+  required: ['prompt'],
   'x-fal-order-properties': [
     'prompt',
     'lyrics',
@@ -8777,72 +8737,111 @@ export const MinimaxMusicV25InputSchema = {
     'lyrics_optimizer',
     'audio_setting',
   ],
+  properties: {
+    prompt: {
+      type: 'string',
+      examples: [
+        'Indie folk, melancholic, introspective, longing, solitary walk, coffee shop',
+      ],
+      description:
+        'A description of the music style, mood, genre, and scenario. Max 2000 characters.',
+      minLength: 1,
+      maxLength: 2000,
+      title: 'Prompt',
+    },
+    is_instrumental: {
+      default: false,
+      description: 'When true, generates vocal-free instrumental music.',
+      type: 'boolean',
+      title: 'Is Instrumental',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting25',
+    },
+    lyrics: {
+      default: '',
+      examples: [
+        '[verse]\nStreetlights flicker, the night breeze sighs\nShadows stretch as I walk alone\n[chorus]\nWandering, longing, where should I go',
+      ],
+      type: 'string',
+      description:
+        'Lyrics of the song. Use \\n to separate lines. Supports structure tags: [Intro], [Verse], [Pre Chorus], [Chorus], [Bridge], [Outro], [Interlude], [Hook], [Break], [Solo], [Inst]. Max 3500 characters. Required when is_instrumental is false and lyrics_optimizer is false.',
+      maxLength: 3500,
+      title: 'Lyrics',
+    },
+    lyrics_optimizer: {
+      default: false,
+      description:
+        'When true and lyrics is empty, auto-generates lyrics from the prompt.',
+      type: 'boolean',
+      title: 'Lyrics Optimizer',
+    },
+  },
   title: 'TextToMusic25PlusRequest',
-  required: ['prompt'],
   $defs: {
     AudioSetting25: {
+      type: 'object',
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       properties: {
-        bitrate: {
-          default: 256000,
-          type: 'integer',
-          title: 'Bitrate',
-          description: 'Bitrate of generated audio',
-          enum: [32000, 64000, 128000, 256000],
-        },
         sample_rate: {
           default: 44100,
-          type: 'integer',
-          title: 'Sample Rate',
           description: 'Sample rate of generated audio',
+          type: 'integer',
           enum: [16000, 24000, 32000, 44100],
+          title: 'Sample Rate',
+        },
+        bitrate: {
+          default: 256000,
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          enum: [32000, 64000, 128000, 256000],
+          title: 'Bitrate',
         },
         format: {
           default: 'mp3',
-          type: 'string',
-          title: 'Format',
           description: 'Audio format',
+          type: 'string',
           enum: ['mp3', 'wav', 'pcm'],
+          title: 'Format',
         },
       },
-      type: 'object',
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       title: 'AudioSetting25',
     },
   },
 } as const
 
 export const MinimaxMusicV25OutputSchema = {
+  type: 'object',
+  required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/kangaroo/GJe3sQehFteUTmpDROzOs_output.mp3',
         },
       ],
+      $ref: '#/$defs/File',
       description: 'The generated music',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   title: 'MusicV25Output',
-  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8851,11 +8850,10 @@ export const MinimaxMusicV25OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -8864,53 +8862,15 @@ export const MinimaxMusicV25OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxMusicV26InputSchema = {
-  properties: {
-    lyrics_optimizer: {
-      default: false,
-      type: 'boolean',
-      title: 'Lyrics Optimizer',
-      description:
-        'When true and lyrics is empty, auto-generates lyrics from the prompt.',
-    },
-    prompt: {
-      minLength: 10,
-      type: 'string',
-      title: 'Prompt',
-      examples: [
-        'City Pop, 80s retro, groovy synth bass, warm female vocal, 104 BPM, nostalgic urban night',
-      ],
-      description:
-        'A description of the music style, mood, genre, and scenario. 10-2000 characters.',
-      maxLength: 2000,
-    },
-    is_instrumental: {
-      default: false,
-      type: 'boolean',
-      title: 'Is Instrumental',
-      description: 'When true, generates vocal-free instrumental music.',
-    },
-    lyrics: {
-      default: '',
-      type: 'string',
-      title: 'Lyrics',
-      examples: [
-        '[verse]\nStreetlights flicker, the night breeze sighs\nShadows stretch as I walk alone\n[chorus]\nWandering, longing, where should I go',
-      ],
-      description:
-        'Lyrics of the song. Use \\n to separate lines. Supports structure tags: [Intro], [Verse], [Pre Chorus], [Chorus], [Post Chorus], [Hook], [Bridge], [Interlude], [Transition], [Build Up], [Break], [Inst], [Solo], [Outro]. Max 3500 characters. Required when is_instrumental is false.',
-      maxLength: 3500,
-    },
-    audio_setting: {
-      $ref: '#/$defs/AudioSetting25',
-      description: 'Audio configuration settings',
-    },
-  },
   type: 'object',
+  required: ['prompt'],
   'x-fal-order-properties': [
     'prompt',
     'lyrics',
@@ -8918,72 +8878,111 @@ export const MinimaxMusicV26InputSchema = {
     'is_instrumental',
     'audio_setting',
   ],
+  properties: {
+    prompt: {
+      type: 'string',
+      examples: [
+        'City Pop, 80s retro, groovy synth bass, warm female vocal, 104 BPM, nostalgic urban night',
+      ],
+      description:
+        'A description of the music style, mood, genre, and scenario. 10-2000 characters.',
+      minLength: 10,
+      maxLength: 2000,
+      title: 'Prompt',
+    },
+    is_instrumental: {
+      default: false,
+      description: 'When true, generates vocal-free instrumental music.',
+      type: 'boolean',
+      title: 'Is Instrumental',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting25',
+    },
+    lyrics: {
+      default: '',
+      examples: [
+        '[verse]\nStreetlights flicker, the night breeze sighs\nShadows stretch as I walk alone\n[chorus]\nWandering, longing, where should I go',
+      ],
+      type: 'string',
+      description:
+        'Lyrics of the song. Use \\n to separate lines. Supports structure tags: [Intro], [Verse], [Pre Chorus], [Chorus], [Post Chorus], [Hook], [Bridge], [Interlude], [Transition], [Build Up], [Break], [Inst], [Solo], [Outro]. Max 3500 characters. Required when is_instrumental is false.',
+      maxLength: 3500,
+      title: 'Lyrics',
+    },
+    lyrics_optimizer: {
+      default: false,
+      description:
+        'When true and lyrics is empty, auto-generates lyrics from the prompt.',
+      type: 'boolean',
+      title: 'Lyrics Optimizer',
+    },
+  },
   title: 'TextToMusic26Request',
-  required: ['prompt'],
   $defs: {
     AudioSetting25: {
+      type: 'object',
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       properties: {
-        bitrate: {
-          default: 256000,
-          type: 'integer',
-          title: 'Bitrate',
-          description: 'Bitrate of generated audio',
-          enum: [32000, 64000, 128000, 256000],
-        },
         sample_rate: {
           default: 44100,
-          type: 'integer',
-          title: 'Sample Rate',
           description: 'Sample rate of generated audio',
+          type: 'integer',
           enum: [16000, 24000, 32000, 44100],
+          title: 'Sample Rate',
+        },
+        bitrate: {
+          default: 256000,
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          enum: [32000, 64000, 128000, 256000],
+          title: 'Bitrate',
         },
         format: {
           default: 'mp3',
-          type: 'string',
-          title: 'Format',
           description: 'Audio format',
+          type: 'string',
           enum: ['mp3', 'wav', 'pcm'],
+          title: 'Format',
         },
       },
-      type: 'object',
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       title: 'AudioSetting25',
     },
   },
 } as const
 
 export const MinimaxMusicV26OutputSchema = {
+  type: 'object',
+  required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/kangaroo/GJe3sQehFteUTmpDROzOs_output.mp3',
         },
       ],
+      $ref: '#/$defs/File',
       description: 'The generated music',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   title: 'MusicV26Output',
-  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -8992,11 +8991,10 @@ export const MinimaxMusicV26OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -9005,107 +9003,108 @@ export const MinimaxMusicV26OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxMusicV2InputSchema = {
+  type: 'object',
+  required: ['prompt', 'lyrics_prompt'],
+  'x-fal-order-properties': ['prompt', 'lyrics_prompt', 'audio_setting'],
   properties: {
     prompt: {
-      minLength: 10,
       type: 'string',
-      title: 'Prompt',
       examples: [
         'Indie folk, melancholic, introspective, longing, solitary walk, coffee shop',
       ],
       description:
         'A description of the music, specifying style, mood, and scenario. 10-300 characters.',
+      minLength: 10,
       maxLength: 2000,
+      title: 'Prompt',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSettingType2',
     },
     lyrics_prompt: {
-      minLength: 10,
       type: 'string',
-      title: 'Lyrics Prompt',
       examples: [
         '[verse]Streetlights flicker, the night breeze sighsShadows stretch as I walk aloneAn old coat wraps my silent sorrow\nWandering, longing, where should I go[chorus]Pushing the wooden door, the aroma spreadsIn a familiar corner, a stranger gazes',
       ],
       description:
         'Lyrics of the song. Use n to separate lines. You may add structure tags like [Intro], [Verse], [Chorus], [Bridge], [Outro] to enhance the arrangement. 10-3000 characters.',
+      minLength: 10,
       maxLength: 3000,
-    },
-    audio_setting: {
-      $ref: '#/$defs/AudioSettingType2',
-      description: 'Audio configuration settings',
+      title: 'Lyrics Prompt',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['prompt', 'lyrics_prompt', 'audio_setting'],
   title: 'TextToMusic20Request',
-  required: ['prompt', 'lyrics_prompt'],
   $defs: {
     AudioSettingType2: {
+      type: 'object',
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       properties: {
-        bitrate: {
-          default: 256000,
-          type: 'integer',
-          title: 'Bitrate',
-          description: 'Bitrate of generated audio',
-          enum: [32000, 64000, 128000, 256000],
-        },
         sample_rate: {
           default: 44100,
-          type: 'integer',
-          title: 'Sample Rate',
           description: 'Sample rate of generated audio',
+          type: 'integer',
           enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          title: 'Sample Rate',
+        },
+        bitrate: {
+          default: 256000,
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          enum: [32000, 64000, 128000, 256000],
+          title: 'Bitrate',
         },
         format: {
           default: 'mp3',
-          type: 'string',
-          title: 'Format',
           description: 'Audio format',
+          type: 'string',
           enum: ['mp3', 'pcm', 'flac'],
+          title: 'Format',
         },
       },
-      type: 'object',
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format'],
       title: 'AudioSetting',
     },
   },
 } as const
 
 export const MinimaxMusicV2OutputSchema = {
+  type: 'object',
+  required: ['audio'],
+  'x-fal-order-properties': ['audio'],
   properties: {
     audio: {
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/b3-wJ5bbmVo8S-KPqDBMK_output.mp3',
         },
       ],
+      $ref: '#/$defs/File',
       description: 'The generated music',
     },
   },
-  type: 'object',
-  'x-fal-order-properties': ['audio'],
   title: 'MusicV15Output',
-  required: ['audio'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -9114,11 +9113,10 @@ export const MinimaxMusicV2OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -9127,41 +9125,49 @@ export const MinimaxMusicV2OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxPreviewSpeech25HdInputSchema = {
-  type: 'object',
   required: ['text'],
+  type: 'object',
   properties: {
-    output_format: {
+    text: {
+      minLength: 1,
+      maxLength: 5000,
+      description:
+        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
       type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
+      examples: ['Hello world! This is a test of the text-to-speech system.'],
+      title: 'Text',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting',
+    },
+    output_format: {
       enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
       title: 'Output Format',
     },
     voice_setting: {
       description: 'Voice configuration settings',
       $ref: '#/$defs/VoiceSetting',
       default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
         english_normalization: false,
         vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
       },
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
-    },
-    audio_setting: {
-      description: 'Audio configuration settings',
-      $ref: '#/$defs/AudioSetting',
-    },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -9211,17 +9217,11 @@ export const MinimaxPreviewSpeech25HdInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
-    text: {
-      title: 'Text',
-      description:
-        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
-      type: 'string',
-      examples: ['Hello world! This is a test of the text-to-speech system.'],
-      minLength: 1,
-      maxLength: 5000,
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
     },
   },
   'x-fal-order-properties': [
@@ -9235,83 +9235,69 @@ export const MinimaxPreviewSpeech25HdInputSchema = {
   title: 'TextToSpeechHDv25Request',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -9332,10 +9318,41 @@ export const MinimaxPreviewSpeech25HdInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -9351,68 +9368,50 @@ export const MinimaxPreviewSpeech25HdInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
 export const MinimaxPreviewSpeech25HdOutputSchema = {
-  type: 'object',
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
   title: 'TextToSpeechOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -9421,11 +9420,10 @@ export const MinimaxPreviewSpeech25HdOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -9434,41 +9432,49 @@ export const MinimaxPreviewSpeech25HdOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxPreviewSpeech25TurboInputSchema = {
-  type: 'object',
   required: ['text'],
+  type: 'object',
   properties: {
-    output_format: {
+    text: {
+      minLength: 1,
+      maxLength: 5000,
+      description:
+        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
       type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
+      examples: ['Hello world! This is a test of the text-to-speech system.'],
+      title: 'Text',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting',
+    },
+    output_format: {
       enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
       title: 'Output Format',
     },
     voice_setting: {
       description: 'Voice configuration settings',
       $ref: '#/$defs/VoiceSetting',
       default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
         english_normalization: false,
         vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
       },
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
-    },
-    audio_setting: {
-      description: 'Audio configuration settings',
-      $ref: '#/$defs/AudioSetting',
-    },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -9518,17 +9524,11 @@ export const MinimaxPreviewSpeech25TurboInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
-    text: {
-      title: 'Text',
-      description:
-        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
-      type: 'string',
-      examples: ['Hello world! This is a test of the text-to-speech system.'],
-      minLength: 1,
-      maxLength: 5000,
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
     },
   },
   'x-fal-order-properties': [
@@ -9542,83 +9542,69 @@ export const MinimaxPreviewSpeech25TurboInputSchema = {
   title: 'TextToSpeechTurbov25Request',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -9639,10 +9625,41 @@ export const MinimaxPreviewSpeech25TurboInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -9658,68 +9675,50 @@ export const MinimaxPreviewSpeech25TurboInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
 export const MinimaxPreviewSpeech25TurboOutputSchema = {
-  type: 'object',
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
   title: 'TextToSpeechOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -9728,11 +9727,10 @@ export const MinimaxPreviewSpeech25TurboOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -9741,41 +9739,49 @@ export const MinimaxPreviewSpeech25TurboOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxSpeech02HdInputSchema = {
-  type: 'object',
   required: ['text'],
+  type: 'object',
   properties: {
-    output_format: {
+    text: {
+      minLength: 1,
+      maxLength: 5000,
+      description:
+        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
       type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
+      examples: ['Hello world! This is a test of the text-to-speech system.'],
+      title: 'Text',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting',
+    },
+    output_format: {
       enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
       title: 'Output Format',
     },
     voice_setting: {
       description: 'Voice configuration settings',
       $ref: '#/$defs/VoiceSetting',
       default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
         english_normalization: false,
         vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
       },
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
-    },
-    audio_setting: {
-      description: 'Audio configuration settings',
-      $ref: '#/$defs/AudioSetting',
-    },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -9822,17 +9828,11 @@ export const MinimaxSpeech02HdInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
-    text: {
-      title: 'Text',
-      description:
-        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
-      type: 'string',
-      examples: ['Hello world! This is a test of the text-to-speech system.'],
-      minLength: 1,
-      maxLength: 5000,
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
     },
   },
   'x-fal-order-properties': [
@@ -9846,83 +9846,69 @@ export const MinimaxSpeech02HdInputSchema = {
   title: 'TextToSpeechHDRequest',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -9943,10 +9929,41 @@ export const MinimaxSpeech02HdInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -9962,68 +9979,50 @@ export const MinimaxSpeech02HdInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
 export const MinimaxSpeech02HdOutputSchema = {
-  type: 'object',
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
   title: 'TextToSpeechOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -10032,11 +10031,10 @@ export const MinimaxSpeech02HdOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -10045,41 +10043,49 @@ export const MinimaxSpeech02HdOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxSpeech02TurboInputSchema = {
-  type: 'object',
   required: ['text'],
+  type: 'object',
   properties: {
-    output_format: {
+    text: {
+      minLength: 1,
+      maxLength: 5000,
+      description:
+        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
       type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
+      examples: ['Hello world! This is a test of the text-to-speech system.'],
+      title: 'Text',
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting',
+    },
+    output_format: {
       enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
       title: 'Output Format',
     },
     voice_setting: {
       description: 'Voice configuration settings',
       $ref: '#/$defs/VoiceSetting',
       default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
         english_normalization: false,
         vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
       },
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
-    },
-    audio_setting: {
-      description: 'Audio configuration settings',
-      $ref: '#/$defs/AudioSetting',
-    },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -10126,17 +10132,11 @@ export const MinimaxSpeech02TurboInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
-    text: {
-      title: 'Text',
-      description:
-        'Text to convert to speech (max 5000 characters, minimum 1 non-whitespace character)',
-      type: 'string',
-      examples: ['Hello world! This is a test of the text-to-speech system.'],
-      minLength: 1,
-      maxLength: 5000,
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
     },
   },
   'x-fal-order-properties': [
@@ -10150,83 +10150,69 @@ export const MinimaxSpeech02TurboInputSchema = {
   title: 'TextToSpeechTurboRequest',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -10247,10 +10233,41 @@ export const MinimaxSpeech02TurboInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -10266,68 +10283,50 @@ export const MinimaxSpeech02TurboInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
 export const MinimaxSpeech02TurboOutputSchema = {
-  type: 'object',
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://fal.media/files/kangaroo/kojPUCNZ9iUGFGMR-xb7h_speech.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
   title: 'TextToSpeechOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -10336,11 +10335,10 @@ export const MinimaxSpeech02TurboOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -10349,52 +10347,55 @@ export const MinimaxSpeech02TurboOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxSpeech26HdInputSchema = {
-  type: 'object',
   required: ['prompt'],
+  type: 'object',
   properties: {
-    output_format: {
-      type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
-      enum: ['url', 'hex'],
-      title: 'Output Format',
-    },
-    voice_setting: {
-      description: 'Voice configuration settings',
-      $ref: '#/$defs/VoiceSetting',
-      default: {
-        english_normalization: false,
-        vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
-      },
-    },
     prompt: {
-      title: 'Prompt',
+      minLength: 1,
+      maxLength: 10000,
       description:
         'Text to convert to speech. Paragraph breaks should be marked with newline characters. **NOTE**: You can customize speech pauses by adding markers in the form `<#x#>`, where `x` is the pause duration in seconds. Valid range: `[0.01, 99.99]`, up to two decimal places. Pause markers must be placed between speakable text segments and cannot be used consecutively.',
       type: 'string',
       examples: [
         "Hello world! Welcome MiniMax's new text to speech model <#0.1#> Speech 2.6, now available on Fal!",
       ],
-      minLength: 1,
-      maxLength: 10000,
+      title: 'Prompt',
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
+    output_format: {
+      enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
+      title: 'Output Format',
     },
     audio_setting: {
       description: 'Audio configuration settings',
       $ref: '#/$defs/AudioSetting',
     },
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
+    },
+    voice_setting: {
+      description: 'Voice configuration settings',
+      $ref: '#/$defs/VoiceSetting',
+      default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
+        english_normalization: false,
+        vol: 1,
+      },
+    },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -10441,7 +10442,6 @@ export const MinimaxSpeech26HdInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
     normalization_setting: {
@@ -10461,125 +10461,111 @@ export const MinimaxSpeech26HdInputSchema = {
   title: 'TextToSpeechHD26Request',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     LoudnessNormalizationSetting: {
-      type: 'object',
-      properties: {
-        target_range: {
-          maximum: 20,
-          description: 'Target loudness range in LU (default 8.0)',
-          type: 'number',
-          default: 8,
-          minimum: 0,
-          title: 'Target Range',
-        },
-        enabled: {
-          type: 'boolean',
-          description: 'Enable loudness normalization for the audio',
-          default: true,
-          title: 'Enabled',
-        },
-        target_peak: {
-          maximum: 0,
-          description: 'Target peak level in dBTP (default -0.5).',
-          type: 'number',
-          default: -0.5,
-          minimum: -3,
-          title: 'Target Peak',
-        },
-        target_loudness: {
-          maximum: -10,
-          description: 'Target loudness in LUFS (default -18.0)',
-          type: 'number',
-          default: -18,
-          minimum: -70,
-          title: 'Target Loudness',
-        },
-      },
       'x-fal-order-properties': [
         'enabled',
         'target_loudness',
         'target_range',
         'target_peak',
       ],
+      type: 'object',
+      properties: {
+        target_peak: {
+          description: 'Target peak level in dBTP (default -0.5).',
+          type: 'number',
+          minimum: -3,
+          maximum: 0,
+          default: -0.5,
+          title: 'Target Peak',
+        },
+        target_loudness: {
+          description: 'Target loudness in LUFS (default -18.0)',
+          type: 'number',
+          minimum: -70,
+          maximum: -10,
+          default: -18,
+          title: 'Target Loudness',
+        },
+        target_range: {
+          description: 'Target loudness range in LU (default 8.0)',
+          type: 'number',
+          minimum: 0,
+          maximum: 20,
+          default: 8,
+          title: 'Target Range',
+        },
+        enabled: {
+          description: 'Enable loudness normalization for the audio',
+          type: 'boolean',
+          default: true,
+          title: 'Enabled',
+        },
+      },
       title: 'LoudnessNormalizationSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -10600,10 +10586,41 @@ export const MinimaxSpeech26HdInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -10619,68 +10636,50 @@ export const MinimaxSpeech26HdInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
 export const MinimaxSpeech26HdOutputSchema = {
-  type: 'object',
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/minimax-speech-26/speech_26_hd_out.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
   title: 'TextToSpeechHD26Output',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -10689,11 +10688,10 @@ export const MinimaxSpeech26HdOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -10702,52 +10700,55 @@ export const MinimaxSpeech26HdOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxSpeech26TurboInputSchema = {
-  type: 'object',
   required: ['prompt'],
+  type: 'object',
   properties: {
-    output_format: {
-      type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
-      enum: ['url', 'hex'],
-      title: 'Output Format',
-    },
-    voice_setting: {
-      description: 'Voice configuration settings',
-      $ref: '#/$defs/VoiceSetting',
-      default: {
-        english_normalization: false,
-        vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
-      },
-    },
     prompt: {
-      title: 'Prompt',
+      minLength: 1,
+      maxLength: 10000,
       description:
         'Text to convert to speech. Paragraph breaks should be marked with newline characters. **NOTE**: You can customize speech pauses by adding markers in the form `<#x#>`, where `x` is the pause duration in seconds. Valid range: `[0.01, 99.99]`, up to two decimal places. Pause markers must be placed between speakable text segments and cannot be used consecutively.',
       type: 'string',
       examples: [
         "Hello world! Welcome MiniMax's new text to speech model <#0.1#> Speech 2.6 Turbo, now available on Fal!",
       ],
-      minLength: 1,
-      maxLength: 10000,
+      title: 'Prompt',
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
+    output_format: {
+      enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
+      title: 'Output Format',
     },
     audio_setting: {
       description: 'Audio configuration settings',
       $ref: '#/$defs/AudioSetting',
     },
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
+    },
+    voice_setting: {
+      description: 'Voice configuration settings',
+      $ref: '#/$defs/VoiceSetting',
+      default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
+        english_normalization: false,
+        vol: 1,
+      },
+    },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -10794,7 +10795,6 @@ export const MinimaxSpeech26TurboInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
     normalization_setting: {
@@ -10814,125 +10814,111 @@ export const MinimaxSpeech26TurboInputSchema = {
   title: 'TextToSpeechTurbo26Request',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     LoudnessNormalizationSetting: {
-      type: 'object',
-      properties: {
-        target_range: {
-          maximum: 20,
-          description: 'Target loudness range in LU (default 8.0)',
-          type: 'number',
-          default: 8,
-          minimum: 0,
-          title: 'Target Range',
-        },
-        enabled: {
-          type: 'boolean',
-          description: 'Enable loudness normalization for the audio',
-          default: true,
-          title: 'Enabled',
-        },
-        target_peak: {
-          maximum: 0,
-          description: 'Target peak level in dBTP (default -0.5).',
-          type: 'number',
-          default: -0.5,
-          minimum: -3,
-          title: 'Target Peak',
-        },
-        target_loudness: {
-          maximum: -10,
-          description: 'Target loudness in LUFS (default -18.0)',
-          type: 'number',
-          default: -18,
-          minimum: -70,
-          title: 'Target Loudness',
-        },
-      },
       'x-fal-order-properties': [
         'enabled',
         'target_loudness',
         'target_range',
         'target_peak',
       ],
+      type: 'object',
+      properties: {
+        target_peak: {
+          description: 'Target peak level in dBTP (default -0.5).',
+          type: 'number',
+          minimum: -3,
+          maximum: 0,
+          default: -0.5,
+          title: 'Target Peak',
+        },
+        target_loudness: {
+          description: 'Target loudness in LUFS (default -18.0)',
+          type: 'number',
+          minimum: -70,
+          maximum: -10,
+          default: -18,
+          title: 'Target Loudness',
+        },
+        target_range: {
+          description: 'Target loudness range in LU (default 8.0)',
+          type: 'number',
+          minimum: 0,
+          maximum: 20,
+          default: 8,
+          title: 'Target Range',
+        },
+        enabled: {
+          description: 'Enable loudness normalization for the audio',
+          type: 'boolean',
+          default: true,
+          title: 'Enabled',
+        },
+      },
       title: 'LoudnessNormalizationSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -10953,10 +10939,41 @@ export const MinimaxSpeech26TurboInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -10972,68 +10989,50 @@ export const MinimaxSpeech26TurboInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
 export const MinimaxSpeech26TurboOutputSchema = {
-  type: 'object',
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/minimax-speech-26/speech_26_turbo_out.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
   title: 'TextToSpeechTurbo26Output',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -11042,11 +11041,10 @@ export const MinimaxSpeech26TurboOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -11055,425 +11053,52 @@ export const MinimaxSpeech26TurboOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxSpeech28HdInputSchema = {
-  type: 'object',
-  description:
-    'Request model for Speech 2.8 HD - highest quality speech synthesis.',
   required: ['prompt'],
+  type: 'object',
   properties: {
-    output_format: {
-      type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
-      enum: ['url', 'hex'],
-      title: 'Output Format',
-    },
-    normalization_setting: {
-      description: 'Loudness normalization settings for the audio',
-      $ref: '#/$defs/LoudnessNormalizationSetting',
-    },
-    language_boost: {
-      anyOf: [
-        {
-          enum: [
-            'Chinese',
-            'Chinese,Yue',
-            'English',
-            'Arabic',
-            'Russian',
-            'Spanish',
-            'French',
-            'Portuguese',
-            'German',
-            'Turkish',
-            'Dutch',
-            'Ukrainian',
-            'Vietnamese',
-            'Indonesian',
-            'Japanese',
-            'Italian',
-            'Korean',
-            'Thai',
-            'Polish',
-            'Romanian',
-            'Greek',
-            'Czech',
-            'Finnish',
-            'Hindi',
-            'Bulgarian',
-            'Danish',
-            'Hebrew',
-            'Malay',
-            'Slovak',
-            'Swedish',
-            'Croatian',
-            'Hungarian',
-            'Norwegian',
-            'Slovenian',
-            'Catalan',
-            'Nynorsk',
-            'Afrikaans',
-            'auto',
-          ],
-          type: 'string',
-        },
-        { type: 'null' },
-      ],
-      description: 'Enhance recognition of specified languages and dialects',
-      title: 'Language Boost',
-    },
-    voice_modify: {
-      description:
-        'Voice modification settings to adjust pitch, intensity, and timbre.',
-      anyOf: [{ $ref: '#/$defs/VoiceModify' }, { type: 'null' }],
-    },
     prompt: {
-      title: 'Prompt',
+      minLength: 1,
+      maxLength: 10000,
       description:
         'Text to convert to speech. Use `<#x#>` for pauses (x = 0.01-99.99 seconds). Supports interjection tags: `(laughs)`, `(sighs)`, `(coughs)`, `(clears throat)`, `(gasps)`, `(sniffs)`, `(groans)`, `(yawns)`.',
       type: 'string',
       examples: [
         "Hello world! Welcome to MiniMax's new text to speech model <#0.1#> Speech 2.8 HD (laughs) now available on Fal!",
       ],
-      minLength: 1,
-      maxLength: 10000,
+      title: 'Prompt',
     },
-    pronunciation_dict: {
-      description: 'Custom pronunciation dictionary for text replacement',
-      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
+    output_format: {
+      enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
+      title: 'Output Format',
     },
-    audio_setting: {
-      description: 'Audio configuration settings',
-      $ref: '#/$defs/AudioSetting',
+    voice_modify: {
+      description:
+        'Voice modification settings to adjust pitch, intensity, and timbre.',
+      anyOf: [{ $ref: '#/$defs/VoiceModify' }, { type: 'null' }],
     },
     voice_setting: {
       description: 'Voice configuration settings',
       $ref: '#/$defs/VoiceSetting',
       default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
         english_normalization: false,
         vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
       },
-    },
-  },
-  'x-fal-order-properties': [
-    'prompt',
-    'voice_setting',
-    'audio_setting',
-    'language_boost',
-    'output_format',
-    'pronunciation_dict',
-    'normalization_setting',
-    'voice_modify',
-  ],
-  title: 'TextToSpeechHD28Request',
-  $defs: {
-    AudioSetting: {
-      type: 'object',
-      properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
-        bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
-          enum: [32000, 64000, 128000, 256000],
-          title: 'Bitrate',
-        },
-        format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
-          enum: ['mp3', 'pcm', 'flac'],
-          title: 'Format',
-        },
-      },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
-      title: 'AudioSetting',
-    },
-    LoudnessNormalizationSetting: {
-      type: 'object',
-      properties: {
-        target_range: {
-          maximum: 20,
-          description: 'Target loudness range in LU (default 8.0)',
-          type: 'number',
-          default: 8,
-          minimum: 0,
-          title: 'Target Range',
-        },
-        enabled: {
-          type: 'boolean',
-          description: 'Enable loudness normalization for the audio',
-          default: true,
-          title: 'Enabled',
-        },
-        target_peak: {
-          maximum: 0,
-          description: 'Target peak level in dBTP (default -0.5).',
-          type: 'number',
-          default: -0.5,
-          minimum: -3,
-          title: 'Target Peak',
-        },
-        target_loudness: {
-          maximum: -10,
-          description: 'Target loudness in LUFS (default -18.0)',
-          type: 'number',
-          default: -18,
-          minimum: -70,
-          title: 'Target Loudness',
-        },
-      },
-      'x-fal-order-properties': [
-        'enabled',
-        'target_loudness',
-        'target_range',
-        'target_peak',
-      ],
-      title: 'LoudnessNormalizationSetting',
-    },
-    PronunciationDict: {
-      type: 'object',
-      properties: {
-        tone_list: {
-          type: 'array',
-          description:
-            "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
-          items: { type: 'string' },
-          title: 'Tone List',
-        },
-      },
-      'x-fal-order-properties': ['tone_list'],
-      title: 'PronunciationDict',
-    },
-    VoiceModify: {
-      type: 'object',
-      description: 'Voice modification settings for Speech 2.8 models.',
-      properties: {
-        intensity: {
-          maximum: 100,
-          description:
-            'Intensity/energy of the voice. Range: -100 to 100. Higher values create more energetic speech.',
-          type: 'integer',
-          default: 0,
-          minimum: -100,
-          title: 'Intensity',
-        },
-        timbre: {
-          maximum: 100,
-          description:
-            'Timbre adjustment. Range: -100 to 100. Affects the tonal quality of the voice.',
-          type: 'integer',
-          default: 0,
-          minimum: -100,
-          title: 'Timbre',
-        },
-        pitch: {
-          maximum: 100,
-          description:
-            'Pitch adjustment in semitones. Range: -100 to 100. Positive values raise pitch, negative values lower it.',
-          type: 'integer',
-          default: 0,
-          minimum: -100,
-          title: 'Pitch',
-        },
-      },
-      'x-fal-order-properties': ['pitch', 'intensity', 'timbre'],
-      title: 'VoiceModify',
-    },
-    VoiceSetting: {
-      type: 'object',
-      properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
-        voice_id: {
-          type: 'string',
-          description: 'Predefined voice ID to use for synthesis',
-          examples: [
-            'Wise_Woman',
-            'Friendly_Person',
-            'Inspirational_girl',
-            'Deep_Voice_Man',
-            'Calm_Woman',
-            'Casual_Guy',
-            'Lively_Girl',
-            'Patient_Man',
-            'Young_Knight',
-            'Determined_Man',
-            'Lovely_Girl',
-            'Decent_Boy',
-            'Imposing_Manner',
-            'Elegant_Man',
-            'Abbess',
-            'Sweet_Girl_2',
-            'Exuberant_Girl',
-          ],
-          default: 'Wise_Woman',
-          minLength: 1,
-          title: 'Voice Id',
-        },
-        emotion: {
-          anyOf: [
-            {
-              enum: [
-                'happy',
-                'sad',
-                'angry',
-                'fearful',
-                'disgusted',
-                'surprised',
-                'neutral',
-              ],
-              type: 'string',
-            },
-            { type: 'null' },
-          ],
-          description: 'Emotion of the generated speech',
-          title: 'Emotion',
-        },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
-      },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
-      title: 'VoiceSetting',
-    },
-  },
-} as const
-
-export const MinimaxSpeech28HdOutputSchema = {
-  type: 'object',
-  description: 'Output model for Speech 2.8 HD.',
-  required: ['audio', 'duration_ms'],
-  properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
-    audio: {
-      description: 'The generated audio file',
-      $ref: '#/$defs/File',
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8d0bda/pF8woD8Iafl8vL6BMk4k4_speech.mp3',
-        },
-      ],
-    },
-  },
-  'x-fal-order-properties': ['audio', 'duration_ms'],
-  title: 'TextToSpeechHD28Output',
-  $defs: {
-    File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
-      'x-fal-order-properties': [
-        'url',
-        'content_type',
-        'file_name',
-        'file_size',
-      ],
-      properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-        file_name: {
-          examples: ['z9RV14K95DvU.png'],
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        content_type: {
-          examples: ['image/png'],
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-      },
-    },
-  },
-} as const
-
-export const MinimaxSpeech28TurboInputSchema = {
-  type: 'object',
-  description:
-    'Request model for Speech 2.8 Turbo - faster speech synthesis with good quality.',
-  required: ['prompt'],
-  properties: {
-    output_format: {
-      type: 'string',
-      description: 'Format of the output content (non-streaming only)',
-      default: 'hex',
-      enum: ['url', 'hex'],
-      title: 'Output Format',
-    },
-    normalization_setting: {
-      description: 'Loudness normalization settings for the audio',
-      $ref: '#/$defs/LoudnessNormalizationSetting',
     },
     language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
       anyOf: [
         {
           enum: [
@@ -11520,24 +11145,11 @@ export const MinimaxSpeech28TurboInputSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Enhance recognition of specified languages and dialects',
       title: 'Language Boost',
     },
-    voice_modify: {
-      description:
-        'Voice modification settings to adjust pitch, intensity, and timbre.',
-      anyOf: [{ $ref: '#/$defs/VoiceModify' }, { type: 'null' }],
-    },
-    prompt: {
-      title: 'Prompt',
-      description:
-        'Text to convert to speech. Use `<#x#>` for pauses (x = 0.01-99.99 seconds). Supports interjection tags: `(laughs)`, `(sighs)`, `(coughs)`, `(clears throat)`, `(gasps)`, `(sniffs)`, `(groans)`, `(yawns)`.',
-      type: 'string',
-      examples: [
-        "Hello world! Welcome to MiniMax's new text to speech model <#0.1#> Speech 2.8 Turbo (sighs) now available on Fal!",
-      ],
-      minLength: 1,
-      maxLength: 10000,
+    normalization_setting: {
+      description: 'Loudness normalization settings for the audio',
+      $ref: '#/$defs/LoudnessNormalizationSetting',
     },
     pronunciation_dict: {
       description: 'Custom pronunciation dictionary for text replacement',
@@ -11546,17 +11158,6 @@ export const MinimaxSpeech28TurboInputSchema = {
     audio_setting: {
       description: 'Audio configuration settings',
       $ref: '#/$defs/AudioSetting',
-    },
-    voice_setting: {
-      description: 'Voice configuration settings',
-      $ref: '#/$defs/VoiceSetting',
-      default: {
-        english_normalization: false,
-        vol: 1,
-        speed: 1,
-        voice_id: 'Wise_Woman',
-        pitch: 0,
-      },
     },
   },
   'x-fal-order-properties': [
@@ -11569,163 +11170,151 @@ export const MinimaxSpeech28TurboInputSchema = {
     'normalization_setting',
     'voice_modify',
   ],
-  title: 'TextToSpeechTurbo28Request',
+  description:
+    'Request model for Speech 2.8 HD - highest quality speech synthesis.',
+  title: 'TextToSpeechHD28Request',
   $defs: {
     AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       type: 'object',
       properties: {
-        channel: {
-          type: 'integer',
-          description: 'Number of audio channels (1=mono, 2=stereo)',
-          default: 1,
-          enum: [1, 2],
-          title: 'Channel',
-        },
-        sample_rate: {
-          type: 'integer',
-          description: 'Sample rate of generated audio',
-          default: 32000,
-          enum: [8000, 16000, 22050, 24000, 32000, 44100],
-          title: 'Sample Rate',
-        },
         bitrate: {
-          type: 'integer',
-          description: 'Bitrate of generated audio',
-          default: 128000,
           enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
           title: 'Bitrate',
         },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
         format: {
-          type: 'string',
-          description: 'Audio format',
-          default: 'mp3',
           enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
           title: 'Format',
         },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
       },
-      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
       title: 'AudioSetting',
     },
     LoudnessNormalizationSetting: {
-      type: 'object',
-      properties: {
-        target_range: {
-          maximum: 20,
-          description: 'Target loudness range in LU (default 8.0)',
-          type: 'number',
-          default: 8,
-          minimum: 0,
-          title: 'Target Range',
-        },
-        enabled: {
-          type: 'boolean',
-          description: 'Enable loudness normalization for the audio',
-          default: true,
-          title: 'Enabled',
-        },
-        target_peak: {
-          maximum: 0,
-          description: 'Target peak level in dBTP (default -0.5).',
-          type: 'number',
-          default: -0.5,
-          minimum: -3,
-          title: 'Target Peak',
-        },
-        target_loudness: {
-          maximum: -10,
-          description: 'Target loudness in LUFS (default -18.0)',
-          type: 'number',
-          default: -18,
-          minimum: -70,
-          title: 'Target Loudness',
-        },
-      },
       'x-fal-order-properties': [
         'enabled',
         'target_loudness',
         'target_range',
         'target_peak',
       ],
+      type: 'object',
+      properties: {
+        target_peak: {
+          description: 'Target peak level in dBTP (default -0.5).',
+          type: 'number',
+          minimum: -3,
+          maximum: 0,
+          default: -0.5,
+          title: 'Target Peak',
+        },
+        target_loudness: {
+          description: 'Target loudness in LUFS (default -18.0)',
+          type: 'number',
+          minimum: -70,
+          maximum: -10,
+          default: -18,
+          title: 'Target Loudness',
+        },
+        target_range: {
+          description: 'Target loudness range in LU (default 8.0)',
+          type: 'number',
+          minimum: 0,
+          maximum: 20,
+          default: 8,
+          title: 'Target Range',
+        },
+        enabled: {
+          description: 'Enable loudness normalization for the audio',
+          type: 'boolean',
+          default: true,
+          title: 'Enabled',
+        },
+      },
       title: 'LoudnessNormalizationSetting',
     },
     PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
       type: 'object',
       properties: {
         tone_list: {
-          type: 'array',
+          title: 'Tone List',
           description:
             "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
           items: { type: 'string' },
-          title: 'Tone List',
         },
       },
-      'x-fal-order-properties': ['tone_list'],
       title: 'PronunciationDict',
     },
     VoiceModify: {
+      'x-fal-order-properties': ['pitch', 'intensity', 'timbre'],
       type: 'object',
-      description: 'Voice modification settings for Speech 2.8 models.',
       properties: {
-        intensity: {
-          maximum: 100,
-          description:
-            'Intensity/energy of the voice. Range: -100 to 100. Higher values create more energetic speech.',
-          type: 'integer',
-          default: 0,
-          minimum: -100,
-          title: 'Intensity',
-        },
         timbre: {
-          maximum: 100,
           description:
             'Timbre adjustment. Range: -100 to 100. Affects the tonal quality of the voice.',
           type: 'integer',
-          default: 0,
           minimum: -100,
+          maximum: 100,
+          default: 0,
           title: 'Timbre',
         },
         pitch: {
-          maximum: 100,
           description:
             'Pitch adjustment in semitones. Range: -100 to 100. Positive values raise pitch, negative values lower it.',
           type: 'integer',
-          default: 0,
           minimum: -100,
+          maximum: 100,
+          default: 0,
           title: 'Pitch',
         },
+        intensity: {
+          description:
+            'Intensity/energy of the voice. Range: -100 to 100. Higher values create more energetic speech.',
+          type: 'integer',
+          minimum: -100,
+          maximum: 100,
+          default: 0,
+          title: 'Intensity',
+        },
       },
-      'x-fal-order-properties': ['pitch', 'intensity', 'timbre'],
+      description: 'Voice modification settings for Speech 2.8 models.',
       title: 'VoiceModify',
     },
     VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
       type: 'object',
       properties: {
-        english_normalization: {
-          type: 'boolean',
-          description:
-            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-          default: false,
-          title: 'English Normalization',
-        },
-        vol: {
-          maximum: 10,
-          description: 'Volume (0-10)',
-          type: 'number',
-          default: 1,
-          minimum: 0.01,
-          title: 'Vol',
-        },
-        speed: {
-          maximum: 2,
-          description: 'Speech speed (0.5-2.0)',
-          type: 'number',
-          default: 1,
-          minimum: 0.5,
-          title: 'Speed',
-        },
         voice_id: {
-          type: 'string',
+          minLength: 1,
           description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
           examples: [
             'Wise_Woman',
             'Friendly_Person',
@@ -11746,10 +11335,41 @@ export const MinimaxSpeech28TurboInputSchema = {
             'Exuberant_Girl',
           ],
           default: 'Wise_Woman',
-          minLength: 1,
           title: 'Voice Id',
         },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
         emotion: {
+          description: 'Emotion of the generated speech',
           anyOf: [
             {
               enum: [
@@ -11765,69 +11385,51 @@ export const MinimaxSpeech28TurboInputSchema = {
             },
             { type: 'null' },
           ],
-          description: 'Emotion of the generated speech',
           title: 'Emotion',
         },
-        pitch: {
-          maximum: 12,
-          description: 'Voice pitch (-12 to 12)',
-          type: 'integer',
-          default: 0,
-          minimum: -12,
-          title: 'Pitch',
-        },
       },
-      'x-fal-order-properties': [
-        'voice_id',
-        'speed',
-        'vol',
-        'pitch',
-        'emotion',
-        'english_normalization',
-      ],
       title: 'VoiceSetting',
     },
   },
 } as const
 
-export const MinimaxSpeech28TurboOutputSchema = {
-  type: 'object',
-  description: 'Output model for Speech 2.8 Turbo.',
+export const MinimaxSpeech28HdOutputSchema = {
   required: ['audio', 'duration_ms'],
+  type: 'object',
   properties: {
-    duration_ms: {
-      type: 'integer',
-      description: 'Duration of the audio in milliseconds',
-      title: 'Duration Ms',
-    },
     audio: {
       description: 'The generated audio file',
-      $ref: '#/$defs/File',
       examples: [
         {
-          url: 'https://v3b.fal.media/files/b/0a8d0bf6/AE2KhEIGf4SkSMrWIDs45_speech.mp3',
+          url: 'https://v3b.fal.media/files/b/0a8d0bda/pF8woD8Iafl8vL6BMk4k4_speech.mp3',
         },
       ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
     },
   },
   'x-fal-order-properties': ['audio', 'duration_ms'],
-  title: 'TextToSpeechTurbo28Output',
+  description: 'Output model for Speech 2.8 HD.',
+  title: 'TextToSpeechHD28Output',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -11836,11 +11438,10 @@ export const MinimaxSpeech28TurboOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -11849,31 +11450,445 @@ export const MinimaxSpeech28TurboOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
+    },
+  },
+} as const
+
+export const MinimaxSpeech28TurboInputSchema = {
+  required: ['prompt'],
+  type: 'object',
+  properties: {
+    prompt: {
+      minLength: 1,
+      maxLength: 10000,
+      description:
+        'Text to convert to speech. Use `<#x#>` for pauses (x = 0.01-99.99 seconds). Supports interjection tags: `(laughs)`, `(sighs)`, `(coughs)`, `(clears throat)`, `(gasps)`, `(sniffs)`, `(groans)`, `(yawns)`.',
+      type: 'string',
+      examples: [
+        "Hello world! Welcome to MiniMax's new text to speech model <#0.1#> Speech 2.8 Turbo (sighs) now available on Fal!",
+      ],
+      title: 'Prompt',
+    },
+    output_format: {
+      enum: ['url', 'hex'],
+      description: 'Format of the output content (non-streaming only)',
+      type: 'string',
+      default: 'hex',
+      title: 'Output Format',
+    },
+    voice_modify: {
+      description:
+        'Voice modification settings to adjust pitch, intensity, and timbre.',
+      anyOf: [{ $ref: '#/$defs/VoiceModify' }, { type: 'null' }],
+    },
+    voice_setting: {
+      description: 'Voice configuration settings',
+      $ref: '#/$defs/VoiceSetting',
+      default: {
+        voice_id: 'Wise_Woman',
+        speed: 1,
+        pitch: 0,
+        english_normalization: false,
+        vol: 1,
+      },
+    },
+    language_boost: {
+      description: 'Enhance recognition of specified languages and dialects',
+      anyOf: [
+        {
+          enum: [
+            'Chinese',
+            'Chinese,Yue',
+            'English',
+            'Arabic',
+            'Russian',
+            'Spanish',
+            'French',
+            'Portuguese',
+            'German',
+            'Turkish',
+            'Dutch',
+            'Ukrainian',
+            'Vietnamese',
+            'Indonesian',
+            'Japanese',
+            'Italian',
+            'Korean',
+            'Thai',
+            'Polish',
+            'Romanian',
+            'Greek',
+            'Czech',
+            'Finnish',
+            'Hindi',
+            'Bulgarian',
+            'Danish',
+            'Hebrew',
+            'Malay',
+            'Slovak',
+            'Swedish',
+            'Croatian',
+            'Hungarian',
+            'Norwegian',
+            'Slovenian',
+            'Catalan',
+            'Nynorsk',
+            'Afrikaans',
+            'auto',
+          ],
+          type: 'string',
+        },
+        { type: 'null' },
+      ],
+      title: 'Language Boost',
+    },
+    normalization_setting: {
+      description: 'Loudness normalization settings for the audio',
+      $ref: '#/$defs/LoudnessNormalizationSetting',
+    },
+    pronunciation_dict: {
+      description: 'Custom pronunciation dictionary for text replacement',
+      anyOf: [{ $ref: '#/$defs/PronunciationDict' }, { type: 'null' }],
+    },
+    audio_setting: {
+      description: 'Audio configuration settings',
+      $ref: '#/$defs/AudioSetting',
+    },
+  },
+  'x-fal-order-properties': [
+    'prompt',
+    'voice_setting',
+    'audio_setting',
+    'language_boost',
+    'output_format',
+    'pronunciation_dict',
+    'normalization_setting',
+    'voice_modify',
+  ],
+  description:
+    'Request model for Speech 2.8 Turbo - faster speech synthesis with good quality.',
+  title: 'TextToSpeechTurbo28Request',
+  $defs: {
+    AudioSetting: {
+      'x-fal-order-properties': ['sample_rate', 'bitrate', 'format', 'channel'],
+      type: 'object',
+      properties: {
+        bitrate: {
+          enum: [32000, 64000, 128000, 256000],
+          description: 'Bitrate of generated audio',
+          type: 'integer',
+          default: 128000,
+          title: 'Bitrate',
+        },
+        channel: {
+          enum: [1, 2],
+          description: 'Number of audio channels (1=mono, 2=stereo)',
+          type: 'integer',
+          default: 1,
+          title: 'Channel',
+        },
+        format: {
+          enum: ['mp3', 'pcm', 'flac'],
+          description: 'Audio format',
+          type: 'string',
+          default: 'mp3',
+          title: 'Format',
+        },
+        sample_rate: {
+          enum: [8000, 16000, 22050, 24000, 32000, 44100],
+          description: 'Sample rate of generated audio',
+          type: 'integer',
+          default: 32000,
+          title: 'Sample Rate',
+        },
+      },
+      title: 'AudioSetting',
+    },
+    LoudnessNormalizationSetting: {
+      'x-fal-order-properties': [
+        'enabled',
+        'target_loudness',
+        'target_range',
+        'target_peak',
+      ],
+      type: 'object',
+      properties: {
+        target_peak: {
+          description: 'Target peak level in dBTP (default -0.5).',
+          type: 'number',
+          minimum: -3,
+          maximum: 0,
+          default: -0.5,
+          title: 'Target Peak',
+        },
+        target_loudness: {
+          description: 'Target loudness in LUFS (default -18.0)',
+          type: 'number',
+          minimum: -70,
+          maximum: -10,
+          default: -18,
+          title: 'Target Loudness',
+        },
+        target_range: {
+          description: 'Target loudness range in LU (default 8.0)',
+          type: 'number',
+          minimum: 0,
+          maximum: 20,
+          default: 8,
+          title: 'Target Range',
+        },
+        enabled: {
+          description: 'Enable loudness normalization for the audio',
+          type: 'boolean',
+          default: true,
+          title: 'Enabled',
+        },
+      },
+      title: 'LoudnessNormalizationSetting',
+    },
+    PronunciationDict: {
+      'x-fal-order-properties': ['tone_list'],
+      type: 'object',
+      properties: {
+        tone_list: {
+          title: 'Tone List',
+          description:
+            "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+          type: 'array',
+          items: { type: 'string' },
+        },
+      },
+      title: 'PronunciationDict',
+    },
+    VoiceModify: {
+      'x-fal-order-properties': ['pitch', 'intensity', 'timbre'],
+      type: 'object',
+      properties: {
+        timbre: {
+          description:
+            'Timbre adjustment. Range: -100 to 100. Affects the tonal quality of the voice.',
+          type: 'integer',
+          minimum: -100,
+          maximum: 100,
+          default: 0,
+          title: 'Timbre',
+        },
+        pitch: {
+          description:
+            'Pitch adjustment in semitones. Range: -100 to 100. Positive values raise pitch, negative values lower it.',
+          type: 'integer',
+          minimum: -100,
+          maximum: 100,
+          default: 0,
+          title: 'Pitch',
+        },
+        intensity: {
+          description:
+            'Intensity/energy of the voice. Range: -100 to 100. Higher values create more energetic speech.',
+          type: 'integer',
+          minimum: -100,
+          maximum: 100,
+          default: 0,
+          title: 'Intensity',
+        },
+      },
+      description: 'Voice modification settings for Speech 2.8 models.',
+      title: 'VoiceModify',
+    },
+    VoiceSetting: {
+      'x-fal-order-properties': [
+        'voice_id',
+        'speed',
+        'vol',
+        'pitch',
+        'emotion',
+        'english_normalization',
+      ],
+      type: 'object',
+      properties: {
+        voice_id: {
+          minLength: 1,
+          description: 'Predefined voice ID to use for synthesis',
+          type: 'string',
+          examples: [
+            'Wise_Woman',
+            'Friendly_Person',
+            'Inspirational_girl',
+            'Deep_Voice_Man',
+            'Calm_Woman',
+            'Casual_Guy',
+            'Lively_Girl',
+            'Patient_Man',
+            'Young_Knight',
+            'Determined_Man',
+            'Lovely_Girl',
+            'Decent_Boy',
+            'Imposing_Manner',
+            'Elegant_Man',
+            'Abbess',
+            'Sweet_Girl_2',
+            'Exuberant_Girl',
+          ],
+          default: 'Wise_Woman',
+          title: 'Voice Id',
+        },
+        speed: {
+          description: 'Speech speed (0.5-2.0)',
+          type: 'number',
+          minimum: 0.5,
+          maximum: 2,
+          default: 1,
+          title: 'Speed',
+        },
+        english_normalization: {
+          description:
+            'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+          type: 'boolean',
+          default: false,
+          title: 'English Normalization',
+        },
+        pitch: {
+          description: 'Voice pitch (-12 to 12)',
+          type: 'integer',
+          minimum: -12,
+          maximum: 12,
+          default: 0,
+          title: 'Pitch',
+        },
+        vol: {
+          description: 'Volume (0-10)',
+          type: 'number',
+          minimum: 0.01,
+          maximum: 10,
+          default: 1,
+          title: 'Vol',
+        },
+        emotion: {
+          description: 'Emotion of the generated speech',
+          anyOf: [
+            {
+              enum: [
+                'happy',
+                'sad',
+                'angry',
+                'fearful',
+                'disgusted',
+                'surprised',
+                'neutral',
+              ],
+              type: 'string',
+            },
+            { type: 'null' },
+          ],
+          title: 'Emotion',
+        },
+      },
+      title: 'VoiceSetting',
+    },
+  },
+} as const
+
+export const MinimaxSpeech28TurboOutputSchema = {
+  required: ['audio', 'duration_ms'],
+  type: 'object',
+  properties: {
+    audio: {
+      description: 'The generated audio file',
+      examples: [
+        {
+          url: 'https://v3b.fal.media/files/b/0a8d0bf6/AE2KhEIGf4SkSMrWIDs45_speech.mp3',
+        },
+      ],
+      $ref: '#/$defs/File',
+    },
+    duration_ms: {
+      description: 'Duration of the audio in milliseconds',
+      type: 'integer',
+      title: 'Duration Ms',
+    },
+  },
+  'x-fal-order-properties': ['audio', 'duration_ms'],
+  description: 'Output model for Speech 2.8 Turbo.',
+  title: 'TextToSpeechTurbo28Output',
+  $defs: {
+    File: {
+      'x-fal-order-properties': [
+        'url',
+        'content_type',
+        'file_name',
+        'file_size',
+      ],
+      type: 'object',
+      properties: {
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          title: 'File Name',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          title: 'Content Type',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+      },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxVoiceCloneInputSchema = {
-  type: 'object',
   required: ['audio_url'],
+  type: 'object',
   properties: {
-    noise_reduction: {
-      type: 'boolean',
-      description: 'Enable noise reduction for the cloned voice',
-      default: false,
-      title: 'Noise Reduction',
+    text: {
+      description:
+        'Text to generate a TTS preview with the cloned voice (optional)',
+      examples: [
+        'Hello, this is a preview of your cloned voice! I hope you like it!',
+      ],
+      anyOf: [{ maxLength: 1000, type: 'string' }, { type: 'null' }],
+      default:
+        'Hello, this is a preview of your cloned voice! I hope you like it!',
+      title: 'Text',
+    },
+    audio_url: {
+      description:
+        '\n            URL of the input audio file for voice cloning. Should be at least 10 seconds\n            long. To retain the voice permanently, use it with a TTS (text-to-speech)\n            endpoint at least once within 7 days. Otherwise, it will be\n            automatically deleted.\n        ',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/zonos/demo_voice_zonos.wav',
+      ],
+      title: 'Audio Url',
+      'x-fal-file-input': true,
     },
     model: {
-      type: 'string',
-      description:
-        'TTS model to use for preview. Options: speech-02-hd, speech-02-turbo, speech-01-hd, speech-01-turbo',
-      examples: [
+      enum: [
         'speech-02-hd',
         'speech-02-turbo',
         'speech-01-hd',
         'speech-01-turbo',
       ],
-      enum: [
+      description:
+        'TTS model to use for preview. Options: speech-02-hd, speech-02-turbo, speech-01-hd, speech-01-turbo',
+      type: 'string',
+      examples: [
         'speech-02-hd',
         'speech-02-turbo',
         'speech-01-hd',
@@ -11882,36 +11897,21 @@ export const MinimaxVoiceCloneInputSchema = {
       default: 'speech-02-hd',
       title: 'Model',
     },
-    audio_url: {
-      type: 'string',
-      description:
-        '\n            URL of the input audio file for voice cloning. Should be at least 10 seconds\n            long. To retain the voice permanently, use it with a TTS (text-to-speech)\n            endpoint at least once within 7 days. Otherwise, it will be\n            automatically deleted.\n        ',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/zonos/demo_voice_zonos.wav',
-      ],
-      title: 'Audio Url',
-      'x-fal-file-input': true,
+    noise_reduction: {
+      description: 'Enable noise reduction for the cloned voice',
+      type: 'boolean',
+      default: false,
+      title: 'Noise Reduction',
     },
     need_volume_normalization: {
-      type: 'boolean',
       description: 'Enable volume normalization for the cloned voice',
+      type: 'boolean',
       default: false,
       title: 'Need Volume Normalization',
     },
-    text: {
-      anyOf: [{ type: 'string', maxLength: 1000 }, { type: 'null' }],
-      description:
-        'Text to generate a TTS preview with the cloned voice (optional)',
-      examples: [
-        'Hello, this is a preview of your cloned voice! I hope you like it!',
-      ],
-      default:
-        'Hello, this is a preview of your cloned voice! I hope you like it!',
-      title: 'Text',
-    },
     accuracy: {
-      anyOf: [{ maximum: 1, minimum: 0, type: 'number' }, { type: 'null' }],
       description: 'Text validation accuracy threshold (0-1)',
+      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
       title: 'Accuracy',
     },
   },
@@ -11927,8 +11927,8 @@ export const MinimaxVoiceCloneInputSchema = {
 } as const
 
 export const MinimaxVoiceCloneOutputSchema = {
-  type: 'object',
   required: ['custom_voice_id'],
+  type: 'object',
   properties: {
     audio: {
       description:
@@ -11941,8 +11941,8 @@ export const MinimaxVoiceCloneOutputSchema = {
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
     custom_voice_id: {
-      type: 'string',
       description: 'The cloned voice ID for use with TTS',
+      type: 'string',
       title: 'Custom Voice Id',
     },
   },
@@ -11950,20 +11950,19 @@ export const MinimaxVoiceCloneOutputSchema = {
   title: 'VoiceCloneOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -11972,11 +11971,10 @@ export const MinimaxVoiceCloneOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -11985,33 +11983,35 @@ export const MinimaxVoiceCloneOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MinimaxVoiceDesignInputSchema = {
-  type: 'object',
   required: ['prompt', 'preview_text'],
+  type: 'object',
   properties: {
     prompt: {
-      title: 'Prompt',
+      maxLength: 2000,
       description:
         'Voice description prompt for generating a personalized voice',
       type: 'string',
       examples: [
         'Bubbly and excitable female pop star interviewee, youthful, slightly breathless, and very enthusiastic',
       ],
-      maxLength: 2000,
+      title: 'Prompt',
     },
     preview_text: {
-      title: 'Preview Text',
+      maxLength: 500,
       description:
         'Text for audio preview. Limited to 500 characters. A fee of $30 per 1M characters will be charged for the generation of the preview audio.',
       type: 'string',
       examples: [
         "Oh my gosh, hi. It's like so amazing to be here. This new endpoint just dropped on fal and the results have been like totally incredible. Use it now, It's gonna be like epic!",
       ],
-      maxLength: 500,
+      title: 'Preview Text',
     },
   },
   'x-fal-order-properties': ['prompt', 'preview_text'],
@@ -12019,21 +12019,21 @@ export const MinimaxVoiceDesignInputSchema = {
 } as const
 
 export const MinimaxVoiceDesignOutputSchema = {
-  type: 'object',
   required: ['custom_voice_id', 'audio'],
+  type: 'object',
   properties: {
     audio: {
       description: 'The preview audio using the generated voice',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/kangaroo/gT22cxTqxgLtGMSDz2JSq_preview.mp3',
         },
       ],
+      $ref: '#/$defs/File',
     },
     custom_voice_id: {
-      type: 'string',
       description: 'The voice_id of the generated voice',
+      type: 'string',
       title: 'Custom Voice Id',
     },
   },
@@ -12041,20 +12041,19 @@ export const MinimaxVoiceDesignOutputSchema = {
   title: 'VoiceDesignOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -12063,11 +12062,10 @@ export const MinimaxVoiceDesignOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -12076,64 +12074,64 @@ export const MinimaxVoiceDesignOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MmaudioV2TextToAudioInputSchema = {
-  type: 'object',
   required: ['prompt'],
-  title: 'AudioInput',
   properties: {
+    seed: {
+      anyOf: [
+        { minimum: 0, maximum: 65535, type: 'integer' },
+        { type: 'null' },
+      ],
+      description: 'The seed for the random number generator',
+      title: 'Seed',
+    },
+    num_steps: {
+      minimum: 4,
+      maximum: 50,
+      default: 25,
+      type: 'integer',
+      description: 'The number of steps to generate the audio for.',
+      title: 'Num Steps',
+    },
+    duration: {
+      minimum: 1,
+      maximum: 30,
+      default: 8,
+      type: 'number',
+      description: 'The duration of the audio to generate.',
+      title: 'Duration',
+    },
+    cfg_strength: {
+      minimum: 0,
+      maximum: 20,
+      default: 4.5,
+      type: 'number',
+      description: 'The strength of Classifier Free Guidance.',
+      title: 'Cfg Strength',
+    },
+    prompt: {
+      description: 'The prompt to generate the audio for.',
+      type: 'string',
+      title: 'Prompt',
+      examples: ['Indian holy music'],
+    },
     mask_away_clip: {
+      description: 'Whether to mask away the clip.',
       type: 'boolean',
       default: false,
       title: 'Mask Away Clip',
-      description: 'Whether to mask away the clip.',
     },
     negative_prompt: {
+      description: 'The negative prompt to generate the audio for.',
       type: 'string',
       default: '',
       title: 'Negative Prompt',
-      description: 'The negative prompt to generate the audio for.',
-    },
-    duration: {
-      type: 'number',
-      maximum: 30,
-      description: 'The duration of the audio to generate.',
-      minimum: 1,
-      default: 8,
-      title: 'Duration',
-    },
-    prompt: {
-      type: 'string',
-      examples: ['Indian holy music'],
-      title: 'Prompt',
-      description: 'The prompt to generate the audio for.',
-    },
-    cfg_strength: {
-      type: 'number',
-      maximum: 20,
-      description: 'The strength of Classifier Free Guidance.',
-      minimum: 0,
-      default: 4.5,
-      title: 'Cfg Strength',
-    },
-    num_steps: {
-      type: 'integer',
-      maximum: 50,
-      description: 'The number of steps to generate the audio for.',
-      minimum: 4,
-      default: 25,
-      title: 'Num Steps',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'The seed for the random number generator',
-      anyOf: [
-        { type: 'integer', maximum: 65535, minimum: 0 },
-        { type: 'null' },
-      ],
     },
   },
   'x-fal-order-properties': [
@@ -12145,43 +12143,44 @@ export const MmaudioV2TextToAudioInputSchema = {
     'cfg_strength',
     'mask_away_clip',
   ],
+  type: 'object',
+  title: 'AudioInput',
 } as const
 
 export const MmaudioV2TextToAudioOutputSchema = {
-  type: 'object',
   required: ['audio'],
-  title: 'AudioOutput',
   properties: {
     audio: {
+      $ref: '#/$defs/File',
+      description: 'The generated audio.',
       examples: [
         {
+          url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/mmaudio_output.flac',
           file_size: 1001342,
           content_type: 'application/octet-stream',
-          url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/mmaudio_output.flac',
           file_name: 'mmaudio_input.flac',
         },
       ],
-      $ref: '#/$defs/File',
-      description: 'The generated audio.',
     },
   },
   'x-fal-order-properties': ['audio'],
+  type: 'object',
+  title: 'AudioOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -12190,11 +12189,10 @@ export const MmaudioV2TextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -12203,79 +12201,43 @@ export const MmaudioV2TextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const MusicCompositionPlanSchema = {
-  title: 'MusicCompositionPlan',
+  required: ['positive_global_styles', 'negative_global_styles', 'sections'],
   properties: {
     positive_global_styles: {
       title: 'Positive Global Styles',
+      type: 'array',
       items: { type: 'string' },
       description: 'The styles that should be present in the entire song.',
-      type: 'array',
-    },
-    negative_global_styles: {
-      title: 'Negative Global Styles',
-      items: { type: 'string' },
-      description: 'The styles that should not be present in the entire song.',
-      type: 'array',
     },
     sections: {
       title: 'Sections',
+      type: 'array',
       items: { $ref: '#/$defs/MusicSection' },
       description: 'The sections of the song.',
+    },
+    negative_global_styles: {
+      title: 'Negative Global Styles',
       type: 'array',
+      items: { type: 'string' },
+      description: 'The styles that should not be present in the entire song.',
     },
   },
-  required: ['positive_global_styles', 'negative_global_styles', 'sections'],
+  title: 'MusicCompositionPlan',
+  type: 'object',
   'x-fal-order-properties': [
     'positive_global_styles',
     'negative_global_styles',
     'sections',
   ],
-  type: 'object',
   $defs: {
     MusicSection: {
-      title: 'MusicSection',
-      properties: {
-        section_name: {
-          minLength: 1,
-          title: 'Section Name',
-          maxLength: 100,
-          description:
-            'The name of the section. Must be between 1 and 100 characters.',
-          type: 'string',
-        },
-        duration_ms: {
-          maximum: 120000,
-          minimum: 3000,
-          title: 'Duration Ms',
-          description:
-            'The duration of the section in milliseconds. Must be between 3000ms and 120000ms.',
-          type: 'integer',
-        },
-        positive_local_styles: {
-          title: 'Positive Local Styles',
-          items: { type: 'string' },
-          description: 'The styles that should be present in this section.',
-          type: 'array',
-        },
-        lines: {
-          title: 'Lines',
-          items: { type: 'string' },
-          description:
-            'The lyrics of the section. Each line must be at most 200 characters long.',
-          type: 'array',
-        },
-        negative_local_styles: {
-          title: 'Negative Local Styles',
-          items: { type: 'string' },
-          description: 'The styles that should not be present in this section.',
-          type: 'array',
-        },
-      },
       required: [
         'section_name',
         'positive_local_styles',
@@ -12283,6 +12245,45 @@ export const MusicCompositionPlanSchema = {
         'duration_ms',
         'lines',
       ],
+      properties: {
+        negative_local_styles: {
+          title: 'Negative Local Styles',
+          type: 'array',
+          items: { type: 'string' },
+          description: 'The styles that should not be present in this section.',
+        },
+        lines: {
+          title: 'Lines',
+          type: 'array',
+          items: { type: 'string' },
+          description:
+            'The lyrics of the section. Each line must be at most 200 characters long.',
+        },
+        duration_ms: {
+          minimum: 3000,
+          type: 'integer',
+          title: 'Duration Ms',
+          maximum: 120000,
+          description:
+            'The duration of the section in milliseconds. Must be between 3000ms and 120000ms.',
+        },
+        positive_local_styles: {
+          title: 'Positive Local Styles',
+          type: 'array',
+          items: { type: 'string' },
+          description: 'The styles that should be present in this section.',
+        },
+        section_name: {
+          minLength: 1,
+          type: 'string',
+          maxLength: 100,
+          title: 'Section Name',
+          description:
+            'The name of the section. Must be between 1 and 100 characters.',
+        },
+      },
+      title: 'MusicSection',
+      type: 'object',
       'x-fal-order-properties': [
         'section_name',
         'positive_local_styles',
@@ -12290,7 +12291,6 @@ export const MusicCompositionPlanSchema = {
         'duration_ms',
         'lines',
       ],
-      type: 'object',
     },
   },
 } as const
@@ -12380,44 +12380,6 @@ export const MusicGeneratorOutputSchema = {
 } as const
 
 export const MusicSectionSchema = {
-  title: 'MusicSection',
-  properties: {
-    section_name: {
-      minLength: 1,
-      title: 'Section Name',
-      maxLength: 100,
-      description:
-        'The name of the section. Must be between 1 and 100 characters.',
-      type: 'string',
-    },
-    duration_ms: {
-      maximum: 120000,
-      minimum: 3000,
-      title: 'Duration Ms',
-      description:
-        'The duration of the section in milliseconds. Must be between 3000ms and 120000ms.',
-      type: 'integer',
-    },
-    positive_local_styles: {
-      title: 'Positive Local Styles',
-      items: { type: 'string' },
-      description: 'The styles that should be present in this section.',
-      type: 'array',
-    },
-    lines: {
-      title: 'Lines',
-      items: { type: 'string' },
-      description:
-        'The lyrics of the section. Each line must be at most 200 characters long.',
-      type: 'array',
-    },
-    negative_local_styles: {
-      title: 'Negative Local Styles',
-      items: { type: 'string' },
-      description: 'The styles that should not be present in this section.',
-      type: 'array',
-    },
-  },
   required: [
     'section_name',
     'positive_local_styles',
@@ -12425,6 +12387,45 @@ export const MusicSectionSchema = {
     'duration_ms',
     'lines',
   ],
+  properties: {
+    negative_local_styles: {
+      title: 'Negative Local Styles',
+      type: 'array',
+      items: { type: 'string' },
+      description: 'The styles that should not be present in this section.',
+    },
+    lines: {
+      title: 'Lines',
+      type: 'array',
+      items: { type: 'string' },
+      description:
+        'The lyrics of the section. Each line must be at most 200 characters long.',
+    },
+    duration_ms: {
+      minimum: 3000,
+      type: 'integer',
+      title: 'Duration Ms',
+      maximum: 120000,
+      description:
+        'The duration of the section in milliseconds. Must be between 3000ms and 120000ms.',
+    },
+    positive_local_styles: {
+      title: 'Positive Local Styles',
+      type: 'array',
+      items: { type: 'string' },
+      description: 'The styles that should be present in this section.',
+    },
+    section_name: {
+      minLength: 1,
+      type: 'string',
+      maxLength: 100,
+      title: 'Section Name',
+      description:
+        'The name of the section. Must be between 1 and 100 characters.',
+    },
+  },
+  title: 'MusicSection',
+  type: 'object',
   'x-fal-order-properties': [
     'section_name',
     'positive_local_styles',
@@ -12432,69 +12433,69 @@ export const MusicSectionSchema = {
     'duration_ms',
     'lines',
   ],
-  type: 'object',
 } as const
 
 export const Nemotron3NanoOmniAudioInputSchema = {
+  type: 'object',
+  required: ['prompt', 'audio_url'],
   properties: {
-    top_p: {
-      default: 0.95,
-      description: 'Nucleus sampling probability mass.',
-      title: 'Top P',
-      type: 'number',
-      minimum: 0,
-      maximum: 1,
-    },
-    temperature: {
-      default: 0.7,
-      description: 'Sampling temperature. Lower is more deterministic.',
-      title: 'Temperature',
-      type: 'number',
-      minimum: 0,
-      maximum: 2,
-    },
     system_prompt: {
+      examples: ['You are a concise enterprise assistant.'],
       description:
         'Optional system prompt to steer the model. Reasoning behavior is controlled by the separate `reasoning_mode` field.',
       title: 'System Prompt',
-      examples: ['You are a concise enterprise assistant.'],
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
-    reasoning_mode: {
-      description:
-        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
-      title: 'Reasoning Mode',
-      type: 'string',
-      enum: ['think', 'no_think'],
-      default: 'no_think',
-    },
-    audio_url: {
-      description:
-        'URL of the audio clip to reason about. wav or mp3, max 1 hour.',
-      title: 'Audio URL',
-      type: 'string',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/audio_in.mp3',
-      ],
-      'x-fal-file-input': true,
+    temperature: {
+      default: 0.7,
+      type: 'number',
+      title: 'Temperature',
+      description: 'Sampling temperature. Lower is more deterministic.',
+      minimum: 0,
+      maximum: 2,
     },
     max_tokens: {
       default: 1024,
-      description: 'Maximum number of tokens to generate.',
-      title: 'Max Tokens',
       type: 'integer',
+      title: 'Max Tokens',
+      description: 'Maximum number of tokens to generate.',
       minimum: 1,
       maximum: 20000,
     },
     prompt: {
-      description: 'Text prompt to send to the model. English only.',
-      title: 'Prompt',
       minLength: 1,
       examples: ['Summarize the key capabilities of a multimodal agent.'],
+      description: 'Text prompt to send to the model. English only.',
+      title: 'Prompt',
+      type: 'string',
+    },
+    top_p: {
+      default: 0.95,
+      type: 'number',
+      title: 'Top P',
+      description: 'Nucleus sampling probability mass.',
+      minimum: 0,
+      maximum: 1,
+    },
+    audio_url: {
+      title: 'Audio URL',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/audio_in.mp3',
+      ],
+      description:
+        'URL of the audio clip to reason about. wav or mp3, max 1 hour.',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    reasoning_mode: {
+      default: 'no_think',
+      title: 'Reasoning Mode',
+      description:
+        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
+      enum: ['think', 'no_think'],
       type: 'string',
     },
   },
-  type: 'object',
   title: 'AudioInput',
   'x-fal-order-properties': [
     'prompt',
@@ -12505,56 +12506,154 @@ export const Nemotron3NanoOmniAudioInputSchema = {
     'top_p',
     'audio_url',
   ],
-  required: ['prompt', 'audio_url'],
 } as const
 
 export const Nemotron3NanoOmniAudioOutputSchema = {
+  type: 'object',
+  required: ['output', 'usage'],
   properties: {
-    finish_reason: {
-      description: 'Reason generation stopped.',
-      title: 'Finish Reason',
-      type: 'string',
-      examples: ['stop', 'length'],
-      default: 'stop',
+    usage: {
+      $ref: '#/$defs/UsageInfo',
+      examples: [{ input_tokens: 412, output_tokens: 87 }],
+      description: 'Token usage for the request.',
     },
     output: {
-      description: 'Generated text response.',
-      title: 'Output',
-      type: 'string',
       examples: [
         'The image shows a golden retriever puppy sitting on a wooden floor.',
       ],
+      description: 'Generated text response.',
+      title: 'Output',
+      type: 'string',
     },
-    usage: {
-      $ref: '#/$defs/UsageInfo',
-      description: 'Token usage for the request.',
-      examples: [{ output_tokens: 87, input_tokens: 412 }],
+    finish_reason: {
+      default: 'stop',
+      examples: ['stop', 'length'],
+      description: 'Reason generation stopped.',
+      title: 'Finish Reason',
+      type: 'string',
     },
   },
-  type: 'object',
   title: 'BaseOutput',
   'x-fal-order-properties': ['output', 'finish_reason', 'usage'],
-  required: ['output', 'usage'],
   $defs: {
     UsageInfo: {
+      type: 'object',
+      required: ['input_tokens', 'output_tokens'],
       properties: {
-        output_tokens: {
-          description: 'Number of output tokens generated.',
-          title: 'Output Tokens',
-          type: 'integer',
-        },
         input_tokens: {
           description: 'Number of input tokens processed.',
           title: 'Input Tokens',
           type: 'integer',
         },
+        output_tokens: {
+          description: 'Number of output tokens generated.',
+          title: 'Output Tokens',
+          type: 'integer',
+        },
       },
-      type: 'object',
       title: 'UsageInfo',
       'x-fal-order-properties': ['input_tokens', 'output_tokens'],
-      required: ['input_tokens', 'output_tokens'],
     },
   },
+} as const
+
+export const NemotronAsrMultilingualAsrInputSchema = {
+  title: 'SpeechInput',
+  type: 'object',
+  properties: {
+    acceleration: {
+      title: 'Acceleration',
+      enum: ['none', 'regular', 'high', 'full'],
+      type: 'string',
+      default: 'regular',
+      description:
+        "Controls the speed/accuracy trade-off. 'none' = best accuracy (1.12s chunks), 'regular' = balanced (0.56s chunks), 'high' = faster (0.32s chunks), 'full' = fastest (0.08s chunks).",
+    },
+    language: {
+      title: 'Language',
+      enum: [
+        'auto',
+        'en-US',
+        'en-GB',
+        'es-US',
+        'es-ES',
+        'de-DE',
+        'fr-FR',
+        'fr-CA',
+        'it-IT',
+        'ar-AR',
+        'ja-JP',
+        'ko-KR',
+        'pt-BR',
+        'pt-PT',
+        'ru-RU',
+        'hi-IN',
+        'zh-CN',
+        'vi-VN',
+        'he-IL',
+        'nl-NL',
+        'cs-CZ',
+        'da-DK',
+        'pl-PL',
+        'nn-NO',
+        'nb-NO',
+        'sv-SE',
+        'th-TH',
+        'tr-TR',
+        'bg-BG',
+        'el-GR',
+        'et-EE',
+        'fi-FI',
+        'hr-HR',
+        'hu-HU',
+        'lt-LT',
+        'lv-LV',
+        'ro-RO',
+        'sk-SK',
+        'uk-UA',
+        'mt-MT',
+        'sl-SI',
+      ],
+      type: 'string',
+      default: 'auto',
+      description:
+        "Target language for transcription (language-ID prompt). 'auto' lets the model detect the language.",
+    },
+    audio_url: {
+      title: 'Audio URL',
+      type: 'string',
+      examples: [
+        'https://v3b.fal.media/files/b/0a9c95c6/qxxx5skDQl8fPqbkjpxBc_speech.mp3',
+      ],
+      description: 'URL of the audio file to transcribe.',
+      'x-fal-file-input': true,
+    },
+  },
+  required: ['audio_url'],
+  'x-fal-order-properties': ['audio_url', 'language', 'acceleration'],
+} as const
+
+export const NemotronAsrMultilingualAsrOutputSchema = {
+  title: 'SpeechOutput',
+  type: 'object',
+  properties: {
+    output: {
+      title: 'Transcribed Text',
+      type: 'string',
+      examples: [
+        "Actually, I'm second guessing myself a single coherent passage might be cleaner and more representative of real world speech performance, which is what benchmarking typically uses. I'll write an engaging flowing piece on something like a journey or a day in a tech forward city. That weaves in all the varied elements naturally, rather than splitting it into sections. I'm deciding to keep the targeted tricky sentences section after all. It'll directly test homophones and number heavy lines that are most prone to errors, so I'll include it as a concise, clearly marked addition at the end now. I'm drafting the full passage, starting with a detailed travel narrative that weaves in dates, times, currency, and specific details by the time we pulled into Waverley Station, my phone had buzzed forty seven times, mostly from doctor Amara Akon Reyes at Neurosynt Technologies fretting over our board presentation. We'd spent three weeks refining a transformer model with one point three billion parameters, and the improvements were stunning. Our word error rate plummeted from fourteen point two percent down to three point eight percent. There's something surreal about watching those number shift like that. They're not just metrics they're the payoff from countless late nights and too much coffee.",
+      ],
+      description: 'The transcribed text from the audio.',
+    },
+    partial: {
+      title: 'Partial Result',
+      description: 'True if this is an intermediate result during streaming.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['output'],
+  'x-fal-order-properties': ['output', 'partial'],
 } as const
 
 export const OrpheusTtsInputSchema = {
@@ -12623,20 +12722,19 @@ export const OrpheusTtsOutputSchema = {
   title: 'OrpheusOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -12645,11 +12743,10 @@ export const OrpheusTtsOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -12658,6 +12755,8 @@ export const OrpheusTtsOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -12695,37 +12794,37 @@ export const OutputFormatSchema = {
 } as const
 
 export const PronunciationDictSchema = {
+  'x-fal-order-properties': ['tone_list'],
   type: 'object',
   properties: {
     tone_list: {
-      type: 'array',
+      title: 'Tone List',
       description:
         "List of pronunciation replacements in format ['text/(pronunciation)', ...]. For Chinese, tones are 1-5. Example: ['燕少飞/(yan4)(shao3)(fei1)']",
+      type: 'array',
       items: { type: 'string' },
-      title: 'Tone List',
     },
   },
-  'x-fal-order-properties': ['tone_list'],
   title: 'PronunciationDict',
 } as const
 
 export const PronunciationDictionaryLocatorSchema = {
-  title: 'PronunciationDictionaryLocator',
   properties: {
     pronunciation_dictionary_id: {
-      description: 'The ID of the pronunciation dictionary.',
       anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Pronunciation Dictionary Id',
+      description: 'The ID of the pronunciation dictionary.',
     },
     version_id: {
-      description:
-        'The ID of the version of the pronunciation dictionary. If not provided, the latest version will be used.',
       anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Version Id',
+      description:
+        'The ID of the version of the pronunciation dictionary. If not provided, the latest version will be used.',
     },
   },
-  'x-fal-order-properties': ['pronunciation_dictionary_id', 'version_id'],
+  title: 'PronunciationDictionaryLocator',
   type: 'object',
+  'x-fal-order-properties': ['pronunciation_dictionary_id', 'version_id'],
 } as const
 
 export const QueueStatusSchema = {
@@ -12752,42 +12851,38 @@ export const QueueStatusSchema = {
 } as const
 
 export const Qwen3TtsCloneVoice06bInputSchema = {
-  type: 'object',
   title: 'Qwen3CloneVoiceInput',
-  'x-fal-order-properties': ['audio_url', 'reference_text'],
+  required: ['audio_url'],
   properties: {
     audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/qwen3-tts/clone_in.mp3',
+      ],
       description: 'URL to the reference audio file used for voice cloning.',
       title: 'Audio Url',
       _fal_ui_field: 'audio',
       type: 'string',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/qwen3-tts/clone_in.mp3',
-      ],
       'x-fal-file-input': true,
     },
     reference_text: {
+      examples: [
+        'Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And it is all thanks to you.',
+      ],
       description:
         'Optional reference text that was used when creating the speaker embedding. Providing this can improve synthesis quality when using a cloned voice.',
       title: 'Reference Text',
       anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: [
-        'Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And it is all thanks to you.',
-      ],
     },
   },
-  required: ['audio_url'],
+  type: 'object',
+  'x-fal-order-properties': ['audio_url', 'reference_text'],
 } as const
 
 export const Qwen3TtsCloneVoice06bOutputSchema = {
-  type: 'object',
   title: 'Qwen3CloneVoiceOutput',
-  'x-fal-order-properties': ['speaker_embedding'],
+  required: ['speaker_embedding'],
   properties: {
     speaker_embedding: {
-      description:
-        'The generated speaker embedding file in safetensors format.',
-      $ref: '#/$defs/File',
       examples: [
         {
           file_size: 16288,
@@ -12796,25 +12891,28 @@ export const Qwen3TtsCloneVoice06bOutputSchema = {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/clone_out.safetensors',
         },
       ],
+      description:
+        'The generated speaker embedding file in safetensors format.',
+      $ref: '#/$defs/File',
     },
   },
-  required: ['speaker_embedding'],
+  type: 'object',
+  'x-fal-order-properties': ['speaker_embedding'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -12823,11 +12921,10 @@ export const Qwen3TtsCloneVoice06bOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -12836,47 +12933,45 @@ export const Qwen3TtsCloneVoice06bOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const Qwen3TtsCloneVoice17bInputSchema = {
-  type: 'object',
   title: 'Qwen3CloneVoiceInput',
-  'x-fal-order-properties': ['audio_url', 'reference_text'],
+  required: ['audio_url'],
   properties: {
     audio_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/qwen3-tts/clone_in.mp3',
+      ],
       description: 'URL to the reference audio file used for voice cloning.',
       title: 'Audio Url',
       _fal_ui_field: 'audio',
       type: 'string',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/qwen3-tts/clone_in.mp3',
-      ],
       'x-fal-file-input': true,
     },
     reference_text: {
+      examples: [
+        'Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And it is all thanks to you.',
+      ],
       description:
         'Optional reference text that was used when creating the speaker embedding. Providing this can improve synthesis quality when using a cloned voice.',
       title: 'Reference Text',
       anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: [
-        'Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And it is all thanks to you.',
-      ],
     },
   },
-  required: ['audio_url'],
+  type: 'object',
+  'x-fal-order-properties': ['audio_url', 'reference_text'],
 } as const
 
 export const Qwen3TtsCloneVoice17bOutputSchema = {
-  type: 'object',
   title: 'Qwen3CloneVoiceOutput',
-  'x-fal-order-properties': ['speaker_embedding'],
+  required: ['speaker_embedding'],
   properties: {
     speaker_embedding: {
-      description:
-        'The generated speaker embedding file in safetensors format.',
-      $ref: '#/$defs/File',
       examples: [
         {
           file_size: 16288,
@@ -12885,25 +12980,28 @@ export const Qwen3TtsCloneVoice17bOutputSchema = {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/clone_out.safetensors',
         },
       ],
+      description:
+        'The generated speaker embedding file in safetensors format.',
+      $ref: '#/$defs/File',
     },
   },
-  required: ['speaker_embedding'],
+  type: 'object',
+  'x-fal-order-properties': ['speaker_embedding'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -12912,11 +13010,10 @@ export const Qwen3TtsCloneVoice17bOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -12925,115 +13022,21 @@ export const Qwen3TtsCloneVoice17bOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const Qwen3TtsTextToSpeech06bInputSchema = {
-  type: 'object',
   title: 'Qwen3TTSInput06b',
-  'x-fal-order-properties': [
-    'text',
-    'prompt',
-    'voice',
-    'language',
-    'speaker_voice_embedding_file_url',
-    'reference_text',
-    'top_k',
-    'top_p',
-    'temperature',
-    'repetition_penalty',
-    'subtalker_dosample',
-    'subtalker_top_k',
-    'subtalker_top_p',
-    'subtalker_temperature',
-    'max_new_tokens',
-  ],
+  required: ['text'],
   properties: {
-    top_k: {
-      description: 'Top-k sampling parameter.',
-      title: 'Top K',
-      anyOf: [{ type: 'integer', minimum: 0 }, { type: 'null' }],
-      default: 50,
-    },
-    repetition_penalty: {
-      description: 'Penalty to reduce repeated tokens/codes.',
-      title: 'Repetition Penalty',
-      anyOf: [{ type: 'number', minimum: 0 }, { type: 'null' }],
-      default: 1.05,
-    },
-    subtalker_top_p: {
-      description: 'Top-p for sub-talker sampling.',
-      title: 'Subtalker Top P',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 1,
-    },
-    language: {
-      description: 'The language of the voice.',
-      title: 'Language',
-      type: 'string',
-      default: 'Auto',
-      enum: [
-        'Auto',
-        'English',
-        'Chinese',
-        'Spanish',
-        'French',
-        'German',
-        'Italian',
-        'Japanese',
-        'Korean',
-        'Portuguese',
-        'Russian',
-      ],
-      examples: ['English'],
-    },
-    max_new_tokens: {
-      description: 'Maximum number of new codec tokens to generate.',
-      title: 'Max New Tokens',
-      anyOf: [{ type: 'integer', minimum: 1, maximum: 8192 }, { type: 'null' }],
-      default: 200,
-    },
-    subtalker_top_k: {
-      description: 'Top-k for sub-talker sampling.',
-      title: 'Subtalker Top K',
-      anyOf: [{ type: 'integer', minimum: 0 }, { type: 'null' }],
-      default: 50,
-    },
     subtalker_dosample: {
+      anyOf: [{ type: 'boolean' }, { type: 'null' }],
       description: 'Sampling switch for the sub-talker.',
       title: 'Subtalker Dosample',
-      anyOf: [{ type: 'boolean' }, { type: 'null' }],
       default: true,
-    },
-    voice: {
-      description:
-        "The voice to be used for speech synthesis, will be ignored if a speaker embedding is provided. Check out the **[documentation](https://github.com/QwenLM/Qwen3-TTS/tree/main?tab=readme-ov-file#custom-voice-generate)** for each voice's details and which language they primarily support.",
-      title: 'Voice',
-      anyOf: [
-        {
-          type: 'string',
-          enum: [
-            'Vivian',
-            'Serena',
-            'Uncle_Fu',
-            'Dylan',
-            'Eric',
-            'Ryan',
-            'Aiden',
-            'Ono_Anna',
-            'Sohee',
-          ],
-        },
-        { type: 'null' },
-      ],
-      examples: ['Vivian'],
-    },
-    subtalker_temperature: {
-      description: 'Temperature for sub-talker sampling.',
-      title: 'Subtalker Temperature',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 0.9,
     },
     reference_text: {
       description:
@@ -13041,132 +13044,120 @@ export const Qwen3TtsTextToSpeech06bInputSchema = {
       title: 'Reference Text',
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
-    temperature: {
-      description: 'Sampling temperature; higher => more random.',
-      title: 'Temperature',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
+    subtalker_top_p: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Top-p for sub-talker sampling.',
+      title: 'Subtalker Top P',
+      default: 1,
+    },
+    subtalker_temperature: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Temperature for sub-talker sampling.',
+      title: 'Subtalker Temperature',
       default: 0.9,
     },
-    text: {
-      description: 'The text to be converted to speech.',
-      title: 'Text',
-      type: 'string',
-      examples: [
-        "I feel like I'm taking crazy pills! How can something be both a square and a circle at the same time? It defies all logic!",
-      ],
+    prompt: {
+      examples: ['Very happy.'],
+      description:
+        'Optional prompt to guide the style of the generated speech. This prompt will be ignored if a speaker embedding is provided.',
+      title: 'Prompt',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
     },
     speaker_voice_embedding_file_url: {
       description:
         'URL to a speaker embedding file in safetensors format, from `fal-ai/qwen-3-tts/clone-voice/0.6b` endpoint. If provided, the TTS model will use the cloned voice for synthesis instead of the predefined voices.',
       title: 'Speaker Voice Embedding File Url',
-      anyOf: [{ type: 'string', ui: { field: 'url' } }, { type: 'null' }],
+      anyOf: [{ ui: { field: 'url' }, type: 'string' }, { type: 'null' }],
+    },
+    top_k: {
+      anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
+      description: 'Top-k sampling parameter.',
+      title: 'Top K',
+      default: 50,
+    },
+    repetition_penalty: {
+      anyOf: [{ minimum: 0, type: 'number' }, { type: 'null' }],
+      description: 'Penalty to reduce repeated tokens/codes.',
+      title: 'Repetition Penalty',
+      default: 1.05,
+    },
+    max_new_tokens: {
+      anyOf: [{ minimum: 1, maximum: 8192, type: 'integer' }, { type: 'null' }],
+      description: 'Maximum number of new codec tokens to generate.',
+      title: 'Max New Tokens',
+      default: 200,
+    },
+    subtalker_top_k: {
+      anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
+      description: 'Top-k for sub-talker sampling.',
+      title: 'Subtalker Top K',
+      default: 50,
+    },
+    temperature: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Sampling temperature; higher => more random.',
+      title: 'Temperature',
+      default: 0.9,
+    },
+    text: {
+      examples: [
+        "I feel like I'm taking crazy pills! How can something be both a square and a circle at the same time? It defies all logic!",
+      ],
+      description: 'The text to be converted to speech.',
+      title: 'Text',
+      type: 'string',
     },
     top_p: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
       description: 'Top-p sampling parameter.',
       title: 'Top P',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
       default: 1,
     },
-    prompt: {
+    language: {
+      examples: ['English'],
+      description: 'The language of the voice.',
+      title: 'Language',
+      default: 'Auto',
+      enum: [
+        'Auto',
+        'English',
+        'Chinese',
+        'Spanish',
+        'French',
+        'German',
+        'Italian',
+        'Japanese',
+        'Korean',
+        'Portuguese',
+        'Russian',
+      ],
+      type: 'string',
+    },
+    voice: {
+      examples: ['Vivian'],
       description:
-        'Optional prompt to guide the style of the generated speech. This prompt will be ignored if a speaker embedding is provided.',
-      title: 'Prompt',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: ['Very happy.'],
-    },
-  },
-  required: ['text'],
-} as const
-
-export const Qwen3TtsTextToSpeech06bOutputSchema = {
-  type: 'object',
-  title: 'Qwen3TTSOutput06b',
-  'x-fal-order-properties': ['audio'],
-  properties: {
-    audio: {
-      description: 'The generated speech audio file.',
-      $ref: '#/$defs/AudioFile',
-      examples: [
+        "The voice to be used for speech synthesis, will be ignored if a speaker embedding is provided. Check out the **[documentation](https://github.com/QwenLM/Qwen3-TTS/tree/main?tab=readme-ov-file#custom-voice-generate)** for each voice's details and which language they primarily support.",
+      title: 'Voice',
+      anyOf: [
         {
-          sample_rate: 24000,
-          duration: 9.816875,
-          content_type: 'audio/mpeg',
-          file_name: 'n6Av3SeD5dFENf9-VmQ1v_is3jLh5h.mp3',
-          url: 'https://storage.googleapis.com/falserverless/example_outputs/example_outputs/qwen3-tts/tts_out_06b.mp3',
-          channels: 1,
-        },
-      ],
-    },
-  },
-  required: ['audio'],
-  $defs: {
-    AudioFile: {
-      required: ['url'],
-      properties: {
-        sample_rate: {
-          description: 'The sample rate of the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Sample Rate',
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'File Size',
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
+          enum: [
+            'Vivian',
+            'Serena',
+            'Uncle_Fu',
+            'Dylan',
+            'Eric',
+            'Ryan',
+            'Aiden',
+            'Ono_Anna',
+            'Sohee',
+          ],
           type: 'string',
-          title: 'Url',
         },
-        channels: {
-          description: 'The number of channels in the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Channels',
-        },
-        bitrate: {
-          description: "The bitrate of the audio (e.g., '192k' or 192000)",
-          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-          title: 'Bitrate',
-        },
-        duration: {
-          description: 'The duration of the audio',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Duration',
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-        },
-      },
-      type: 'object',
-      title: 'AudioFile',
-      'x-fal-order-properties': [
-        'url',
-        'content_type',
-        'file_name',
-        'file_size',
-        'duration',
-        'channels',
-        'sample_rate',
-        'bitrate',
+        { type: 'null' },
       ],
     },
   },
-} as const
-
-export const Qwen3TtsTextToSpeech17bInputSchema = {
   type: 'object',
-  title: 'Qwen3TTSInput',
   'x-fal-order-properties': [
     'text',
     'prompt',
@@ -13184,29 +13175,189 @@ export const Qwen3TtsTextToSpeech17bInputSchema = {
     'subtalker_temperature',
     'max_new_tokens',
   ],
+} as const
+
+export const Qwen3TtsTextToSpeech06bOutputSchema = {
+  title: 'Qwen3TTSOutput06b',
+  required: ['audio'],
   properties: {
+    audio: {
+      examples: [
+        {
+          sample_rate: 24000,
+          content_type: 'audio/mpeg',
+          channels: 1,
+          file_name: 'n6Av3SeD5dFENf9-VmQ1v_is3jLh5h.mp3',
+          duration: 9.816875,
+          url: 'https://storage.googleapis.com/falserverless/example_outputs/example_outputs/qwen3-tts/tts_out_06b.mp3',
+        },
+      ],
+      description: 'The generated speech audio file.',
+      $ref: '#/$defs/AudioFile',
+    },
+  },
+  type: 'object',
+  'x-fal-order-properties': ['audio'],
+  $defs: {
+    AudioFile: {
+      type: 'object',
+      'x-fal-order-properties': [
+        'url',
+        'content_type',
+        'file_name',
+        'file_size',
+        'duration',
+        'channels',
+        'sample_rate',
+        'bitrate',
+      ],
+      required: ['url'],
+      properties: {
+        channels: {
+          description: 'The number of channels in the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Channels',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+        },
+        bitrate: {
+          description: "The bitrate of the audio (e.g., '192k' or 192000)",
+          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+          title: 'Bitrate',
+        },
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+        },
+        url: {
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+        },
+        duration: {
+          description: 'The duration of the audio',
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Duration',
+        },
+        sample_rate: {
+          description: 'The sample rate of the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Sample Rate',
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+        },
+      },
+      title: 'AudioFile',
+    },
+  },
+} as const
+
+export const Qwen3TtsTextToSpeech17bInputSchema = {
+  title: 'Qwen3TTSInput',
+  required: ['text'],
+  properties: {
+    subtalker_dosample: {
+      anyOf: [{ type: 'boolean' }, { type: 'null' }],
+      description: 'Sampling switch for the sub-talker.',
+      title: 'Subtalker Dosample',
+      default: true,
+    },
+    reference_text: {
+      examples: [
+        'Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And it is all thanks to you.',
+      ],
+      description:
+        'Optional reference text that was used when creating the speaker embedding. Providing this can improve synthesis quality when using a cloned voice.',
+      title: 'Reference Text',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    subtalker_top_p: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Top-p for sub-talker sampling.',
+      title: 'Subtalker Top P',
+      default: 1,
+    },
+    subtalker_temperature: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Temperature for sub-talker sampling.',
+      title: 'Subtalker Temperature',
+      default: 0.9,
+    },
+    prompt: {
+      examples: ['Very happy.'],
+      description:
+        'Optional prompt to guide the style of the generated speech. This prompt will be ignored if a speaker embedding is provided.',
+      title: 'Prompt',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    speaker_voice_embedding_file_url: {
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/clone_out.safetensors',
+      ],
+      description:
+        'URL to a speaker embedding file in safetensors format, from `fal-ai/qwen-3-tts/clone-voice` endpoint. If provided, the TTS model will use the cloned voice for synthesis instead of the predefined voices.',
+      title: 'Speaker Voice Embedding File Url',
+      anyOf: [{ ui: { field: 'url' }, type: 'string' }, { type: 'null' }],
+    },
     top_k: {
+      anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
       description: 'Top-k sampling parameter.',
       title: 'Top K',
-      anyOf: [{ type: 'integer', minimum: 0 }, { type: 'null' }],
       default: 50,
     },
     repetition_penalty: {
+      anyOf: [{ minimum: 0, type: 'number' }, { type: 'null' }],
       description: 'Penalty to reduce repeated tokens/codes.',
       title: 'Repetition Penalty',
-      anyOf: [{ type: 'number', minimum: 0 }, { type: 'null' }],
       default: 1.05,
     },
-    subtalker_top_p: {
-      description: 'Top-p for sub-talker sampling.',
-      title: 'Subtalker Top P',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
+    max_new_tokens: {
+      anyOf: [{ minimum: 1, maximum: 8192, type: 'integer' }, { type: 'null' }],
+      description: 'Maximum number of new codec tokens to generate.',
+      title: 'Max New Tokens',
+      default: 200,
+    },
+    subtalker_top_k: {
+      anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
+      description: 'Top-k for sub-talker sampling.',
+      title: 'Subtalker Top K',
+      default: 50,
+    },
+    temperature: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Sampling temperature; higher => more random.',
+      title: 'Temperature',
+      default: 0.9,
+    },
+    text: {
+      examples: [
+        "I am solving the equation: x = [-b ± √(b²-4ac)] / 2a? Nobody can — it's a disaster (◍•͈⌔•͈◍), very sad!",
+      ],
+      description: 'The text to be converted to speech.',
+      title: 'Text',
+      type: 'string',
+    },
+    top_p: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Top-p sampling parameter.',
+      title: 'Top P',
       default: 1,
     },
     language: {
+      examples: ['English'],
       description: 'The language of the voice.',
       title: 'Language',
-      type: 'string',
       default: 'Auto',
       enum: [
         'Auto',
@@ -13221,33 +13372,15 @@ export const Qwen3TtsTextToSpeech17bInputSchema = {
         'Portuguese',
         'Russian',
       ],
-      examples: ['English'],
-    },
-    max_new_tokens: {
-      description: 'Maximum number of new codec tokens to generate.',
-      title: 'Max New Tokens',
-      anyOf: [{ type: 'integer', minimum: 1, maximum: 8192 }, { type: 'null' }],
-      default: 200,
-    },
-    subtalker_top_k: {
-      description: 'Top-k for sub-talker sampling.',
-      title: 'Subtalker Top K',
-      anyOf: [{ type: 'integer', minimum: 0 }, { type: 'null' }],
-      default: 50,
-    },
-    subtalker_dosample: {
-      description: 'Sampling switch for the sub-talker.',
-      title: 'Subtalker Dosample',
-      anyOf: [{ type: 'boolean' }, { type: 'null' }],
-      default: true,
+      type: 'string',
     },
     voice: {
+      examples: ['Vivian'],
       description:
         "The voice to be used for speech synthesis, will be ignored if a speaker embedding is provided. Check out the **[documentation](https://github.com/QwenLM/Qwen3-TTS/tree/main?tab=readme-ov-file#custom-voice-generate)** for each voice's details and which language they primarily support.",
       title: 'Voice',
       anyOf: [
         {
-          type: 'string',
           enum: [
             'Vivian',
             'Serena',
@@ -13259,138 +13392,56 @@ export const Qwen3TtsTextToSpeech17bInputSchema = {
             'Ono_Anna',
             'Sohee',
           ],
+          type: 'string',
         },
         { type: 'null' },
       ],
-      examples: ['Vivian'],
-    },
-    subtalker_temperature: {
-      description: 'Temperature for sub-talker sampling.',
-      title: 'Subtalker Temperature',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 0.9,
-    },
-    reference_text: {
-      description:
-        'Optional reference text that was used when creating the speaker embedding. Providing this can improve synthesis quality when using a cloned voice.',
-      title: 'Reference Text',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: [
-        'Okay. Yeah. I resent you. I love you. I respect you. But you know what? You blew it! And it is all thanks to you.',
-      ],
-    },
-    temperature: {
-      description: 'Sampling temperature; higher => more random.',
-      title: 'Temperature',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 0.9,
-    },
-    text: {
-      description: 'The text to be converted to speech.',
-      title: 'Text',
-      type: 'string',
-      examples: [
-        "I am solving the equation: x = [-b ± √(b²-4ac)] / 2a? Nobody can — it's a disaster (◍•͈⌔•͈◍), very sad!",
-      ],
-    },
-    speaker_voice_embedding_file_url: {
-      description:
-        'URL to a speaker embedding file in safetensors format, from `fal-ai/qwen-3-tts/clone-voice` endpoint. If provided, the TTS model will use the cloned voice for synthesis instead of the predefined voices.',
-      title: 'Speaker Voice Embedding File Url',
-      anyOf: [{ type: 'string', ui: { field: 'url' } }, { type: 'null' }],
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/clone_out.safetensors',
-      ],
-    },
-    top_p: {
-      description: 'Top-p sampling parameter.',
-      title: 'Top P',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 1,
-    },
-    prompt: {
-      description:
-        'Optional prompt to guide the style of the generated speech. This prompt will be ignored if a speaker embedding is provided.',
-      title: 'Prompt',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: ['Very happy.'],
     },
   },
-  required: ['text'],
+  type: 'object',
+  'x-fal-order-properties': [
+    'text',
+    'prompt',
+    'voice',
+    'language',
+    'speaker_voice_embedding_file_url',
+    'reference_text',
+    'top_k',
+    'top_p',
+    'temperature',
+    'repetition_penalty',
+    'subtalker_dosample',
+    'subtalker_top_k',
+    'subtalker_top_p',
+    'subtalker_temperature',
+    'max_new_tokens',
+  ],
 } as const
 
 export const Qwen3TtsTextToSpeech17bOutputSchema = {
-  type: 'object',
   title: 'Qwen3TTSOutput',
-  'x-fal-order-properties': ['audio'],
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated speech audio file.',
-      $ref: '#/$defs/AudioFile',
       examples: [
         {
           sample_rate: 24000,
-          duration: 13.025333333333334,
           content_type: 'audio/mpeg',
-          file_name: 'n5Ynr2aFKUPw1QjLYjB_4_XEdHoD1K.mp3',
-          url: 'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/tts_out.mp3',
           channels: 1,
+          file_name: 'n5Ynr2aFKUPw1QjLYjB_4_XEdHoD1K.mp3',
+          duration: 13.025333333333334,
+          url: 'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/tts_out.mp3',
         },
       ],
+      description: 'The generated speech audio file.',
+      $ref: '#/$defs/AudioFile',
     },
   },
-  required: ['audio'],
+  type: 'object',
+  'x-fal-order-properties': ['audio'],
   $defs: {
     AudioFile: {
-      required: ['url'],
-      properties: {
-        sample_rate: {
-          description: 'The sample rate of the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Sample Rate',
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'File Size',
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-          title: 'Url',
-        },
-        channels: {
-          description: 'The number of channels in the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Channels',
-        },
-        bitrate: {
-          description: "The bitrate of the audio (e.g., '192k' or 192000)",
-          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-          title: 'Bitrate',
-        },
-        duration: {
-          description: 'The duration of the audio',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Duration',
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-        },
-      },
       type: 'object',
-      title: 'AudioFile',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -13401,13 +13452,155 @@ export const Qwen3TtsTextToSpeech17bOutputSchema = {
         'sample_rate',
         'bitrate',
       ],
+      required: ['url'],
+      properties: {
+        channels: {
+          description: 'The number of channels in the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Channels',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+        },
+        bitrate: {
+          description: "The bitrate of the audio (e.g., '192k' or 192000)",
+          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+          title: 'Bitrate',
+        },
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+        },
+        url: {
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+        },
+        duration: {
+          description: 'The duration of the audio',
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Duration',
+        },
+        sample_rate: {
+          description: 'The sample rate of the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Sample Rate',
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+        },
+      },
+      title: 'AudioFile',
     },
   },
 } as const
 
 export const Qwen3TtsVoiceDesign17bInputSchema = {
-  type: 'object',
   title: 'Qwen3DesignVoiceInput',
+  required: ['text', 'prompt'],
+  properties: {
+    subtalker_dosample: {
+      anyOf: [{ type: 'boolean' }, { type: 'null' }],
+      description: 'Sampling switch for the sub-talker.',
+      title: 'Subtalker Dosample',
+      default: true,
+    },
+    repetition_penalty: {
+      anyOf: [{ minimum: 0, type: 'number' }, { type: 'null' }],
+      description: 'Penalty to reduce repeated tokens/codes.',
+      title: 'Repetition Penalty',
+      default: 1.05,
+    },
+    temperature: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Sampling temperature; higher => more random.',
+      title: 'Temperature',
+      default: 0.9,
+    },
+    max_new_tokens: {
+      anyOf: [{ minimum: 1, maximum: 8192, type: 'integer' }, { type: 'null' }],
+      description: 'Maximum number of new codec tokens to generate.',
+      title: 'Max New Tokens',
+      default: 200,
+    },
+    subtalker_temperature: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Temperature for sub-talker sampling.',
+      title: 'Subtalker Temperature',
+      default: 0.9,
+    },
+    subtalker_top_k: {
+      anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
+      description: 'Top-k for sub-talker sampling.',
+      title: 'Subtalker Top K',
+      default: 50,
+    },
+    prompt: {
+      examples: [
+        'Speak in an incredulous tone, but with a hint of panic beginning to creep into your voice.',
+      ],
+      description:
+        'Optional prompt to guide the style of the generated speech.',
+      title: 'Prompt',
+      type: 'string',
+    },
+    language: {
+      examples: ['English'],
+      description: 'The language of the voice to be designed.',
+      title: 'Language',
+      default: 'Auto',
+      enum: [
+        'Auto',
+        'English',
+        'Chinese',
+        'Spanish',
+        'French',
+        'German',
+        'Italian',
+        'Japanese',
+        'Korean',
+        'Portuguese',
+        'Russian',
+      ],
+      type: 'string',
+    },
+    text: {
+      examples: [
+        "It's in the top drawer... wait, it's empty? No way, that's impossible! I'm sure I put it there!",
+      ],
+      description: 'The text to be converted to speech.',
+      title: 'Text',
+      type: 'string',
+    },
+    subtalker_top_p: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Top-p for sub-talker sampling.',
+      title: 'Subtalker Top P',
+      default: 1,
+    },
+    top_k: {
+      anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
+      description: 'Top-k sampling parameter.',
+      title: 'Top K',
+      default: 50,
+    },
+    top_p: {
+      anyOf: [{ minimum: 0, maximum: 1, type: 'number' }, { type: 'null' }],
+      description: 'Top-p sampling parameter.',
+      title: 'Top P',
+      default: 1,
+    },
+  },
+  type: 'object',
   'x-fal-order-properties': [
     'text',
     'language',
@@ -13422,174 +13615,32 @@ export const Qwen3TtsVoiceDesign17bInputSchema = {
     'subtalker_temperature',
     'max_new_tokens',
   ],
-  properties: {
-    subtalker_temperature: {
-      description: 'Temperature for sub-talker sampling.',
-      title: 'Subtalker Temperature',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 0.9,
-    },
-    repetition_penalty: {
-      description: 'Penalty to reduce repeated tokens/codes.',
-      title: 'Repetition Penalty',
-      anyOf: [{ type: 'number', minimum: 0 }, { type: 'null' }],
-      default: 1.05,
-    },
-    language: {
-      description: 'The language of the voice to be designed.',
-      title: 'Language',
-      type: 'string',
-      default: 'Auto',
-      enum: [
-        'Auto',
-        'English',
-        'Chinese',
-        'Spanish',
-        'French',
-        'German',
-        'Italian',
-        'Japanese',
-        'Korean',
-        'Portuguese',
-        'Russian',
-      ],
-      examples: ['English'],
-    },
-    temperature: {
-      description: 'Sampling temperature; higher => more random.',
-      title: 'Temperature',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 0.9,
-    },
-    max_new_tokens: {
-      description: 'Maximum number of new codec tokens to generate.',
-      title: 'Max New Tokens',
-      anyOf: [{ type: 'integer', minimum: 1, maximum: 8192 }, { type: 'null' }],
-      default: 200,
-    },
-    prompt: {
-      description:
-        'Optional prompt to guide the style of the generated speech.',
-      title: 'Prompt',
-      type: 'string',
-      examples: [
-        'Speak in an incredulous tone, but with a hint of panic beginning to creep into your voice.',
-      ],
-    },
-    top_k: {
-      description: 'Top-k sampling parameter.',
-      title: 'Top K',
-      anyOf: [{ type: 'integer', minimum: 0 }, { type: 'null' }],
-      default: 50,
-    },
-    subtalker_top_k: {
-      description: 'Top-k for sub-talker sampling.',
-      title: 'Subtalker Top K',
-      anyOf: [{ type: 'integer', minimum: 0 }, { type: 'null' }],
-      default: 50,
-    },
-    subtalker_dosample: {
-      description: 'Sampling switch for the sub-talker.',
-      title: 'Subtalker Dosample',
-      anyOf: [{ type: 'boolean' }, { type: 'null' }],
-      default: true,
-    },
-    text: {
-      description: 'The text to be converted to speech.',
-      title: 'Text',
-      type: 'string',
-      examples: [
-        "It's in the top drawer... wait, it's empty? No way, that's impossible! I'm sure I put it there!",
-      ],
-    },
-    top_p: {
-      description: 'Top-p sampling parameter.',
-      title: 'Top P',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 1,
-    },
-    subtalker_top_p: {
-      description: 'Top-p for sub-talker sampling.',
-      title: 'Subtalker Top P',
-      anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'null' }],
-      default: 1,
-    },
-  },
-  required: ['text', 'prompt'],
 } as const
 
 export const Qwen3TtsVoiceDesign17bOutputSchema = {
-  type: 'object',
   title: 'Qwen3DesignVoiceOutput',
-  'x-fal-order-properties': ['audio'],
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated speech audio file.',
-      $ref: '#/$defs/AudioFile',
       examples: [
         {
           sample_rate: 24000,
-          duration: 7.736875,
           content_type: 'audio/mpeg',
-          file_name: 'rHFLVApz9Rdenm20UvnGf_FtjmMLBV.mp3',
-          url: 'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/design_out.mp3',
           channels: 1,
+          file_name: 'rHFLVApz9Rdenm20UvnGf_FtjmMLBV.mp3',
+          duration: 7.736875,
+          url: 'https://storage.googleapis.com/falserverless/example_outputs/qwen3-tts/design_out.mp3',
         },
       ],
+      description: 'The generated speech audio file.',
+      $ref: '#/$defs/AudioFile',
     },
   },
-  required: ['audio'],
+  type: 'object',
+  'x-fal-order-properties': ['audio'],
   $defs: {
     AudioFile: {
-      required: ['url'],
-      properties: {
-        sample_rate: {
-          description: 'The sample rate of the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Sample Rate',
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'File Size',
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-          title: 'Url',
-        },
-        channels: {
-          description: 'The number of channels in the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Channels',
-        },
-        bitrate: {
-          description: "The bitrate of the audio (e.g., '192k' or 192000)",
-          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-          title: 'Bitrate',
-        },
-        duration: {
-          description: 'The duration of the audio',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Duration',
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-        },
-      },
       type: 'object',
-      title: 'AudioFile',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -13600,81 +13651,128 @@ export const Qwen3TtsVoiceDesign17bOutputSchema = {
         'sample_rate',
         'bitrate',
       ],
+      required: ['url'],
+      properties: {
+        channels: {
+          description: 'The number of channels in the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Channels',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+        },
+        bitrate: {
+          description: "The bitrate of the audio (e.g., '192k' or 192000)",
+          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+          title: 'Bitrate',
+        },
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+        },
+        url: {
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+        },
+        duration: {
+          description: 'The duration of the audio',
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Duration',
+        },
+        sample_rate: {
+          description: 'The sample rate of the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Sample Rate',
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+        },
+      },
+      title: 'AudioFile',
     },
   },
 } as const
 
 export const SamAudioSeparateInputSchema = {
-  description: 'Input for text-based audio separation.',
-  required: ['audio_url', 'prompt'],
   properties: {
+    acceleration: {
+      title: 'Acceleration',
+      enum: ['fast', 'balanced', 'quality'],
+      type: 'string',
+      default: 'balanced',
+      description: 'The acceleration level to use.',
+    },
     predict_spans: {
+      title: 'Predict Spans',
+      type: 'boolean',
+      default: false,
       description:
         'Automatically predict temporal spans where the target sound occurs.',
-      type: 'boolean',
-      title: 'Predict Spans',
-      default: false,
-    },
-    reranking_candidates: {
-      description:
-        'Number of candidates to generate and rank. Higher improves quality but increases latency and cost.',
-      maximum: 7,
-      minimum: 1,
-      type: 'integer',
-      title: 'Reranking Candidates',
-      default: 1,
-    },
-    max_chunk_duration: {
-      description:
-        'Maximum audio duration (in seconds) to process in a single pass. Longer audio will be chunked with overlap and blended.',
-      maximum: 60,
-      minimum: 10,
-      type: 'number',
-      title: 'Max Chunk Duration',
-      default: 60,
-    },
-    output_format: {
-      enum: ['wav', 'mp3'],
-      description: 'Output audio format.',
-      type: 'string',
-      title: 'Output Format',
-      default: 'wav',
-    },
-    chunk_overlap: {
-      description:
-        'Overlap duration (in seconds) between chunks for crossfade blending.',
-      maximum: 30,
-      minimum: 0,
-      type: 'number',
-      title: 'Chunk Overlap',
-      default: 5,
     },
     audio_url: {
-      description:
-        'URL of the audio file to process (WAV, MP3, FLAC supported)',
       examples: [
         'https://v3b.fal.media/files/b/0a88511f/tUUCI9eDmeC2RqJEOXrZk_assets_avatar_multi_sing_woman.WAV',
       ],
-      type: 'string',
       title: 'Audio Url',
+      type: 'string',
+      description:
+        'URL of the audio file to process (WAV, MP3, FLAC supported)',
       'x-fal-file-input': true,
     },
-    prompt: {
-      description: 'Text prompt describing the sound to isolate.',
-      examples: ['piano playing'],
-      type: 'string',
-      title: 'Prompt',
+    reranking_candidates: {
+      title: 'Reranking Candidates',
+      minimum: 1,
+      type: 'integer',
+      default: 1,
+      maximum: 7,
+      description:
+        'Number of candidates to generate and rank. Higher improves quality but increases latency and cost.',
     },
-    acceleration: {
-      enum: ['fast', 'balanced', 'quality'],
-      description: 'The acceleration level to use.',
+    max_chunk_duration: {
+      title: 'Max Chunk Duration',
+      minimum: 10,
+      type: 'number',
+      default: 60,
+      maximum: 60,
+      description:
+        'Maximum audio duration (in seconds) to process in a single pass. Longer audio will be chunked with overlap and blended.',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['wav', 'mp3'],
       type: 'string',
-      title: 'Acceleration',
-      default: 'balanced',
+      default: 'wav',
+      description: 'Output audio format.',
+    },
+    prompt: {
+      examples: ['piano playing'],
+      title: 'Prompt',
+      type: 'string',
+      description: 'Text prompt describing the sound to isolate.',
+    },
+    chunk_overlap: {
+      title: 'Chunk Overlap',
+      minimum: 0,
+      type: 'number',
+      default: 5,
+      maximum: 30,
+      description:
+        'Overlap duration (in seconds) between chunks for crossfade blending.',
     },
   },
-  type: 'object',
+  required: ['audio_url', 'prompt'],
   title: 'SAMAudioInput',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'prompt',
@@ -13685,64 +13783,64 @@ export const SamAudioSeparateInputSchema = {
     'chunk_overlap',
     'output_format',
   ],
+  description: 'Input for text-based audio separation.',
 } as const
 
 export const SamAudioSeparateOutputSchema = {
-  description: 'Output for text-based audio separation.',
-  required: ['target', 'residual', 'duration'],
   properties: {
-    sample_rate: {
-      description: 'Sample rate of the output audio in Hz.',
-      type: 'integer',
-      title: 'Sample Rate',
-      default: 48000,
-    },
-    target: {
-      description: 'The isolated target sound.',
-      $ref: '#/$defs/File',
-      examples: [
-        {
-          content_type: 'audio/wav',
-          url: 'https://v3b.fal.media/files/b/0a8853af/bxm0-bZp5tH46Qp5PMwl6_tmpus5ep6vl.wav',
-        },
-      ],
+    duration: {
+      examples: [26.6],
+      title: 'Duration',
+      type: 'number',
+      description: 'Duration of the output audio in seconds.',
     },
     residual: {
-      description: 'Everything else in the audio.',
-      $ref: '#/$defs/File',
       examples: [
         {
           content_type: 'audio/wav',
           url: 'https://v3b.fal.media/files/b/0a88512b/xqDIegkZuLPPlufZ9RLP8_tmpos7b9db_.wav',
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Everything else in the audio.',
     },
-    duration: {
-      description: 'Duration of the output audio in seconds.',
-      examples: [26.6],
-      type: 'number',
-      title: 'Duration',
+    target: {
+      examples: [
+        {
+          content_type: 'audio/wav',
+          url: 'https://v3b.fal.media/files/b/0a8853af/bxm0-bZp5tH46Qp5PMwl6_tmpus5ep6vl.wav',
+        },
+      ],
+      $ref: '#/$defs/File',
+      description: 'The isolated target sound.',
+    },
+    sample_rate: {
+      title: 'Sample Rate',
+      type: 'integer',
+      default: 48000,
+      description: 'Sample rate of the output audio in Hz.',
     },
   },
-  type: 'object',
+  required: ['target', 'residual', 'duration'],
   title: 'SAMAudioSeparateOutput',
+  type: 'object',
   'x-fal-order-properties': ['target', 'residual', 'duration', 'sample_rate'],
+  description: 'Output for text-based audio separation.',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -13751,11 +13849,10 @@ export const SamAudioSeparateOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -13764,96 +13861,97 @@ export const SamAudioSeparateOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const SamAudioSpanSeparateInputSchema = {
-  description: 'Input for temporal span-based audio separation.',
-  required: ['audio_url', 'spans'],
   properties: {
-    trim_to_span: {
-      description:
-        'Trim output audio to only include the specified span time range. If False, returns the full audio length with the target sound isolated throughout.',
-      type: 'boolean',
-      title: 'Trim To Span',
-      default: false,
-    },
     acceleration: {
-      enum: ['fast', 'balanced', 'quality'],
-      description: 'The acceleration level to use.',
-      type: 'string',
       title: 'Acceleration',
+      enum: ['fast', 'balanced', 'quality'],
+      type: 'string',
       default: 'balanced',
-    },
-    reranking_candidates: {
-      description:
-        'Number of candidates to generate and rank. Higher improves quality but increases latency and cost. Requires text prompt; ignored for span-only separation.',
-      maximum: 7,
-      minimum: 1,
-      type: 'integer',
-      title: 'Reranking Candidates',
-      default: 1,
-    },
-    max_chunk_duration: {
-      description:
-        'Maximum audio duration (in seconds) to process in a single pass. Longer audio will be chunked with overlap and blended.',
-      maximum: 60,
-      minimum: 10,
-      type: 'number',
-      title: 'Max Chunk Duration',
-      default: 60,
+      description: 'The acceleration level to use.',
     },
     use_sound_activity_ranking: {
+      title: 'Use Sound Activity Ranking',
+      type: 'boolean',
+      default: false,
       description:
         "Use sound activity detection to rank reranking candidates based on how well each candidate's non-silent regions match the provided spans. Enables effective reranking even without a text prompt (span-only separation). Requires reranking_candidates > 1.",
-      type: 'boolean',
-      title: 'Use Sound Activity Ranking',
-      default: false,
-    },
-    output_format: {
-      enum: ['wav', 'mp3'],
-      description: 'Output audio format.',
-      type: 'string',
-      title: 'Output Format',
-      default: 'wav',
-    },
-    chunk_overlap: {
-      description:
-        'Overlap duration (in seconds) between chunks for crossfade blending.',
-      maximum: 30,
-      minimum: 0,
-      type: 'number',
-      title: 'Chunk Overlap',
-      default: 5,
     },
     audio_url: {
-      description: 'URL of the audio file to process.',
       examples: [
         'https://v3b.fal.media/files/b/0a8853d1/T7zRmsiculA6u_V6RCF2c_man.mp3',
       ],
-      type: 'string',
       title: 'Audio Url',
+      type: 'string',
+      description: 'URL of the audio file to process.',
       'x-fal-file-input': true,
-    },
-    prompt: {
-      description:
-        'Text prompt describing the sound to isolate. Optional but recommended - helps the model identify what type of sound to extract from the span.',
-      examples: ['man singing', 'dog barking'],
-      title: 'Prompt',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
     },
     spans: {
       items: { $ref: '#/$defs/AudioTimeSpan' },
+      examples: [[{ include: true, end: 10, start: 6 }]],
+      title: 'Spans',
+      type: 'array',
       description:
         'Time spans where the target sound occurs which should be isolated.',
-      examples: [[{ end: 10, include: true, start: 6 }]],
-      type: 'array',
-      title: 'Spans',
+    },
+    reranking_candidates: {
+      title: 'Reranking Candidates',
+      minimum: 1,
+      type: 'integer',
+      default: 1,
+      maximum: 7,
+      description:
+        'Number of candidates to generate and rank. Higher improves quality but increases latency and cost. Requires text prompt; ignored for span-only separation.',
+    },
+    max_chunk_duration: {
+      title: 'Max Chunk Duration',
+      minimum: 10,
+      type: 'number',
+      default: 60,
+      maximum: 60,
+      description:
+        'Maximum audio duration (in seconds) to process in a single pass. Longer audio will be chunked with overlap and blended.',
+    },
+    trim_to_span: {
+      title: 'Trim To Span',
+      type: 'boolean',
+      default: false,
+      description:
+        'Trim output audio to only include the specified span time range. If False, returns the full audio length with the target sound isolated throughout.',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['wav', 'mp3'],
+      type: 'string',
+      default: 'wav',
+      description: 'Output audio format.',
+    },
+    prompt: {
+      examples: ['man singing', 'dog barking'],
+      title: 'Prompt',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        'Text prompt describing the sound to isolate. Optional but recommended - helps the model identify what type of sound to extract from the span.',
+    },
+    chunk_overlap: {
+      title: 'Chunk Overlap',
+      minimum: 0,
+      type: 'number',
+      default: 5,
+      maximum: 30,
+      description:
+        'Overlap duration (in seconds) between chunks for crossfade blending.',
     },
   },
-  type: 'object',
+  required: ['audio_url', 'spans'],
   title: 'SAMAudioSpanInput',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'prompt',
@@ -13866,96 +13964,96 @@ export const SamAudioSpanSeparateInputSchema = {
     'trim_to_span',
     'output_format',
   ],
+  description: 'Input for temporal span-based audio separation.',
   $defs: {
     AudioTimeSpan: {
-      description: 'A time span indicating where the target sound occurs.',
-      required: ['start', 'end'],
       properties: {
-        end: {
-          description: 'End time of the span in seconds',
-          examples: [1.5, 4],
-          minimum: 0,
-          type: 'number',
-          title: 'End',
-        },
         include: {
+          title: 'Include',
+          type: 'boolean',
+          default: true,
           description:
             'Whether to include (True) or exclude (False) sounds in this span',
-          type: 'boolean',
-          title: 'Include',
-          default: true,
         },
-        start: {
-          description: 'Start time of the span in seconds',
-          examples: [0.5, 2],
+        end: {
+          examples: [1.5, 4],
+          title: 'End',
           minimum: 0,
           type: 'number',
+          description: 'End time of the span in seconds',
+        },
+        start: {
+          examples: [0.5, 2],
           title: 'Start',
+          minimum: 0,
+          type: 'number',
+          description: 'Start time of the span in seconds',
         },
       },
-      type: 'object',
+      required: ['start', 'end'],
       title: 'AudioTimeSpan',
+      type: 'object',
       'x-fal-order-properties': ['start', 'end', 'include'],
+      description: 'A time span indicating where the target sound occurs.',
     },
   },
 } as const
 
 export const SamAudioSpanSeparateOutputSchema = {
-  description: 'Output for span-based audio separation.',
-  required: ['target', 'residual', 'duration'],
   properties: {
-    sample_rate: {
-      description: 'Sample rate of the output audio in Hz.',
-      type: 'integer',
-      title: 'Sample Rate',
-      default: 48000,
-    },
-    target: {
-      description: 'The isolated target sound.',
-      $ref: '#/$defs/File',
-      examples: [
-        {
-          content_type: 'audio/wav',
-          url: 'https://v3b.fal.media/files/b/0a89374c/mImRbqrjB72o9vEmIrSmW_tmpp2rmotgs.wav',
-        },
-      ],
+    duration: {
+      examples: [81.96],
+      title: 'Duration',
+      type: 'number',
+      description: 'Duration of the output audio in seconds.',
     },
     residual: {
-      description: 'Everything else in the audio.',
-      $ref: '#/$defs/File',
       examples: [
         {
           content_type: 'audio/wav',
           url: 'https://v3b.fal.media/files/b/0a89374d/suELShppRlPCTAVnbWRqj_tmpr8shao_e.wav',
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Everything else in the audio.',
     },
-    duration: {
-      description: 'Duration of the output audio in seconds.',
-      examples: [81.96],
-      type: 'number',
-      title: 'Duration',
+    target: {
+      examples: [
+        {
+          content_type: 'audio/wav',
+          url: 'https://v3b.fal.media/files/b/0a89374c/mImRbqrjB72o9vEmIrSmW_tmpp2rmotgs.wav',
+        },
+      ],
+      $ref: '#/$defs/File',
+      description: 'The isolated target sound.',
+    },
+    sample_rate: {
+      title: 'Sample Rate',
+      type: 'integer',
+      default: 48000,
+      description: 'Sample rate of the output audio in Hz.',
     },
   },
-  type: 'object',
+  required: ['target', 'residual', 'duration'],
   title: 'SAMAudioSpanSeparateOutput',
+  type: 'object',
   'x-fal-order-properties': ['target', 'residual', 'duration', 'sample_rate'],
+  description: 'Output for span-based audio separation.',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -13964,11 +14062,10 @@ export const SamAudioSpanSeparateOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -13977,81 +14074,82 @@ export const SamAudioSpanSeparateOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const SamAudioVisualSeparateInputSchema = {
-  description: 'Input for visual-prompted audio separation.',
-  required: ['video_url'],
   properties: {
-    reranking_candidates: {
-      description:
-        'Number of candidates to generate and rank. Higher improves quality but increases latency and cost.',
-      maximum: 4,
-      minimum: 1,
-      type: 'integer',
-      title: 'Reranking Candidates',
-      default: 1,
-    },
-    max_chunk_duration: {
-      description:
-        'Maximum audio duration (in seconds) to process in a single pass. Longer audio will be chunked with overlap and blended.',
-      maximum: 60,
-      minimum: 10,
-      type: 'number',
-      title: 'Max Chunk Duration',
-      default: 60,
-    },
-    output_format: {
-      enum: ['wav', 'mp3'],
-      description: 'Output audio format.',
+    acceleration: {
+      title: 'Acceleration',
+      enum: ['fast', 'balanced', 'quality'],
       type: 'string',
-      title: 'Output Format',
-      default: 'wav',
+      default: 'balanced',
+      description: 'The acceleration level to use.',
     },
     video_url: {
-      description: 'URL of the video file to process (MP4, MOV, etc.)',
       examples: [
         'https://v3b.fal.media/files/b/0a8850d1/gff7zKI-6XwIbBBip4946_office.mp4',
       ],
-      type: 'string',
       title: 'Video Url',
+      type: 'string',
+      description: 'URL of the video file to process (MP4, MOV, etc.)',
       'x-fal-file-input': true,
     },
-    chunk_overlap: {
-      description:
-        'Overlap duration (in seconds) between chunks for crossfade blending.',
-      maximum: 30,
-      minimum: 0,
-      type: 'number',
-      title: 'Chunk Overlap',
-      default: 5,
-    },
-    acceleration: {
-      enum: ['fast', 'balanced', 'quality'],
-      description: 'The acceleration level to use.',
-      type: 'string',
-      title: 'Acceleration',
-      default: 'balanced',
-    },
-    prompt: {
-      description:
-        'Text prompt to assist with separation. Use natural language to describe the target sound.',
-      examples: ['man on the left'],
-      type: 'string',
-      title: 'Prompt',
-      default: '',
-    },
     mask_video_url: {
-      description:
-        'URL of the mask video (binary mask indicating target object). Black=target, White=background.',
       title: 'Mask Video Url',
       anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        'URL of the mask video (binary mask indicating target object). Black=target, White=background.',
+    },
+    reranking_candidates: {
+      title: 'Reranking Candidates',
+      minimum: 1,
+      type: 'integer',
+      default: 1,
+      maximum: 4,
+      description:
+        'Number of candidates to generate and rank. Higher improves quality but increases latency and cost.',
+    },
+    max_chunk_duration: {
+      title: 'Max Chunk Duration',
+      minimum: 10,
+      type: 'number',
+      default: 60,
+      maximum: 60,
+      description:
+        'Maximum audio duration (in seconds) to process in a single pass. Longer audio will be chunked with overlap and blended.',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['wav', 'mp3'],
+      type: 'string',
+      default: 'wav',
+      description: 'Output audio format.',
+    },
+    prompt: {
+      examples: ['man on the left'],
+      title: 'Prompt',
+      type: 'string',
+      default: '',
+      description:
+        'Text prompt to assist with separation. Use natural language to describe the target sound.',
+    },
+    chunk_overlap: {
+      title: 'Chunk Overlap',
+      minimum: 0,
+      type: 'number',
+      default: 5,
+      maximum: 30,
+      description:
+        'Overlap duration (in seconds) between chunks for crossfade blending.',
     },
   },
-  type: 'object',
+  required: ['video_url'],
   title: 'SAMAudioVisualInput',
+  type: 'object',
   'x-fal-order-properties': [
     'video_url',
     'mask_video_url',
@@ -14062,64 +14160,64 @@ export const SamAudioVisualSeparateInputSchema = {
     'chunk_overlap',
     'output_format',
   ],
+  description: 'Input for visual-prompted audio separation.',
 } as const
 
 export const SamAudioVisualSeparateOutputSchema = {
-  description: 'Output for visual-prompted audio separation.',
-  required: ['target', 'residual', 'duration'],
   properties: {
-    sample_rate: {
-      description: 'Sample rate of the output audio in Hz.',
-      type: 'integer',
-      title: 'Sample Rate',
-      default: 48000,
-    },
-    target: {
-      description: 'The isolated target sound.',
-      $ref: '#/$defs/File',
-      examples: [
-        {
-          content_type: 'audio/wav',
-          url: 'https://v3b.fal.media/files/b/0a88550c/CVyBZ1Cxka1vLxVwOfUcc_tmpzzftm934.wav',
-        },
-      ],
+    duration: {
+      examples: [15],
+      title: 'Duration',
+      type: 'number',
+      description: 'Duration of the output audio in seconds.',
     },
     residual: {
-      description: 'Everything else in the audio.',
-      $ref: '#/$defs/File',
       examples: [
         {
           content_type: 'audio/wav',
           url: 'https://v3b.fal.media/files/b/0a88550c/pdOH_J84S-197LRjMQDrz_tmprx375uix.wav',
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Everything else in the audio.',
     },
-    duration: {
-      description: 'Duration of the output audio in seconds.',
-      examples: [15],
-      type: 'number',
-      title: 'Duration',
+    target: {
+      examples: [
+        {
+          content_type: 'audio/wav',
+          url: 'https://v3b.fal.media/files/b/0a88550c/CVyBZ1Cxka1vLxVwOfUcc_tmpzzftm934.wav',
+        },
+      ],
+      $ref: '#/$defs/File',
+      description: 'The isolated target sound.',
+    },
+    sample_rate: {
+      title: 'Sample Rate',
+      type: 'integer',
+      default: 48000,
+      description: 'Sample rate of the output audio in Hz.',
     },
   },
-  type: 'object',
+  required: ['target', 'residual', 'duration'],
   title: 'SAMAudioVisualSeparateOutput',
+  type: 'object',
   'x-fal-order-properties': ['target', 'residual', 'duration', 'sample_rate'],
+  description: 'Output for visual-prompted audio separation.',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -14128,11 +14226,10 @@ export const SamAudioVisualSeparateOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -14141,6 +14238,8 @@ export const SamAudioVisualSeparateOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
@@ -14813,8 +14912,6 @@ export const SfxV1VideoToAudioOutputSchema = {
 
 export const SileroVadInputSchema = {
   type: 'object',
-  required: ['audio_url'],
-  title: 'SileroVADInput',
   properties: {
     audio_url: {
       type: 'string',
@@ -14827,12 +14924,12 @@ export const SileroVadInputSchema = {
     },
   },
   'x-fal-order-properties': ['audio_url'],
+  title: 'SileroVADInput',
+  required: ['audio_url'],
 } as const
 
 export const SileroVadOutputSchema = {
   type: 'object',
-  required: ['has_speech', 'timestamps'],
-  title: 'SileroVADOutput',
   properties: {
     timestamps: {
       type: 'array',
@@ -14842,8 +14939,8 @@ export const SileroVadOutputSchema = {
           { start: 2.434, end: 3.998 },
         ],
       ],
-      title: 'Speech Timestamps',
       items: { $ref: '#/$defs/SpeechTimestamp' },
+      title: 'Speech Timestamps',
       description: 'The speech timestamps.',
     },
     has_speech: {
@@ -14854,11 +14951,11 @@ export const SileroVadOutputSchema = {
     },
   },
   'x-fal-order-properties': ['has_speech', 'timestamps'],
+  title: 'SileroVADOutput',
+  required: ['has_speech', 'timestamps'],
   $defs: {
     SpeechTimestamp: {
       type: 'object',
-      required: ['start', 'end'],
-      title: 'SpeechTimestamp',
       properties: {
         start: {
           type: 'number',
@@ -14872,48 +14969,50 @@ export const SileroVadOutputSchema = {
         },
       },
       'x-fal-order-properties': ['start', 'end'],
+      title: 'SpeechTimestamp',
+      required: ['start', 'end'],
     },
   },
 } as const
 
 export const SmartTurnInputSchema = {
+  title: 'SmartTurnInput',
+  type: 'object',
   required: ['audio_url'],
+  'x-fal-order-properties': ['audio_url'],
   properties: {
     audio_url: {
-      description: 'The URL of the audio file to be processed.',
-      examples: ['https://fal.media/files/panda/5-QaAOC32rB_hqWaVdqEH.mpga'],
-      type: 'string',
       title: 'Audio Url',
+      type: 'string',
+      examples: ['https://fal.media/files/panda/5-QaAOC32rB_hqWaVdqEH.mpga'],
+      description: 'The URL of the audio file to be processed.',
       'x-fal-file-input': true,
     },
   },
-  type: 'object',
-  title: 'SmartTurnInput',
-  'x-fal-order-properties': ['audio_url'],
 } as const
 
 export const SmartTurnOutputSchema = {
+  title: 'Output',
+  type: 'object',
   required: ['prediction', 'probability', 'metrics'],
+  'x-fal-order-properties': ['prediction', 'probability', 'metrics'],
   properties: {
     metrics: {
-      description: 'The metrics of the inference.',
-      type: 'object',
       title: 'Metrics',
-    },
-    probability: {
-      description: 'The probability of the predicted turn type.',
-      type: 'number',
-      title: 'Probability',
+      type: 'object',
+      description: 'The metrics of the inference.',
     },
     prediction: {
-      description: 'The predicted turn type. 1 for Complete, 0 for Incomplete.',
-      type: 'integer',
       title: 'Prediction',
+      type: 'integer',
+      description: 'The predicted turn type. 1 for Complete, 0 for Incomplete.',
+    },
+    probability: {
+      title: 'Probability',
+      type: 'number',
+      description: 'The probability of the predicted turn type.',
     },
   },
-  type: 'object',
-  title: 'Output',
-  'x-fal-order-properties': ['prediction', 'probability', 'metrics'],
 } as const
 
 export const SoundEffectsGeneratorInputSchema = {
@@ -14959,20 +15058,19 @@ export const SoundEffectsGeneratorOutputSchema = {
   required: ['audio_file'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -14981,11 +15079,10 @@ export const SoundEffectsGeneratorOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -14994,40 +15091,31 @@ export const SoundEffectsGeneratorOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const SpeakerSchema = {
-  type: 'object',
-  title: 'Speaker',
+  required: ['prompt', 'speaker_id', 'audio_url'],
   'x-fal-order-properties': ['prompt', 'speaker_id', 'audio_url'],
   properties: {
-    audio_url: { type: 'string', title: 'Audio Url' },
-    speaker_id: { type: 'integer', title: 'Speaker Id' },
-    prompt: { type: 'string', title: 'Prompt' },
+    prompt: { title: 'Prompt', type: 'string' },
+    audio_url: { title: 'Audio Url', type: 'string' },
+    speaker_id: { title: 'Speaker Id', type: 'integer' },
   },
-  required: ['prompt', 'speaker_id', 'audio_url'],
+  title: 'Speaker',
+  type: 'object',
 } as const
 
 export const SpeakerConfigSchema = {
   type: 'object',
-  required: ['voice', 'speaker_id'],
-  description:
-    'Voice configuration for a single speaker in multi-speaker synthesis.',
   properties: {
-    speaker_id: {
-      pattern: '^\\w+$',
-      type: 'string',
-      examples: ['Speaker1', 'Alice', 'Narrator'],
-      description:
-        "Alias used to identify this speaker in the prompt. Use this alias as a prefix in the prompt field, e.g. 'Alice: Hello! Bob: Hi there!'. Must be alphanumeric with no whitespace.",
-      title: 'Speaker Id',
-    },
     voice: {
       type: 'string',
-      description: 'Voice preset for this speaker.',
       title: 'Voice',
+      description: 'Voice preset for this speaker.',
       enum: [
         'Achernar',
         'Achird',
@@ -15061,15 +15149,24 @@ export const SpeakerConfigSchema = {
         'Zubenelgenubi',
       ],
     },
+    speaker_id: {
+      pattern: '^\\w+$',
+      examples: ['Speaker1', 'Alice', 'Narrator'],
+      type: 'string',
+      title: 'Speaker Id',
+      description:
+        "Alias used to identify this speaker in the prompt. Use this alias as a prefix in the prompt field, e.g. 'Alice: Hello! Bob: Hi there!'. Must be alphanumeric with no whitespace.",
+    },
   },
-  title: 'SpeakerConfig',
   'x-fal-order-properties': ['voice', 'speaker_id'],
+  title: 'SpeakerConfig',
+  description:
+    'Voice configuration for a single speaker in multi-speaker synthesis.',
+  required: ['voice', 'speaker_id'],
 } as const
 
 export const SpeechTimestampSchema = {
   type: 'object',
-  required: ['start', 'end'],
-  title: 'SpeechTimestamp',
   properties: {
     start: {
       type: 'number',
@@ -15083,216 +15180,218 @@ export const SpeechTimestampSchema = {
     },
   },
   'x-fal-order-properties': ['start', 'end'],
+  title: 'SpeechTimestamp',
+  required: ['start', 'end'],
 } as const
 
 export const SpeechToTextInputSchema = {
+  type: 'object',
+  required: ['audio_url'],
+  'x-fal-order-properties': ['audio_url', 'use_pnc'],
   properties: {
     audio_url: {
-      description: 'Local filesystem path (or remote URL) to a long audio file',
       type: 'string',
-      title: 'Audio Path',
       examples: [
         'https://storage.googleapis.com/falserverless/canary/18e15559-ab3e-4f96-9583-be5ddde91e43.mp3',
       ],
+      description: 'Local filesystem path (or remote URL) to a long audio file',
+      title: 'Audio Path',
       'x-fal-file-input': true,
     },
     use_pnc: {
-      default: true,
       type: 'boolean',
-      title: 'Use Punctuation/Capitalization (PnC)',
       description:
         "Whether to use Canary's built-in punctuation & capitalization",
+      default: true,
+      title: 'Use Punctuation/Capitalization (PnC)',
     },
   },
   title: 'SpeechInput',
-  type: 'object',
-  'x-fal-order-properties': ['audio_url', 'use_pnc'],
-  required: ['audio_url'],
 } as const
 
 export const SpeechToTextOutputSchema = {
+  type: 'object',
+  required: ['output'],
+  'x-fal-order-properties': ['output', 'partial'],
   properties: {
+    partial: {
+      type: 'boolean',
+      description: 'Indicates if this is a partial (in-progress) transcript',
+      default: false,
+      title: 'Partial',
+    },
     output: {
       type: 'string',
-      title: 'Transcribed Text',
       description: 'The partial or final transcription output from Canary',
-    },
-    partial: {
-      default: false,
-      type: 'boolean',
-      title: 'Partial',
-      description: 'Indicates if this is a partial (in-progress) transcript',
+      title: 'Transcribed Text',
     },
   },
   title: 'SpeechOutput',
-  type: 'object',
-  'x-fal-order-properties': ['output', 'partial'],
-  required: ['output'],
 } as const
 
 export const SpeechToTextStreamInputSchema = {
+  type: 'object',
+  required: ['audio_url'],
+  'x-fal-order-properties': ['audio_url', 'use_pnc'],
   properties: {
     audio_url: {
-      description: 'Local filesystem path (or remote URL) to a long audio file',
       type: 'string',
-      title: 'Audio Path',
       examples: [
         'https://storage.googleapis.com/falserverless/canary/18e15559-ab3e-4f96-9583-be5ddde91e43.mp3',
       ],
+      description: 'Local filesystem path (or remote URL) to a long audio file',
+      title: 'Audio Path',
       'x-fal-file-input': true,
     },
     use_pnc: {
-      default: true,
       type: 'boolean',
-      title: 'Use Punctuation/Capitalization (PnC)',
       description:
         "Whether to use Canary's built-in punctuation & capitalization",
+      default: true,
+      title: 'Use Punctuation/Capitalization (PnC)',
     },
   },
   title: 'SpeechInput',
-  type: 'object',
-  'x-fal-order-properties': ['audio_url', 'use_pnc'],
-  required: ['audio_url'],
 } as const
 
 export const SpeechToTextStreamOutputSchema = {} as const
 
 export const SpeechToTextTurboInputSchema = {
+  type: 'object',
+  required: ['audio_url'],
+  'x-fal-order-properties': ['audio_url', 'use_pnc'],
   properties: {
     audio_url: {
-      description: 'Local filesystem path (or remote URL) to a long audio file',
       type: 'string',
-      title: 'Audio Path',
       examples: [
         'https://storage.googleapis.com/falserverless/canary/18e15559-ab3e-4f96-9583-be5ddde91e43.mp3',
       ],
+      description: 'Local filesystem path (or remote URL) to a long audio file',
+      title: 'Audio Path',
       'x-fal-file-input': true,
     },
     use_pnc: {
-      default: true,
       type: 'boolean',
-      title: 'Use Punctuation/Capitalization (PnC)',
       description:
         "Whether to use Canary's built-in punctuation & capitalization",
+      default: true,
+      title: 'Use Punctuation/Capitalization (PnC)',
     },
   },
   title: 'SpeechInput',
-  type: 'object',
-  'x-fal-order-properties': ['audio_url', 'use_pnc'],
-  required: ['audio_url'],
 } as const
 
 export const SpeechToTextTurboOutputSchema = {
+  type: 'object',
+  required: ['output'],
+  'x-fal-order-properties': ['output', 'partial'],
   properties: {
+    partial: {
+      type: 'boolean',
+      description: 'Indicates if this is a partial (in-progress) transcript',
+      default: false,
+      title: 'Partial',
+    },
     output: {
       type: 'string',
-      title: 'Transcribed Text',
       description: 'The partial or final transcription output from Canary',
-    },
-    partial: {
-      default: false,
-      type: 'boolean',
-      title: 'Partial',
-      description: 'Indicates if this is a partial (in-progress) transcript',
+      title: 'Transcribed Text',
     },
   },
   title: 'SpeechOutput',
-  type: 'object',
-  'x-fal-order-properties': ['output', 'partial'],
-  required: ['output'],
 } as const
 
 export const SpeechToTextTurboStreamInputSchema = {
+  type: 'object',
+  required: ['audio_url'],
+  'x-fal-order-properties': ['audio_url', 'use_pnc'],
   properties: {
     audio_url: {
-      description: 'Local filesystem path (or remote URL) to a long audio file',
       type: 'string',
-      title: 'Audio Path',
       examples: [
         'https://storage.googleapis.com/falserverless/canary/18e15559-ab3e-4f96-9583-be5ddde91e43.mp3',
       ],
+      description: 'Local filesystem path (or remote URL) to a long audio file',
+      title: 'Audio Path',
       'x-fal-file-input': true,
     },
     use_pnc: {
-      default: true,
       type: 'boolean',
-      title: 'Use Punctuation/Capitalization (PnC)',
       description:
         "Whether to use Canary's built-in punctuation & capitalization",
+      default: true,
+      title: 'Use Punctuation/Capitalization (PnC)',
     },
   },
   title: 'SpeechInput',
-  type: 'object',
-  'x-fal-order-properties': ['audio_url', 'use_pnc'],
-  required: ['audio_url'],
 } as const
 
 export const SpeechToTextTurboStreamOutputSchema = {} as const
 
 export const StableAudio25AudioToAudioInputSchema = {
+  title: 'AudioToAudioInput',
   required: ['prompt', 'audio_url'],
-  type: 'object',
   properties: {
     total_seconds: {
+      examples: [45],
       description:
         'The duration of the audio clip to generate. If not provided, it will be set to the duration of the input audio.',
-      examples: [45],
       title: 'Total Seconds',
-      anyOf: [{ maximum: 190, type: 'integer', minimum: 1 }, { type: 'null' }],
+      anyOf: [{ minimum: 1, maximum: 190, type: 'integer' }, { type: 'null' }],
     },
-    strength: {
-      description:
-        'Sometimes referred to as denoising, this parameter controls how much influence the `audio_url` parameter has on the generated audio. A value of 0 would yield audio that is identical to the input. A value of 1 would be as if you passed in no audio at all.',
-      maximum: 1,
-      type: 'number',
-      minimum: 0.01,
-      title: 'Strength',
-      default: 0.8,
-    },
-    sync_mode: {
-      description:
-        "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      type: 'boolean',
-      title: 'Sync Mode',
-      default: false,
-    },
-    seed: { title: 'Seed', anyOf: [{ type: 'integer' }, { type: 'null' }] },
     guidance_scale: {
       description:
         'How strictly the diffusion process adheres to the prompt text (higher values make your audio closer to your prompt). ',
-      maximum: 25,
-      type: 'number',
-      minimum: 1,
       title: 'Guidance Scale',
       default: 1,
+      maximum: 25,
+      minimum: 1,
+      type: 'number',
     },
+    seed: { anyOf: [{ type: 'integer' }, { type: 'null' }], title: 'Seed' },
     audio_url: {
       description: 'The audio clip to transform',
+      title: 'Audio Url',
       examples: [
         'https://v3.fal.media/files/panda/1-0iezBUIePBa3Sz5YY5B_tmpy1jyshw9.wav',
       ],
       type: 'string',
-      title: 'Audio Url',
       'x-fal-file-input': true,
     },
     prompt: {
-      description: 'The prompt to guide the audio generation',
       examples: [
         'Post rock, guitars, bass, strings, euphoric, up-lifting, moody, flowing, raw, epic',
       ],
-      type: 'string',
+      description: 'The prompt to guide the audio generation',
       title: 'Prompt',
+      type: 'string',
     },
     num_inference_steps: {
       description: 'The number of steps to denoise the audio for',
-      maximum: 8,
-      type: 'integer',
-      minimum: 4,
       title: 'Num Inference Steps',
       default: 8,
+      maximum: 8,
+      minimum: 4,
+      type: 'integer',
+    },
+    sync_mode: {
+      description:
+        "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      title: 'Sync Mode',
+      default: false,
+      type: 'boolean',
+    },
+    strength: {
+      description:
+        'Sometimes referred to as denoising, this parameter controls how much influence the `audio_url` parameter has on the generated audio. A value of 0 would yield audio that is identical to the input. A value of 1 would be as if you passed in no audio at all.',
+      title: 'Strength',
+      default: 0.8,
+      maximum: 1,
+      minimum: 0.01,
+      type: 'number',
     },
   },
-  title: 'AudioToAudioInput',
+  type: 'object',
   'x-fal-order-properties': [
     'prompt',
     'audio_url',
@@ -15306,40 +15405,39 @@ export const StableAudio25AudioToAudioInputSchema = {
 } as const
 
 export const StableAudio25AudioToAudioOutputSchema = {
+  title: 'AudioToAudioOutput',
   required: ['audio', 'seed'],
-  type: 'object',
   properties: {
     audio: {
-      description: 'The generated audio clip',
-      $ref: '#/$defs/File',
       examples: [
         'https://v3.fal.media/files/elephant/bJ-KIfIXsls5-pqSRXRwx_tmpdurmawkp.wav',
       ],
+      description: 'The generated audio clip',
+      $ref: '#/$defs/File',
     },
     seed: {
       description: 'The random seed used for generation',
-      type: 'integer',
       title: 'Seed',
+      type: 'integer',
     },
   },
-  title: 'AudioToAudioOutput',
+  type: 'object',
   'x-fal-order-properties': ['audio', 'seed'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -15348,11 +15446,10 @@ export const StableAudio25AudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -15361,82 +15458,84 @@ export const StableAudio25AudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio25InpaintInputSchema = {
+  title: 'InpaintInput',
   required: ['prompt', 'audio_url'],
-  type: 'object',
   properties: {
-    mask_start: {
-      examples: [15],
-      description: 'The start point of the audio mask',
-      maximum: 190,
-      type: 'integer',
-      minimum: 0,
-      title: 'Mask Start',
-      default: 30,
-    },
-    sync_mode: {
-      description:
-        "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      type: 'boolean',
-      title: 'Sync Mode',
-      default: false,
-    },
-    seed: { title: 'Seed', anyOf: [{ type: 'integer' }, { type: 'null' }] },
-    seconds_total: {
-      anyOf: [{ maximum: 190, type: 'integer', minimum: 1 }, { type: 'null' }],
-      description:
-        'The duration of the audio clip to generate. If not provided, it will be set to the duration of the input audio.',
-      examples: [45],
-      title: 'Seconds Total',
-      default: 190,
-    },
-    mask_end: {
-      examples: [40],
-      description: 'The end point of the audio mask',
-      maximum: 190,
-      type: 'integer',
-      minimum: 0,
-      title: 'Mask End',
-      default: 190,
-    },
     guidance_scale: {
       description:
         'How strictly the diffusion process adheres to the prompt text (higher values make your audio closer to your prompt). ',
-      maximum: 25,
-      type: 'number',
-      minimum: 1,
       title: 'Guidance Scale',
       default: 1,
+      maximum: 25,
+      minimum: 1,
+      type: 'number',
+    },
+    seed: { anyOf: [{ type: 'integer' }, { type: 'null' }], title: 'Seed' },
+    mask_end: {
+      examples: [40],
+      description: 'The end point of the audio mask',
+      title: 'Mask End',
+      default: 190,
+      maximum: 190,
+      minimum: 0,
+      type: 'integer',
     },
     audio_url: {
       description: 'The audio clip to inpaint',
+      title: 'Audio Url',
       examples: [
         'https://v3.fal.media/files/elephant/t0ZrzW_ueetXrr3NUa87F_a2a_in.mp3',
       ],
       type: 'string',
-      title: 'Audio Url',
       'x-fal-file-input': true,
     },
     prompt: {
-      description: 'The prompt to guide the audio generation',
       examples: ['Lofi hip hop beat, chillhop'],
-      type: 'string',
+      description: 'The prompt to guide the audio generation',
       title: 'Prompt',
+      type: 'string',
+    },
+    seconds_total: {
+      examples: [45],
+      description:
+        'The duration of the audio clip to generate. If not provided, it will be set to the duration of the input audio.',
+      title: 'Seconds Total',
+      default: 190,
+      anyOf: [{ minimum: 1, maximum: 190, type: 'integer' }, { type: 'null' }],
     },
     num_inference_steps: {
       description: 'The number of steps to denoise the audio for',
-      maximum: 8,
-      type: 'integer',
-      minimum: 4,
       title: 'Num Inference Steps',
       default: 8,
+      maximum: 8,
+      minimum: 4,
+      type: 'integer',
+    },
+    sync_mode: {
+      description:
+        "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
+      title: 'Sync Mode',
+      default: false,
+      type: 'boolean',
+    },
+    mask_start: {
+      examples: [15],
+      description: 'The start point of the audio mask',
+      title: 'Mask Start',
+      default: 30,
+      maximum: 190,
+      minimum: 0,
+      type: 'integer',
     },
   },
-  title: 'InpaintInput',
+  type: 'object',
   'x-fal-order-properties': [
     'prompt',
     'audio_url',
@@ -15451,40 +15550,39 @@ export const StableAudio25InpaintInputSchema = {
 } as const
 
 export const StableAudio25InpaintOutputSchema = {
+  title: 'InpaintOutput',
   required: ['audio', 'seed'],
-  type: 'object',
   properties: {
     audio: {
-      description: 'The generated audio clip',
-      $ref: '#/$defs/File',
       examples: [
         'https://v3.fal.media/files/elephant/5F2Oour2tH_EHZrFUEmM-_tmp75kuha71.wav',
       ],
+      description: 'The generated audio clip',
+      $ref: '#/$defs/File',
     },
     seed: {
       description: 'The random seed used for generation',
-      type: 'integer',
       title: 'Seed',
+      type: 'integer',
     },
   },
-  title: 'InpaintOutput',
+  type: 'object',
   'x-fal-order-properties': ['audio', 'seed'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -15493,11 +15591,10 @@ export const StableAudio25InpaintOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -15506,57 +15603,59 @@ export const StableAudio25InpaintOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio25TextToAudioInputSchema = {
+  title: 'TextToAudioInput',
   required: ['prompt'],
-  type: 'object',
   properties: {
-    seed: { title: 'Seed', anyOf: [{ type: 'integer' }, { type: 'null' }] },
-    guidance_scale: {
-      description:
-        'How strictly the diffusion process adheres to the prompt text (higher values make your audio closer to your prompt).',
-      maximum: 25,
-      type: 'number',
-      minimum: 1,
-      title: 'Guidance Scale',
-      default: 1,
-    },
     seconds_total: {
       description: 'The duration of the audio clip to generate',
-      maximum: 190,
-      type: 'integer',
-      minimum: 1,
       title: 'Seconds Total',
       default: 190,
+      maximum: 190,
+      minimum: 1,
+      type: 'integer',
     },
     prompt: {
-      description: 'The prompt to generate audio from',
       examples: [
         'A beautiful piano arpeggio grows into a grand orchestral climax',
       ],
-      type: 'string',
+      description: 'The prompt to generate audio from',
       title: 'Prompt',
+      type: 'string',
     },
     sync_mode: {
       description:
         "If `True`, the media will be returned as a data URI and the output data won't be available in the request history.",
-      type: 'boolean',
       title: 'Sync Mode',
       default: false,
+      type: 'boolean',
+    },
+    guidance_scale: {
+      description:
+        'How strictly the diffusion process adheres to the prompt text (higher values make your audio closer to your prompt).',
+      title: 'Guidance Scale',
+      default: 1,
+      maximum: 25,
+      minimum: 1,
+      type: 'number',
     },
     num_inference_steps: {
       description: 'The number of steps to denoise the audio for',
-      maximum: 8,
-      type: 'integer',
-      minimum: 4,
       title: 'Num Inference Steps',
       default: 8,
+      maximum: 8,
+      minimum: 4,
+      type: 'integer',
     },
+    seed: { anyOf: [{ type: 'integer' }, { type: 'null' }], title: 'Seed' },
   },
-  title: 'TextToAudioInput',
+  type: 'object',
   'x-fal-order-properties': [
     'prompt',
     'seconds_total',
@@ -15568,40 +15667,39 @@ export const StableAudio25TextToAudioInputSchema = {
 } as const
 
 export const StableAudio25TextToAudioOutputSchema = {
+  title: 'TextToAudioOutput',
   required: ['audio', 'seed'],
-  type: 'object',
   properties: {
     audio: {
-      description: 'The generated audio clip',
-      $ref: '#/$defs/File',
       examples: [
         'https://v3.fal.media/files/zebra/lGob9bN7VHfFXG4R1btQn_tmpabwhgi6n.wav',
       ],
+      description: 'The generated audio clip',
+      $ref: '#/$defs/File',
     },
     seed: {
       description: 'The random seed used for generation',
-      type: 'integer',
       title: 'Seed',
+      type: 'integer',
     },
   },
-  title: 'TextToAudioOutput',
+  type: 'object',
   'x-fal-order-properties': ['audio', 'seed'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -15610,11 +15708,10 @@ export const StableAudio25TextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -15623,112 +15720,14 @@ export const StableAudio25TextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumAudioInpaintingInputSchema = {
   title: 'AudioInpaintingMediumInput',
-  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    mask_start_seconds: {
-      examples: [4],
-      description: 'Start of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask Start Seconds',
-      maximum: 380,
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio. Only the masked region is regenerated.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['punchy kick drum fill'],
-      description:
-        'Text description guiding how the masked region is regenerated.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    mask_end_seconds: {
-      examples: [8],
-      description: 'End of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask End Seconds',
-      maximum: 380,
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -15744,42 +15743,141 @@ export const StableAudio3MediumAudioInpaintingInputSchema = {
     'mask_start_seconds',
     'mask_end_seconds',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio. Only the masked region is regenerated.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    mask_start_seconds: {
+      title: 'Mask Start Seconds',
+      minimum: 0,
+      examples: [4],
+      type: 'number',
+      description: 'Start of the region to regenerate, in seconds.',
+      maximum: 380,
+    },
+    mask_end_seconds: {
+      title: 'Mask End Seconds',
+      minimum: 0,
+      examples: [8],
+      type: 'number',
+      description: 'End of the region to regenerate, in seconds.',
+      maximum: 380,
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the masked region is regenerated.',
+      type: 'string',
+      examples: ['punchy kick drum fill'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumAudioInpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -15788,11 +15886,10 @@ export const StableAudio3MediumAudioInpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -15801,113 +15898,14 @@ export const StableAudio3MediumAudioInpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumAudioOutpaintingInputSchema = {
   title: 'AudioOutpaintingMediumInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to extend.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['soft strings continue the melody'],
-      description: 'Text description guiding the extension content.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    extend_seconds_after: {
-      examples: [30],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate after the source audio.',
-      title: 'Extend Seconds After',
-      maximum: 380,
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    extend_seconds_before: {
-      examples: [0],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate before the source audio.',
-      title: 'Extend Seconds Before',
-      maximum: 380,
-      type: 'number',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -15923,42 +15921,142 @@ export const StableAudio3MediumAudioOutpaintingInputSchema = {
     'extend_seconds_before',
     'extend_seconds_after',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to extend.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    extend_seconds_before: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate before the source audio.',
+      type: 'number',
+      maximum: 380,
+      title: 'Extend Seconds Before',
+      examples: [0],
+      default: 0,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    extend_seconds_after: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate after the source audio.',
+      type: 'number',
+      maximum: 380,
+      title: 'Extend Seconds After',
+      examples: [30],
+      default: 0,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description guiding the extension content.',
+      type: 'string',
+      examples: ['soft strings continue the melody'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumAudioOutpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -15967,11 +16065,10 @@ export const StableAudio3MediumAudioOutpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -15980,114 +16077,14 @@ export const StableAudio3MediumAudioOutpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumAudioToAudioInputSchema = {
   title: 'AudioToAudioMediumInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    init_noise_level: {
-      description:
-        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
-      minimum: 0,
-      default: 0.9,
-      maximum: 1,
-      title: 'Init Noise Level',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to transform.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['bossa nova bassline'],
-      description:
-        'Text description guiding how the source audio should be transformed.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description:
-        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
-      minimum: 1,
-      default: 30,
-      maximum: 380,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -16103,42 +16100,143 @@ export const StableAudio3MediumAudioToAudioInputSchema = {
     'audio_url',
     'init_noise_level',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to transform.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description:
+        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
+      type: 'number',
+      default: 30,
+      maximum: 380,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the source audio should be transformed.',
+      type: 'string',
+      examples: ['bossa nova bassline'],
+    },
+    init_noise_level: {
+      title: 'Init Noise Level',
+      minimum: 0,
+      description:
+        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
+      type: 'number',
+      default: 0.9,
+      maximum: 1,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumAudioToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -16147,11 +16245,10 @@ export const StableAudio3MediumAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -16160,112 +16257,14 @@ export const StableAudio3MediumAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumBaseAudioInpaintingInputSchema = {
   title: 'AudioInpaintingMediumBaseInput',
-  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    mask_start_seconds: {
-      examples: [4],
-      description: 'Start of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask Start Seconds',
-      maximum: 380,
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio. Only the masked region is regenerated.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['punchy kick drum fill'],
-      description:
-        'Text description guiding how the masked region is regenerated.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    mask_end_seconds: {
-      examples: [8],
-      description: 'End of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask End Seconds',
-      maximum: 380,
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -16281,42 +16280,141 @@ export const StableAudio3MediumBaseAudioInpaintingInputSchema = {
     'mask_start_seconds',
     'mask_end_seconds',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio. Only the masked region is regenerated.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    mask_start_seconds: {
+      title: 'Mask Start Seconds',
+      minimum: 0,
+      examples: [4],
+      type: 'number',
+      description: 'Start of the region to regenerate, in seconds.',
+      maximum: 380,
+    },
+    mask_end_seconds: {
+      title: 'Mask End Seconds',
+      minimum: 0,
+      examples: [8],
+      type: 'number',
+      description: 'End of the region to regenerate, in seconds.',
+      maximum: 380,
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the masked region is regenerated.',
+      type: 'string',
+      examples: ['punchy kick drum fill'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumBaseAudioInpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -16325,11 +16423,10 @@ export const StableAudio3MediumBaseAudioInpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -16338,113 +16435,14 @@ export const StableAudio3MediumBaseAudioInpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumBaseAudioOutpaintingInputSchema = {
   title: 'AudioOutpaintingMediumBaseInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to extend.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['soft strings continue the melody'],
-      description: 'Text description guiding the extension content.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    extend_seconds_after: {
-      examples: [30],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate after the source audio.',
-      title: 'Extend Seconds After',
-      maximum: 380,
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    extend_seconds_before: {
-      examples: [0],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate before the source audio.',
-      title: 'Extend Seconds Before',
-      maximum: 380,
-      type: 'number',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -16460,42 +16458,142 @@ export const StableAudio3MediumBaseAudioOutpaintingInputSchema = {
     'extend_seconds_before',
     'extend_seconds_after',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to extend.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    extend_seconds_before: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate before the source audio.',
+      type: 'number',
+      maximum: 380,
+      title: 'Extend Seconds Before',
+      examples: [0],
+      default: 0,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    extend_seconds_after: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate after the source audio.',
+      type: 'number',
+      maximum: 380,
+      title: 'Extend Seconds After',
+      examples: [30],
+      default: 0,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description guiding the extension content.',
+      type: 'string',
+      examples: ['soft strings continue the melody'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumBaseAudioOutpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -16504,11 +16602,10 @@ export const StableAudio3MediumBaseAudioOutpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -16517,114 +16614,14 @@ export const StableAudio3MediumBaseAudioOutpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumBaseAudioToAudioInputSchema = {
   title: 'AudioToAudioMediumBaseInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    init_noise_level: {
-      description:
-        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
-      minimum: 0,
-      default: 0.9,
-      maximum: 1,
-      title: 'Init Noise Level',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to transform.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['bossa nova bassline'],
-      description:
-        'Text description guiding how the source audio should be transformed.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description:
-        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
-      minimum: 1,
-      default: 30,
-      maximum: 380,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -16640,42 +16637,143 @@ export const StableAudio3MediumBaseAudioToAudioInputSchema = {
     'audio_url',
     'init_noise_level',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to transform.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description:
+        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
+      type: 'number',
+      default: 30,
+      maximum: 380,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the source audio should be transformed.',
+      type: 'string',
+      examples: ['bossa nova bassline'],
+    },
+    init_noise_level: {
+      title: 'Init Noise Level',
+      minimum: 0,
+      description:
+        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
+      type: 'number',
+      default: 0.9,
+      maximum: 1,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumBaseAudioToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -16684,11 +16782,10 @@ export const StableAudio3MediumBaseAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -16697,97 +16794,14 @@ export const StableAudio3MediumBaseAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumBaseTextToAudioInputSchema = {
   title: 'TextToAudioMediumBaseInput',
-  required: ['prompt'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    prompt: {
-      examples: [
-        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
-      ],
-      description: 'Text description of the audio to generate.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description:
-        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
-      minimum: 1,
-      default: 30,
-      maximum: 380,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -16801,42 +16815,126 @@ export const StableAudio3MediumBaseTextToAudioInputSchema = {
     'bitrate',
     'prompt',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description:
+        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
+      type: 'number',
+      default: 30,
+      maximum: 380,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description of the audio to generate.',
+      type: 'string',
+      examples: [
+        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
+      ],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumBaseTextToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -16845,11 +16943,10 @@ export const StableAudio3MediumBaseTextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -16858,97 +16955,14 @@ export const StableAudio3MediumBaseTextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3MediumTextToAudioInputSchema = {
   title: 'TextToAudioMediumInput',
-  required: ['prompt'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    prompt: {
-      examples: [
-        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
-      ],
-      description: 'Text description of the audio to generate.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description:
-        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
-      minimum: 1,
-      default: 30,
-      maximum: 380,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -16962,42 +16976,126 @@ export const StableAudio3MediumTextToAudioInputSchema = {
     'bitrate',
     'prompt',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description:
+        'Duration of the generated audio in seconds. The medium model supports up to 380 seconds (~6m20s).',
+      type: 'number',
+      default: 30,
+      maximum: 380,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description of the audio to generate.',
+      type: 'string',
+      examples: [
+        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
+      ],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const StableAudio3MediumTextToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -17006,11 +17104,10 @@ export const StableAudio3MediumTextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -17019,112 +17116,14 @@ export const StableAudio3MediumTextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicAudioInpaintingInputSchema = {
   title: 'AudioInpaintingInput',
-  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    mask_start_seconds: {
-      examples: [4],
-      description: 'Start of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask Start Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio. Only the masked region is regenerated.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['punchy kick drum fill'],
-      description:
-        'Text description guiding how the masked region is regenerated.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    mask_end_seconds: {
-      examples: [8],
-      description: 'End of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask End Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -17140,42 +17139,141 @@ export const StableAudio3SmallMusicAudioInpaintingInputSchema = {
     'mask_start_seconds',
     'mask_end_seconds',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio. Only the masked region is regenerated.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    mask_start_seconds: {
+      title: 'Mask Start Seconds',
+      minimum: 0,
+      examples: [4],
+      type: 'number',
+      description: 'Start of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    mask_end_seconds: {
+      title: 'Mask End Seconds',
+      minimum: 0,
+      examples: [8],
+      type: 'number',
+      description: 'End of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the masked region is regenerated.',
+      type: 'string',
+      examples: ['punchy kick drum fill'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicAudioInpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -17184,11 +17282,10 @@ export const StableAudio3SmallMusicAudioInpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -17197,113 +17294,14 @@ export const StableAudio3SmallMusicAudioInpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicAudioOutpaintingInputSchema = {
   title: 'AudioOutpaintingInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to extend.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['soft strings continue the melody'],
-      description: 'Text description guiding the extension content.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    extend_seconds_after: {
-      examples: [30],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate after the source audio.',
-      title: 'Extend Seconds After',
-      maximum: 120,
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    extend_seconds_before: {
-      examples: [0],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate before the source audio.',
-      title: 'Extend Seconds Before',
-      maximum: 120,
-      type: 'number',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -17319,42 +17317,142 @@ export const StableAudio3SmallMusicAudioOutpaintingInputSchema = {
     'extend_seconds_before',
     'extend_seconds_after',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to extend.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    extend_seconds_before: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate before the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds Before',
+      examples: [0],
+      default: 0,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    extend_seconds_after: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate after the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds After',
+      examples: [30],
+      default: 0,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description guiding the extension content.',
+      type: 'string',
+      examples: ['soft strings continue the melody'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicAudioOutpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -17363,11 +17461,10 @@ export const StableAudio3SmallMusicAudioOutpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -17376,113 +17473,14 @@ export const StableAudio3SmallMusicAudioOutpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicAudioToAudioInputSchema = {
   title: 'AudioToAudioInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    init_noise_level: {
-      description:
-        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
-      minimum: 0,
-      default: 0.9,
-      maximum: 1,
-      title: 'Init Noise Level',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to transform.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['bossa nova bassline'],
-      description:
-        'Text description guiding how the source audio should be transformed.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -17498,42 +17496,142 @@ export const StableAudio3SmallMusicAudioToAudioInputSchema = {
     'audio_url',
     'init_noise_level',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to transform.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the source audio should be transformed.',
+      type: 'string',
+      examples: ['bossa nova bassline'],
+    },
+    init_noise_level: {
+      title: 'Init Noise Level',
+      minimum: 0,
+      description:
+        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
+      type: 'number',
+      default: 0.9,
+      maximum: 1,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicAudioToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -17542,11 +17640,10 @@ export const StableAudio3SmallMusicAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -17555,112 +17652,14 @@ export const StableAudio3SmallMusicAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicBaseAudioInpaintingInputSchema = {
   title: 'AudioInpaintingBaseInput',
-  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    mask_start_seconds: {
-      examples: [4],
-      description: 'Start of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask Start Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio. Only the masked region is regenerated.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['punchy kick drum fill'],
-      description:
-        'Text description guiding how the masked region is regenerated.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    mask_end_seconds: {
-      examples: [8],
-      description: 'End of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask End Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -17676,42 +17675,141 @@ export const StableAudio3SmallMusicBaseAudioInpaintingInputSchema = {
     'mask_start_seconds',
     'mask_end_seconds',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio. Only the masked region is regenerated.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    mask_start_seconds: {
+      title: 'Mask Start Seconds',
+      minimum: 0,
+      examples: [4],
+      type: 'number',
+      description: 'Start of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    mask_end_seconds: {
+      title: 'Mask End Seconds',
+      minimum: 0,
+      examples: [8],
+      type: 'number',
+      description: 'End of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the masked region is regenerated.',
+      type: 'string',
+      examples: ['punchy kick drum fill'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicBaseAudioInpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -17720,11 +17818,10 @@ export const StableAudio3SmallMusicBaseAudioInpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -17733,113 +17830,14 @@ export const StableAudio3SmallMusicBaseAudioInpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicBaseAudioOutpaintingInputSchema = {
   title: 'AudioOutpaintingBaseInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to extend.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['soft strings continue the melody'],
-      description: 'Text description guiding the extension content.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    extend_seconds_after: {
-      examples: [30],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate after the source audio.',
-      title: 'Extend Seconds After',
-      maximum: 120,
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    extend_seconds_before: {
-      examples: [0],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate before the source audio.',
-      title: 'Extend Seconds Before',
-      maximum: 120,
-      type: 'number',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -17855,42 +17853,142 @@ export const StableAudio3SmallMusicBaseAudioOutpaintingInputSchema = {
     'extend_seconds_before',
     'extend_seconds_after',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to extend.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    extend_seconds_before: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate before the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds Before',
+      examples: [0],
+      default: 0,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    extend_seconds_after: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate after the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds After',
+      examples: [30],
+      default: 0,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description guiding the extension content.',
+      type: 'string',
+      examples: ['soft strings continue the melody'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicBaseAudioOutpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -17899,11 +17997,10 @@ export const StableAudio3SmallMusicBaseAudioOutpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -17912,113 +18009,14 @@ export const StableAudio3SmallMusicBaseAudioOutpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicBaseAudioToAudioInputSchema = {
   title: 'AudioToAudioBaseInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    init_noise_level: {
-      description:
-        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
-      minimum: 0,
-      default: 0.9,
-      maximum: 1,
-      title: 'Init Noise Level',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to transform.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['bossa nova bassline'],
-      description:
-        'Text description guiding how the source audio should be transformed.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -18034,42 +18032,142 @@ export const StableAudio3SmallMusicBaseAudioToAudioInputSchema = {
     'audio_url',
     'init_noise_level',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to transform.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the source audio should be transformed.',
+      type: 'string',
+      examples: ['bossa nova bassline'],
+    },
+    init_noise_level: {
+      title: 'Init Noise Level',
+      minimum: 0,
+      description:
+        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
+      type: 'number',
+      default: 0.9,
+      maximum: 1,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicBaseAudioToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -18078,11 +18176,10 @@ export const StableAudio3SmallMusicBaseAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -18091,96 +18188,14 @@ export const StableAudio3SmallMusicBaseAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicBaseTextToAudioInputSchema = {
   title: 'TextToAudioBaseInput',
-  required: ['prompt'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    prompt: {
-      examples: [
-        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
-      ],
-      description: 'Text description of the audio to generate.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -18194,42 +18209,125 @@ export const StableAudio3SmallMusicBaseTextToAudioInputSchema = {
     'bitrate',
     'prompt',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description of the audio to generate.',
+      type: 'string',
+      examples: [
+        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
+      ],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicBaseTextToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -18238,11 +18336,10 @@ export const StableAudio3SmallMusicBaseTextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -18251,96 +18348,14 @@ export const StableAudio3SmallMusicBaseTextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallMusicTextToAudioInputSchema = {
   title: 'TextToAudioInput',
-  required: ['prompt'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    prompt: {
-      examples: [
-        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
-      ],
-      description: 'Text description of the audio to generate.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -18354,42 +18369,125 @@ export const StableAudio3SmallMusicTextToAudioInputSchema = {
     'bitrate',
     'prompt',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description of the audio to generate.',
+      type: 'string',
+      examples: [
+        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
+      ],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallMusicTextToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -18398,11 +18496,10 @@ export const StableAudio3SmallMusicTextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -18411,112 +18508,14 @@ export const StableAudio3SmallMusicTextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxAudioInpaintingInputSchema = {
   title: 'AudioInpaintingInput',
-  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    mask_start_seconds: {
-      examples: [4],
-      description: 'Start of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask Start Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio. Only the masked region is regenerated.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['punchy kick drum fill'],
-      description:
-        'Text description guiding how the masked region is regenerated.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    mask_end_seconds: {
-      examples: [8],
-      description: 'End of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask End Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -18532,42 +18531,141 @@ export const StableAudio3SmallSfxAudioInpaintingInputSchema = {
     'mask_start_seconds',
     'mask_end_seconds',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio. Only the masked region is regenerated.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    mask_start_seconds: {
+      title: 'Mask Start Seconds',
+      minimum: 0,
+      examples: [4],
+      type: 'number',
+      description: 'Start of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    mask_end_seconds: {
+      title: 'Mask End Seconds',
+      minimum: 0,
+      examples: [8],
+      type: 'number',
+      description: 'End of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the masked region is regenerated.',
+      type: 'string',
+      examples: ['punchy kick drum fill'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxAudioInpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -18576,11 +18674,10 @@ export const StableAudio3SmallSfxAudioInpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -18589,113 +18686,14 @@ export const StableAudio3SmallSfxAudioInpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxAudioOutpaintingInputSchema = {
   title: 'AudioOutpaintingInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to extend.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['soft strings continue the melody'],
-      description: 'Text description guiding the extension content.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    extend_seconds_after: {
-      examples: [30],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate after the source audio.',
-      title: 'Extend Seconds After',
-      maximum: 120,
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    extend_seconds_before: {
-      examples: [0],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate before the source audio.',
-      title: 'Extend Seconds Before',
-      maximum: 120,
-      type: 'number',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -18711,42 +18709,142 @@ export const StableAudio3SmallSfxAudioOutpaintingInputSchema = {
     'extend_seconds_before',
     'extend_seconds_after',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to extend.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    extend_seconds_before: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate before the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds Before',
+      examples: [0],
+      default: 0,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    extend_seconds_after: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate after the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds After',
+      examples: [30],
+      default: 0,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description guiding the extension content.',
+      type: 'string',
+      examples: ['soft strings continue the melody'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxAudioOutpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -18755,11 +18853,10 @@ export const StableAudio3SmallSfxAudioOutpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -18768,113 +18865,14 @@ export const StableAudio3SmallSfxAudioOutpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxAudioToAudioInputSchema = {
   title: 'AudioToAudioInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    init_noise_level: {
-      description:
-        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
-      minimum: 0,
-      default: 0.9,
-      maximum: 1,
-      title: 'Init Noise Level',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to transform.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['bossa nova bassline'],
-      description:
-        'Text description guiding how the source audio should be transformed.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -18890,42 +18888,142 @@ export const StableAudio3SmallSfxAudioToAudioInputSchema = {
     'audio_url',
     'init_noise_level',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to transform.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the source audio should be transformed.',
+      type: 'string',
+      examples: ['bossa nova bassline'],
+    },
+    init_noise_level: {
+      title: 'Init Noise Level',
+      minimum: 0,
+      description:
+        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
+      type: 'number',
+      default: 0.9,
+      maximum: 1,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxAudioToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -18934,11 +19032,10 @@ export const StableAudio3SmallSfxAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -18947,112 +19044,14 @@ export const StableAudio3SmallSfxAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxBaseAudioInpaintingInputSchema = {
   title: 'AudioInpaintingBaseInput',
-  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    mask_start_seconds: {
-      examples: [4],
-      description: 'Start of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask Start Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio. Only the masked region is regenerated.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['punchy kick drum fill'],
-      description:
-        'Text description guiding how the masked region is regenerated.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    mask_end_seconds: {
-      examples: [8],
-      description: 'End of the region to regenerate, in seconds.',
-      minimum: 0,
-      title: 'Mask End Seconds',
-      maximum: 120,
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -19068,42 +19067,141 @@ export const StableAudio3SmallSfxBaseAudioInpaintingInputSchema = {
     'mask_start_seconds',
     'mask_end_seconds',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio. Only the masked region is regenerated.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    mask_start_seconds: {
+      title: 'Mask Start Seconds',
+      minimum: 0,
+      examples: [4],
+      type: 'number',
+      description: 'Start of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    mask_end_seconds: {
+      title: 'Mask End Seconds',
+      minimum: 0,
+      examples: [8],
+      type: 'number',
+      description: 'End of the region to regenerate, in seconds.',
+      maximum: 120,
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the masked region is regenerated.',
+      type: 'string',
+      examples: ['punchy kick drum fill'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url', 'mask_start_seconds', 'mask_end_seconds'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxBaseAudioInpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -19112,11 +19210,10 @@ export const StableAudio3SmallSfxBaseAudioInpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -19125,113 +19222,14 @@ export const StableAudio3SmallSfxBaseAudioInpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxBaseAudioOutpaintingInputSchema = {
   title: 'AudioOutpaintingBaseInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to extend.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['soft strings continue the melody'],
-      description: 'Text description guiding the extension content.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    extend_seconds_after: {
-      examples: [30],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate after the source audio.',
-      title: 'Extend Seconds After',
-      maximum: 120,
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    extend_seconds_before: {
-      examples: [0],
-      minimum: 0,
-      default: 0,
-      description: 'Seconds of new audio to generate before the source audio.',
-      title: 'Extend Seconds Before',
-      maximum: 120,
-      type: 'number',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'num_inference_steps',
@@ -19247,42 +19245,142 @@ export const StableAudio3SmallSfxBaseAudioOutpaintingInputSchema = {
     'extend_seconds_before',
     'extend_seconds_after',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to extend.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    extend_seconds_before: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate before the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds Before',
+      examples: [0],
+      default: 0,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    extend_seconds_after: {
+      minimum: 0,
+      description: 'Seconds of new audio to generate after the source audio.',
+      type: 'number',
+      maximum: 120,
+      title: 'Extend Seconds After',
+      examples: [30],
+      default: 0,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description guiding the extension content.',
+      type: 'string',
+      examples: ['soft strings continue the melody'],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxBaseAudioOutpaintingOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -19291,11 +19389,10 @@ export const StableAudio3SmallSfxBaseAudioOutpaintingOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -19304,113 +19401,14 @@ export const StableAudio3SmallSfxBaseAudioOutpaintingOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxBaseAudioToAudioInputSchema = {
   title: 'AudioToAudioBaseInput',
-  required: ['prompt', 'audio_url'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    init_noise_level: {
-      description:
-        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
-      minimum: 0,
-      default: 0.9,
-      maximum: 1,
-      title: 'Init Noise Level',
-      type: 'number',
-    },
-    audio_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
-      ],
-      description: 'Source audio to transform.',
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      examples: ['bossa nova bassline'],
-      description:
-        'Text description guiding how the source audio should be transformed.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -19426,42 +19424,142 @@ export const StableAudio3SmallSfxBaseAudioToAudioInputSchema = {
     'audio_url',
     'init_noise_level',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      description: 'Source audio to transform.',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/diffrythm/rock_en.wav',
+      ],
+      'x-fal-file-input': true,
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        'Text description guiding how the source audio should be transformed.',
+      type: 'string',
+      examples: ['bossa nova bassline'],
+    },
+    init_noise_level: {
+      title: 'Init Noise Level',
+      minimum: 0,
+      description:
+        'How much noise to add to the source audio. 1.0 fully replaces the audio with noise (pure generation); 0.1 keeps the source close to the input. 0.5 sits halfway between.',
+      type: 'number',
+      default: 0.9,
+      maximum: 1,
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt', 'audio_url'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxBaseAudioToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -19470,11 +19568,10 @@ export const StableAudio3SmallSfxBaseAudioToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -19483,96 +19580,14 @@ export const StableAudio3SmallSfxBaseAudioToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxBaseTextToAudioInputSchema = {
   title: 'TextToAudioBaseInput',
-  required: ['prompt'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
-      minimum: 0,
-      default: 7,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    prompt: {
-      examples: [
-        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
-      ],
-      description: 'Text description of the audio to generate.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
-      minimum: 1,
-      default: 50,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -19586,42 +19601,125 @@ export const StableAudio3SmallSfxBaseTextToAudioInputSchema = {
     'bitrate',
     'prompt',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Base (non-distilled) checkpoints typically need ~50 for good quality.',
+      type: 'integer',
+      default: 50,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly; ~7.0 is a good starting point for base checkpoints.',
+      type: 'number',
+      default: 7,
+      maximum: 25,
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description of the audio to generate.',
+      type: 'string',
+      examples: [
+        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
+      ],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxBaseTextToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -19630,11 +19728,10 @@ export const StableAudio3SmallSfxBaseTextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -19643,96 +19740,14 @@ export const StableAudio3SmallSfxBaseTextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudio3SmallSfxTextToAudioInputSchema = {
   title: 'TextToAudioInput',
-  required: ['prompt'],
-  properties: {
-    enable_prompt_expansion: {
-      description:
-        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
-      title: 'Enable Prompt Expansion',
-      default: false,
-      type: 'boolean',
-    },
-    negative_prompt: {
-      description: 'Text description of qualities to avoid in the output.',
-      title: 'Negative Prompt',
-      default: '',
-      type: 'string',
-    },
-    bitrate: {
-      description:
-        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
-      title: 'Bitrate',
-      default: '192k',
-      type: 'string',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducible outputs. Omit for a random seed.',
-      title: 'Seed',
-    },
-    guidance_scale: {
-      description:
-        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
-      minimum: 0,
-      default: 1,
-      maximum: 25,
-      title: 'Guidance Scale',
-      type: 'number',
-    },
-    prompt: {
-      examples: [
-        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
-      ],
-      description: 'Text description of the audio to generate.',
-      title: 'Prompt',
-      type: 'string',
-    },
-    num_inference_steps: {
-      description:
-        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
-      minimum: 1,
-      default: 8,
-      maximum: 100,
-      title: 'Num Inference Steps',
-      type: 'integer',
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds.',
-      minimum: 1,
-      default: 30,
-      maximum: 120,
-      title: 'Duration',
-      type: 'number',
-    },
-    output_format: {
-      description: 'Container format for the generated audio output.',
-      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
-      default: 'mp3',
-      title: 'Output Format',
-      type: 'string',
-    },
-    sync_mode: {
-      description:
-        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
-      title: 'Sync Mode',
-      default: false,
-      type: 'boolean',
-    },
-    enable_safety_checker: {
-      description: 'Enable NSFW content safety checking.',
-      title: 'Enable Safety Checker',
-      default: true,
-      type: 'boolean',
-    },
-  },
-  type: 'object',
   'x-fal-order-properties': [
     'negative_prompt',
     'duration',
@@ -19746,42 +19761,125 @@ export const StableAudio3SmallSfxTextToAudioInputSchema = {
     'bitrate',
     'prompt',
   ],
+  properties: {
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      minimum: 1,
+      description:
+        'Number of sampling steps. Post-trained (distilled) checkpoints look good with the default 8 and gain little from going higher.',
+      type: 'integer',
+      default: 8,
+      maximum: 100,
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      description: 'Text description of qualities to avoid in the output.',
+      type: 'string',
+      default: '',
+    },
+    bitrate: {
+      title: 'Bitrate',
+      description:
+        "Audio bitrate for compressed output formats (e.g., mp3, aac, opus). Format e.g. '192k' or '320k'. Ignored for lossless formats (wav, flac).",
+      type: 'string',
+      default: '192k',
+    },
+    output_format: {
+      title: 'Output Format',
+      enum: ['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'],
+      description: 'Container format for the generated audio output.',
+      type: 'string',
+      default: 'mp3',
+    },
+    enable_safety_checker: {
+      title: 'Enable Safety Checker',
+      description: 'Enable NSFW content safety checking.',
+      type: 'boolean',
+      default: true,
+    },
+    guidance_scale: {
+      title: 'Guidance Scale',
+      minimum: 0,
+      description:
+        'Classifier-free guidance scale. Higher values follow the prompt more strictly. Only effective on base (non-distilled) checkpoints.',
+      type: 'number',
+      default: 1,
+      maximum: 25,
+    },
+    duration: {
+      title: 'Duration',
+      minimum: 1,
+      description: 'Duration of the generated audio in seconds.',
+      type: 'number',
+      default: 30,
+      maximum: 120,
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      description:
+        'If True, the audio is returned inline as a data URI and the result is not saved to the request history.',
+      type: 'boolean',
+      default: false,
+    },
+    prompt: {
+      title: 'Prompt',
+      description: 'Text description of the audio to generate.',
+      type: 'string',
+      examples: [
+        'An anthemic Pop Rock instrumental that fills your head with nostalgic thoughtfulness',
+      ],
+    },
+    seed: {
+      title: 'Seed',
+      description:
+        'Random seed for reproducible outputs. Omit for a random seed.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+    enable_prompt_expansion: {
+      title: 'Enable Prompt Expansion',
+      description:
+        'If True, the prompt will be expanded using an LLM for more detailed and higher quality results.',
+      type: 'boolean',
+      default: false,
+    },
+  },
+  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const StableAudio3SmallSfxTextToAudioOutputSchema = {
   title: 'AudioOutput',
-  required: ['audio', 'seed', 'prompt'],
+  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   properties: {
     prompt: {
-      description: 'The prompt used for generation.',
       title: 'Prompt',
+      description: 'The prompt used for generation.',
       type: 'string',
     },
-    audio: { $ref: '#/$defs/File', description: 'The generated audio clip.' },
+    audio: { description: 'The generated audio clip.', $ref: '#/$defs/File' },
     seed: {
-      description: 'The random seed used for generation.',
       title: 'Seed',
+      description: 'The random seed used for generation.',
       type: 'integer',
     },
   },
+  required: ['audio', 'seed', 'prompt'],
   type: 'object',
-  'x-fal-order-properties': ['audio', 'seed', 'prompt'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -19790,11 +19888,10 @@ export const StableAudio3SmallSfxTextToAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -19803,55 +19900,59 @@ export const StableAudio3SmallSfxTextToAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const StableAudioInputSchema = {
-  required: ['prompt'],
-  properties: {
-    seconds_total: {
-      description: 'The duration of the audio clip to generate',
-      maximum: 47,
-      minimum: 0,
-      type: 'integer',
-      title: 'Seconds Total',
-      default: 30,
-    },
-    steps: {
-      description: 'The number of steps to denoise the audio for',
-      maximum: 1000,
-      minimum: 2,
-      type: 'integer',
-      title: 'Steps',
-      default: 100,
-    },
-    prompt: {
-      description: 'The prompt to generate audio from',
-      examples: ['128 BPM tech house drum loop'],
-      type: 'string',
-      title: 'Prompt',
-    },
-    seconds_start: {
-      description: 'The start point of the audio clip to generate',
-      maximum: 47,
-      minimum: 0,
-      type: 'integer',
-      title: 'Seconds Start',
-      default: 0,
-    },
-  },
   type: 'object',
-  title: 'Input',
   'x-fal-order-properties': [
     'prompt',
     'seconds_start',
     'seconds_total',
     'steps',
   ],
+  required: ['prompt'],
+  properties: {
+    prompt: {
+      type: 'string',
+      description: 'The prompt to generate audio from',
+      examples: ['128 BPM tech house drum loop'],
+      title: 'Prompt',
+    },
+    steps: {
+      type: 'integer',
+      description: 'The number of steps to denoise the audio for',
+      minimum: 2,
+      maximum: 1000,
+      default: 100,
+      title: 'Steps',
+    },
+    seconds_start: {
+      type: 'integer',
+      description: 'The start point of the audio clip to generate',
+      minimum: 0,
+      maximum: 47,
+      default: 0,
+      title: 'Seconds Start',
+    },
+    seconds_total: {
+      type: 'integer',
+      description: 'The duration of the audio clip to generate',
+      minimum: 0,
+      maximum: 47,
+      default: 30,
+      title: 'Seconds Total',
+    },
+  },
+  title: 'Input',
 } as const
 
 export const StableAudioOutputSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['audio_file'],
   required: ['audio_file'],
   properties: {
     audio_file: {
@@ -19859,25 +19960,22 @@ export const StableAudioOutputSchema = {
       $ref: '#/$defs/File',
     },
   },
-  type: 'object',
   title: 'Output',
-  'x-fal-order-properties': ['audio_file'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -19886,11 +19984,10 @@ export const StableAudioOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -19899,127 +19996,130 @@ export const StableAudioOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const Tada1bTextToSpeechInputSchema = {
+  required: ['audio_url', 'prompt'],
   properties: {
     noise_temperature: {
       default: 0.9,
+      title: 'Noise Temperature',
+      type: 'number',
+      minimum: 0,
+      maximum: 2,
       description:
         'Temperature for noise in the flow matching diffusion process.',
-      minimum: 0,
-      title: 'Noise Temperature',
-      maximum: 2,
-      type: 'number',
-    },
-    speed_up_factor: {
-      default: 1,
-      description:
-        'Factor to speed up or slow down the generated speech. Values > 1.0 speed up, < 1.0 slow down.',
-      minimum: 0.5,
-      title: 'Speed Up Factor',
-      maximum: 2,
-      type: 'number',
-    },
-    num_extra_steps: {
-      default: 0,
-      description:
-        'Number of extra autoregressive steps for speech continuation beyond the input text. Useful for generating trailing prosody or silence.',
-      minimum: 0,
-      title: 'Num Extra Steps',
-      maximum: 50,
-      type: 'integer',
-    },
-    acoustic_cfg_scale: {
-      default: 1.6,
-      description:
-        'Classifier-free guidance scale for acoustic feature generation.',
-      minimum: 0,
-      title: 'Acoustic Cfg Scale',
-      maximum: 10,
-      type: 'number',
-    },
-    audio_url: {
-      description:
-        "URL of the reference audio file for voice cloning. The model will replicate this speaker's voice characteristics.",
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/reference_audio.wav',
-      ],
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    output_format: {
-      enum: ['wav', 'mp3'],
-      default: 'wav',
-      description: 'The format of the output audio file.',
-      title: 'Output Format',
-      type: 'string',
-    },
-    top_p: {
-      default: 0.9,
-      description: 'Top-p (nucleus) sampling parameter for text generation.',
-      minimum: 0,
-      title: 'Top P',
-      maximum: 1,
-      type: 'number',
-    },
-    temperature: {
-      default: 0.6,
-      description:
-        'Sampling temperature for text token generation. Higher values produce more varied output.',
-      minimum: 0,
-      title: 'Temperature',
-      maximum: 2,
-      type: 'number',
     },
     transcript: {
       default: '',
-      description:
-        'Transcript of the reference audio. For non-English audio, providing a transcript is required since the built-in ASR is English-only.',
-      examples: ['Some call me nature, others call me mother nature.'],
       title: 'Transcript',
       type: 'string',
-    },
-    language: {
-      enum: ['en', 'ar', 'ch', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'pt'],
-      default: 'en',
+      examples: ['Some call me nature, others call me mother nature.'],
       description:
-        'Language for text alignment. Use the appropriate code for non-English synthesis.',
-      title: 'Language',
-      type: 'string',
+        'Transcript of the reference audio. For non-English audio, providing a transcript is required since the built-in ASR is English-only.',
     },
-    num_inference_steps: {
-      default: 20,
+    temperature: {
+      default: 0.6,
+      title: 'Temperature',
+      type: 'number',
+      minimum: 0,
+      maximum: 2,
       description:
-        'Number of ODE solver steps for flow matching acoustic generation. More steps improve quality at the cost of speed.',
-      minimum: 1,
-      title: 'Num Inference Steps',
-      maximum: 50,
-      type: 'integer',
-    },
-    prompt: {
-      description:
-        "The text to synthesize into speech using the reference speaker's voice.",
-      examples: [
-        'The autumn leaves danced gracefully through the crisp morning air, painting the cobblestone streets with shades of amber and gold.',
-      ],
-      title: 'Prompt',
-      type: 'string',
+        'Sampling temperature for text token generation. Higher values produce more varied output.',
     },
     repetition_penalty: {
       default: 1.1,
-      description: 'Penalty applied to repeated tokens during generation.',
-      minimum: 1,
       title: 'Repetition Penalty',
-      maximum: 2,
       type: 'number',
+      minimum: 1,
+      maximum: 2,
+      description: 'Penalty applied to repeated tokens during generation.',
+    },
+    language: {
+      default: 'en',
+      title: 'Language',
+      type: 'string',
+      enum: ['en', 'ar', 'ch', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'pt'],
+      description:
+        'Language for text alignment. Use the appropriate code for non-English synthesis.',
+    },
+    num_extra_steps: {
+      default: 0,
+      title: 'Num Extra Steps',
+      type: 'integer',
+      minimum: 0,
+      maximum: 50,
+      description:
+        'Number of extra autoregressive steps for speech continuation beyond the input text. Useful for generating trailing prosody or silence.',
+    },
+    num_inference_steps: {
+      default: 20,
+      title: 'Num Inference Steps',
+      type: 'integer',
+      minimum: 1,
+      maximum: 50,
+      description:
+        'Number of ODE solver steps for flow matching acoustic generation. More steps improve quality at the cost of speed.',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/reference_audio.wav',
+      ],
+      description:
+        "URL of the reference audio file for voice cloning. The model will replicate this speaker's voice characteristics.",
+      'x-fal-file-input': true,
+    },
+    output_format: {
+      default: 'wav',
+      title: 'Output Format',
+      type: 'string',
+      enum: ['wav', 'mp3'],
+      description: 'The format of the output audio file.',
+    },
+    prompt: {
+      title: 'Prompt',
+      type: 'string',
+      examples: [
+        'The autumn leaves danced gracefully through the crisp morning air, painting the cobblestone streets with shades of amber and gold.',
+      ],
+      description:
+        "The text to synthesize into speech using the reference speaker's voice.",
+    },
+    acoustic_cfg_scale: {
+      default: 1.6,
+      title: 'Acoustic Cfg Scale',
+      type: 'number',
+      minimum: 0,
+      maximum: 10,
+      description:
+        'Classifier-free guidance scale for acoustic feature generation.',
+    },
+    top_p: {
+      default: 0.9,
+      title: 'Top P',
+      type: 'number',
+      minimum: 0,
+      maximum: 1,
+      description: 'Top-p (nucleus) sampling parameter for text generation.',
+    },
+    speed_up_factor: {
+      default: 1,
+      title: 'Speed Up Factor',
+      type: 'number',
+      minimum: 0.5,
+      maximum: 2,
+      description:
+        'Factor to speed up or slow down the generated speech. Values > 1.0 speed up, < 1.0 slow down.',
     },
   },
-  required: ['audio_url', 'prompt'],
   title: 'Input',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'transcript',
@@ -20035,76 +20135,27 @@ export const Tada1bTextToSpeechInputSchema = {
     'speed_up_factor',
     'output_format',
   ],
-  type: 'object',
 } as const
 
 export const Tada1bTextToSpeechOutputSchema = {
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated speech audio file.',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a91e55e/HUVJsjW6QoDUBfg6HdM5e_B2R8G4X4.wav',
         },
       ],
       $ref: '#/$defs/AudioFile',
+      description: 'The generated speech audio file.',
     },
   },
-  required: ['audio'],
   title: 'MiniOutput',
-  'x-fal-order-properties': ['audio'],
   type: 'object',
+  'x-fal-order-properties': ['audio'],
   $defs: {
     AudioFile: {
-      required: ['url'],
-      properties: {
-        sample_rate: {
-          description: 'The sample rate of the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Sample Rate',
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'File Size',
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-          title: 'Url',
-        },
-        channels: {
-          description: 'The number of channels in the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Channels',
-        },
-        bitrate: {
-          description: "The bitrate of the audio (e.g., '192k' or 192000)",
-          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-          title: 'Bitrate',
-        },
-        duration: {
-          description: 'The duration of the audio',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Duration',
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-        },
-      },
       type: 'object',
-      title: 'AudioFile',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -20115,127 +20166,176 @@ export const Tada1bTextToSpeechOutputSchema = {
         'sample_rate',
         'bitrate',
       ],
+      required: ['url'],
+      properties: {
+        channels: {
+          description: 'The number of channels in the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Channels',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+        },
+        bitrate: {
+          description: "The bitrate of the audio (e.g., '192k' or 192000)",
+          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+          title: 'Bitrate',
+        },
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+        },
+        url: {
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+        },
+        duration: {
+          description: 'The duration of the audio',
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Duration',
+        },
+        sample_rate: {
+          description: 'The sample rate of the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Sample Rate',
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+        },
+      },
+      title: 'AudioFile',
     },
   },
 } as const
 
 export const Tada3bTextToSpeechInputSchema = {
+  required: ['audio_url', 'prompt'],
   properties: {
     noise_temperature: {
       default: 0.9,
+      title: 'Noise Temperature',
+      type: 'number',
+      minimum: 0,
+      maximum: 2,
       description:
         'Temperature for noise in the flow matching diffusion process.',
-      minimum: 0,
-      title: 'Noise Temperature',
-      maximum: 2,
-      type: 'number',
-    },
-    speed_up_factor: {
-      default: 1,
-      description:
-        'Factor to speed up or slow down the generated speech. Values > 1.0 speed up, < 1.0 slow down.',
-      minimum: 0.5,
-      title: 'Speed Up Factor',
-      maximum: 2,
-      type: 'number',
-    },
-    num_extra_steps: {
-      default: 0,
-      description:
-        'Number of extra autoregressive steps for speech continuation beyond the input text. Useful for generating trailing prosody or silence.',
-      minimum: 0,
-      title: 'Num Extra Steps',
-      maximum: 50,
-      type: 'integer',
-    },
-    acoustic_cfg_scale: {
-      default: 1.6,
-      description:
-        'Classifier-free guidance scale for acoustic feature generation.',
-      minimum: 0,
-      title: 'Acoustic Cfg Scale',
-      maximum: 10,
-      type: 'number',
-    },
-    audio_url: {
-      description:
-        "URL of the reference audio file for voice cloning. The model will replicate this speaker's voice characteristics.",
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/reference_audio.wav',
-      ],
-      title: 'Audio Url',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    output_format: {
-      enum: ['wav', 'mp3'],
-      default: 'wav',
-      description: 'The format of the output audio file.',
-      title: 'Output Format',
-      type: 'string',
-    },
-    top_p: {
-      default: 0.9,
-      description: 'Top-p (nucleus) sampling parameter for text generation.',
-      minimum: 0,
-      title: 'Top P',
-      maximum: 1,
-      type: 'number',
-    },
-    temperature: {
-      default: 0.6,
-      description:
-        'Sampling temperature for text token generation. Higher values produce more varied output.',
-      minimum: 0,
-      title: 'Temperature',
-      maximum: 2,
-      type: 'number',
     },
     transcript: {
       default: '',
-      description:
-        'Transcript of the reference audio. For non-English audio, providing a transcript is required since the built-in ASR is English-only.',
-      examples: ['Some call me nature, others call me mother nature.'],
       title: 'Transcript',
       type: 'string',
-    },
-    language: {
-      enum: ['en', 'ar', 'ch', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'pt'],
-      default: 'en',
+      examples: ['Some call me nature, others call me mother nature.'],
       description:
-        'Language for text alignment. Use the appropriate code for non-English synthesis.',
-      title: 'Language',
-      type: 'string',
+        'Transcript of the reference audio. For non-English audio, providing a transcript is required since the built-in ASR is English-only.',
     },
-    num_inference_steps: {
-      default: 20,
+    temperature: {
+      default: 0.6,
+      title: 'Temperature',
+      type: 'number',
+      minimum: 0,
+      maximum: 2,
       description:
-        'Number of ODE solver steps for flow matching acoustic generation. More steps improve quality at the cost of speed.',
-      minimum: 1,
-      title: 'Num Inference Steps',
-      maximum: 50,
-      type: 'integer',
-    },
-    prompt: {
-      description:
-        "The text to synthesize into speech using the reference speaker's voice.",
-      examples: [
-        'The autumn leaves danced gracefully through the crisp morning air, painting the cobblestone streets with shades of amber and gold.',
-      ],
-      title: 'Prompt',
-      type: 'string',
+        'Sampling temperature for text token generation. Higher values produce more varied output.',
     },
     repetition_penalty: {
       default: 1.1,
-      description: 'Penalty applied to repeated tokens during generation.',
-      minimum: 1,
       title: 'Repetition Penalty',
-      maximum: 2,
       type: 'number',
+      minimum: 1,
+      maximum: 2,
+      description: 'Penalty applied to repeated tokens during generation.',
+    },
+    language: {
+      default: 'en',
+      title: 'Language',
+      type: 'string',
+      enum: ['en', 'ar', 'ch', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'pt'],
+      description:
+        'Language for text alignment. Use the appropriate code for non-English synthesis.',
+    },
+    num_extra_steps: {
+      default: 0,
+      title: 'Num Extra Steps',
+      type: 'integer',
+      minimum: 0,
+      maximum: 50,
+      description:
+        'Number of extra autoregressive steps for speech continuation beyond the input text. Useful for generating trailing prosody or silence.',
+    },
+    num_inference_steps: {
+      default: 20,
+      title: 'Num Inference Steps',
+      type: 'integer',
+      minimum: 1,
+      maximum: 50,
+      description:
+        'Number of ODE solver steps for flow matching acoustic generation. More steps improve quality at the cost of speed.',
+    },
+    audio_url: {
+      title: 'Audio Url',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/reference_audio.wav',
+      ],
+      description:
+        "URL of the reference audio file for voice cloning. The model will replicate this speaker's voice characteristics.",
+      'x-fal-file-input': true,
+    },
+    output_format: {
+      default: 'wav',
+      title: 'Output Format',
+      type: 'string',
+      enum: ['wav', 'mp3'],
+      description: 'The format of the output audio file.',
+    },
+    prompt: {
+      title: 'Prompt',
+      type: 'string',
+      examples: [
+        'The autumn leaves danced gracefully through the crisp morning air, painting the cobblestone streets with shades of amber and gold.',
+      ],
+      description:
+        "The text to synthesize into speech using the reference speaker's voice.",
+    },
+    acoustic_cfg_scale: {
+      default: 1.6,
+      title: 'Acoustic Cfg Scale',
+      type: 'number',
+      minimum: 0,
+      maximum: 10,
+      description:
+        'Classifier-free guidance scale for acoustic feature generation.',
+    },
+    top_p: {
+      default: 0.9,
+      title: 'Top P',
+      type: 'number',
+      minimum: 0,
+      maximum: 1,
+      description: 'Top-p (nucleus) sampling parameter for text generation.',
+    },
+    speed_up_factor: {
+      default: 1,
+      title: 'Speed Up Factor',
+      type: 'number',
+      minimum: 0.5,
+      maximum: 2,
+      description:
+        'Factor to speed up or slow down the generated speech. Values > 1.0 speed up, < 1.0 slow down.',
     },
   },
-  required: ['audio_url', 'prompt'],
   title: 'Input',
+  type: 'object',
   'x-fal-order-properties': [
     'audio_url',
     'transcript',
@@ -20251,76 +20351,27 @@ export const Tada3bTextToSpeechInputSchema = {
     'speed_up_factor',
     'output_format',
   ],
-  type: 'object',
 } as const
 
 export const Tada3bTextToSpeechOutputSchema = {
+  required: ['audio'],
   properties: {
     audio: {
-      description: 'The generated speech audio file.',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a91e54b/Ldhq_0EWjUdnUEwn-Tcrk_nfs9DTGI.wav',
         },
       ],
       $ref: '#/$defs/AudioFile',
+      description: 'The generated speech audio file.',
     },
   },
-  required: ['audio'],
   title: 'Output',
-  'x-fal-order-properties': ['audio'],
   type: 'object',
+  'x-fal-order-properties': ['audio'],
   $defs: {
     AudioFile: {
-      required: ['url'],
-      properties: {
-        sample_rate: {
-          description: 'The sample rate of the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Sample Rate',
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'File Size',
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-          title: 'Url',
-        },
-        channels: {
-          description: 'The number of channels in the audio',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Channels',
-        },
-        bitrate: {
-          description: "The bitrate of the audio (e.g., '192k' or 192000)",
-          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
-          title: 'Bitrate',
-        },
-        duration: {
-          description: 'The duration of the audio',
-          anyOf: [{ type: 'number' }, { type: 'null' }],
-          title: 'Duration',
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-        },
-      },
       type: 'object',
-      title: 'AudioFile',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -20331,42 +20382,90 @@ export const Tada3bTextToSpeechOutputSchema = {
         'sample_rate',
         'bitrate',
       ],
+      required: ['url'],
+      properties: {
+        channels: {
+          description: 'The number of channels in the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Channels',
+        },
+        content_type: {
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+        },
+        bitrate: {
+          description: "The bitrate of the audio (e.g., '192k' or 192000)",
+          anyOf: [{ type: 'string' }, { type: 'integer' }, { type: 'null' }],
+          title: 'Bitrate',
+        },
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+        },
+        url: {
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+        },
+        duration: {
+          description: 'The duration of the audio',
+          anyOf: [{ type: 'number' }, { type: 'null' }],
+          title: 'Duration',
+        },
+        sample_rate: {
+          description: 'The sample rate of the audio',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Sample Rate',
+        },
+        file_name: {
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+        },
+      },
+      title: 'AudioFile',
     },
   },
 } as const
 
 export const TranscriptionWordSchema = {
-  title: 'TranscriptionWord',
+  required: ['text', 'type'],
   properties: {
-    start: {
-      description: 'Start time in seconds',
-      anyOf: [{ type: 'number' }, { type: 'null' }],
-      title: 'Start',
-    },
     text: {
       title: 'Text',
-      description: 'The transcribed word or audio event',
       type: 'string',
-    },
-    end: {
-      description: 'End time in seconds',
-      anyOf: [{ type: 'number' }, { type: 'null' }],
-      title: 'End',
-    },
-    speaker_id: {
-      description: 'Speaker identifier if diarization was enabled',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Speaker Id',
+      description: 'The transcribed word or audio event',
     },
     type: {
       title: 'Type',
-      description: 'Type of element (word, spacing, or audio_event)',
       type: 'string',
+      description: 'Type of element (word, spacing, or audio_event)',
+    },
+    speaker_id: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Speaker Id',
+      description: 'Speaker identifier if diarization was enabled',
+    },
+    start: {
+      anyOf: [{ type: 'number' }, { type: 'null' }],
+      title: 'Start',
+      description: 'Start time in seconds',
+    },
+    end: {
+      anyOf: [{ type: 'number' }, { type: 'null' }],
+      title: 'End',
+      description: 'End time in seconds',
     },
   },
-  required: ['text', 'type'],
-  'x-fal-order-properties': ['text', 'start', 'end', 'type', 'speaker_id'],
+  title: 'TranscriptionWord',
   type: 'object',
+  'x-fal-order-properties': ['text', 'start', 'end', 'type', 'speaker_id'],
 } as const
 
 export const TtsV1InputSchema = {
@@ -20485,20 +20584,19 @@ export const TtsV1OutputSchema = {
   },
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -20507,11 +20605,10 @@ export const TtsV1OutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -20520,38 +20617,40 @@ export const TtsV1OutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const TurnSchema = {
-  type: 'object',
-  title: 'Turn',
+  required: ['speaker_id', 'text'],
   'x-fal-order-properties': ['speaker_id', 'text'],
   properties: {
-    text: { type: 'string', title: 'Text' },
-    speaker_id: { type: 'integer', title: 'Speaker Id' },
+    text: { title: 'Text', type: 'string' },
+    speaker_id: { title: 'Speaker Id', type: 'integer' },
   },
-  required: ['speaker_id', 'text'],
+  title: 'Turn',
+  type: 'object',
 } as const
 
 export const UsageInfoSchema = {
+  type: 'object',
+  required: ['input_tokens', 'output_tokens'],
   properties: {
-    output_tokens: {
-      description: 'Number of output tokens generated.',
-      title: 'Output Tokens',
-      type: 'integer',
-    },
     input_tokens: {
       description: 'Number of input tokens processed.',
       title: 'Input Tokens',
       type: 'integer',
     },
+    output_tokens: {
+      description: 'Number of output tokens generated.',
+      title: 'Output Tokens',
+      type: 'integer',
+    },
   },
-  type: 'object',
   title: 'UsageInfo',
   'x-fal-order-properties': ['input_tokens', 'output_tokens'],
-  required: ['input_tokens', 'output_tokens'],
 } as const
 
 export const V11TextToMusicInputSchema = {
@@ -20793,21 +20892,9 @@ export const V11VideoToMusicOutputSchema = {
 } as const
 
 export const VibeVoiceSpeakerSchema = {
-  'x-fal-order-properties': ['preset', 'audio_url'],
-  title: 'VibeVoiceSpeaker',
   type: 'object',
   properties: {
-    audio_url: {
-      description:
-        'URL to a voice sample audio file. If provided, `preset` will be ignored.',
-      title: 'Audio URL',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-    },
     preset: {
-      description:
-        'Default voice preset to use for the speaker. Not used if `audio_url` is provided.',
-      title: 'Preset',
-      type: 'string',
       default: 'Alice [EN]',
       enum: [
         'Alice [EN]',
@@ -20820,51 +20907,61 @@ export const VibeVoiceSpeakerSchema = {
         'Xinran [ZH]',
       ],
       examples: ['Alice [EN]'],
+      description:
+        'Default voice preset to use for the speaker. Not used if `audio_url` is provided.',
+      title: 'Preset',
+      type: 'string',
+    },
+    audio_url: {
+      description:
+        'URL to a voice sample audio file. If provided, `preset` will be ignored.',
+      title: 'Audio URL',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
     },
   },
+  title: 'VibeVoiceSpeaker',
+  'x-fal-order-properties': ['preset', 'audio_url'],
 } as const
 
 export const Vibevoice05bInputSchema = {
-  description: 'Input schema for VibeVoice-0.5b TTS generation',
-  title: 'VibeVoice0_5bInput',
   'x-fal-order-properties': ['script', 'speaker', 'seed', 'cfg_scale'],
   type: 'object',
   properties: {
-    cfg_scale: {
-      minimum: 1,
-      title: 'CFG Scale',
-      maximum: 2,
-      type: 'number',
-      description:
-        'CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.',
-      default: 1.3,
-    },
-    script: {
-      description: 'The script to convert to speech.',
-      title: 'Script',
-      type: 'string',
-      maxLength: 90000,
-      examples: ['VibeVoice is now available on Fal!'],
-    },
     seed: {
       description: 'Random seed for reproducible generation.',
       title: 'Seed',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
+    cfg_scale: {
+      default: 1.3,
+      minimum: 1,
+      type: 'number',
+      description:
+        'CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.',
+      title: 'CFG Scale',
+      maximum: 2,
+    },
     speaker: {
+      enum: ['Frank', 'Wayne', 'Carter', 'Emma', 'Grace', 'Mike'],
+      examples: ['Frank'],
       description: 'Voice to use for speaking.',
       title: 'Speaker',
       type: 'string',
-      enum: ['Frank', 'Wayne', 'Carter', 'Emma', 'Grace', 'Mike'],
-      examples: ['Frank'],
+    },
+    script: {
+      maxLength: 90000,
+      examples: ['VibeVoice is now available on Fal!'],
+      description: 'The script to convert to speech.',
+      title: 'Script',
+      type: 'string',
     },
   },
+  description: 'Input schema for VibeVoice-0.5b TTS generation',
+  title: 'VibeVoice0_5bInput',
   required: ['script', 'speaker'],
 } as const
 
 export const Vibevoice05bOutputSchema = {
-  description: 'Output schema for VibeVoice-0.5b TTS generation',
-  title: 'VibeVoice_0_5BOutput',
   'x-fal-order-properties': [
     'audio',
     'duration',
@@ -20874,58 +20971,59 @@ export const Vibevoice05bOutputSchema = {
   ],
   type: 'object',
   properties: {
+    rtf: {
+      examples: [0.53],
+      description:
+        'Real-time factor (generation_time / audio_duration). Lower is better.',
+      title: 'Rtf',
+      type: 'number',
+    },
+    duration: {
+      examples: [9.46],
+      description: 'Duration of the generated audio in seconds',
+      title: 'Duration',
+      type: 'number',
+    },
     sample_rate: {
+      examples: [24000],
       description: 'Sample rate of the generated audio',
       title: 'Sample Rate',
       type: 'integer',
-      examples: [24000],
     },
     audio: {
-      description: 'The generated audio file containing the speech',
       $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/vibevoice/0_5b.mp3',
         },
       ],
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds',
-      title: 'Duration',
-      type: 'number',
-      examples: [9.46],
-    },
-    rtf: {
-      description:
-        'Real-time factor (generation_time / audio_duration). Lower is better.',
-      title: 'Rtf',
-      type: 'number',
-      examples: [0.53],
+      description: 'The generated audio file containing the speech',
     },
     generation_time: {
+      examples: [5.6],
       description: 'Time taken to generate the audio in seconds',
       title: 'Generation Time',
       type: 'number',
-      examples: [5.6],
     },
   },
+  description: 'Output schema for VibeVoice-0.5b TTS generation',
+  title: 'VibeVoice_0_5BOutput',
   required: ['audio', 'duration', 'sample_rate', 'generation_time', 'rtf'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -20934,11 +21032,10 @@ export const Vibevoice05bOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -20947,67 +21044,57 @@ export const Vibevoice05bOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const Vibevoice7bInputSchema = {
-  description: 'Input schema for VibeVoice-7b TTS generation',
-  title: 'VibeVoice7bInput',
   'x-fal-order-properties': ['script', 'speakers', 'seed', 'cfg_scale'],
   type: 'object',
   properties: {
-    speakers: {
-      description:
-        'List of speakers to use for the script. If not provided, will be inferred from the script or voice samples.',
-      title: 'Speakers',
-      type: 'array',
-      examples: [[{ preset: 'Frank [EN]' }, { preset: 'Carter [EN]' }]],
-      items: { $ref: '#/$defs/VibeVoiceSpeaker' },
-    },
-    cfg_scale: {
-      minimum: 1,
-      title: 'CFG Scale',
-      maximum: 2,
-      type: 'number',
-      description:
-        'CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.',
-      default: 1.3,
-    },
-    script: {
-      description:
-        "The script to convert to speech. Can be formatted with 'Speaker X:' prefixes for multi-speaker dialogues.",
-      title: 'Script',
-      type: 'string',
-      maxLength: 30000,
-      examples: [
-        "Speaker 0: VibeVoice is now available on Fal. Isn't that right, Carter?\nSpeaker 1: That's right Frank, and it supports up to four speakers at once. Try it now!",
-      ],
-    },
     seed: {
       description: 'Random seed for reproducible generation.',
       title: 'Seed',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
+    cfg_scale: {
+      default: 1.3,
+      minimum: 1,
+      type: 'number',
+      description:
+        'CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.',
+      title: 'CFG Scale',
+      maximum: 2,
+    },
+    speakers: {
+      items: { $ref: '#/$defs/VibeVoiceSpeaker' },
+      examples: [[{ preset: 'Frank [EN]' }, { preset: 'Carter [EN]' }]],
+      description:
+        'List of speakers to use for the script. If not provided, will be inferred from the script or voice samples.',
+      title: 'Speakers',
+      type: 'array',
+    },
+    script: {
+      maxLength: 30000,
+      examples: [
+        "Speaker 0: VibeVoice is now available on Fal. Isn't that right, Carter?\nSpeaker 1: That's right Frank, and it supports up to four speakers at once. Try it now!",
+      ],
+      description:
+        "The script to convert to speech. Can be formatted with 'Speaker X:' prefixes for multi-speaker dialogues.",
+      title: 'Script',
+      type: 'string',
+    },
   },
+  description: 'Input schema for VibeVoice-7b TTS generation',
+  title: 'VibeVoice7bInput',
   required: ['script', 'speakers'],
   $defs: {
     VibeVoiceSpeaker: {
-      'x-fal-order-properties': ['preset', 'audio_url'],
-      title: 'VibeVoiceSpeaker',
       type: 'object',
       properties: {
-        audio_url: {
-          description:
-            'URL to a voice sample audio file. If provided, `preset` will be ignored.',
-          title: 'Audio URL',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
         preset: {
-          description:
-            'Default voice preset to use for the speaker. Not used if `audio_url` is provided.',
-          title: 'Preset',
-          type: 'string',
           default: 'Alice [EN]',
           enum: [
             'Alice [EN]',
@@ -21020,15 +21107,25 @@ export const Vibevoice7bInputSchema = {
             'Xinran [ZH]',
           ],
           examples: ['Alice [EN]'],
+          description:
+            'Default voice preset to use for the speaker. Not used if `audio_url` is provided.',
+          title: 'Preset',
+          type: 'string',
+        },
+        audio_url: {
+          description:
+            'URL to a voice sample audio file. If provided, `preset` will be ignored.',
+          title: 'Audio URL',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'VibeVoiceSpeaker',
+      'x-fal-order-properties': ['preset', 'audio_url'],
     },
   },
 } as const
 
 export const Vibevoice7bOutputSchema = {
-  description: 'Output schema for VibeVoice TTS generation',
-  title: 'VibeVoiceOutput',
   'x-fal-order-properties': [
     'audio',
     'duration',
@@ -21038,58 +21135,59 @@ export const Vibevoice7bOutputSchema = {
   ],
   type: 'object',
   properties: {
+    rtf: {
+      examples: [0.53],
+      description:
+        'Real-time factor (generation_time / audio_duration). Lower is better.',
+      title: 'Rtf',
+      type: 'number',
+    },
+    duration: {
+      examples: [9.46],
+      description: 'Duration of the generated audio in seconds',
+      title: 'Duration',
+      type: 'number',
+    },
     sample_rate: {
+      examples: [24000],
       description: 'Sample rate of the generated audio',
       title: 'Sample Rate',
       type: 'integer',
-      examples: [24000],
     },
     audio: {
-      description: 'The generated audio file containing the speech',
       $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/vibevoice.mp3',
         },
       ],
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds',
-      title: 'Duration',
-      type: 'number',
-      examples: [9.46],
-    },
-    rtf: {
-      description:
-        'Real-time factor (generation_time / audio_duration). Lower is better.',
-      title: 'Rtf',
-      type: 'number',
-      examples: [0.53],
+      description: 'The generated audio file containing the speech',
     },
     generation_time: {
+      examples: [5.6],
       description: 'Time taken to generate the audio in seconds',
       title: 'Generation Time',
       type: 'number',
-      examples: [5.6],
     },
   },
+  description: 'Output schema for VibeVoice TTS generation',
+  title: 'VibeVoiceOutput',
   required: ['audio', 'duration', 'sample_rate', 'generation_time', 'rtf'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -21098,11 +21196,10 @@ export const Vibevoice7bOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -21111,67 +21208,57 @@ export const Vibevoice7bOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const VibevoiceInputSchema = {
-  description: 'Input schema for VibeVoice TTS generation',
-  title: 'VibeVoiceInput',
   'x-fal-order-properties': ['script', 'speakers', 'seed', 'cfg_scale'],
   type: 'object',
   properties: {
-    speakers: {
-      description:
-        'List of speakers to use for the script. If not provided, will be inferred from the script or voice samples.',
-      title: 'Speakers',
-      type: 'array',
-      examples: [[{ preset: 'Frank [EN]' }, { preset: 'Carter [EN]' }]],
-      items: { $ref: '#/$defs/VibeVoiceSpeaker' },
-    },
-    cfg_scale: {
-      minimum: 1,
-      title: 'CFG Scale',
-      maximum: 2,
-      type: 'number',
-      description:
-        'CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.',
-      default: 1.3,
-    },
-    script: {
-      description:
-        "The script to convert to speech. Can be formatted with 'Speaker X:' prefixes for multi-speaker dialogues.",
-      title: 'Script',
-      type: 'string',
-      maxLength: 90000,
-      examples: [
-        "Speaker 0: VibeVoice is now available on Fal. Isn't that right, Carter?\nSpeaker 1: That's right Frank, and it supports up to four speakers at once. Try it now!",
-      ],
-    },
     seed: {
       description: 'Random seed for reproducible generation.',
       title: 'Seed',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
+    cfg_scale: {
+      default: 1.3,
+      minimum: 1,
+      type: 'number',
+      description:
+        'CFG (Classifier-Free Guidance) scale for generation. Higher values increase adherence to text.',
+      title: 'CFG Scale',
+      maximum: 2,
+    },
+    speakers: {
+      items: { $ref: '#/$defs/VibeVoiceSpeaker' },
+      examples: [[{ preset: 'Frank [EN]' }, { preset: 'Carter [EN]' }]],
+      description:
+        'List of speakers to use for the script. If not provided, will be inferred from the script or voice samples.',
+      title: 'Speakers',
+      type: 'array',
+    },
+    script: {
+      maxLength: 90000,
+      examples: [
+        "Speaker 0: VibeVoice is now available on Fal. Isn't that right, Carter?\nSpeaker 1: That's right Frank, and it supports up to four speakers at once. Try it now!",
+      ],
+      description:
+        "The script to convert to speech. Can be formatted with 'Speaker X:' prefixes for multi-speaker dialogues.",
+      title: 'Script',
+      type: 'string',
+    },
   },
+  description: 'Input schema for VibeVoice TTS generation',
+  title: 'VibeVoiceInput',
   required: ['script', 'speakers'],
   $defs: {
     VibeVoiceSpeaker: {
-      'x-fal-order-properties': ['preset', 'audio_url'],
-      title: 'VibeVoiceSpeaker',
       type: 'object',
       properties: {
-        audio_url: {
-          description:
-            'URL to a voice sample audio file. If provided, `preset` will be ignored.',
-          title: 'Audio URL',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
         preset: {
-          description:
-            'Default voice preset to use for the speaker. Not used if `audio_url` is provided.',
-          title: 'Preset',
-          type: 'string',
           default: 'Alice [EN]',
           enum: [
             'Alice [EN]',
@@ -21184,15 +21271,25 @@ export const VibevoiceInputSchema = {
             'Xinran [ZH]',
           ],
           examples: ['Alice [EN]'],
+          description:
+            'Default voice preset to use for the speaker. Not used if `audio_url` is provided.',
+          title: 'Preset',
+          type: 'string',
+        },
+        audio_url: {
+          description:
+            'URL to a voice sample audio file. If provided, `preset` will be ignored.',
+          title: 'Audio URL',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'VibeVoiceSpeaker',
+      'x-fal-order-properties': ['preset', 'audio_url'],
     },
   },
 } as const
 
 export const VibevoiceOutputSchema = {
-  description: 'Output schema for VibeVoice TTS generation',
-  title: 'VibeVoiceOutput',
   'x-fal-order-properties': [
     'audio',
     'duration',
@@ -21202,58 +21299,59 @@ export const VibevoiceOutputSchema = {
   ],
   type: 'object',
   properties: {
+    rtf: {
+      examples: [0.53],
+      description:
+        'Real-time factor (generation_time / audio_duration). Lower is better.',
+      title: 'Rtf',
+      type: 'number',
+    },
+    duration: {
+      examples: [9.46],
+      description: 'Duration of the generated audio in seconds',
+      title: 'Duration',
+      type: 'number',
+    },
     sample_rate: {
+      examples: [24000],
       description: 'Sample rate of the generated audio',
       title: 'Sample Rate',
       type: 'integer',
-      examples: [24000],
     },
     audio: {
-      description: 'The generated audio file containing the speech',
       $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/vibevoice.mp3',
         },
       ],
-    },
-    duration: {
-      description: 'Duration of the generated audio in seconds',
-      title: 'Duration',
-      type: 'number',
-      examples: [9.46],
-    },
-    rtf: {
-      description:
-        'Real-time factor (generation_time / audio_duration). Lower is better.',
-      title: 'Rtf',
-      type: 'number',
-      examples: [0.53],
+      description: 'The generated audio file containing the speech',
     },
     generation_time: {
+      examples: [5.6],
       description: 'Time taken to generate the audio in seconds',
       title: 'Generation Time',
       type: 'number',
-      examples: [5.6],
     },
   },
+  description: 'Output schema for VibeVoice TTS generation',
+  title: 'VibeVoiceOutput',
   required: ['audio', 'duration', 'sample_rate', 'generation_time', 'rtf'],
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -21262,11 +21360,10 @@ export const VibevoiceOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -21275,75 +21372,63 @@ export const VibevoiceOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const
 
 export const VoiceModifySchema = {
+  'x-fal-order-properties': ['pitch', 'intensity', 'timbre'],
   type: 'object',
-  description: 'Voice modification settings for Speech 2.8 models.',
   properties: {
-    intensity: {
-      maximum: 100,
-      description:
-        'Intensity/energy of the voice. Range: -100 to 100. Higher values create more energetic speech.',
-      type: 'integer',
-      default: 0,
-      minimum: -100,
-      title: 'Intensity',
-    },
     timbre: {
-      maximum: 100,
       description:
         'Timbre adjustment. Range: -100 to 100. Affects the tonal quality of the voice.',
       type: 'integer',
-      default: 0,
       minimum: -100,
+      maximum: 100,
+      default: 0,
       title: 'Timbre',
     },
     pitch: {
-      maximum: 100,
       description:
         'Pitch adjustment in semitones. Range: -100 to 100. Positive values raise pitch, negative values lower it.',
       type: 'integer',
-      default: 0,
       minimum: -100,
+      maximum: 100,
+      default: 0,
       title: 'Pitch',
     },
+    intensity: {
+      description:
+        'Intensity/energy of the voice. Range: -100 to 100. Higher values create more energetic speech.',
+      type: 'integer',
+      minimum: -100,
+      maximum: 100,
+      default: 0,
+      title: 'Intensity',
+    },
   },
-  'x-fal-order-properties': ['pitch', 'intensity', 'timbre'],
+  description: 'Voice modification settings for Speech 2.8 models.',
   title: 'VoiceModify',
 } as const
 
 export const VoiceSettingSchema = {
+  'x-fal-order-properties': [
+    'voice_id',
+    'speed',
+    'vol',
+    'pitch',
+    'emotion',
+    'english_normalization',
+  ],
   type: 'object',
   properties: {
-    english_normalization: {
-      type: 'boolean',
-      description:
-        'Enables English text normalization to improve number reading performance, with a slight increase in latency',
-      default: false,
-      title: 'English Normalization',
-    },
-    vol: {
-      maximum: 10,
-      description: 'Volume (0-10)',
-      type: 'number',
-      default: 1,
-      minimum: 0.01,
-      title: 'Vol',
-    },
-    speed: {
-      maximum: 2,
-      description: 'Speech speed (0.5-2.0)',
-      type: 'number',
-      default: 1,
-      minimum: 0.5,
-      title: 'Speed',
-    },
     voice_id: {
-      type: 'string',
+      minLength: 1,
       description: 'Predefined voice ID to use for synthesis',
+      type: 'string',
       examples: [
         'Wise_Woman',
         'Friendly_Person',
@@ -21364,10 +21449,41 @@ export const VoiceSettingSchema = {
         'Exuberant_Girl',
       ],
       default: 'Wise_Woman',
-      minLength: 1,
       title: 'Voice Id',
     },
+    speed: {
+      description: 'Speech speed (0.5-2.0)',
+      type: 'number',
+      minimum: 0.5,
+      maximum: 2,
+      default: 1,
+      title: 'Speed',
+    },
+    english_normalization: {
+      description:
+        'Enables English text normalization to improve number reading performance, with a slight increase in latency',
+      type: 'boolean',
+      default: false,
+      title: 'English Normalization',
+    },
+    pitch: {
+      description: 'Voice pitch (-12 to 12)',
+      type: 'integer',
+      minimum: -12,
+      maximum: 12,
+      default: 0,
+      title: 'Pitch',
+    },
+    vol: {
+      description: 'Volume (0-10)',
+      type: 'number',
+      minimum: 0.01,
+      maximum: 10,
+      default: 1,
+      title: 'Vol',
+    },
     emotion: {
+      description: 'Emotion of the generated speech',
       anyOf: [
         {
           enum: [
@@ -21383,96 +21499,81 @@ export const VoiceSettingSchema = {
         },
         { type: 'null' },
       ],
-      description: 'Emotion of the generated speech',
       title: 'Emotion',
     },
-    pitch: {
-      maximum: 12,
-      description: 'Voice pitch (-12 to 12)',
-      type: 'integer',
-      default: 0,
-      minimum: -12,
-      title: 'Pitch',
-    },
   },
-  'x-fal-order-properties': [
-    'voice_id',
-    'speed',
-    'vol',
-    'pitch',
-    'emotion',
-    'english_normalization',
-  ],
   title: 'VoiceSetting',
 } as const
 
 export const WhisperChunkSchema = {
-  type: 'object',
+  required: ['timestamp', 'text'],
   properties: {
     timestamp: {
-      description: 'Start and end timestamp of the chunk',
+      minItems: 2,
       maxItems: 2,
       type: 'array',
-      minItems: 2,
-      title: 'Timestamp',
       prefixItems: [
         { anyOf: [{ type: 'number' }, { type: 'null' }] },
         { anyOf: [{ type: 'number' }, { type: 'null' }] },
       ],
+      title: 'Timestamp',
+      description: 'Start and end timestamp of the chunk',
     },
     text: {
+      description: 'Transcription of the chunk',
       type: 'string',
       title: 'Text',
-      description: 'Transcription of the chunk',
     },
   },
-  title: 'WhisperChunk',
   'x-fal-order-properties': ['timestamp', 'text'],
-  required: ['timestamp', 'text'],
+  type: 'object',
+  title: 'WhisperChunk',
 } as const
 
 export const WizperInputSchema = {
-  type: 'object',
+  required: ['audio_url'],
   properties: {
-    max_segment_len: {
-      minimum: 10,
-      default: 29,
-      type: 'integer',
-      title: 'Max Segment Len',
-      maximum: 29,
-      description:
-        'Maximum speech segment duration in seconds before splitting.',
-    },
     audio_url: {
+      description:
+        'URL of the audio file to transcribe. Supported formats: mp3, mp4, mpeg, mpga, m4a, wav or webm.',
+      type: 'string',
+      title: 'Audio Url',
       examples: [
         'https://ihlhivqvotguuqycfcvj.supabase.co/storage/v1/object/public/public-text-to-speech/scratch-testing/earth-history-19mins.mp3',
       ],
-      type: 'string',
-      title: 'Audio Url',
-      description:
-        'URL of the audio file to transcribe. Supported formats: mp3, mp4, mpeg, mpga, m4a, wav or webm.',
       'x-fal-file-input': true,
+    },
+    merge_chunks: {
+      default: true,
+      type: 'boolean',
+      description:
+        'Whether to merge consecutive chunks. When enabled, chunks are merged if their combined duration does not exceed max_segment_len.',
+      title: 'Merge Chunks',
+    },
+    chunk_level: {
+      default: 'segment',
+      type: 'string',
+      const: 'segment',
+      title: 'Chunk Level',
+      description: 'Level of the chunks to return.',
     },
     task: {
       default: 'transcribe',
       type: 'string',
-      enum: ['transcribe', 'translate'],
-      title: 'Task',
       description:
         'Task to perform on the audio file. Either transcribe or translate.',
+      title: 'Task',
+      enum: ['transcribe', 'translate'],
     },
     version: {
       default: '3',
       type: 'string',
-      title: 'Version',
       const: '3',
+      title: 'Version',
       description:
         'Version of the model to use. All of the models are the Whisper large variant.',
     },
     language: {
-      default: 'en',
-      examples: [null],
-      title: 'Language',
       anyOf: [
         {
           type: 'string',
@@ -21580,25 +21681,22 @@ export const WizperInputSchema = {
         },
         { type: 'null' },
       ],
+      default: 'en',
       description:
         '\n        Language of the audio file.\n        If translate is selected as the task, the audio will be translated to\n        English, regardless of the language selected. If `None` is passed,\n        the language will be automatically detected. This will also increase\n        the inference time.\n        ',
+      title: 'Language',
+      examples: [null],
     },
-    chunk_level: {
-      default: 'segment',
-      type: 'string',
-      title: 'Chunk Level',
-      const: 'segment',
-      description: 'Level of the chunks to return.',
-    },
-    merge_chunks: {
-      default: true,
-      type: 'boolean',
-      title: 'Merge Chunks',
+    max_segment_len: {
+      minimum: 10,
+      maximum: 29,
+      default: 29,
+      type: 'integer',
       description:
-        'Whether to merge consecutive chunks. When enabled, chunks are merged if their combined duration does not exceed max_segment_len.',
+        'Maximum speech segment duration in seconds before splitting.',
+      title: 'Max Segment Len',
     },
   },
-  title: 'WhisperInput',
   'x-fal-order-properties': [
     'audio_url',
     'task',
@@ -21608,15 +21706,25 @@ export const WizperInputSchema = {
     'merge_chunks',
     'version',
   ],
-  required: ['audio_url'],
+  type: 'object',
+  title: 'WhisperInput',
 } as const
 
 export const WizperOutputSchema = {
-  type: 'object',
+  required: ['text', 'chunks', 'languages'],
   properties: {
-    languages: {
+    text: {
+      description: 'Transcription of the audio file',
+      type: 'string',
+      title: 'Text',
+    },
+    chunks: {
+      items: { $ref: '#/$defs/WhisperChunk' },
       type: 'array',
-      title: 'Languages',
+      description: 'Timestamp chunks of the audio file',
+      title: 'Chunks',
+    },
+    languages: {
       items: {
         type: 'string',
         enum: [
@@ -21721,123 +21829,116 @@ export const WizperOutputSchema = {
           'zh',
         ],
       },
+      type: 'array',
       description:
         'List of languages that the audio file is inferred to be. Defaults to null.',
-    },
-    chunks: {
-      type: 'array',
-      title: 'Chunks',
-      items: { $ref: '#/$defs/WhisperChunk' },
-      description: 'Timestamp chunks of the audio file',
-    },
-    text: {
-      type: 'string',
-      title: 'Text',
-      description: 'Transcription of the audio file',
+      title: 'Languages',
     },
   },
-  title: 'WhisperOutput',
   'x-fal-order-properties': ['text', 'chunks', 'languages'],
-  required: ['text', 'chunks', 'languages'],
+  type: 'object',
+  title: 'WhisperOutput',
   $defs: {
     WhisperChunk: {
-      type: 'object',
+      required: ['timestamp', 'text'],
       properties: {
         timestamp: {
-          description: 'Start and end timestamp of the chunk',
+          minItems: 2,
           maxItems: 2,
           type: 'array',
-          minItems: 2,
-          title: 'Timestamp',
           prefixItems: [
             { anyOf: [{ type: 'number' }, { type: 'null' }] },
             { anyOf: [{ type: 'number' }, { type: 'null' }] },
           ],
+          title: 'Timestamp',
+          description: 'Start and end timestamp of the chunk',
         },
         text: {
+          description: 'Transcription of the chunk',
           type: 'string',
           title: 'Text',
-          description: 'Transcription of the chunk',
         },
       },
-      title: 'WhisperChunk',
       'x-fal-order-properties': ['timestamp', 'text'],
-      required: ['timestamp', 'text'],
+      type: 'object',
+      title: 'WhisperChunk',
     },
   },
 } as const
 
 export const WorkflowUtilitiesAudioCompressorInputSchema = {
+  description: 'Input model for audio dynamic range compression',
+  type: 'object',
   properties: {
     makeup: {
-      default: 8,
-      type: 'number',
-      title: 'Makeup',
-      maximum: 64,
       description: 'Makeup gain in dB to compensate for volume reduction',
-      minimum: 0,
-    },
-    knee: {
-      default: 2.83,
       type: 'number',
-      title: 'Knee',
-      maximum: 8,
-      description: 'Knee width in dB for soft knee compression (0 = hard knee)',
-      minimum: 1,
+      minimum: 0,
+      maximum: 64,
+      default: 8,
+      title: 'Makeup',
     },
     output_bitrate: {
-      default: '192k',
-      type: 'string',
-      title: 'Output Bitrate',
-      description: 'Output audio bitrate',
       enum: ['128k', '192k', '256k', '320k'],
+      description: 'Output audio bitrate',
+      type: 'string',
+      default: '192k',
+      title: 'Output Bitrate',
+    },
+    knee: {
+      description: 'Knee width in dB for soft knee compression (0 = hard knee)',
+      type: 'number',
+      minimum: 1,
+      maximum: 8,
+      default: 2.83,
+      title: 'Knee',
     },
     attack: {
-      default: 5,
-      type: 'number',
-      title: 'Attack',
-      maximum: 2000,
       description: 'Attack time in milliseconds (how fast compression starts)',
+      type: 'number',
       minimum: 0.01,
+      maximum: 2000,
+      default: 5,
+      title: 'Attack',
     },
     ratio: {
-      default: 3,
-      type: 'number',
-      title: 'Ratio',
-      maximum: 20,
       description:
         'Compression ratio (1 = no compression, higher = more compression)',
+      type: 'number',
       minimum: 1,
+      maximum: 20,
+      default: 3,
+      title: 'Ratio',
     },
     audio_url: {
+      description: 'URL of the audio file to compress',
       max_file_size: 60000000,
-      title: 'Audio Url',
+      type: 'string',
       examples: [
         'https://v3.fal.media/files/panda/1-0iezBUIePBa3Sz5YY5B_tmpy1jyshw9.wav',
       ],
-      description: 'URL of the audio file to compress',
-      type: 'string',
+      title: 'Audio Url',
       'x-fal-file-input': true,
     },
-    release: {
-      default: 50,
-      type: 'number',
-      title: 'Release',
-      maximum: 9000,
-      description: 'Release time in milliseconds (how fast compression stops)',
-      minimum: 0.01,
-    },
     threshold: {
-      default: -18,
-      type: 'number',
-      title: 'Threshold',
-      maximum: 0,
       description:
         'Threshold level in dB above which compression is applied (-60 to 0)',
+      type: 'number',
       minimum: -60,
+      maximum: 0,
+      default: -18,
+      title: 'Threshold',
+    },
+    release: {
+      description: 'Release time in milliseconds (how fast compression stops)',
+      type: 'number',
+      minimum: 0.01,
+      maximum: 9000,
+      default: 50,
+      title: 'Release',
     },
   },
-  type: 'object',
+  required: ['audio_url'],
   'x-fal-order-properties': [
     'audio_url',
     'threshold',
@@ -21849,55 +21950,55 @@ export const WorkflowUtilitiesAudioCompressorInputSchema = {
     'output_bitrate',
   ],
   title: 'AudioCompressorInput',
-  required: ['audio_url'],
-  description: 'Input model for audio dynamic range compression',
 } as const
 
 export const WorkflowUtilitiesAudioCompressorOutputSchema = {
+  description: 'Output model for compressed audio',
+  type: 'object',
   properties: {
     audio: {
-      $ref: '#/$defs/AudioFileType2',
+      description: 'The compressed audio file',
       examples: [
         {
           file_size: 1234567,
-          file_name: 'compressed_audio.wav',
           content_type: 'application/octet-stream',
           url: 'https://v3b.fal.media/files/b/panda/compressed_audio.wav',
+          file_name: 'compressed_audio.wav',
         },
       ],
-      description: 'The compressed audio file',
+      $ref: '#/$defs/AudioFileType2',
     },
   },
-  type: 'object',
+  required: ['audio'],
   'x-fal-order-properties': ['audio'],
   title: 'AudioCompressorOutput',
-  required: ['audio'],
-  description: 'Output model for compressed audio',
   $defs: {
     AudioFileType2: {
+      description: 'Audio file with url field',
+      type: 'object',
       properties: {
         file_size: {
+          description: 'Size of the audio file in bytes',
           type: 'integer',
           title: 'File Size',
-          description: 'Size of the audio file in bytes',
-        },
-        file_name: {
-          type: 'string',
-          title: 'File Name',
-          description: 'Name of the audio file',
         },
         content_type: {
+          description: 'Content type of the audio file',
           type: 'string',
           title: 'Content Type',
-          description: 'Content type of the audio file',
         },
         url: {
+          description: 'URL of the audio file',
           type: 'string',
           title: 'Url',
-          description: 'URL of the audio file',
+        },
+        file_name: {
+          description: 'Name of the audio file',
+          type: 'string',
+          title: 'File Name',
         },
       },
-      type: 'object',
+      required: ['url', 'content_type', 'file_name', 'file_size'],
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -21905,84 +22006,85 @@ export const WorkflowUtilitiesAudioCompressorOutputSchema = {
         'file_size',
       ],
       title: 'AudioFile',
-      required: ['url', 'content_type', 'file_name', 'file_size'],
-      description: 'Audio file with url field',
     },
   },
 } as const
 
 export const WorkflowUtilitiesImpulseResponseInputSchema = {
+  description:
+    'Input model for applying impulse response (IR) convolution reverb to audio',
+  type: 'object',
   properties: {
-    loudness_lra: {
-      default: 8,
-      type: 'number',
-      title: 'Loudness Lra',
-      maximum: 50,
-      description: 'Loudness Range target in LU (typically 5-15)',
-      minimum: 1,
-    },
-    loudness_i: {
-      default: -18,
-      type: 'number',
-      title: 'Loudness I',
-      maximum: 0,
-      description: 'Target integrated loudness in LUFS (typically -24 to -14)',
-      minimum: -70,
-    },
-    wet_level: {
-      default: 0.3,
-      type: 'number',
-      title: 'Wet Level',
-      maximum: 1,
-      description: 'Level of the processed (wet) signal in the mix (0.0-1.0)',
-      minimum: 0,
-    },
-    output_bitrate: {
-      default: '192k',
-      type: 'string',
-      title: 'Output Bitrate',
-      description: 'Output audio bitrate',
-      enum: ['128k', '192k', '256k', '320k'],
-    },
-    loudness_tp: {
-      default: -1.5,
-      type: 'number',
-      title: 'Loudness Tp',
-      maximum: 0,
-      description: 'Maximum true peak in dBTP (typically -2 to -1)',
-      minimum: -10,
-    },
-    audio_url: {
-      max_file_size: 60000000,
-      title: 'Audio Url',
-      examples: [
-        'https://v3.fal.media/files/panda/1-0iezBUIePBa3Sz5YY5B_tmpy1jyshw9.wav',
-      ],
-      description: 'URL of the main audio file to process',
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-    dry_level: {
-      default: 0.7,
-      type: 'number',
-      title: 'Dry Level',
-      maximum: 1,
-      description: 'Level of the original (dry) signal in the mix (0.0-1.0)',
-      minimum: 0,
-    },
     impulse_response_url: {
-      max_file_size: 60000000,
-      title: 'Impulse Response Url',
-      examples: [
-        'https://v3.fal.media/files/panda/1-0iezBUIePBa3Sz5YY5B_tmpy1jyshw9.wav',
-      ],
       description:
         'URL of the impulse response WAV file (reverb/effect profile)',
+      max_file_size: 60000000,
       type: 'string',
+      examples: [
+        'https://v3.fal.media/files/panda/1-0iezBUIePBa3Sz5YY5B_tmpy1jyshw9.wav',
+      ],
+      title: 'Impulse Response Url',
       'x-fal-file-input': true,
     },
+    loudness_lra: {
+      description: 'Loudness Range target in LU (typically 5-15)',
+      type: 'number',
+      minimum: 1,
+      maximum: 50,
+      default: 8,
+      title: 'Loudness Lra',
+    },
+    output_bitrate: {
+      enum: ['128k', '192k', '256k', '320k'],
+      description: 'Output audio bitrate',
+      type: 'string',
+      default: '192k',
+      title: 'Output Bitrate',
+    },
+    dry_level: {
+      description: 'Level of the original (dry) signal in the mix (0.0-1.0)',
+      type: 'number',
+      minimum: 0,
+      maximum: 1,
+      default: 0.7,
+      title: 'Dry Level',
+    },
+    wet_level: {
+      description: 'Level of the processed (wet) signal in the mix (0.0-1.0)',
+      type: 'number',
+      minimum: 0,
+      maximum: 1,
+      default: 0.3,
+      title: 'Wet Level',
+    },
+    audio_url: {
+      description: 'URL of the main audio file to process',
+      max_file_size: 60000000,
+      type: 'string',
+      examples: [
+        'https://v3.fal.media/files/panda/1-0iezBUIePBa3Sz5YY5B_tmpy1jyshw9.wav',
+      ],
+      title: 'Audio Url',
+      'x-fal-file-input': true,
+    },
+    loudness_tp: {
+      description: 'Maximum true peak in dBTP (typically -2 to -1)',
+      type: 'number',
+      minimum: -10,
+      maximum: 0,
+      default: -1.5,
+      title: 'Loudness Tp',
+    },
+    loudness_i: {
+      description: 'Target integrated loudness in LUFS (typically -24 to -14)',
+      type: 'number',
+      minimum: -70,
+      maximum: 0,
+      default: -18,
+      title: 'Loudness I',
+    },
   },
-  type: 'object',
+  required: ['audio_url', 'impulse_response_url'],
   'x-fal-order-properties': [
     'audio_url',
     'impulse_response_url',
@@ -21994,56 +22096,55 @@ export const WorkflowUtilitiesImpulseResponseInputSchema = {
     'output_bitrate',
   ],
   title: 'ImpulseResponseInput',
-  required: ['audio_url', 'impulse_response_url'],
-  description:
-    'Input model for applying impulse response (IR) convolution reverb to audio',
 } as const
 
 export const WorkflowUtilitiesImpulseResponseOutputSchema = {
+  description: 'Output model for impulse response processed audio',
+  type: 'object',
   properties: {
     audio: {
-      $ref: '#/$defs/AudioFileType2',
+      description: 'The processed audio file with reverb applied',
       examples: [
         {
           file_size: 2456789,
-          file_name: 'impulse_output.wav',
           content_type: 'application/octet-stream',
           url: 'https://v3b.fal.media/files/b/panda/impulse_output.wav',
+          file_name: 'impulse_output.wav',
         },
       ],
-      description: 'The processed audio file with reverb applied',
+      $ref: '#/$defs/AudioFileType2',
     },
   },
-  type: 'object',
+  required: ['audio'],
   'x-fal-order-properties': ['audio'],
   title: 'ImpulseResponseOutput',
-  required: ['audio'],
-  description: 'Output model for impulse response processed audio',
   $defs: {
     AudioFileType2: {
+      description: 'Audio file with url field',
+      type: 'object',
       properties: {
         file_size: {
+          description: 'Size of the audio file in bytes',
           type: 'integer',
           title: 'File Size',
-          description: 'Size of the audio file in bytes',
-        },
-        file_name: {
-          type: 'string',
-          title: 'File Name',
-          description: 'Name of the audio file',
         },
         content_type: {
+          description: 'Content type of the audio file',
           type: 'string',
           title: 'Content Type',
-          description: 'Content type of the audio file',
         },
         url: {
+          description: 'URL of the audio file',
           type: 'string',
           title: 'Url',
-          description: 'URL of the audio file',
+        },
+        file_name: {
+          description: 'Name of the audio file',
+          type: 'string',
+          title: 'File Name',
         },
       },
-      type: 'object',
+      required: ['url', 'content_type', 'file_name', 'file_size'],
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -22051,60 +22152,57 @@ export const WorkflowUtilitiesImpulseResponseOutputSchema = {
         'file_size',
       ],
       title: 'AudioFile',
-      required: ['url', 'content_type', 'file_name', 'file_size'],
-      description: 'Audio file with url field',
     },
   },
 } as const
 
 export const ZonosInputSchema = {
   type: 'object',
-  title: 'ZonosInput',
   'x-fal-order-properties': ['reference_audio_url', 'prompt'],
+  required: ['reference_audio_url', 'prompt'],
   properties: {
+    prompt: {
+      type: 'string',
+      examples: ['Fal is the fastest solution for your image generation.'],
+      description: 'The content generated using cloned voice.',
+      title: 'Prompt',
+    },
     reference_audio_url: {
       type: 'string',
-      title: 'Reference Audio Url',
-      description: 'The reference audio.',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/zonos/demo_voice_zonos.wav',
       ],
+      description: 'The reference audio.',
+      title: 'Reference Audio Url',
       'x-fal-file-input': true,
     },
-    prompt: {
-      type: 'string',
-      title: 'Prompt',
-      description: 'The content generated using cloned voice.',
-      examples: ['Fal is the fastest solution for your image generation.'],
-    },
   },
-  required: ['reference_audio_url', 'prompt'],
+  title: 'ZonosInput',
 } as const
 
 export const ZonosOutputSchema = {
   type: 'object',
-  title: 'ZonosOutput',
   'x-fal-order-properties': ['audio'],
+  required: ['audio'],
   properties: {
     audio: { description: 'The generated audio', $ref: '#/$defs/File' },
   },
-  required: ['audio'],
+  title: 'ZonosOutput',
   $defs: {
     File: {
-      type: 'object',
-      required: ['url'],
-      title: 'File',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
+      type: 'object',
       properties: {
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
+        file_size: {
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         file_name: {
           examples: ['z9RV14K95DvU.png'],
@@ -22113,11 +22211,10 @@ export const ZonosOutputSchema = {
           title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
-        file_size: {
-          examples: [4404019],
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        url: {
+          description: 'The URL where the file can be downloaded from.',
+          title: 'Url',
+          type: 'string',
         },
         content_type: {
           examples: ['image/png'],
@@ -22126,6 +22223,8 @@ export const ZonosOutputSchema = {
           anyOf: [{ type: 'string' }, { type: 'null' }],
         },
       },
+      title: 'File',
+      required: ['url'],
     },
   },
 } as const

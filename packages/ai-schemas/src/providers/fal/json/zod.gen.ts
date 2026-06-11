@@ -66,9 +66,9 @@ export const zAudioTrack = z.object({
  * ImageUnderstandingInput
  */
 export const zBagelUnderstandInput = z.object({
-  seed: z.int().optional(),
   prompt: z.string(),
   image_url: z.string(),
+  seed: z.int().optional(),
 })
 
 /**
@@ -76,9 +76,9 @@ export const zBagelUnderstandInput = z.object({
  */
 export const zBagelUnderstandOutput = z.object({
   text: z.string(),
-  timings: z.record(z.string(), z.unknown()),
-  seed: z.int(),
   prompt: z.string(),
+  seed: z.int(),
+  timings: z.record(z.string(), z.unknown()),
 })
 
 /**
@@ -133,11 +133,11 @@ export const zFfmpegApiWaveformOutput = z.object({
  * StructuredInstructionInputModel
  */
 export const zFiboEditEditStructuredInstructionInput = z.object({
+  seed: z.int().optional().default(5555),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   mask_url: z.union([z.string(), z.unknown()]).optional(),
   sync_mode: z.boolean().optional().default(false),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
   instruction: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.int().optional().default(5555),
 })
 
 export const zFiboEditEditStructuredInstructionOutput = z.unknown()
@@ -229,12 +229,12 @@ export const zObjectDescription = z.object({
  * ImageToLottieInput
  */
 export const zOmnilottieImageToLottieInput = z.object({
-  top_p: z.number().gte(0).lte(1).optional().default(0.25),
-  max_tokens: z.int().gte(256).lte(8192).optional().default(4096),
-  temperature: z.number().gte(0).lte(2).optional().default(0.9),
-  top_k: z.int().gte(1).lte(100).optional().default(5),
   image_url: z.string(),
+  top_p: z.number().gte(0).lte(1).optional().default(0.25),
+  temperature: z.number().gte(0).lte(2).optional().default(0.9),
+  max_tokens: z.int().gte(256).lte(8192).optional().default(4096),
   prompt: z.string().max(2000),
+  top_k: z.int().gte(1).lte(100).optional().default(5),
 })
 
 /**
@@ -248,11 +248,11 @@ export const zOmnilottieImageToLottieOutput = z.object({
  * TextToLottieInput
  */
 export const zOmnilottieInput = z.object({
-  top_p: z.number().gte(0).lte(1).optional().default(0.25),
   max_tokens: z.int().gte(256).lte(8192).optional().default(4096),
+  top_p: z.number().gte(0).lte(1).optional().default(0.25),
   temperature: z.number().gte(0).lte(2).optional().default(0.9),
-  top_k: z.int().gte(1).lte(100).optional().default(5),
   prompt: z.string().max(2000),
+  top_k: z.int().gte(1).lte(100).optional().default(5),
 })
 
 /**
@@ -266,12 +266,12 @@ export const zOmnilottieOutput = z.object({
  * VideoToLottieInput
  */
 export const zOmnilottieVideoToLottieInput = z.object({
-  video_url: z.string(),
-  top_p: z.number().gte(0).lte(1).optional().default(0.25),
   max_tokens: z.int().gte(256).lte(8192).optional().default(4096),
+  top_p: z.number().gte(0).lte(1).optional().default(0.25),
   temperature: z.number().gte(0).lte(2).optional().default(0.9),
-  top_k: z.int().gte(1).lte(100).optional().default(5),
   prompt: z.union([z.string().max(2000), z.unknown()]).optional(),
+  video_url: z.string(),
+  top_k: z.int().gte(1).lte(100).optional().default(5),
 })
 
 /**

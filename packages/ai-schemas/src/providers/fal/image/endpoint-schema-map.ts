@@ -2,6 +2,14 @@
 // Generated via scripts/generate-endpoint-maps.ts
 
 import {
+  AgentUni1V1EditInputSchema,
+  AgentUni1V1EditOutputSchema,
+  AgentUni1V1MaxEditInputSchema,
+  AgentUni1V1MaxEditOutputSchema,
+  AgentUni1V1MaxInputSchema,
+  AgentUni1V1MaxOutputSchema,
+  AgentUni1V1TextToImageInputSchema,
+  AgentUni1V1TextToImageOutputSchema,
   AuraFlowInputSchema,
   AuraFlowOutputSchema,
   AuraSrInputSchema,
@@ -14,6 +22,8 @@ import {
   BagelOutputSchema,
   BenV2ImageInputSchema,
   BenV2ImageOutputSchema,
+  BerniniREditImageInputSchema,
+  BerniniREditImageOutputSchema,
   BirefnetInputSchema,
   BirefnetOutputSchema,
   BirefnetV2InputSchema,
@@ -436,6 +446,8 @@ import {
   Gemini3ProImagePreviewEditOutputSchema,
   Gemini3ProImagePreviewInputSchema,
   Gemini3ProImagePreviewOutputSchema,
+  GenfillV2InputSchema,
+  GenfillV2OutputSchema,
   GhiblifyInputSchema,
   GhiblifyOutputSchema,
   GlmImageImageToImageInputSchema,
@@ -956,8 +968,6 @@ import {
   RecraftV4TextToVectorOutputSchema,
   RecraftVectorizeInputSchema,
   RecraftVectorizeOutputSchema,
-  Reimagine32InputSchema,
-  Reimagine32OutputSchema,
   RembgEnhanceInputSchema,
   RembgEnhanceOutputSchema,
   ReplaceBackgroundInputSchema,
@@ -1035,6 +1045,8 @@ import {
   V2MediumTurboTextToImageInputSchema,
   V2MediumTurboTextToImageOutputSchema,
   V4InputSchema,
+  V4LoraInputSchema,
+  V4LoraOutputSchema,
   V4OutputSchema,
   VecglypherImageToSvgInputSchema,
   VecglypherImageToSvgOutputSchema,
@@ -1166,9 +1178,9 @@ export const falImageEndpointSchemaMap: {
     readonly input: typeof FiboGenerateInputSchema
     readonly output: typeof FiboGenerateOutputSchema
   }
-  readonly 'bria/reimagine/3.2': {
-    readonly input: typeof Reimagine32InputSchema
-    readonly output: typeof Reimagine32OutputSchema
+  readonly 'bria/genfill/v2': {
+    readonly input: typeof GenfillV2InputSchema
+    readonly output: typeof GenfillV2OutputSchema
   }
   readonly 'bria/replace-background': {
     readonly input: typeof ReplaceBackgroundInputSchema
@@ -1201,6 +1213,10 @@ export const falImageEndpointSchemaMap: {
   readonly 'fal-ai/ben/v2/image': {
     readonly input: typeof BenV2ImageInputSchema
     readonly output: typeof BenV2ImageOutputSchema
+  }
+  readonly 'fal-ai/bernini-r/edit-image': {
+    readonly input: typeof BerniniREditImageInputSchema
+    readonly output: typeof BerniniREditImageOutputSchema
   }
   readonly 'fal-ai/birefnet': {
     readonly input: typeof BirefnetInputSchema
@@ -3170,6 +3186,10 @@ export const falImageEndpointSchemaMap: {
     readonly input: typeof V4InputSchema
     readonly output: typeof V4OutputSchema
   }
+  readonly 'ideogram/v4/lora': {
+    readonly input: typeof V4LoraInputSchema
+    readonly output: typeof V4LoraOutputSchema
+  }
   readonly 'imagineart/imagineart-1.5-preview/text-to-image': {
     readonly input: typeof Imagineart15PreviewTextToImageInputSchema
     readonly output: typeof Imagineart15PreviewTextToImageOutputSchema
@@ -3197,6 +3217,22 @@ export const falImageEndpointSchemaMap: {
   readonly 'krea/v2/medium/turbo/text-to-image': {
     readonly input: typeof V2MediumTurboTextToImageInputSchema
     readonly output: typeof V2MediumTurboTextToImageOutputSchema
+  }
+  readonly 'luma/agent/uni-1/v1/edit': {
+    readonly input: typeof AgentUni1V1EditInputSchema
+    readonly output: typeof AgentUni1V1EditOutputSchema
+  }
+  readonly 'luma/agent/uni-1/v1/max': {
+    readonly input: typeof AgentUni1V1MaxInputSchema
+    readonly output: typeof AgentUni1V1MaxOutputSchema
+  }
+  readonly 'luma/agent/uni-1/v1/max/edit': {
+    readonly input: typeof AgentUni1V1MaxEditInputSchema
+    readonly output: typeof AgentUni1V1MaxEditOutputSchema
+  }
+  readonly 'luma/agent/uni-1/v1/text-to-image': {
+    readonly input: typeof AgentUni1V1TextToImageInputSchema
+    readonly output: typeof AgentUni1V1TextToImageOutputSchema
   }
   readonly 'microsoft/mai-image-2.5': {
     readonly input: typeof MaiImage25InputSchema
@@ -3347,9 +3383,9 @@ export const falImageEndpointSchemaMap: {
     input: FiboGenerateInputSchema,
     output: FiboGenerateOutputSchema,
   },
-  'bria/reimagine/3.2': {
-    input: Reimagine32InputSchema,
-    output: Reimagine32OutputSchema,
+  'bria/genfill/v2': {
+    input: GenfillV2InputSchema,
+    output: GenfillV2OutputSchema,
   },
   'bria/replace-background': {
     input: ReplaceBackgroundInputSchema,
@@ -3376,6 +3412,10 @@ export const falImageEndpointSchemaMap: {
   'fal-ai/ben/v2/image': {
     input: BenV2ImageInputSchema,
     output: BenV2ImageOutputSchema,
+  },
+  'fal-ai/bernini-r/edit-image': {
+    input: BerniniREditImageInputSchema,
+    output: BerniniREditImageOutputSchema,
   },
   'fal-ai/birefnet': {
     input: BirefnetInputSchema,
@@ -5270,6 +5310,7 @@ export const falImageEndpointSchemaMap: {
     output: ZImageTurboTilingLoraOutputSchema,
   },
   'ideogram/v4': { input: V4InputSchema, output: V4OutputSchema },
+  'ideogram/v4/lora': { input: V4LoraInputSchema, output: V4LoraOutputSchema },
   'imagineart/imagineart-1.5-preview/text-to-image': {
     input: Imagineart15PreviewTextToImageInputSchema,
     output: Imagineart15PreviewTextToImageOutputSchema,
@@ -5297,6 +5338,22 @@ export const falImageEndpointSchemaMap: {
   'krea/v2/medium/turbo/text-to-image': {
     input: V2MediumTurboTextToImageInputSchema,
     output: V2MediumTurboTextToImageOutputSchema,
+  },
+  'luma/agent/uni-1/v1/edit': {
+    input: AgentUni1V1EditInputSchema,
+    output: AgentUni1V1EditOutputSchema,
+  },
+  'luma/agent/uni-1/v1/max': {
+    input: AgentUni1V1MaxInputSchema,
+    output: AgentUni1V1MaxOutputSchema,
+  },
+  'luma/agent/uni-1/v1/max/edit': {
+    input: AgentUni1V1MaxEditInputSchema,
+    output: AgentUni1V1MaxEditOutputSchema,
+  },
+  'luma/agent/uni-1/v1/text-to-image': {
+    input: AgentUni1V1TextToImageInputSchema,
+    output: AgentUni1V1TextToImageOutputSchema,
   },
   'microsoft/mai-image-2.5': {
     input: MaiImage25InputSchema,

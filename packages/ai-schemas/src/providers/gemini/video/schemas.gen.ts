@@ -7,11 +7,12 @@ export const OperationSchema = {
   description:
     'This resource represents a long-running operation that is the result of a network API call.',
   properties: {
-    name: {
-      type: 'string',
+    done: {
+      type: 'boolean',
       description:
-        'The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.',
+        'If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available.',
     },
+    error: { $ref: '#/$defs/Status' },
     metadata: {
       type: 'object',
       description:
@@ -22,12 +23,11 @@ export const OperationSchema = {
           'Properties of the object. Contains field @type with type URL.',
       },
     },
-    done: {
-      type: 'boolean',
+    name: {
+      type: 'string',
       description:
-        'If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available.',
+        'The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.',
     },
-    error: { $ref: '#/$defs/Status' },
     response: {
       type: 'object',
       description:
@@ -45,16 +45,16 @@ export const OperationSchema = {
       description:
         'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).',
       properties: {
+        message: {
+          type: 'string',
+          description:
+            'A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.',
+        },
         code: {
           type: 'integer',
           format: 'int32',
           description:
             'The status code, which should be an enum value of google.rpc.Code.',
-        },
-        message: {
-          type: 'string',
-          description:
-            'A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.',
         },
         details: {
           type: 'array',
@@ -96,16 +96,16 @@ export const StatusSchema = {
   description:
     'The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).',
   properties: {
+    message: {
+      type: 'string',
+      description:
+        'A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.',
+    },
     code: {
       type: 'integer',
       format: 'int32',
       description:
         'The status code, which should be an enum value of google.rpc.Code.',
-    },
-    message: {
-      type: 'string',
-      description:
-        'A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.',
     },
     details: {
       type: 'array',

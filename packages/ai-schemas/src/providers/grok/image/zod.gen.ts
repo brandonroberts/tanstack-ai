@@ -3,11 +3,25 @@
 import * as z from 'zod'
 
 /**
+ * Information about a generated file stored in the Files API.
+ */
+export const zFileOutput = z.object({
+  expires_at: z.unknown().optional(),
+  file_id: z.string(),
+  filename: z.string(),
+  public_url: z.unknown().optional(),
+  public_url_error: z.unknown().optional(),
+  public_url_expires_at: z.unknown().optional(),
+})
+
+/**
  * Generated images
  */
 export const zGeneratedImage = z.object({
   b64_json: z.unknown().optional(),
+  file_output: z.union([z.unknown(), zFileOutput]).optional(),
   mime_type: z.unknown().optional(),
+  storage_error: z.unknown().optional(),
   url: z.unknown().optional(),
 })
 
@@ -38,16 +52,6 @@ export const zImageAspectRatio = z.enum([
  */
 export const zImageResolution = z.enum(['1k', '2k'])
 
-export const zGenerateImageRequest = z.object({
-  aspect_ratio: z.union([z.unknown(), zImageAspectRatio]).optional(),
-  model: z.unknown().optional(),
-  n: z.unknown().optional().default(1),
-  prompt: z.string().optional(),
-  resolution: z.union([z.unknown(), zImageResolution]).optional(),
-  response_format: z.unknown().optional().default('url'),
-  user: z.unknown().optional(),
-})
-
 /**
  * Image input for generation and editing requests.
  * Accepts a public URL, a base64-encoded data URL, or a file_id from the xAI Files API.
@@ -55,21 +59,6 @@ export const zGenerateImageRequest = z.object({
 export const zImageUrl = z.object({
   file_id: z.unknown().optional(),
   url: z.string().optional(),
-})
-
-/**
- * Request for editing image
- */
-export const zEditImageRequest = z.object({
-  aspect_ratio: z.union([z.unknown(), zImageAspectRatio]).optional(),
-  image: z.union([z.unknown(), zImageUrl]).optional(),
-  images: z.array(zImageUrl).optional(),
-  model: z.unknown().optional(),
-  n: z.unknown().optional(),
-  prompt: z.string(),
-  resolution: z.union([z.unknown(), zImageResolution]).optional(),
-  response_format: z.unknown().optional().default('url'),
-  user: z.unknown().optional(),
 })
 
 /**
@@ -92,6 +81,65 @@ export const zMediaUsage = z.object({
 export const zGeneratedImageResponse = z.object({
   data: z.array(zGeneratedImage),
   usage: z.union([z.unknown(), zMediaUsage]).optional(),
+})
+
+/**
+ * Configuration for creating a public URL alongside file storage.
+ */
+export const zPublicUrlOptions = z.object({
+  expires_after: z.unknown().optional(),
+})
+
+/**
+ * Accepts either `true` (create public URL with defaults) or a configuration
+ * object with explicit options.
+ *
+ * **Variant order matters for `#[serde(untagged)]`:** `Flag` must come before
+ * `Options` so that JSON `true`/`false` match `Flag` rather than falling
+ * through to the object variant.
+ *
+ * **Serialization note:** Proto→REST readback always constructs
+ * `Options(...)`, never `Flag`, so responses always emit the object form.
+ * `Flag` only appears on the deserialization (request) path.
+ */
+export const zPublicUrlInput = z.union([z.boolean(), zPublicUrlOptions])
+
+/**
+ * Configuration for storing generation output in the Files API.
+ * When provided in a generation request, the output is stored as a
+ * permanent file and a `file_output` reference is included in the response.
+ */
+export const zStorageOptions = z.object({
+  expires_after: z.unknown().optional(),
+  filename: z.string(),
+  public_url: z.union([z.unknown(), zPublicUrlInput]).optional(),
+})
+
+/**
+ * Request for editing image
+ */
+export const zEditImageRequest = z.object({
+  aspect_ratio: z.union([z.unknown(), zImageAspectRatio]).optional(),
+  image: z.union([z.unknown(), zImageUrl]).optional(),
+  images: z.array(zImageUrl).optional(),
+  model: z.unknown().optional(),
+  n: z.unknown().optional(),
+  prompt: z.string(),
+  resolution: z.union([z.unknown(), zImageResolution]).optional(),
+  response_format: z.unknown().optional().default('url'),
+  storage_options: z.union([z.unknown(), zStorageOptions]).optional(),
+  user: z.unknown().optional(),
+})
+
+export const zGenerateImageRequest = z.object({
+  aspect_ratio: z.union([z.unknown(), zImageAspectRatio]).optional(),
+  model: z.unknown().optional(),
+  n: z.unknown().optional().default(1),
+  prompt: z.string().optional(),
+  resolution: z.union([z.unknown(), zImageResolution]).optional(),
+  response_format: z.unknown().optional().default('url'),
+  storage_options: z.union([z.unknown(), zStorageOptions]).optional(),
+  user: z.unknown().optional(),
 })
 
 export const zHandleEditImageRequestBody = zEditImageRequest

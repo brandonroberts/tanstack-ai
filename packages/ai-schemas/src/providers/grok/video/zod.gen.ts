@@ -12,10 +12,42 @@ export const zImageUrl = z.object({
 })
 
 /**
+ * Configuration for creating a public URL alongside file storage.
+ */
+export const zPublicUrlOptions = z.object({
+  expires_after: z.unknown().optional(),
+})
+
+/**
+ * Accepts either `true` (create public URL with defaults) or a configuration
+ * object with explicit options.
+ *
+ * **Variant order matters for `#[serde(untagged)]`:** `Flag` must come before
+ * `Options` so that JSON `true`/`false` match `Flag` rather than falling
+ * through to the object variant.
+ *
+ * **Serialization note:** Proto→REST readback always constructs
+ * `Options(...)`, never `Flag`, so responses always emit the object form.
+ * `Flag` only appears on the deserialization (request) path.
+ */
+export const zPublicUrlInput = z.union([z.boolean(), zPublicUrlOptions])
+
+/**
  * Response for starting a deferred operation.
  */
 export const zStartDeferredResponse = z.object({
   request_id: z.string(),
+})
+
+/**
+ * Configuration for storing generation output in the Files API.
+ * When provided in a generation request, the output is stored as a
+ * permanent file and a `file_output` reference is included in the response.
+ */
+export const zStorageOptions = z.object({
+  expires_after: z.unknown().optional(),
+  filename: z.string(),
+  public_url: z.union([z.unknown(), zPublicUrlInput]).optional(),
 })
 
 /**
@@ -55,6 +87,7 @@ export const zGenerateVideoRequest = z.object({
   prompt: z.string().optional(),
   reference_images: z.array(zImageUrl).optional(),
   resolution: z.union([z.unknown(), zVideoResolution]).optional(),
+  storage_options: z.union([z.unknown(), zStorageOptions]).optional(),
   user: z.unknown().optional(),
 })
 
@@ -74,6 +107,7 @@ export const zEditVideoRequest = z.object({
   model: z.unknown().optional(),
   output: z.union([z.unknown(), zVideoOutput]).optional(),
   prompt: z.string(),
+  storage_options: z.union([z.unknown(), zStorageOptions]).optional(),
   user: z.unknown().optional(),
   video: zVideoUrl,
 })
@@ -86,6 +120,7 @@ export const zExtendVideoRequest = z.object({
   model: z.unknown().optional(),
   output: z.union([z.unknown(), zVideoOutput]).optional(),
   prompt: z.string(),
+  storage_options: z.union([z.unknown(), zStorageOptions]).optional(),
   video: zVideoUrl,
 })
 

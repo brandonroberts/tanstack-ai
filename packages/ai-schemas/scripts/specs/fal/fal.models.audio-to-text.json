@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.775Z",
+  "generated_at": "2026-06-11T02:20:29.653Z",
   "total_models": 2,
   "category": "audio-to-text",
   "models": [
@@ -88,8 +88,6 @@
             },
             "SileroVadInput": {
               "type": "object",
-              "required": ["audio_url"],
-              "title": "SileroVADInput",
               "properties": {
                 "audio_url": {
                   "type": "string",
@@ -100,12 +98,12 @@
                   "description": "The URL of the audio to get speech timestamps from."
                 }
               },
-              "x-fal-order-properties": ["audio_url"]
+              "x-fal-order-properties": ["audio_url"],
+              "title": "SileroVADInput",
+              "required": ["audio_url"]
             },
             "SileroVadOutput": {
               "type": "object",
-              "required": ["has_speech", "timestamps"],
-              "title": "SileroVADOutput",
               "properties": {
                 "timestamps": {
                   "type": "array",
@@ -121,10 +119,10 @@
                       }
                     ]
                   ],
-                  "title": "Speech Timestamps",
                   "items": {
                     "$ref": "#/components/schemas/SpeechTimestamp"
                   },
+                  "title": "Speech Timestamps",
                   "description": "The speech timestamps."
                 },
                 "has_speech": {
@@ -134,12 +132,12 @@
                   "description": "Whether the audio has speech."
                 }
               },
-              "x-fal-order-properties": ["has_speech", "timestamps"]
+              "x-fal-order-properties": ["has_speech", "timestamps"],
+              "title": "SileroVADOutput",
+              "required": ["has_speech", "timestamps"]
             },
             "SpeechTimestamp": {
               "type": "object",
-              "required": ["start", "end"],
-              "title": "SpeechTimestamp",
               "properties": {
                 "start": {
                   "type": "number",
@@ -152,7 +150,9 @@
                   "description": "The end time of the speech in seconds."
                 }
               },
-              "x-fal-order-properties": ["start", "end"]
+              "x-fal-order-properties": ["start", "end"],
+              "title": "SpeechTimestamp",
+              "required": ["start", "end"]
             }
           }
         },
@@ -393,27 +393,13 @@
               "required": ["status", "request_id"]
             },
             "Nemotron3NanoOmniAudioInput": {
+              "type": "object",
+              "required": ["prompt", "audio_url"],
               "properties": {
-                "top_p": {
-                  "default": 0.95,
-                  "description": "Nucleus sampling probability mass.",
-                  "title": "Top P",
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "temperature": {
-                  "default": 0.7,
-                  "description": "Sampling temperature. Lower is more deterministic.",
-                  "title": "Temperature",
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 2
-                },
                 "system_prompt": {
+                  "examples": ["You are a concise enterprise assistant."],
                   "description": "Optional system prompt to steer the model. Reasoning behavior is controlled by the separate `reasoning_mode` field.",
                   "title": "System Prompt",
-                  "examples": ["You are a concise enterprise assistant."],
                   "anyOf": [
                     {
                       "type": "string"
@@ -423,40 +409,55 @@
                     }
                   ]
                 },
-                "reasoning_mode": {
-                  "description": "Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.",
-                  "title": "Reasoning Mode",
-                  "type": "string",
-                  "enum": ["think", "no_think"],
-                  "default": "no_think"
-                },
-                "audio_url": {
-                  "description": "URL of the audio clip to reason about. wav or mp3, max 1 hour.",
-                  "title": "Audio URL",
-                  "type": "string",
-                  "examples": [
-                    "https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/audio_in.mp3"
-                  ]
+                "temperature": {
+                  "default": 0.7,
+                  "type": "number",
+                  "title": "Temperature",
+                  "description": "Sampling temperature. Lower is more deterministic.",
+                  "minimum": 0,
+                  "maximum": 2
                 },
                 "max_tokens": {
                   "default": 1024,
-                  "description": "Maximum number of tokens to generate.",
-                  "title": "Max Tokens",
                   "type": "integer",
+                  "title": "Max Tokens",
+                  "description": "Maximum number of tokens to generate.",
                   "minimum": 1,
                   "maximum": 20000
                 },
                 "prompt": {
-                  "description": "Text prompt to send to the model. English only.",
-                  "title": "Prompt",
                   "minLength": 1,
                   "examples": [
                     "Summarize the key capabilities of a multimodal agent."
                   ],
+                  "description": "Text prompt to send to the model. English only.",
+                  "title": "Prompt",
+                  "type": "string"
+                },
+                "top_p": {
+                  "default": 0.95,
+                  "type": "number",
+                  "title": "Top P",
+                  "description": "Nucleus sampling probability mass.",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "audio_url": {
+                  "title": "Audio URL",
+                  "examples": [
+                    "https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/audio_in.mp3"
+                  ],
+                  "description": "URL of the audio clip to reason about. wav or mp3, max 1 hour.",
+                  "type": "string"
+                },
+                "reasoning_mode": {
+                  "default": "no_think",
+                  "title": "Reasoning Mode",
+                  "description": "Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.",
+                  "enum": ["think", "no_think"],
                   "type": "string"
                 }
               },
-              "type": "object",
               "title": "AudioInput",
               "x-fal-order-properties": [
                 "prompt",
@@ -466,59 +467,58 @@
                 "temperature",
                 "top_p",
                 "audio_url"
-              ],
-              "required": ["prompt", "audio_url"]
+              ]
             },
             "Nemotron3NanoOmniAudioOutput": {
+              "type": "object",
+              "required": ["output", "usage"],
               "properties": {
-                "finish_reason": {
-                  "description": "Reason generation stopped.",
-                  "title": "Finish Reason",
-                  "type": "string",
-                  "examples": ["stop", "length"],
-                  "default": "stop"
-                },
-                "output": {
-                  "description": "Generated text response.",
-                  "title": "Output",
-                  "type": "string",
-                  "examples": [
-                    "The image shows a golden retriever puppy sitting on a wooden floor."
-                  ]
-                },
                 "usage": {
                   "$ref": "#/components/schemas/UsageInfo",
-                  "description": "Token usage for the request.",
                   "examples": [
                     {
-                      "output_tokens": 87,
-                      "input_tokens": 412
+                      "input_tokens": 412,
+                      "output_tokens": 87
                     }
-                  ]
+                  ],
+                  "description": "Token usage for the request."
+                },
+                "output": {
+                  "examples": [
+                    "The image shows a golden retriever puppy sitting on a wooden floor."
+                  ],
+                  "description": "Generated text response.",
+                  "title": "Output",
+                  "type": "string"
+                },
+                "finish_reason": {
+                  "default": "stop",
+                  "examples": ["stop", "length"],
+                  "description": "Reason generation stopped.",
+                  "title": "Finish Reason",
+                  "type": "string"
                 }
               },
-              "type": "object",
               "title": "BaseOutput",
-              "x-fal-order-properties": ["output", "finish_reason", "usage"],
-              "required": ["output", "usage"]
+              "x-fal-order-properties": ["output", "finish_reason", "usage"]
             },
             "UsageInfo": {
+              "type": "object",
+              "required": ["input_tokens", "output_tokens"],
               "properties": {
-                "output_tokens": {
-                  "description": "Number of output tokens generated.",
-                  "title": "Output Tokens",
-                  "type": "integer"
-                },
                 "input_tokens": {
                   "description": "Number of input tokens processed.",
                   "title": "Input Tokens",
                   "type": "integer"
+                },
+                "output_tokens": {
+                  "description": "Number of output tokens generated.",
+                  "title": "Output Tokens",
+                  "type": "integer"
                 }
               },
-              "type": "object",
               "title": "UsageInfo",
-              "x-fal-order-properties": ["input_tokens", "output_tokens"],
-              "required": ["input_tokens", "output_tokens"]
+              "x-fal-order-properties": ["input_tokens", "output_tokens"]
             }
           }
         },

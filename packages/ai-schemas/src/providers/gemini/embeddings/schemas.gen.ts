@@ -37,10 +37,10 @@ export const BatchEmbedContentsRequestSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -52,10 +52,10 @@ export const BatchEmbedContentsRequestSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -64,16 +64,16 @@ export const BatchEmbedContentsRequestSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -81,9 +81,13 @@ export const BatchEmbedContentsRequestSchema = {
       type: 'object',
       description: 'Configurations for the EmbedContent request.',
       properties: {
-        title: {
-          type: 'string',
-          description: 'Optional. The title for the text.',
+        documentOcr: {
+          type: 'boolean',
+          description: 'Optional. Whether to enable OCR for document content.',
+        },
+        audioTrackExtraction: {
+          type: 'boolean',
+          description: 'Optional. Whether to extract audio from video content.',
         },
         taskType: {
           type: 'string',
@@ -100,24 +104,20 @@ export const BatchEmbedContentsRequestSchema = {
             'CODE_RETRIEVAL_QUERY',
           ],
         },
-        autoTruncate: {
-          type: 'boolean',
-          description:
-            "Optional. Whether to silently truncate the input content if it's longer than the maximum sequence length.",
-        },
         outputDimensionality: {
           type: 'integer',
           format: 'int32',
           description:
             'Optional. Reduced dimension for the output embedding. If set, excessive values in the output embedding are truncated from the end.',
         },
-        documentOcr: {
-          type: 'boolean',
-          description: 'Optional. Whether to enable OCR for document content.',
+        title: {
+          type: 'string',
+          description: 'Optional. The title for the text.',
         },
-        audioTrackExtraction: {
+        autoTruncate: {
           type: 'boolean',
-          description: 'Optional. Whether to extract audio from video content.',
+          description:
+            "Optional. Whether to silently truncate the input content if it's longer than the maximum sequence length.",
         },
       },
     },
@@ -125,10 +125,10 @@ export const BatchEmbedContentsRequestSchema = {
       type: 'object',
       description: 'Request containing the `Content` for the model to embed.',
       properties: {
-        model: {
+        title: {
           type: 'string',
           description:
-            "Required. The model's resource name. This serves as an ID for the Model to use. This name should match a model name returned by the `ListModels` method. Format: `models/{model}`",
+            'Optional. Deprecated: Please use EmbedContentConfig.title instead. An optional title for the text. Only applicable when TaskType is `RETRIEVAL_DOCUMENT`. Note: Specifying a `title` for `RETRIEVAL_DOCUMENT` provides better quality embeddings for retrieval.',
         },
         content: { $ref: '#/$defs/Content' },
         taskType: {
@@ -147,16 +147,16 @@ export const BatchEmbedContentsRequestSchema = {
             'CODE_RETRIEVAL_QUERY',
           ],
         },
-        title: {
-          type: 'string',
-          description:
-            'Optional. Deprecated: Please use EmbedContentConfig.title instead. An optional title for the text. Only applicable when TaskType is `RETRIEVAL_DOCUMENT`. Note: Specifying a `title` for `RETRIEVAL_DOCUMENT` provides better quality embeddings for retrieval.',
-        },
         outputDimensionality: {
           type: 'integer',
           format: 'int32',
           description:
             'Optional. Deprecated: Please use EmbedContentConfig.output_dimensionality instead. Optional reduced dimension for the output embedding. If set, excessive values in the output embedding are truncated from the end. Supported by newer models since 2024 only. You cannot set this value if using the earlier model (`models/embedding-001`).',
+        },
+        model: {
+          type: 'string',
+          description:
+            "Required. The model's resource name. This serves as an ID for the Model to use. This name should match a model name returned by the `ListModels` method. Format: `models/{model}`",
         },
         embedContentConfig: { $ref: '#/$defs/EmbedContentConfig' },
       },
@@ -166,11 +166,6 @@ export const BatchEmbedContentsRequestSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -179,6 +174,11 @@ export const BatchEmbedContentsRequestSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -230,6 +230,17 @@ export const BatchEmbedContentsRequestSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -249,17 +260,6 @@ export const BatchEmbedContentsRequestSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -297,27 +297,17 @@ export const BatchEmbedContentsRequestSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -327,7 +317,17 @@ export const BatchEmbedContentsRequestSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -426,13 +426,13 @@ export const BatchEmbedContentsResponseSchema = {
   type: 'object',
   description: 'The response to a `BatchEmbedContentsRequest`.',
   properties: {
+    usageMetadata: { $ref: '#/$defs/EmbeddingUsageMetadata' },
     embeddings: {
       type: 'array',
       description:
         'Output only. The embeddings for each request, in the same order as provided in the batch request.',
       items: { $ref: '#/$defs/ContentEmbedding' },
     },
-    usageMetadata: { $ref: '#/$defs/EmbeddingUsageMetadata' },
   },
   $defs: {
     ContentEmbedding: {
@@ -457,16 +457,16 @@ export const BatchEmbedContentsResponseSchema = {
       type: 'object',
       description: 'Metadata on the usage of the embedding request.',
       properties: {
-        promptTokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description: 'Output only. Number of tokens in the prompt.',
-        },
         promptTokenDetails: {
           type: 'array',
           description:
             'Output only. List of modalities that were processed in the request input.',
           items: { $ref: '#/$defs/ModalityTokenCount' },
+        },
+        promptTokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description: 'Output only. Number of tokens in the prompt.',
         },
       },
     },
@@ -581,10 +581,10 @@ export const CodeExecutionResultSchema = {
   description:
     'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
   properties: {
-    id: {
+    output: {
       type: 'string',
       description:
-        'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+        'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
     },
     outcome: {
       type: 'string',
@@ -596,10 +596,10 @@ export const CodeExecutionResultSchema = {
         'OUTCOME_DEADLINE_EXCEEDED',
       ],
     },
-    output: {
+    id: {
       type: 'string',
       description:
-        'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+        'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
     },
   },
 } as const
@@ -609,16 +609,16 @@ export const ContentSchema = {
   description:
     'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
   properties: {
+    role: {
+      type: 'string',
+      description:
+        "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+    },
     parts: {
       type: 'array',
       description:
         'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
       items: { $ref: '#/$defs/Part' },
-    },
-    role: {
-      type: 'string',
-      description:
-        "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
     },
   },
   $defs: {
@@ -644,10 +644,10 @@ export const ContentSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -659,10 +659,10 @@ export const ContentSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -671,11 +671,6 @@ export const ContentSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -684,6 +679,11 @@ export const ContentSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -735,6 +735,17 @@ export const ContentSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -754,17 +765,6 @@ export const ContentSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -802,27 +802,17 @@ export const ContentSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -832,7 +822,17 @@ export const ContentSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -950,7 +950,14 @@ export const EmbedContentConfigSchema = {
   type: 'object',
   description: 'Configurations for the EmbedContent request.',
   properties: {
-    title: { type: 'string', description: 'Optional. The title for the text.' },
+    documentOcr: {
+      type: 'boolean',
+      description: 'Optional. Whether to enable OCR for document content.',
+    },
+    audioTrackExtraction: {
+      type: 'boolean',
+      description: 'Optional. Whether to extract audio from video content.',
+    },
     taskType: {
       type: 'string',
       description: 'Optional. The task type of the embedding.',
@@ -966,24 +973,17 @@ export const EmbedContentConfigSchema = {
         'CODE_RETRIEVAL_QUERY',
       ],
     },
-    autoTruncate: {
-      type: 'boolean',
-      description:
-        "Optional. Whether to silently truncate the input content if it's longer than the maximum sequence length.",
-    },
     outputDimensionality: {
       type: 'integer',
       format: 'int32',
       description:
         'Optional. Reduced dimension for the output embedding. If set, excessive values in the output embedding are truncated from the end.',
     },
-    documentOcr: {
+    title: { type: 'string', description: 'Optional. The title for the text.' },
+    autoTruncate: {
       type: 'boolean',
-      description: 'Optional. Whether to enable OCR for document content.',
-    },
-    audioTrackExtraction: {
-      type: 'boolean',
-      description: 'Optional. Whether to extract audio from video content.',
+      description:
+        "Optional. Whether to silently truncate the input content if it's longer than the maximum sequence length.",
     },
   },
 } as const
@@ -992,10 +992,10 @@ export const EmbedContentRequestSchema = {
   type: 'object',
   description: 'Request containing the `Content` for the model to embed.',
   properties: {
-    model: {
+    title: {
       type: 'string',
       description:
-        "Required. The model's resource name. This serves as an ID for the Model to use. This name should match a model name returned by the `ListModels` method. Format: `models/{model}`",
+        'Optional. Deprecated: Please use EmbedContentConfig.title instead. An optional title for the text. Only applicable when TaskType is `RETRIEVAL_DOCUMENT`. Note: Specifying a `title` for `RETRIEVAL_DOCUMENT` provides better quality embeddings for retrieval.',
     },
     content: { $ref: '#/$defs/Content' },
     taskType: {
@@ -1014,16 +1014,16 @@ export const EmbedContentRequestSchema = {
         'CODE_RETRIEVAL_QUERY',
       ],
     },
-    title: {
-      type: 'string',
-      description:
-        'Optional. Deprecated: Please use EmbedContentConfig.title instead. An optional title for the text. Only applicable when TaskType is `RETRIEVAL_DOCUMENT`. Note: Specifying a `title` for `RETRIEVAL_DOCUMENT` provides better quality embeddings for retrieval.',
-    },
     outputDimensionality: {
       type: 'integer',
       format: 'int32',
       description:
         'Optional. Deprecated: Please use EmbedContentConfig.output_dimensionality instead. Optional reduced dimension for the output embedding. If set, excessive values in the output embedding are truncated from the end. Supported by newer models since 2024 only. You cannot set this value if using the earlier model (`models/embedding-001`).',
+    },
+    model: {
+      type: 'string',
+      description:
+        "Required. The model's resource name. This serves as an ID for the Model to use. This name should match a model name returned by the `ListModels` method. Format: `models/{model}`",
     },
     embedContentConfig: { $ref: '#/$defs/EmbedContentConfig' },
   },
@@ -1050,10 +1050,10 @@ export const EmbedContentRequestSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -1065,10 +1065,10 @@ export const EmbedContentRequestSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -1077,16 +1077,16 @@ export const EmbedContentRequestSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -1094,9 +1094,13 @@ export const EmbedContentRequestSchema = {
       type: 'object',
       description: 'Configurations for the EmbedContent request.',
       properties: {
-        title: {
-          type: 'string',
-          description: 'Optional. The title for the text.',
+        documentOcr: {
+          type: 'boolean',
+          description: 'Optional. Whether to enable OCR for document content.',
+        },
+        audioTrackExtraction: {
+          type: 'boolean',
+          description: 'Optional. Whether to extract audio from video content.',
         },
         taskType: {
           type: 'string',
@@ -1113,24 +1117,20 @@ export const EmbedContentRequestSchema = {
             'CODE_RETRIEVAL_QUERY',
           ],
         },
-        autoTruncate: {
-          type: 'boolean',
-          description:
-            "Optional. Whether to silently truncate the input content if it's longer than the maximum sequence length.",
-        },
         outputDimensionality: {
           type: 'integer',
           format: 'int32',
           description:
             'Optional. Reduced dimension for the output embedding. If set, excessive values in the output embedding are truncated from the end.',
         },
-        documentOcr: {
-          type: 'boolean',
-          description: 'Optional. Whether to enable OCR for document content.',
+        title: {
+          type: 'string',
+          description: 'Optional. The title for the text.',
         },
-        audioTrackExtraction: {
+        autoTruncate: {
           type: 'boolean',
-          description: 'Optional. Whether to extract audio from video content.',
+          description:
+            "Optional. Whether to silently truncate the input content if it's longer than the maximum sequence length.",
         },
       },
     },
@@ -1139,11 +1139,6 @@ export const EmbedContentRequestSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -1152,6 +1147,11 @@ export const EmbedContentRequestSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -1203,6 +1203,17 @@ export const EmbedContentRequestSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -1222,17 +1233,6 @@ export const EmbedContentRequestSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -1270,27 +1270,17 @@ export const EmbedContentRequestSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -1300,7 +1290,17 @@ export const EmbedContentRequestSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -1399,8 +1399,8 @@ export const EmbedContentResponseSchema = {
   type: 'object',
   description: 'The response to an `EmbedContentRequest`.',
   properties: {
-    embedding: { $ref: '#/$defs/ContentEmbedding' },
     usageMetadata: { $ref: '#/$defs/EmbeddingUsageMetadata' },
+    embedding: { $ref: '#/$defs/ContentEmbedding' },
   },
   $defs: {
     ContentEmbedding: {
@@ -1425,16 +1425,16 @@ export const EmbedContentResponseSchema = {
       type: 'object',
       description: 'Metadata on the usage of the embedding request.',
       properties: {
-        promptTokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description: 'Output only. Number of tokens in the prompt.',
-        },
         promptTokenDetails: {
           type: 'array',
           description:
             'Output only. List of modalities that were processed in the request input.',
           items: { $ref: '#/$defs/ModalityTokenCount' },
+        },
+        promptTokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description: 'Output only. Number of tokens in the prompt.',
         },
       },
     },
@@ -1516,16 +1516,16 @@ export const EmbeddingUsageMetadataSchema = {
   type: 'object',
   description: 'Metadata on the usage of the embedding request.',
   properties: {
-    promptTokenCount: {
-      type: 'integer',
-      format: 'int32',
-      description: 'Output only. Number of tokens in the prompt.',
-    },
     promptTokenDetails: {
       type: 'array',
       description:
         'Output only. List of modalities that were processed in the request input.',
       items: { $ref: '#/$defs/ModalityTokenCount' },
+    },
+    promptTokenCount: {
+      type: 'integer',
+      format: 'int32',
+      description: 'Output only. Number of tokens in the prompt.',
     },
   },
   $defs: {
@@ -1560,17 +1560,17 @@ export const ExecutableCodeSchema = {
   description:
     'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
   properties: {
-    id: {
-      type: 'string',
-      description:
-        'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-    },
     language: {
       type: 'string',
       description: 'Required. Programming language of the `code`.',
       enum: ['LANGUAGE_UNSPECIFIED', 'PYTHON'],
     },
     code: { type: 'string', description: 'Required. The code to be executed.' },
+    id: {
+      type: 'string',
+      description:
+        'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
+    },
   },
 } as const
 
@@ -1623,6 +1623,17 @@ export const FunctionResponseSchema = {
       description:
         'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
     },
+    scheduling: {
+      type: 'string',
+      description:
+        'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+      enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+    },
+    willContinue: {
+      type: 'boolean',
+      description:
+        'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+    },
     name: {
       type: 'string',
       description:
@@ -1642,17 +1653,6 @@ export const FunctionResponseSchema = {
       description:
         'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
       items: { $ref: '#/$defs/FunctionResponsePart' },
-    },
-    willContinue: {
-      type: 'boolean',
-      description:
-        'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-    },
-    scheduling: {
-      type: 'string',
-      description:
-        'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-      enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
     },
   },
   $defs: {
@@ -1762,26 +1762,16 @@ export const PartSchema = {
   description:
     'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
   properties: {
-    text: { type: 'string', description: 'Inline text.' },
-    inlineData: { $ref: '#/$defs/Blob' },
-    functionCall: { $ref: '#/$defs/FunctionCall' },
-    functionResponse: { $ref: '#/$defs/FunctionResponse' },
-    fileData: { $ref: '#/$defs/FileData' },
-    executableCode: { $ref: '#/$defs/ExecutableCode' },
-    codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-    toolCall: { $ref: '#/$defs/ToolCall' },
-    toolResponse: { $ref: '#/$defs/ToolResponse' },
     videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+    text: { type: 'string', description: 'Inline text.' },
+    executableCode: { $ref: '#/$defs/ExecutableCode' },
+    functionResponse: { $ref: '#/$defs/FunctionResponse' },
     thought: {
       type: 'boolean',
       description: 'Optional. Indicates if the part is thought from the model.',
     },
-    thoughtSignature: {
-      type: 'string',
-      format: 'byte',
-      description:
-        'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-    },
+    mediaResolution: { $ref: '#/$defs/MediaResolution' },
+    fileData: { $ref: '#/$defs/FileData' },
     partMetadata: {
       type: 'object',
       description:
@@ -1791,7 +1781,17 @@ export const PartSchema = {
         description: 'Properties of the object.',
       },
     },
-    mediaResolution: { $ref: '#/$defs/MediaResolution' },
+    functionCall: { $ref: '#/$defs/FunctionCall' },
+    toolResponse: { $ref: '#/$defs/ToolResponse' },
+    inlineData: { $ref: '#/$defs/Blob' },
+    codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+    toolCall: { $ref: '#/$defs/ToolCall' },
+    thoughtSignature: {
+      type: 'string',
+      format: 'byte',
+      description:
+        'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+    },
   },
   $defs: {
     Blob: {
@@ -1816,10 +1816,10 @@ export const PartSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -1831,10 +1831,10 @@ export const PartSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -1843,11 +1843,6 @@ export const PartSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -1856,6 +1851,11 @@ export const PartSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -1907,6 +1907,17 @@ export const PartSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -1926,17 +1937,6 @@ export const PartSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },

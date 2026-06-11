@@ -2,6 +2,54 @@
 
 import * as z from 'zod'
 
+/**
+ * A tool made available to the advisor sub-agent. Accepts function tools and OpenRouter server tools (e.g. openrouter:web_search). The advisor tool may not list itself.
+ */
+export const zAdvisorNestedTool = z.object({
+  function: z.record(z.string(), z.unknown()).optional(),
+  parameters: z.record(z.string(), z.unknown()).optional(),
+  type: z.string(),
+})
+
+/**
+ * Reasoning configuration forwarded to the advisor call. Use this to control reasoning effort and token budget for models that support extended thinking.
+ */
+export const zAdvisorReasoning = z.object({
+  effort: z
+    .enum(['xhigh', 'high', 'medium', 'low', 'minimal', 'none'])
+    .optional(),
+  max_tokens: z.int().optional(),
+})
+
+/**
+ * Configuration for one openrouter:advisor server tool entry.
+ */
+export const zAdvisorServerToolConfig = z.object({
+  forward_transcript: z.boolean().optional(),
+  instructions: z.string().optional(),
+  max_completion_tokens: z.int().optional(),
+  max_tool_calls: z.int().gte(1).lte(25).optional(),
+  model: z.string().optional(),
+  name: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-zA-Z0-9 _-]+$/)
+    .optional(),
+  reasoning: zAdvisorReasoning.optional(),
+  stream: z.boolean().optional(),
+  temperature: z.number().optional(),
+  tools: z.array(zAdvisorNestedTool).optional(),
+})
+
+/**
+ * OpenRouter built-in server tool: consults a higher-intelligence advisor model (any OpenRouter model) for guidance mid-generation and returns its response. The advisor may run as a sub-agent with its own tools. Include multiple entries to offer several named advisors; at most one entry may omit `name` to act as the default advisor.
+ */
+export const zAdvisorServerToolOpenRouter = z.object({
+  parameters: zAdvisorServerToolConfig.optional(),
+  type: z.enum(['openrouter:advisor']),
+})
+
 export const zAnthropicAdvisorToolResult = z.object({
   content: z.record(z.string(), z.unknown()),
   tool_use_id: z.string(),
@@ -996,6 +1044,11 @@ export const zBaseRefusalDoneEvent = z.object({
 })
 
 /**
+ * Which bash engine to use. "openrouter" runs commands server-side in the OpenRouter sandbox. "auto" (default) and "native" use native passthrough, returning the tool call to your application to run client-side; OpenRouter does not execute the commands.
+ */
+export const zBashServerToolEngine = z.enum(['auto', 'native', 'openrouter'])
+
+/**
  * Price per million prompt tokens
  */
 export const zBigNumberUnion = z.string()
@@ -1299,6 +1352,35 @@ export const zComputerUseServerTool = z.object({
 })
 
 /**
+ * An OpenRouter-managed, auto-provisioned ephemeral container.
+ */
+export const zContainerAutoEnvironment = z.object({
+  type: z.enum(['container_auto']),
+})
+
+/**
+ * Reference to a previously created container to reuse.
+ */
+export const zContainerReferenceEnvironment = z.object({
+  container_id: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^[\w-]+$/),
+  type: z.enum(['container_reference']),
+})
+
+/**
+ * Execution environment for the bash server tool.
+ */
+export const zBashServerToolEnvironment = z.discriminatedUnion('type', [
+  zContainerAutoEnvironment.extend({ type: z.literal('container_auto') }),
+  zContainerReferenceEnvironment.extend({
+    type: z.literal('container_reference'),
+  }),
+])
+
+/**
  * The compression engine to use. Defaults to "middle-out".
  */
 export const zContextCompressionEngine = z.enum(['middle-out'])
@@ -1572,12 +1654,171 @@ export const zFunctionTool = z.object({
   type: z.enum(['function']),
 })
 
+/**
+ * Structured analysis produced by the fusion judge model.
+ */
+export const zFusionAnalysisResult = z.object({
+  blind_spots: z.array(z.string()),
+  consensus: z.array(z.string()),
+  contradictions: z.array(
+    z.object({
+      stances: z.array(
+        z.object({
+          model: z.string(),
+          stance: z.string(),
+        }),
+      ),
+      topic: z.string(),
+    }),
+  ),
+  partial_coverage: z.array(
+    z.object({
+      models: z.array(z.string()),
+      point: z.string(),
+    }),
+  ),
+  unique_insights: z.array(
+    z.object({
+      insight: z.string(),
+      model: z.string(),
+    }),
+  ),
+})
+
+/**
+ * Emitted when the fusion judge completes with the structured analysis.
+ */
+export const zFusionCallAnalysisCompletedEvent = z.object({
+  analysis: zFusionAnalysisResult,
+  item_id: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.analysis.completed']),
+})
+
+/**
+ * Emitted when the fusion judge starts producing the structured analysis.
+ */
+export const zFusionCallAnalysisInProgressEvent = z.object({
+  item_id: z.string(),
+  judge_model: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.analysis.in_progress']),
+})
+
+/**
+ * Emitted when the openrouter:fusion tool call finishes.
+ */
+export const zFusionCallCompletedEvent = z.object({
+  item_id: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.completed']),
+})
+
+/**
+ * Emitted when an openrouter:fusion tool call begins executing.
+ */
+export const zFusionCallInProgressEvent = z.object({
+  item_id: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.in_progress']),
+})
+
+/**
+ * Emitted when a fusion analysis-panel model starts.
+ */
+export const zFusionCallPanelAddedEvent = z.object({
+  item_id: z.string(),
+  model: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.panel.added']),
+})
+
+/**
+ * Emitted when a fusion panel model finishes with its full content.
+ */
+export const zFusionCallPanelCompletedEvent = z.object({
+  content: z.string(),
+  item_id: z.string(),
+  model: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.panel.completed']),
+})
+
+/**
+ * Incremental content token from a fusion panel model.
+ */
+export const zFusionCallPanelDeltaEvent = z.object({
+  delta: z.string(),
+  item_id: z.string(),
+  model: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.panel.delta']),
+})
+
+/**
+ * Emitted when a fusion panel model fails.
+ */
+export const zFusionCallPanelFailedEvent = z.object({
+  error: z.string(),
+  item_id: z.string(),
+  model: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  status_code: z.int().optional(),
+  type: z.enum(['response.fusion_call.panel.failed']),
+})
+
+/**
+ * Incremental reasoning token from a fusion panel model.
+ */
+export const zFusionCallPanelReasoningDeltaEvent = z.object({
+  delta: z.string(),
+  item_id: z.string(),
+  model: z.string(),
+  output_index: z.int(),
+  sequence_number: z.int(),
+  type: z.enum(['response.fusion_call.panel.reasoning.delta']),
+})
+
 export const zFusionPlugin = z.object({
   analysis_models: z.array(z.string()).min(1).max(8).optional(),
   enabled: z.boolean().optional(),
   id: z.enum(['fusion']),
   max_tool_calls: z.int().gte(1).lte(16).optional(),
   model: z.string().optional(),
+  tools: z
+    .array(
+      z.object({
+        parameters: z
+          .record(
+            z.string(),
+            z.union([
+              z.string(),
+              z.number(),
+              z.boolean(),
+              z.unknown(),
+              z.array(
+                z.union([z.string(), z.number(), z.boolean(), z.unknown()]),
+              ),
+              z.record(
+                z.string(),
+                z.union([z.string(), z.number(), z.boolean(), z.unknown()]),
+              ),
+            ]),
+          )
+          .optional(),
+        type: z.string(),
+      }),
+    )
+    .max(8)
+    .optional(),
 })
 
 /**
@@ -1597,6 +1838,15 @@ export const zFusionServerToolConfig = z.object({
     })
     .optional(),
   temperature: z.number().optional(),
+  tools: z
+    .array(
+      z.object({
+        parameters: z.record(z.string(), z.unknown()).optional(),
+        type: z.string(),
+      }),
+    )
+    .max(8)
+    .optional(),
 })
 
 /**
@@ -2562,6 +2812,7 @@ export const zMessagesStartEvent = z.object({
         'Crucible',
         'Crusoe',
         'Darkbloom',
+        'Decart',
         'DeepInfra',
         'DeepSeek',
         'DekaLLM',
@@ -2616,6 +2867,7 @@ export const zMessagesStartEvent = z.object({
         'Together',
         'Upstage',
         'Venice',
+        'Wafer',
         'WandB',
         'Xiaomi',
         'xAI',
@@ -2948,6 +3200,7 @@ export const zProviderName = z.enum([
   'Crucible',
   'Crusoe',
   'Darkbloom',
+  'Decart',
   'DeepInfra',
   'DeepSeek',
   'DekaLLM',
@@ -3002,6 +3255,7 @@ export const zProviderName = z.enum([
   'Together',
   'Upstage',
   'Venice',
+  'Wafer',
   'WandB',
   'Xiaomi',
   'xAI',
@@ -3577,6 +3831,28 @@ export const zMessagesStreamingResponse = z.object({
 })
 
 /**
+ * How long (in seconds) the container stays warm after its last command before sleeping, freeing its capacity slot. Idle-based: each command renews the timer. Defaults to 900 (15 minutes); capped at 2592000 (30 days).
+ */
+export const zSandboxSleepAfterSeconds = z.int()
+
+/**
+ * Configuration for the openrouter:bash server tool
+ */
+export const zBashServerToolConfig = z.object({
+  engine: zBashServerToolEngine.optional(),
+  environment: zBashServerToolEnvironment.optional(),
+  sleep_after_seconds: zSandboxSleepAfterSeconds.optional(),
+})
+
+/**
+ * OpenRouter built-in server tool: runs shell commands server-side in a sandboxed container
+ */
+export const zBashServerTool = z.object({
+  parameters: zBashServerToolConfig.optional(),
+  type: z.enum(['openrouter:bash']),
+})
+
+/**
  * Size of the search context for web search tools
  */
 export const zSearchContextSizeEnum = z.enum(['low', 'medium', 'high'])
@@ -3624,10 +3900,94 @@ export const zServiceUnavailableResponse = z.object({
 })
 
 /**
+ * Status of a shell call or its output.
+ */
+export const zShellCallStatus = z.enum([
+  'in_progress',
+  'completed',
+  'incomplete',
+])
+
+/**
+ * A native `shell_call` output item matching OpenAI's Responses API shape. Emitted for the sandbox-backed `shell` tool.
+ */
+export const zOutputShellCallItem = z.object({
+  action: z
+    .object({
+      commands: z.array(z.string()),
+      max_output_length: z.int().nullable(),
+      timeout_ms: z.int().nullable(),
+    })
+    .optional(),
+  call_id: z.string(),
+  id: z.string(),
+  status: zShellCallStatus,
+  type: z.enum(['shell_call']),
+})
+
+/**
+ * A native `shell_call_output` item matching OpenAI's Responses API shape. Carries per-command stdout, stderr, and the exit/timeout outcome.
+ */
+export const zOutputShellCallOutputItem = z.object({
+  call_id: z.string(),
+  id: z.string(),
+  max_output_length: z.int().nullish(),
+  output: z.array(
+    z.object({
+      outcome: z.union([
+        z.object({
+          exit_code: z.int(),
+          type: z.enum(['exit']),
+        }),
+        z.object({
+          type: z.enum(['timeout']),
+        }),
+      ]),
+      stderr: z.string(),
+      stdout: z.string(),
+    }),
+  ),
+  status: zShellCallStatus,
+  type: z.enum(['shell_call_output']),
+})
+
+/**
  * Shell tool configuration
  */
 export const zShellServerTool = z.object({
   type: z.enum(['shell']),
+})
+
+/**
+ * Which shell engine to use. "openrouter" runs commands server-side in the OpenRouter sandbox. "auto" (default) keeps the provider's native hosted shell when available (OpenAI); on other providers the call is routed to the OpenRouter sandbox.
+ */
+export const zShellServerToolEngine = z.enum(['auto', 'openrouter'])
+
+/**
+ * Server-side execution environment for the shell tool. Only container-backed environments are supported; "local" shells are not.
+ */
+export const zShellServerToolEnvironment = z.discriminatedUnion('type', [
+  zContainerAutoEnvironment.extend({ type: z.literal('container_auto') }),
+  zContainerReferenceEnvironment.extend({
+    type: z.literal('container_reference'),
+  }),
+])
+
+/**
+ * Configuration for the openrouter:shell server tool
+ */
+export const zShellServerToolConfig = z.object({
+  engine: zShellServerToolEngine.optional(),
+  environment: zShellServerToolEnvironment.optional(),
+  sleep_after_seconds: zSandboxSleepAfterSeconds.optional(),
+})
+
+/**
+ * OpenRouter built-in server tool: runs shell commands server-side in a sandboxed container (a sandbox-backed clone of OpenAI's hosted shell tool)
+ */
+export const zShellServerToolOpenRouter = z.object({
+  parameters: zShellServerToolConfig.optional(),
+  type: z.enum(['openrouter:shell']),
 })
 
 /**
@@ -3882,6 +4242,20 @@ export const zFunctionCallOutputItem =
   )
 
 /**
+ * An openrouter:advisor server tool output item
+ */
+export const zOutputAdvisorServerToolItem = z.object({
+  advice: z.string().optional(),
+  error: z.string().optional(),
+  id: z.string().optional(),
+  instance_name: z.string().optional(),
+  model: z.string().optional(),
+  prompt: z.string().optional(),
+  status: zToolCallStatus,
+  type: z.enum(['openrouter:advisor']),
+})
+
+/**
  * An openrouter:apply_patch server tool output item. The turn halts when validation succeeds so the client can apply the patch and echo an `apply_patch_call_output` on the next turn.
  */
 export const zOutputApplyPatchServerToolItem = z.object({
@@ -3962,35 +4336,7 @@ export const zOutputFileSearchServerToolItem = z.object({
  * An openrouter:fusion server tool output item
  */
 export const zOutputFusionServerToolItem = z.object({
-  analysis: z
-    .object({
-      blind_spots: z.array(z.string()),
-      consensus: z.array(z.string()),
-      contradictions: z.array(
-        z.object({
-          stances: z.array(
-            z.object({
-              model: z.string(),
-              stance: z.string(),
-            }),
-          ),
-          topic: z.string(),
-        }),
-      ),
-      partial_coverage: z.array(
-        z.object({
-          models: z.array(z.string()),
-          point: z.string(),
-        }),
-      ),
-      unique_insights: z.array(
-        z.object({
-          insight: z.string(),
-          model: z.string(),
-        }),
-      ),
-    })
-    .optional(),
+  analysis: zFusionAnalysisResult.optional(),
   error: z.string().optional(),
   failed_models: z
     .array(
@@ -4006,6 +4352,7 @@ export const zOutputFusionServerToolItem = z.object({
   responses: z
     .array(
       z.object({
+        content: z.string().optional(),
         model: z.string(),
       }),
     )
@@ -4723,6 +5070,7 @@ export const zInputs = z.union([
       zOutputMemoryServerToolItem,
       zOutputMcpServerToolItem,
       zOutputSearchModelsServerToolItem,
+      zOutputAdvisorServerToolItem,
       zLocalShellCallItem,
       zLocalShellCallOutputItem,
       zShellCallItem,
@@ -4835,6 +5183,16 @@ export const zOutputItems = z.union([
     .and(zOutputApplyPatchCallItem),
   z
     .object({
+      type: z.literal('shell_call'),
+    })
+    .and(zOutputShellCallItem),
+  z
+    .object({
+      type: z.literal('shell_call_output'),
+    })
+    .and(zOutputShellCallOutputItem),
+  z
+    .object({
       type: z.literal('openrouter:web_fetch'),
     })
     .and(zOutputWebFetchServerToolItem),
@@ -4863,6 +5221,11 @@ export const zOutputItems = z.union([
       type: z.literal('openrouter:fusion'),
     })
     .and(zOutputFusionServerToolItem),
+  z
+    .object({
+      type: z.literal('openrouter:advisor'),
+    })
+    .and(zOutputAdvisorServerToolItem),
   z
     .object({
       type: z.literal('custom_tool_call'),
@@ -5311,6 +5674,51 @@ export const zStreamEvents = z.union([
       type: z.literal('response.apply_patch_call_operation_diff.done'),
     })
     .and(zApplyPatchCallOperationDiffDoneEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.in_progress'),
+    })
+    .and(zFusionCallInProgressEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.panel.added'),
+    })
+    .and(zFusionCallPanelAddedEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.panel.delta'),
+    })
+    .and(zFusionCallPanelDeltaEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.panel.reasoning.delta'),
+    })
+    .and(zFusionCallPanelReasoningDeltaEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.panel.completed'),
+    })
+    .and(zFusionCallPanelCompletedEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.panel.failed'),
+    })
+    .and(zFusionCallPanelFailedEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.analysis.in_progress'),
+    })
+    .and(zFusionCallAnalysisInProgressEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.analysis.completed'),
+    })
+    .and(zFusionCallAnalysisCompletedEvent),
+  z
+    .object({
+      type: z.literal('response.fusion_call.completed'),
+    })
+    .and(zFusionCallCompletedEvent),
 ])
 
 export const zResponsesStreamingResponse = z.object({
@@ -5380,6 +5788,8 @@ export const zChatFunctionTool = z.union([
     }),
     type: z.enum(['function']),
   }),
+  zAdvisorServerToolOpenRouter,
+  zBashServerTool,
   zDatetimeServerTool,
   zImageGenerationServerToolOpenRouter,
   zChatSearchModelsServerTool,
@@ -5711,6 +6121,7 @@ export const zMessagesRequest = z.object({
           name: z.enum(['advisor']),
           type: z.enum(['advisor_20260301']),
         }),
+        zBashServerTool,
         zDatetimeServerTool,
         zImageGenerationServerToolOpenRouter,
         zChatSearchModelsServerTool,
@@ -5854,6 +6265,7 @@ export const zResponsesRequest = z.object({
         zShellServerTool,
         zApplyPatchServerTool,
         zCustomTool,
+        zAdvisorServerToolOpenRouter,
         zDatetimeServerTool,
         zFusionServerToolOpenRouter,
         zImageGenerationServerToolOpenRouter,
@@ -5861,6 +6273,8 @@ export const zResponsesRequest = z.object({
         zWebFetchServerTool,
         zWebSearchServerToolOpenRouter,
         zApplyPatchServerToolOpenRouter,
+        zBashServerTool,
+        zShellServerToolOpenRouter,
       ]),
     )
     .optional(),
@@ -5875,7 +6289,7 @@ export const zResponsesRequest = z.object({
 export const zSendChatCompletionRequestBody = zChatRequest
 
 export const zSendChatCompletionRequestHeaders = z.object({
-  'X-OpenRouter-Experimental-Metadata': zMetadataLevel.optional(),
+  'X-OpenRouter-Metadata': zMetadataLevel.optional(),
 })
 
 /**
@@ -5886,7 +6300,7 @@ export const zSendChatCompletionRequestResponse = zChatResult
 export const zCreateMessagesBody = zMessagesRequest
 
 export const zCreateMessagesHeaders = z.object({
-  'X-OpenRouter-Experimental-Metadata': zMetadataLevel.optional(),
+  'X-OpenRouter-Metadata': zMetadataLevel.optional(),
 })
 
 /**
@@ -5897,7 +6311,7 @@ export const zCreateMessagesResponse = zMessagesResult
 export const zCreateResponsesBody = zResponsesRequest
 
 export const zCreateResponsesHeaders = z.object({
-  'X-OpenRouter-Experimental-Metadata': zMetadataLevel.optional(),
+  'X-OpenRouter-Metadata': zMetadataLevel.optional(),
 })
 
 /**

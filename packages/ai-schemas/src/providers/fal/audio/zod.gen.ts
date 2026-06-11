@@ -6,111 +6,111 @@ import * as z from 'zod'
  * ACEStepAudioInpaintRequest
  */
 export const zAceStepAudioInpaintInput = z.object({
-  lyrics: z.string().optional().default(''),
-  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
-  tags: z.string(),
-  variance: z.number().gte(0).lte(1).optional().default(0.5),
-  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
-  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
   start_time: z.number().gte(0).lte(240).optional().default(0),
-  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
-  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
-  end_time_relative_to: z.enum(['start', 'end']).optional().default('start'),
-  start_time_relative_to: z.enum(['start', 'end']).optional().default('start'),
-  audio_url: z.string(),
-  number_of_steps: z.int().gte(3).lte(60).optional().default(27),
-  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
-  tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
   end_time: z.number().gte(0).lte(240).optional().default(30),
-  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
+  end_time_relative_to: z.enum(['start', 'end']).optional().default('start'),
+  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
   minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  tags: z.string(),
+  audio_url: z.string(),
+  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
+  start_time_relative_to: z.enum(['start', 'end']).optional().default('start'),
+  lyrics: z.string().optional().default(''),
+  tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
+  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
+  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
+  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
+  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
+  number_of_steps: z.int().gte(3).lte(60).optional().default(27),
+  variance: z.number().gte(0).lte(1).optional().default(0.5),
+  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
 })
 
 /**
  * ACEStepAudioOutpaintRequest
  */
 export const zAceStepAudioOutpaintInput = z.object({
-  lyrics: z.string().optional().default(''),
-  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
-  extend_before_duration: z.number().gte(0).lte(240).optional().default(0),
+  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
+  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
+  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   tags: z.string(),
+  audio_url: z.string(),
   scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
   guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
-  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
-  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
-  audio_url: z.string(),
-  number_of_steps: z.int().gte(3).lte(60).optional().default(27),
-  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
-  extend_after_duration: z.number().gte(0).lte(240).optional().default(30),
+  lyrics: z.string().optional().default(''),
   tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
-  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
+  extend_before_duration: z.number().gte(0).lte(240).optional().default(0),
+  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
+  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
+  number_of_steps: z.int().gte(3).lte(60).optional().default(27),
+  extend_after_duration: z.number().gte(0).lte(240).optional().default(30),
 })
 
 /**
  * ACEStepAudioToAudioRequest
  */
 export const zAceStepAudioToAudioInput = z.object({
-  lyrics: z.string().optional().default(''),
-  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
-  tags: z.string(),
-  edit_mode: z.enum(['lyrics', 'remix']).optional().default('remix'),
-  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
-  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
-  original_tags: z.string(),
+  original_lyrics: z.string().optional().default(''),
   guidance_scale: z.number().gte(0).lte(200).optional().default(15),
-  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
+  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  tags: z.string(),
   audio_url: z.string(),
+  lyrics: z.string().optional().default(''),
+  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
+  tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
+  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
+  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
+  edit_mode: z.enum(['lyrics', 'remix']).optional().default('remix'),
   original_seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
-  original_lyrics: z.string().optional().default(''),
+  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
   number_of_steps: z.int().gte(3).lte(60).optional().default(27),
-  tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
-  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
+  original_tags: z.string(),
+  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
 })
 
 /**
  * ACEStepTextToAudioRequest
  */
 export const zAceStepInput = z.object({
+  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
   lyrics: z.string().optional().default(''),
+  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
+  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
+  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  tags: z.string(),
   guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
-  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
+  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
+  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
   duration: z.number().gte(5).lte(240).optional().default(60),
   number_of_steps: z.int().gte(3).lte(60).optional().default(27),
-  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
-  tags: z.string(),
   tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
-  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
-  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
-  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
-  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
+  granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
 })
 
 /**
  * ACEStepPromptToAudioRequest
  */
 export const zAceStepPromptToAudioInput = z.object({
-  instrumental: z.boolean().optional().default(false),
-  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
+  tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
   granularity_scale: z.int().gte(-100).lte(100).optional().default(10),
+  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
+  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
+  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
+  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
+  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
   duration: z.number().gte(5).lte(240).optional().default(60),
   number_of_steps: z.int().gte(3).lte(60).optional().default(27),
-  guidance_interval: z.number().gte(0).lte(1).optional().default(0.5),
-  tag_guidance_scale: z.number().gte(0).lte(10).optional().default(5),
-  guidance_interval_decay: z.number().gte(0).lte(1).optional().default(0),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  lyric_guidance_scale: z.number().gte(0).lte(10).optional().default(1.5),
-  minimum_guidance_scale: z.number().gte(0).lte(200).optional().default(3),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(200).optional().default(15),
-  scheduler: z.enum(['euler', 'heun']).optional().default('euler'),
+  guidance_type: z.enum(['cfg', 'apg', 'cfg_star']).optional().default('apg'),
+  instrumental: z.boolean().optional().default(false),
 })
 
 /**
@@ -137,14 +137,14 @@ export const zAudioOutput = z.object({
  * AudioFile
  */
 export const zAudioFile = z.object({
-  sample_rate: z.union([z.int(), z.unknown()]).optional(),
+  channels: z.union([z.int(), z.unknown()]).optional(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+  bitrate: z.union([z.string(), z.int(), z.unknown()]).optional(),
   file_size: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
-  channels: z.union([z.int(), z.unknown()]).optional(),
-  bitrate: z.union([z.string(), z.int(), z.unknown()]).optional(),
   duration: z.union([z.number(), z.unknown()]).optional(),
+  sample_rate: z.union([z.int(), z.unknown()]).optional(),
   file_name: z.union([z.string(), z.unknown()]).optional(),
-  content_type: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -154,9 +154,9 @@ export const zAudioFile = z.object({
  */
 export const zAudioFileType2 = z.object({
   file_size: z.int(),
-  file_name: z.string(),
   content_type: z.string(),
   url: z.string(),
+  file_name: z.string(),
 })
 
 /**
@@ -191,10 +191,20 @@ export const zAudioSegmentSpec = z.object({
  * AudioSetting
  */
 export const zAudioSetting = z.object({
+  bitrate: z
+    .union([
+      z.literal(32000),
+      z.literal(64000),
+      z.literal(128000),
+      z.literal(256000),
+    ])
+    .optional()
+    .default(128000),
   channel: z
     .union([z.literal(1), z.literal(2)])
     .optional()
     .default(1),
+  format: z.enum(['mp3', 'pcm', 'flac']).optional().default('mp3'),
   sample_rate: z
     .union([
       z.literal(8000),
@@ -206,31 +216,12 @@ export const zAudioSetting = z.object({
     ])
     .optional()
     .default(32000),
-  bitrate: z
-    .union([
-      z.literal(32000),
-      z.literal(64000),
-      z.literal(128000),
-      z.literal(256000),
-    ])
-    .optional()
-    .default(128000),
-  format: z.enum(['mp3', 'pcm', 'flac']).optional().default('mp3'),
 })
 
 /**
  * AudioSetting25
  */
 export const zAudioSetting25 = z.object({
-  bitrate: z
-    .union([
-      z.literal(32000),
-      z.literal(64000),
-      z.literal(128000),
-      z.literal(256000),
-    ])
-    .optional()
-    .default(256000),
   sample_rate: z
     .union([
       z.literal(16000),
@@ -240,13 +231,6 @@ export const zAudioSetting25 = z.object({
     ])
     .optional()
     .default(44100),
-  format: z.enum(['mp3', 'wav', 'pcm']).optional().default('mp3'),
-})
-
-/**
- * AudioSetting
- */
-export const zAudioSettingType2 = z.object({
   bitrate: z
     .union([
       z.literal(32000),
@@ -256,6 +240,13 @@ export const zAudioSettingType2 = z.object({
     ])
     .optional()
     .default(256000),
+  format: z.enum(['mp3', 'wav', 'pcm']).optional().default('mp3'),
+})
+
+/**
+ * AudioSetting
+ */
+export const zAudioSettingType2 = z.object({
   sample_rate: z
     .union([
       z.literal(8000),
@@ -267,6 +258,15 @@ export const zAudioSettingType2 = z.object({
     ])
     .optional()
     .default(44100),
+  bitrate: z
+    .union([
+      z.literal(32000),
+      z.literal(64000),
+      z.literal(128000),
+      z.literal(256000),
+    ])
+    .optional()
+    .default(256000),
   format: z.enum(['mp3', 'pcm', 'flac']).optional().default('mp3'),
 })
 
@@ -276,8 +276,8 @@ export const zAudioSettingType2 = z.object({
  * A time span indicating where the target sound occurs.
  */
 export const zAudioTimeSpan = z.object({
-  end: z.number().gte(0),
   include: z.boolean().optional().default(true),
+  end: z.number().gte(0),
   start: z.number().gte(0),
 })
 
@@ -296,9 +296,9 @@ export const zAudioType2 = z.object({
  * AudioUnderstandingInput
  */
 export const zAudioUnderstandingInput = z.object({
+  detailed_analysis: z.boolean().optional().default(false),
   prompt: z.string().min(1).max(10000),
   audio_url: z.string(),
-  detailed_analysis: z.boolean().optional().default(false),
 })
 
 /**
@@ -327,6 +327,8 @@ export const zBytedanceSeedSpeechTtsV2Input = z.object({
     ])
     .optional()
     .default(24000),
+  output_format: z.enum(['mp3', 'opus']).optional().default('mp3'),
+  text: z.string().max(5000),
   language: z
     .union([
       z.enum([
@@ -344,8 +346,6 @@ export const zBytedanceSeedSpeechTtsV2Input = z.object({
       z.unknown(),
     ])
     .optional(),
-  text: z.string().max(5000),
-  output_format: z.enum(['mp3', 'opus']).optional().default('mp3'),
   pitch: z.int().gte(-12).lte(12).optional().default(0),
   voice: z
     .enum([
@@ -482,24 +482,21 @@ export const zChatterboxSpeechToSpeechInput = z.object({
  * ChatterboxRequest
  */
 export const zChatterboxTextToSpeechInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  exaggeration: z.number().gte(0).lte(1).optional().default(0.25),
   text: z.string(),
-  temperature: z.number().gte(0.05).lte(2).optional().default(0.7),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
   cfg: z.number().gte(0.1).lte(1).optional().default(0.5),
+  temperature: z.number().gte(0.05).lte(2).optional().default(0.7),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  exaggeration: z.number().gte(0).lte(1).optional().default(0.25),
 })
 
 /**
  * ChatterboxMultilingualRequest
  */
 export const zChatterboxTextToSpeechMultilingualInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  exaggeration: z.number().gte(0.25).lte(2).optional().default(0.5),
   voice: z.string().optional().default('english'),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   text: z.string().max(300),
-  temperature: z.number().gte(0.05).lte(5).optional().default(0.8),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   custom_audio_language: z
     .union([
       z.enum([
@@ -530,14 +527,16 @@ export const zChatterboxTextToSpeechMultilingualInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  temperature: z.number().gte(0.05).lte(5).optional().default(0.8),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  exaggeration: z.number().gte(0.25).lte(2).optional().default(0.5),
 })
 
 /**
  * TranscribeInput
  */
 export const zCohereTranscribeInput = z.object({
-  max_new_tokens: z.int().gte(1).lte(1024).optional().default(256),
-  punctuation: z.boolean().optional().default(true),
+  audio_url: z.string(),
   language: z
     .enum([
       'en',
@@ -557,7 +556,8 @@ export const zCohereTranscribeInput = z.object({
     ])
     .optional()
     .default('en'),
-  audio_url: z.string(),
+  punctuation: z.boolean().optional().default(true),
+  max_new_tokens: z.int().gte(1).lte(1014).optional().default(256),
 })
 
 /**
@@ -573,41 +573,37 @@ export const zCohereTranscribeOutput = z.object({
  */
 export const zDeepfilternet3Input = z.object({
   bitrate: z.string().optional().default('192k'),
+  sync_mode: z.boolean().optional().default(false),
   audio_url: z.string(),
   audio_format: z
     .enum(['mp3', 'aac', 'm4a', 'ogg', 'opus', 'flac', 'wav'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * DeepFilterNetTimings
  */
 export const zDeepFilterNetTimings = z.object({
+  preprocess: z.number(),
   postprocess: z.number(),
   inference: z.number(),
-  preprocess: z.number(),
 })
 
 /**
  * DeepFilterNet3Output
  */
 export const zDeepfilternet3Output = z.object({
-  audio_file: zAudioFile,
   timings: zDeepFilterNetTimings,
+  audio_file: zAudioFile,
 })
 
 /**
  * DemucsInput
  */
 export const zDemucsInput = z.object({
-  stems: z
-    .union([
-      z.array(z.enum(['vocals', 'drums', 'bass', 'other', 'guitar', 'piano'])),
-      z.unknown(),
-    ])
-    .optional(),
+  shifts: z.int().gte(1).lte(10).optional().default(1),
+  overlap: z.number().gte(0).lte(1).optional().default(0.25),
   output_format: z.enum(['wav', 'mp3']).optional().default('mp3'),
   model: z
     .enum([
@@ -622,18 +618,22 @@ export const zDemucsInput = z.object({
     ])
     .optional()
     .default('htdemucs_6s'),
-  shifts: z.int().gte(1).lte(10).optional().default(1),
-  overlap: z.number().gte(0).lte(1).optional().default(0.25),
-  audio_url: z.string(),
   segment_length: z.union([z.int(), z.unknown()]).optional(),
+  audio_url: z.string(),
+  stems: z
+    .union([
+      z.array(z.enum(['vocals', 'drums', 'bass', 'other', 'guitar', 'piano'])),
+      z.unknown(),
+    ])
+    .optional(),
 })
 
 /**
  * DialogueBlock
  */
 export const zDialogueBlock = z.object({
-  text: z.string(),
   voice: z.string(),
+  text: z.string(),
 })
 
 /**
@@ -654,32 +654,30 @@ export const zDiaTtsVoiceCloneInput = z.object({
  * TextToMusicInput
  */
 export const zDiffrhythmInput = z.object({
-  reference_audio_url: z.string().optional(),
+  num_inference_steps: z.int().gte(10).lte(100).optional().default(32),
   music_duration: z.enum(['95s', '285s']).optional().default('95s'),
-  lyrics: z.string(),
+  cfg_strength: z.number().gte(1).lte(10).optional().default(4),
   scheduler: z
     .enum(['euler', 'midpoint', 'rk4', 'implicit_adams'])
     .optional()
     .default('euler'),
-  cfg_strength: z.number().gte(1).lte(10).optional().default(4),
   style_prompt: z.string().optional(),
-  num_inference_steps: z.int().gte(10).lte(100).optional().default(32),
+  lyrics: z.string(),
+  reference_audio_url: z.string().optional(),
 })
 
 /**
  * AudioIsolationRequest
  */
 export const zElevenlabsAudioIsolationInput = z.object({
-  video_url: z.union([z.string(), z.unknown()]).optional(),
   audio_url: z.union([z.string(), z.unknown()]).optional(),
+  video_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * SoundEffectRequestV2
  */
 export const zElevenlabsSoundEffectsV2Input = z.object({
-  prompt_influence: z.number().gte(0).lte(1).optional().default(0.3),
-  text: z.string(),
   output_format: z
     .enum([
       'mp3_22050_32',
@@ -704,31 +702,33 @@ export const zElevenlabsSoundEffectsV2Input = z.object({
     ])
     .optional()
     .default('mp3_44100_128'),
-  loop: z.boolean().optional().default(false),
   duration_seconds: z
     .union([z.number().gte(0.5).lte(22), z.unknown()])
     .optional(),
+  prompt_influence: z.number().gte(0).lte(1).optional().default(0.3),
+  text: z.string(),
+  loop: z.boolean().optional().default(false),
 })
 
 /**
  * SpeechToTextRequest
  */
 export const zElevenlabsSpeechToTextInput = z.object({
-  language_code: z.union([z.string(), z.unknown()]).optional(),
   diarize: z.boolean().optional().default(true),
   audio_url: z.string(),
   tag_audio_events: z.boolean().optional().default(true),
+  language_code: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * SpeechToTextRequestScribeV2
  */
 export const zElevenlabsSpeechToTextScribeV2Input = z.object({
-  language_code: z.union([z.string(), z.unknown()]).optional(),
   diarize: z.boolean().optional().default(true),
-  keyterms: z.array(z.string()).max(100).optional().default([]),
   audio_url: z.string(),
   tag_audio_events: z.boolean().optional().default(true),
+  keyterms: z.array(z.string()).max(100).optional().default([]),
+  language_code: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -737,11 +737,11 @@ export const zElevenlabsSpeechToTextScribeV2Input = z.object({
  * Request model for eleven_v3 which doesn't support previous_text/next_text
  */
 export const zElevenlabsTtsElevenV3Input = z.object({
+  voice: z.string().optional().default('Rachel'),
+  language_code: z.union([z.string(), z.unknown()]).optional(),
   stability: z.number().gte(0).lte(1).optional().default(0.5),
   text: z.string().min(1).max(5000),
   timestamps: z.boolean().optional().default(false),
-  language_code: z.union([z.string(), z.unknown()]).optional(),
-  voice: z.string().optional().default('Rachel'),
   apply_text_normalization: z
     .enum(['auto', 'on', 'off'])
     .optional()
@@ -752,47 +752,46 @@ export const zElevenlabsTtsElevenV3Input = z.object({
  * TextToSpeechRequest
  */
 export const zElevenlabsTtsMultilingualV2Input = z.object({
-  next_text: z.union([z.string(), z.unknown()]).optional(),
-  stability: z.number().gte(0).lte(1).optional().default(0.5),
-  text: z.string().min(1),
-  timestamps: z.boolean().optional().default(false),
-  style: z.number().gte(0).lte(1).optional().default(0),
   voice: z.string().optional().default('Rachel'),
-  similarity_boost: z.number().gte(0).lte(1).optional().default(0.75),
   previous_text: z.union([z.string(), z.unknown()]).optional(),
-  language_code: z.union([z.string(), z.unknown()]).optional(),
   speed: z.number().gte(0.7).lte(1.2).optional().default(1),
+  text: z.string().min(1),
   apply_text_normalization: z
     .enum(['auto', 'on', 'off'])
     .optional()
     .default('auto'),
+  next_text: z.union([z.string(), z.unknown()]).optional(),
+  similarity_boost: z.number().gte(0).lte(1).optional().default(0.75),
+  style: z.number().gte(0).lte(1).optional().default(0),
+  stability: z.number().gte(0).lte(1).optional().default(0.5),
+  timestamps: z.boolean().optional().default(false),
+  language_code: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * TextToSpeechRequest
  */
 export const zElevenlabsTtsTurboV25Input = z.object({
-  next_text: z.union([z.string(), z.unknown()]).optional(),
-  stability: z.number().gte(0).lte(1).optional().default(0.5),
-  text: z.string().min(1),
-  timestamps: z.boolean().optional().default(false),
-  style: z.number().gte(0).lte(1).optional().default(0),
   voice: z.string().optional().default('Rachel'),
-  similarity_boost: z.number().gte(0).lte(1).optional().default(0.75),
   previous_text: z.union([z.string(), z.unknown()]).optional(),
-  language_code: z.union([z.string(), z.unknown()]).optional(),
   speed: z.number().gte(0.7).lte(1.2).optional().default(1),
+  text: z.string().min(1),
   apply_text_normalization: z
     .enum(['auto', 'on', 'off'])
     .optional()
     .default('auto'),
+  next_text: z.union([z.string(), z.unknown()]).optional(),
+  similarity_boost: z.number().gte(0).lte(1).optional().default(0.75),
+  style: z.number().gte(0).lte(1).optional().default(0),
+  stability: z.number().gte(0).lte(1).optional().default(0.5),
+  timestamps: z.boolean().optional().default(false),
+  language_code: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * VoiceChangerRequest
  */
 export const zElevenlabsVoiceChangerInput = z.object({
-  remove_background_noise: z.boolean().optional().default(false),
   output_format: z
     .enum([
       'mp3_22050_32',
@@ -818,32 +817,33 @@ export const zElevenlabsVoiceChangerInput = z.object({
     .optional()
     .default('mp3_44100_128'),
   seed: z.int().optional(),
-  audio_url: z.string(),
   voice: z.string().optional().default('Rachel'),
+  audio_url: z.string(),
+  remove_background_noise: z.boolean().optional().default(false),
 })
 
 /**
  * EmotionalStrengths
  */
 export const zEmotionalStrengths = z.object({
+  sad: z.number().gte(0).lte(1).optional().default(0),
   happy: z.number().gte(0).lte(1).optional().default(0),
   calm: z.number().gte(0).lte(1).optional().default(0),
-  disgusted: z.number().gte(0).lte(1).optional().default(0),
-  sad: z.number().gte(0).lte(1).optional().default(0),
   melancholic: z.number().gte(0).lte(1).optional().default(0),
-  angry: z.number().gte(0).lte(1).optional().default(0),
   afraid: z.number().gte(0).lte(1).optional().default(0),
+  disgusted: z.number().gte(0).lte(1).optional().default(0),
   surprised: z.number().gte(0).lte(1).optional().default(0),
+  angry: z.number().gte(0).lte(1).optional().default(0),
 })
 
 /**
  * TTSInput
  */
 export const zF5TtsInput = z.object({
-  gen_text: z.string(),
-  model_type: z.enum(['F5-TTS', 'E2-TTS']),
   remove_silence: z.boolean().optional().default(true),
+  gen_text: z.string(),
   ref_audio_url: z.string(),
+  model_type: z.enum(['F5-TTS', 'E2-TTS']),
   ref_text: z.string().optional().default(''),
 })
 
@@ -891,9 +891,9 @@ export const zFfmpegApiMergeAudiosInput = z.object({
  * File
  */
 export const zFile = z.object({
-  url: z.string(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
   file_size: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
+  url: z.string(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -902,9 +902,9 @@ export const zFile = z.object({
  */
 export const zAceStepAudioInpaintOutput = z.object({
   lyrics: z.string(),
-  seed: z.int(),
-  tags: z.string(),
   audio: zFile,
+  tags: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -912,9 +912,9 @@ export const zAceStepAudioInpaintOutput = z.object({
  */
 export const zAceStepAudioOutpaintOutput = z.object({
   lyrics: z.string(),
-  seed: z.int(),
-  tags: z.string(),
   audio: zFile,
+  tags: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -922,9 +922,9 @@ export const zAceStepAudioOutpaintOutput = z.object({
  */
 export const zAceStepAudioToAudioOutput = z.object({
   lyrics: z.string(),
-  seed: z.int(),
-  tags: z.string(),
   audio: zFile,
+  tags: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -932,9 +932,9 @@ export const zAceStepAudioToAudioOutput = z.object({
  */
 export const zAceStepOutput = z.object({
   lyrics: z.string(),
-  seed: z.int(),
-  tags: z.string(),
   audio: zFile,
+  tags: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -942,9 +942,9 @@ export const zAceStepOutput = z.object({
  */
 export const zAceStepPromptToAudioOutput = z.object({
   lyrics: z.string(),
-  seed: z.int(),
-  tags: z.string(),
   audio: zFile,
+  tags: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -986,11 +986,11 @@ export const zCsm1bOutput = z.object({
  * DemucsOutput
  */
 export const zDemucsOutput = z.object({
-  other: z.union([zFile, z.unknown()]).optional(),
-  vocals: z.union([zFile, z.unknown()]).optional(),
-  guitar: z.union([zFile, z.unknown()]).optional(),
   bass: z.union([zFile, z.unknown()]).optional(),
+  guitar: z.union([zFile, z.unknown()]).optional(),
+  vocals: z.union([zFile, z.unknown()]).optional(),
   piano: z.union([zFile, z.unknown()]).optional(),
+  other: z.union([zFile, z.unknown()]).optional(),
   drums: z.union([zFile, z.unknown()]).optional(),
 })
 
@@ -1119,13 +1119,13 @@ export const zGeminiTtsOutput = z.object({
  * IndexTTS2Input
  */
 export const zIndexTts2TextToSpeechInput = z.object({
-  emotional_audio_url: z.union([z.string(), z.unknown()]).optional(),
-  emotion_prompt: z.union([z.string(), z.unknown()]).optional(),
-  emotional_strengths: z.union([zEmotionalStrengths, z.unknown()]).optional(),
   prompt: z.string(),
-  strength: z.number().gte(0).lte(1).optional().default(1),
   should_use_prompt_for_emotion: z.boolean().optional().default(false),
   audio_url: z.string(),
+  emotional_strengths: z.union([zEmotionalStrengths, z.unknown()]).optional(),
+  emotion_prompt: z.union([z.string(), z.unknown()]).optional(),
+  emotional_audio_url: z.union([z.string(), z.unknown()]).optional(),
+  strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
@@ -1139,7 +1139,6 @@ export const zIndexTts2TextToSpeechOutput = z.object({
  * InworldTTSInput
  */
 export const zInworldTtsInput = z.object({
-  text: z.string().max(2000),
   sample_rate_hertz: z
     .union([
       z.literal(8000),
@@ -1151,6 +1150,7 @@ export const zInworldTtsInput = z.object({
     ])
     .optional()
     .default(48000),
+  text: z.string().max(2000),
   voice: z
     .enum([
       'Loretta (en)',
@@ -1300,8 +1300,6 @@ export const zKlingVideoCreateVoiceOutput = z.object({
  * TTSInput
  */
 export const zKlingVideoV1TtsInput = z.object({
-  voice_speed: z.number().gte(0.8).lte(2).optional().default(1),
-  text: z.string().max(500),
   voice_id: z
     .enum([
       'genshin_vindi2',
@@ -1353,6 +1351,8 @@ export const zKlingVideoV1TtsInput = z.object({
     ])
     .optional()
     .default('genshin_vindi2'),
+  text: z.string().max(500),
+  voice_speed: z.number().gte(0.8).lte(2).optional().default(1),
 })
 
 /**
@@ -1366,12 +1366,12 @@ export const zKlingVideoV1TtsOutput = z.object({
  * VideoToAudioInput
  */
 export const zKlingVideoVideoToAudioInput = z.object({
-  sound_effect_prompt: z.union([z.string().max(200), z.unknown()]).optional(),
-  video_url: z.string(),
   asmr_mode: z.boolean().optional().default(false),
   background_music_prompt: z
     .union([z.string().max(200), z.unknown()])
     .optional(),
+  video_url: z.string(),
+  sound_effect_prompt: z.union([z.string().max(200), z.unknown()]).optional(),
 })
 
 /**
@@ -1578,18 +1578,18 @@ export const zKokoroSpanishOutput = z.object({
  * LoudnessNormalizationSetting
  */
 export const zLoudnessNormalizationSetting = z.object({
-  target_range: z.number().gte(0).lte(20).optional().default(8),
-  enabled: z.boolean().optional().default(true),
   target_peak: z.number().gte(-3).lte(0).optional().default(-0.5),
   target_loudness: z.number().gte(-70).lte(-10).optional().default(-18),
+  target_range: z.number().gte(0).lte(20).optional().default(8),
+  enabled: z.boolean().optional().default(true),
 })
 
 /**
  * TextToMusicInput
  */
 export const zLyria2Input = z.object({
-  negative_prompt: z.string().optional().default('low quality'),
   prompt: z.string().min(1).max(2000),
+  negative_prompt: z.string().optional().default('low quality'),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -1604,34 +1604,34 @@ export const zLyria2Output = z.object({
  * TextToMusicInput
  */
 export const zLyria3Input = z.object({
+  prompt: z.string().min(1).max(5000),
   image_url: z.union([z.string(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
-  prompt: z.string().min(1).max(5000),
 })
 
 /**
  * TextToMusicOutput
  */
 export const zLyria3Output = z.object({
-  lyrics: z.union([z.string(), z.unknown()]).optional(),
   audio: zFile,
+  lyrics: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * TextToMusicInput
  */
 export const zLyria3ProInput = z.object({
+  prompt: z.string().min(1).max(5000),
   image_url: z.union([z.string(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
-  prompt: z.string().min(1).max(5000),
 })
 
 /**
  * TextToMusicOutput
  */
 export const zLyria3ProOutput = z.object({
-  lyrics: z.union([z.string(), z.unknown()]).optional(),
   audio: zFile,
+  lyrics: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -1641,13 +1641,13 @@ export const zLyria3ProOutput = z.object({
  */
 export const zMayaBatchInput = z.object({
   output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  sample_rate: z.enum(['48 kHz', '24 kHz']).optional().default('48 kHz'),
-  max_tokens: z.int().gte(28).lte(4000).optional().default(2000),
+  repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
+  temperature: z.number().gte(0).lte(2).optional().default(0.4),
   prompts: z.array(z.string()).min(1).max(100),
   texts: z.array(z.string()).min(1).max(100),
-  temperature: z.number().gte(0).lte(2).optional().default(0.4),
   top_p: z.number().gte(0).lte(1).optional().default(0.9),
-  repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
+  sample_rate: z.enum(['48 kHz', '24 kHz']).optional().default('48 kHz'),
+  max_tokens: z.int().gte(28).lte(4000).optional().default(2000),
 })
 
 /**
@@ -1656,11 +1656,11 @@ export const zMayaBatchInput = z.object({
  * Output schema for batch Maya-1-Voice TTS generation
  */
 export const zMayaBatchOutput = z.object({
+  durations: z.array(z.number()),
   average_rtf: z.number(),
   total_generation_time: z.number(),
   sample_rate: z.string(),
   audios: z.array(zFile),
-  durations: z.array(z.number()),
 })
 
 /**
@@ -1669,14 +1669,14 @@ export const zMayaBatchOutput = z.object({
  * Input schema for Maya-1-Voice TTS generation
  */
 export const zMayaInput = z.object({
-  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  sample_rate: z.enum(['48 kHz', '24 kHz']).optional().default('48 kHz'),
-  text: z.string().max(5000),
-  temperature: z.number().gte(0).lte(2).optional().default(0.4),
-  max_tokens: z.int().gte(28).lte(4000).optional().default(2000),
   prompt: z.string().max(500),
-  top_p: z.number().gte(0).lte(1).optional().default(0.9),
+  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
   repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
+  temperature: z.number().gte(0).lte(2).optional().default(0.4),
+  text: z.string().max(5000),
+  top_p: z.number().gte(0).lte(1).optional().default(0.9),
+  sample_rate: z.enum(['48 kHz', '24 kHz']).optional().default('48 kHz'),
+  max_tokens: z.int().gte(28).lte(4000).optional().default(2000),
 })
 
 /**
@@ -1685,11 +1685,11 @@ export const zMayaInput = z.object({
  * Output schema for Maya-1-Voice TTS generation
  */
 export const zMayaOutput = z.object({
-  generation_time: z.number(),
-  sample_rate: z.string(),
   audio: zFile,
   rtf: z.number(),
+  sample_rate: z.string(),
   duration: z.number(),
+  generation_time: z.number(),
 })
 
 /**
@@ -1698,14 +1698,14 @@ export const zMayaOutput = z.object({
  * Input schema for Maya-1-Voice streaming TTS generation
  */
 export const zMayaStreamInput = z.object({
-  output_format: z.enum(['mp3', 'wav', 'pcm']).optional().default('mp3'),
-  sample_rate: z.enum(['48 kHz', '24 kHz']).optional().default('24 kHz'),
-  text: z.string().max(5000),
-  temperature: z.number().gte(0).lte(2).optional().default(0.4),
-  max_tokens: z.int().gte(28).lte(4000).optional().default(2000),
   prompt: z.string().max(500),
-  top_p: z.number().gte(0).lte(1).optional().default(0.9),
+  output_format: z.enum(['mp3', 'wav', 'pcm']).optional().default('mp3'),
   repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
+  temperature: z.number().gte(0).lte(2).optional().default(0.4),
+  text: z.string().max(5000),
+  top_p: z.number().gte(0).lte(1).optional().default(0.9),
+  sample_rate: z.enum(['48 kHz', '24 kHz']).optional().default('24 kHz'),
+  max_tokens: z.int().gte(28).lte(4000).optional().default(2000),
 })
 
 export const zMayaStreamOutput = z.unknown()
@@ -1730,8 +1730,8 @@ export const zMinimaxMusicOutput = z.object({
  */
 export const zMinimaxMusicV15Input = z.object({
   prompt: z.string().min(10).max(600),
-  lyrics_prompt: z.string().min(10).max(3000),
   audio_setting: zAudioSettingType2.optional(),
+  lyrics_prompt: z.string().min(10).max(3000),
 })
 
 /**
@@ -1745,11 +1745,11 @@ export const zMinimaxMusicV15Output = z.object({
  * TextToMusic25PlusRequest
  */
 export const zMinimaxMusicV25Input = z.object({
-  lyrics_optimizer: z.boolean().optional().default(false),
   prompt: z.string().min(1).max(2000),
   is_instrumental: z.boolean().optional().default(false),
-  lyrics: z.string().max(3500).optional().default(''),
   audio_setting: zAudioSetting25.optional(),
+  lyrics: z.string().max(3500).optional().default(''),
+  lyrics_optimizer: z.boolean().optional().default(false),
 })
 
 /**
@@ -1763,11 +1763,11 @@ export const zMinimaxMusicV25Output = z.object({
  * TextToMusic26Request
  */
 export const zMinimaxMusicV26Input = z.object({
-  lyrics_optimizer: z.boolean().optional().default(false),
   prompt: z.string().min(10).max(2000),
   is_instrumental: z.boolean().optional().default(false),
-  lyrics: z.string().max(3500).optional().default(''),
   audio_setting: zAudioSetting25.optional(),
+  lyrics: z.string().max(3500).optional().default(''),
+  lyrics_optimizer: z.boolean().optional().default(false),
 })
 
 /**
@@ -1782,8 +1782,8 @@ export const zMinimaxMusicV26Output = z.object({
  */
 export const zMinimaxMusicV2Input = z.object({
   prompt: z.string().min(10).max(2000),
-  lyrics_prompt: z.string().min(10).max(3000),
   audio_setting: zAudioSettingType2.optional(),
+  lyrics_prompt: z.string().min(10).max(3000),
 })
 
 /**
@@ -1797,48 +1797,48 @@ export const zMinimaxMusicV2Output = z.object({
  * TextToSpeechOutput
  */
 export const zMinimaxPreviewSpeech25HdOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
  * TextToSpeechOutput
  */
 export const zMinimaxPreviewSpeech25TurboOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
  * TextToSpeechOutput
  */
 export const zMinimaxSpeech02HdOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
  * TextToSpeechOutput
  */
 export const zMinimaxSpeech02TurboOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
  * TextToSpeechHD26Output
  */
 export const zMinimaxSpeech26HdOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
  * TextToSpeechTurbo26Output
  */
 export const zMinimaxSpeech26TurboOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
@@ -1847,8 +1847,8 @@ export const zMinimaxSpeech26TurboOutput = z.object({
  * Output model for Speech 2.8 HD.
  */
 export const zMinimaxSpeech28HdOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
@@ -1857,15 +1857,16 @@ export const zMinimaxSpeech28HdOutput = z.object({
  * Output model for Speech 2.8 Turbo.
  */
 export const zMinimaxSpeech28TurboOutput = z.object({
-  duration_ms: z.int(),
   audio: zFile,
+  duration_ms: z.int(),
 })
 
 /**
  * VoiceCloneRequest
  */
 export const zMinimaxVoiceCloneInput = z.object({
-  noise_reduction: z.boolean().optional().default(false),
+  text: z.union([z.string().max(1000), z.unknown()]).optional(),
+  audio_url: z.string(),
   model: z
     .enum([
       'speech-02-hd',
@@ -1875,9 +1876,8 @@ export const zMinimaxVoiceCloneInput = z.object({
     ])
     .optional()
     .default('speech-02-hd'),
-  audio_url: z.string(),
+  noise_reduction: z.boolean().optional().default(false),
   need_volume_normalization: z.boolean().optional().default(false),
-  text: z.union([z.string().max(1000), z.unknown()]).optional(),
   accuracy: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
 })
 
@@ -1909,13 +1909,13 @@ export const zMinimaxVoiceDesignOutput = z.object({
  * AudioInput
  */
 export const zMmaudioV2TextToAudioInput = z.object({
+  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
+  num_steps: z.int().gte(4).lte(50).optional().default(25),
+  duration: z.number().gte(1).lte(30).optional().default(8),
+  cfg_strength: z.number().gte(0).lte(20).optional().default(4.5),
+  prompt: z.string(),
   mask_away_clip: z.boolean().optional().default(false),
   negative_prompt: z.string().optional().default(''),
-  duration: z.number().gte(1).lte(30).optional().default(8),
-  prompt: z.string(),
-  cfg_strength: z.number().gte(0).lte(20).optional().default(4.5),
-  num_steps: z.int().gte(4).lte(50).optional().default(25),
-  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
 })
 
 /**
@@ -1946,11 +1946,11 @@ export const zMusicGeneratorOutput = z.object({
  * MusicSection
  */
 export const zMusicSection = z.object({
-  section_name: z.string().min(1).max(100),
+  negative_local_styles: z.array(z.string()),
+  lines: z.array(z.string()),
   duration_ms: z.int().gte(3000).lte(120000),
   positive_local_styles: z.array(z.string()),
-  lines: z.array(z.string()),
-  negative_local_styles: z.array(z.string()),
+  section_name: z.string().min(1).max(100),
 })
 
 /**
@@ -1958,8 +1958,8 @@ export const zMusicSection = z.object({
  */
 export const zMusicCompositionPlan = z.object({
   positive_global_styles: z.array(z.string()),
-  negative_global_styles: z.array(z.string()),
   sections: z.array(zMusicSection),
+  negative_global_styles: z.array(z.string()),
 })
 
 /**
@@ -1968,6 +1968,7 @@ export const zMusicCompositionPlan = z.object({
  * Request format for Elevenlabs Music API
  */
 export const zElevenlabsMusicInput = z.object({
+  respect_sections_durations: z.boolean().optional().default(true),
   output_format: z
     .enum([
       'mp3_22050_32',
@@ -1992,26 +1993,90 @@ export const zElevenlabsMusicInput = z.object({
     ])
     .optional()
     .default('mp3_44100_128'),
-  force_instrumental: z.boolean().optional().default(false),
   prompt: z.union([z.string(), z.unknown()]).optional(),
-  composition_plan: z.union([zMusicCompositionPlan, z.unknown()]).optional(),
+  force_instrumental: z.boolean().optional().default(false),
   music_length_ms: z
     .union([z.int().gte(3000).lte(600000), z.unknown()])
     .optional(),
-  respect_sections_durations: z.boolean().optional().default(true),
+  composition_plan: z.union([zMusicCompositionPlan, z.unknown()]).optional(),
 })
 
 /**
  * AudioInput
  */
 export const zNemotron3NanoOmniAudioInput = z.object({
-  top_p: z.number().gte(0).lte(1).optional().default(0.95),
-  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   system_prompt: z.union([z.string(), z.unknown()]).optional(),
-  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
-  audio_url: z.string(),
+  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   max_tokens: z.int().gte(1).lte(20000).optional().default(1024),
   prompt: z.string().min(1),
+  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  audio_url: z.string(),
+  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
+})
+
+/**
+ * SpeechInput
+ */
+export const zNemotronAsrMultilingualAsrInput = z.object({
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  language: z
+    .enum([
+      'auto',
+      'en-US',
+      'en-GB',
+      'es-US',
+      'es-ES',
+      'de-DE',
+      'fr-FR',
+      'fr-CA',
+      'it-IT',
+      'ar-AR',
+      'ja-JP',
+      'ko-KR',
+      'pt-BR',
+      'pt-PT',
+      'ru-RU',
+      'hi-IN',
+      'zh-CN',
+      'vi-VN',
+      'he-IL',
+      'nl-NL',
+      'cs-CZ',
+      'da-DK',
+      'pl-PL',
+      'nn-NO',
+      'nb-NO',
+      'sv-SE',
+      'th-TH',
+      'tr-TR',
+      'bg-BG',
+      'el-GR',
+      'et-EE',
+      'fi-FI',
+      'hr-HR',
+      'hu-HU',
+      'lt-LT',
+      'lv-LV',
+      'ro-RO',
+      'sk-SK',
+      'uk-UA',
+      'mt-MT',
+      'sl-SI',
+    ])
+    .optional()
+    .default('auto'),
+  audio_url: z.string(),
+})
+
+/**
+ * SpeechOutput
+ */
+export const zNemotronAsrMultilingualAsrOutput = z.object({
+  output: z.string(),
+  partial: z.boolean().optional().default(false),
 })
 
 /**
@@ -2088,7 +2153,6 @@ export const zPronunciationDictionaryLocator = z.object({
  * TextToDialogueRequest
  */
 export const zElevenlabsTextToDialogueElevenV3Input = z.object({
-  use_speaker_boost: z.union([z.boolean(), z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
   inputs: z.array(zDialogueBlock),
   pronunciation_dictionary_locators: z
@@ -2096,6 +2160,7 @@ export const zElevenlabsTextToDialogueElevenV3Input = z.object({
     .optional()
     .default([]),
   stability: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  use_speaker_boost: z.union([z.boolean(), z.unknown()]).optional(),
   language_code: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -2144,9 +2209,23 @@ export const zQwen3TtsCloneVoice17bOutput = z.object({
  * Qwen3TTSInput06b
  */
 export const zQwen3TtsTextToSpeech06bInput = z.object({
+  subtalker_dosample: z.union([z.boolean(), z.unknown()]).optional(),
+  reference_text: z.union([z.string(), z.unknown()]).optional(),
+  subtalker_top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  subtalker_temperature: z
+    .union([z.number().gte(0).lte(1), z.unknown()])
+    .optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  speaker_voice_embedding_file_url: z
+    .union([z.string(), z.unknown()])
+    .optional(),
   top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
   repetition_penalty: z.union([z.number().gte(0), z.unknown()]).optional(),
-  subtalker_top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  max_new_tokens: z.union([z.int().gte(1).lte(8192), z.unknown()]).optional(),
+  subtalker_top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
+  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  text: z.string(),
+  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   language: z
     .enum([
       'Auto',
@@ -2163,9 +2242,6 @@ export const zQwen3TtsTextToSpeech06bInput = z.object({
     ])
     .optional()
     .default('Auto'),
-  max_new_tokens: z.union([z.int().gte(1).lte(8192), z.unknown()]).optional(),
-  subtalker_top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
-  subtalker_dosample: z.union([z.boolean(), z.unknown()]).optional(),
   voice: z
     .union([
       z.enum([
@@ -2182,17 +2258,6 @@ export const zQwen3TtsTextToSpeech06bInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  subtalker_temperature: z
-    .union([z.number().gte(0).lte(1), z.unknown()])
-    .optional(),
-  reference_text: z.union([z.string(), z.unknown()]).optional(),
-  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  text: z.string(),
-  speaker_voice_embedding_file_url: z
-    .union([z.string(), z.unknown()])
-    .optional(),
-  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -2206,9 +2271,23 @@ export const zQwen3TtsTextToSpeech06bOutput = z.object({
  * Qwen3TTSInput
  */
 export const zQwen3TtsTextToSpeech17bInput = z.object({
+  subtalker_dosample: z.union([z.boolean(), z.unknown()]).optional(),
+  reference_text: z.union([z.string(), z.unknown()]).optional(),
+  subtalker_top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  subtalker_temperature: z
+    .union([z.number().gte(0).lte(1), z.unknown()])
+    .optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  speaker_voice_embedding_file_url: z
+    .union([z.string(), z.unknown()])
+    .optional(),
   top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
   repetition_penalty: z.union([z.number().gte(0), z.unknown()]).optional(),
-  subtalker_top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  max_new_tokens: z.union([z.int().gte(1).lte(8192), z.unknown()]).optional(),
+  subtalker_top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
+  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  text: z.string(),
+  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   language: z
     .enum([
       'Auto',
@@ -2225,9 +2304,6 @@ export const zQwen3TtsTextToSpeech17bInput = z.object({
     ])
     .optional()
     .default('Auto'),
-  max_new_tokens: z.union([z.int().gte(1).lte(8192), z.unknown()]).optional(),
-  subtalker_top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
-  subtalker_dosample: z.union([z.boolean(), z.unknown()]).optional(),
   voice: z
     .union([
       z.enum([
@@ -2244,17 +2320,6 @@ export const zQwen3TtsTextToSpeech17bInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  subtalker_temperature: z
-    .union([z.number().gte(0).lte(1), z.unknown()])
-    .optional(),
-  reference_text: z.union([z.string(), z.unknown()]).optional(),
-  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  text: z.string(),
-  speaker_voice_embedding_file_url: z
-    .union([z.string(), z.unknown()])
-    .optional(),
-  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -2268,10 +2333,15 @@ export const zQwen3TtsTextToSpeech17bOutput = z.object({
  * Qwen3DesignVoiceInput
  */
 export const zQwen3TtsVoiceDesign17bInput = z.object({
+  subtalker_dosample: z.union([z.boolean(), z.unknown()]).optional(),
+  repetition_penalty: z.union([z.number().gte(0), z.unknown()]).optional(),
+  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  max_new_tokens: z.union([z.int().gte(1).lte(8192), z.unknown()]).optional(),
   subtalker_temperature: z
     .union([z.number().gte(0).lte(1), z.unknown()])
     .optional(),
-  repetition_penalty: z.union([z.number().gte(0), z.unknown()]).optional(),
+  subtalker_top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
+  prompt: z.string(),
   language: z
     .enum([
       'Auto',
@@ -2288,15 +2358,10 @@ export const zQwen3TtsVoiceDesign17bInput = z.object({
     ])
     .optional()
     .default('Auto'),
-  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  max_new_tokens: z.union([z.int().gte(1).lte(8192), z.unknown()]).optional(),
-  prompt: z.string(),
-  top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
-  subtalker_top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
-  subtalker_dosample: z.union([z.boolean(), z.unknown()]).optional(),
   text: z.string(),
-  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   subtalker_top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  top_k: z.union([z.int().gte(0), z.unknown()]).optional(),
+  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
 })
 
 /**
@@ -2312,17 +2377,17 @@ export const zQwen3TtsVoiceDesign17bOutput = z.object({
  * Input for text-based audio separation.
  */
 export const zSamAudioSeparateInput = z.object({
-  predict_spans: z.boolean().optional().default(false),
-  reranking_candidates: z.int().gte(1).lte(7).optional().default(1),
-  max_chunk_duration: z.number().gte(10).lte(60).optional().default(60),
-  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  chunk_overlap: z.number().gte(0).lte(30).optional().default(5),
-  audio_url: z.string(),
-  prompt: z.string(),
   acceleration: z
     .enum(['fast', 'balanced', 'quality'])
     .optional()
     .default('balanced'),
+  predict_spans: z.boolean().optional().default(false),
+  audio_url: z.string(),
+  reranking_candidates: z.int().gte(1).lte(7).optional().default(1),
+  max_chunk_duration: z.number().gte(10).lte(60).optional().default(60),
+  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
+  prompt: z.string(),
+  chunk_overlap: z.number().gte(0).lte(30).optional().default(5),
 })
 
 /**
@@ -2331,10 +2396,10 @@ export const zSamAudioSeparateInput = z.object({
  * Output for text-based audio separation.
  */
 export const zSamAudioSeparateOutput = z.object({
-  sample_rate: z.int().optional().default(48000),
-  target: zFile,
-  residual: zFile,
   duration: z.number(),
+  residual: zFile,
+  target: zFile,
+  sample_rate: z.int().optional().default(48000),
 })
 
 /**
@@ -2343,19 +2408,19 @@ export const zSamAudioSeparateOutput = z.object({
  * Input for temporal span-based audio separation.
  */
 export const zSamAudioSpanSeparateInput = z.object({
-  trim_to_span: z.boolean().optional().default(false),
   acceleration: z
     .enum(['fast', 'balanced', 'quality'])
     .optional()
     .default('balanced'),
+  use_sound_activity_ranking: z.boolean().optional().default(false),
+  audio_url: z.string(),
+  spans: z.array(zAudioTimeSpan),
   reranking_candidates: z.int().gte(1).lte(7).optional().default(1),
   max_chunk_duration: z.number().gte(10).lte(60).optional().default(60),
-  use_sound_activity_ranking: z.boolean().optional().default(false),
+  trim_to_span: z.boolean().optional().default(false),
   output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  chunk_overlap: z.number().gte(0).lte(30).optional().default(5),
-  audio_url: z.string(),
   prompt: z.union([z.string(), z.unknown()]).optional(),
-  spans: z.array(zAudioTimeSpan),
+  chunk_overlap: z.number().gte(0).lte(30).optional().default(5),
 })
 
 /**
@@ -2364,10 +2429,10 @@ export const zSamAudioSpanSeparateInput = z.object({
  * Output for span-based audio separation.
  */
 export const zSamAudioSpanSeparateOutput = z.object({
-  sample_rate: z.int().optional().default(48000),
-  target: zFile,
-  residual: zFile,
   duration: z.number(),
+  residual: zFile,
+  target: zFile,
+  sample_rate: z.int().optional().default(48000),
 })
 
 /**
@@ -2376,17 +2441,17 @@ export const zSamAudioSpanSeparateOutput = z.object({
  * Input for visual-prompted audio separation.
  */
 export const zSamAudioVisualSeparateInput = z.object({
-  reranking_candidates: z.int().gte(1).lte(4).optional().default(1),
-  max_chunk_duration: z.number().gte(10).lte(60).optional().default(60),
-  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  video_url: z.string(),
-  chunk_overlap: z.number().gte(0).lte(30).optional().default(5),
   acceleration: z
     .enum(['fast', 'balanced', 'quality'])
     .optional()
     .default('balanced'),
-  prompt: z.string().optional().default(''),
+  video_url: z.string(),
   mask_video_url: z.union([z.string(), z.unknown()]).optional(),
+  reranking_candidates: z.int().gte(1).lte(4).optional().default(1),
+  max_chunk_duration: z.number().gte(10).lte(60).optional().default(60),
+  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
+  prompt: z.string().optional().default(''),
+  chunk_overlap: z.number().gte(0).lte(30).optional().default(5),
 })
 
 /**
@@ -2395,10 +2460,10 @@ export const zSamAudioVisualSeparateInput = z.object({
  * Output for visual-prompted audio separation.
  */
 export const zSamAudioVisualSeparateOutput = z.object({
-  sample_rate: z.int().optional().default(48000),
-  target: zFile,
-  residual: zFile,
   duration: z.number(),
+  residual: zFile,
+  target: zFile,
+  sample_rate: z.int().optional().default(48000),
 })
 
 /**
@@ -2526,8 +2591,8 @@ export const zSmartTurnInput = z.object({
  */
 export const zSmartTurnOutput = z.object({
   metrics: z.record(z.string(), z.unknown()),
-  probability: z.number(),
   prediction: z.int(),
+  probability: z.number(),
 })
 
 /**
@@ -2551,9 +2616,9 @@ export const zSoundEffectsGeneratorOutput = z.object({
  * Speaker
  */
 export const zSpeaker = z.object({
+  prompt: z.string(),
   audio_url: z.string(),
   speaker_id: z.int(),
-  prompt: z.string(),
 })
 
 /**
@@ -2562,7 +2627,6 @@ export const zSpeaker = z.object({
  * Voice configuration for a single speaker in multi-speaker synthesis.
  */
 export const zSpeakerConfig = z.object({
-  speaker_id: z.string().regex(/^\w+$/),
   voice: z.enum([
     'Achernar',
     'Achird',
@@ -2595,6 +2659,7 @@ export const zSpeakerConfig = z.object({
     'Zephyr',
     'Zubenelgenubi',
   ]),
+  speaker_id: z.string().regex(/^\w+$/),
 })
 
 /**
@@ -2603,10 +2668,13 @@ export const zSpeakerConfig = z.object({
  * Input for Gemini 3.1 Flash TTS preview speech generation.
  */
 export const zGemini31FlashTtsInput = z.object({
+  output_format: z.enum(['wav', 'mp3', 'ogg_opus']).optional().default('mp3'),
+  prompt: z.string().min(1).max(50000),
   speakers: z
     .union([z.array(zSpeakerConfig).min(2).max(10), z.unknown()])
     .optional(),
-  prompt: z.string().min(1).max(50000),
+  temperature: z.number().gte(0).lte(2).optional().default(1),
+  style_instructions: z.union([z.string().max(4000), z.unknown()]).optional(),
   language_code: z
     .union([
       z.enum([
@@ -2701,7 +2769,6 @@ export const zGemini31FlashTtsInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  output_format: z.enum(['wav', 'mp3', 'ogg_opus']).optional().default('mp3'),
   voice: z
     .enum([
       'Achernar',
@@ -2737,8 +2804,6 @@ export const zGemini31FlashTtsInput = z.object({
     ])
     .optional()
     .default('Kore'),
-  style_instructions: z.union([z.string().max(4000), z.unknown()]).optional(),
-  temperature: z.number().gte(0).lte(2).optional().default(1),
 })
 
 /**
@@ -2747,6 +2812,12 @@ export const zGemini31FlashTtsInput = z.object({
  * Input for Gemini text-to-speech generation.
  */
 export const zGeminiTtsInput = z.object({
+  prompt: z.string().min(1).max(50000),
+  style_instructions: z.union([z.string().max(4000), z.unknown()]).optional(),
+  speakers: z
+    .union([z.array(zSpeakerConfig).min(2).max(10), z.unknown()])
+    .optional(),
+  temperature: z.number().gte(0).lte(2).optional().default(1),
   language_code: z
     .union([
       z.enum([
@@ -2841,17 +2912,6 @@ export const zGeminiTtsInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  output_format: z.enum(['wav', 'mp3', 'ogg_opus']).optional().default('mp3'),
-  temperature: z.number().gte(0).lte(2).optional().default(1),
-  model: z
-    .enum(['gemini-2.5-flash-tts', 'gemini-2.5-pro-tts'])
-    .optional()
-    .default('gemini-2.5-flash-tts'),
-  speakers: z
-    .union([z.array(zSpeakerConfig).min(2).max(10), z.unknown()])
-    .optional(),
-  style_instructions: z.union([z.string().max(4000), z.unknown()]).optional(),
-  prompt: z.string().min(1).max(50000),
   voice: z
     .enum([
       'Achernar',
@@ -2887,6 +2947,11 @@ export const zGeminiTtsInput = z.object({
     ])
     .optional()
     .default('Kore'),
+  output_format: z.enum(['wav', 'mp3', 'ogg_opus']).optional().default('mp3'),
+  model: z
+    .enum(['gemini-2.5-flash-tts', 'gemini-2.5-pro-tts'])
+    .optional()
+    .default('gemini-2.5-flash-tts'),
 })
 
 /**
@@ -2917,8 +2982,8 @@ export const zSpeechToTextInput = z.object({
  * SpeechOutput
  */
 export const zSpeechToTextOutput = z.object({
-  output: z.string(),
   partial: z.boolean().optional().default(false),
+  output: z.string(),
 })
 
 /**
@@ -2943,8 +3008,8 @@ export const zSpeechToTextTurboInput = z.object({
  * SpeechOutput
  */
 export const zSpeechToTextTurboOutput = z.object({
-  output: z.string(),
   partial: z.boolean().optional().default(false),
+  output: z.string(),
 })
 
 /**
@@ -2962,13 +3027,13 @@ export const zSpeechToTextTurboStreamOutput = z.unknown()
  */
 export const zStableAudio25AudioToAudioInput = z.object({
   total_seconds: z.union([z.int().gte(1).lte(190), z.unknown()]).optional(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(25).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   audio_url: z.string(),
   prompt: z.string(),
   num_inference_steps: z.int().gte(4).lte(8).optional().default(8),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
 })
 
 /**
@@ -2983,15 +3048,15 @@ export const zStableAudio25AudioToAudioOutput = z.object({
  * InpaintInput
  */
 export const zStableAudio25InpaintInput = z.object({
-  mask_start: z.int().gte(0).lte(190).optional().default(30),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  seconds_total: z.union([z.int().gte(1).lte(190), z.unknown()]).optional(),
-  mask_end: z.int().gte(0).lte(190).optional().default(190),
   guidance_scale: z.number().gte(1).lte(25).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  mask_end: z.int().gte(0).lte(190).optional().default(190),
   audio_url: z.string(),
   prompt: z.string(),
+  seconds_total: z.union([z.int().gte(1).lte(190), z.unknown()]).optional(),
   num_inference_steps: z.int().gte(4).lte(8).optional().default(8),
+  sync_mode: z.boolean().optional().default(false),
+  mask_start: z.int().gte(0).lte(190).optional().default(30),
 })
 
 /**
@@ -3006,12 +3071,12 @@ export const zStableAudio25InpaintOutput = z.object({
  * TextToAudioInput
  */
 export const zStableAudio25TextToAudioInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(25).optional().default(1),
   seconds_total: z.int().gte(1).lte(190).optional().default(190),
   prompt: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(25).optional().default(1),
   num_inference_steps: z.int().gte(4).lte(8).optional().default(8),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -3026,22 +3091,22 @@ export const zStableAudio25TextToAudioOutput = z.object({
  * AudioInpaintingMediumInput
  */
 export const zStableAudio3MediumAudioInpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_start_seconds: z.number().gte(0).lte(380),
-  audio_url: z.string(),
-  prompt: z.string(),
-  mask_end_seconds: z.number().gte(0).lte(380),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  mask_start_seconds: z.number().gte(0).lte(380),
+  mask_end_seconds: z.number().gte(0).lte(380),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3057,22 +3122,22 @@ export const zStableAudio3MediumAudioInpaintingOutput = z.object({
  * AudioOutpaintingMediumInput
  */
 export const zStableAudio3MediumAudioOutpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
-  audio_url: z.string(),
-  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  extend_seconds_after: z.number().gte(0).lte(380).optional().default(0),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   extend_seconds_before: z.number().gte(0).lte(380).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
+  extend_seconds_after: z.number().gte(0).lte(380).optional().default(0),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3088,22 +3153,22 @@ export const zStableAudio3MediumAudioOutpaintingOutput = z.object({
  * AudioToAudioMediumInput
  */
 export const zStableAudio3MediumAudioToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
-  audio_url: z.string(),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  duration: z.number().gte(1).lte(380).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
+  duration: z.number().gte(1).lte(380).optional().default(30),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3119,22 +3184,22 @@ export const zStableAudio3MediumAudioToAudioOutput = z.object({
  * AudioInpaintingMediumBaseInput
  */
 export const zStableAudio3MediumBaseAudioInpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_start_seconds: z.number().gte(0).lte(380),
-  audio_url: z.string(),
-  prompt: z.string(),
-  mask_end_seconds: z.number().gte(0).lte(380),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  mask_start_seconds: z.number().gte(0).lte(380),
+  mask_end_seconds: z.number().gte(0).lte(380),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3150,22 +3215,22 @@ export const zStableAudio3MediumBaseAudioInpaintingOutput = z.object({
  * AudioOutpaintingMediumBaseInput
  */
 export const zStableAudio3MediumBaseAudioOutpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
-  audio_url: z.string(),
-  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  extend_seconds_after: z.number().gte(0).lte(380).optional().default(0),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   extend_seconds_before: z.number().gte(0).lte(380).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
+  extend_seconds_after: z.number().gte(0).lte(380).optional().default(0),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3181,22 +3246,22 @@ export const zStableAudio3MediumBaseAudioOutpaintingOutput = z.object({
  * AudioToAudioMediumBaseInput
  */
 export const zStableAudio3MediumBaseAudioToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
-  audio_url: z.string(),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  duration: z.number().gte(1).lte(380).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
+  duration: z.number().gte(1).lte(380).optional().default(30),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3212,20 +3277,20 @@ export const zStableAudio3MediumBaseAudioToAudioOutput = z.object({
  * TextToAudioMediumBaseInput
  */
 export const zStableAudio3MediumBaseTextToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
   negative_prompt: z.string().optional().default(''),
   bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  duration: z.number().gte(1).lte(380).optional().default(30),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
+  duration: z.number().gte(1).lte(380).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3241,20 +3306,20 @@ export const zStableAudio3MediumBaseTextToAudioOutput = z.object({
  * TextToAudioMediumInput
  */
 export const zStableAudio3MediumTextToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
   negative_prompt: z.string().optional().default(''),
   bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  duration: z.number().gte(1).lte(380).optional().default(30),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
+  duration: z.number().gte(1).lte(380).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3270,22 +3335,22 @@ export const zStableAudio3MediumTextToAudioOutput = z.object({
  * AudioInpaintingInput
  */
 export const zStableAudio3SmallMusicAudioInpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_start_seconds: z.number().gte(0).lte(120),
-  audio_url: z.string(),
-  prompt: z.string(),
-  mask_end_seconds: z.number().gte(0).lte(120),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  mask_start_seconds: z.number().gte(0).lte(120),
+  mask_end_seconds: z.number().gte(0).lte(120),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3301,22 +3366,22 @@ export const zStableAudio3SmallMusicAudioInpaintingOutput = z.object({
  * AudioOutpaintingInput
  */
 export const zStableAudio3SmallMusicAudioOutpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
-  audio_url: z.string(),
-  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   extend_seconds_before: z.number().gte(0).lte(120).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
+  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3332,22 +3397,22 @@ export const zStableAudio3SmallMusicAudioOutpaintingOutput = z.object({
  * AudioToAudioInput
  */
 export const zStableAudio3SmallMusicAudioToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
-  audio_url: z.string(),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  duration: z.number().gte(1).lte(120).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
+  duration: z.number().gte(1).lte(120).optional().default(30),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3363,22 +3428,22 @@ export const zStableAudio3SmallMusicAudioToAudioOutput = z.object({
  * AudioInpaintingBaseInput
  */
 export const zStableAudio3SmallMusicBaseAudioInpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_start_seconds: z.number().gte(0).lte(120),
-  audio_url: z.string(),
-  prompt: z.string(),
-  mask_end_seconds: z.number().gte(0).lte(120),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  mask_start_seconds: z.number().gte(0).lte(120),
+  mask_end_seconds: z.number().gte(0).lte(120),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3394,22 +3459,22 @@ export const zStableAudio3SmallMusicBaseAudioInpaintingOutput = z.object({
  * AudioOutpaintingBaseInput
  */
 export const zStableAudio3SmallMusicBaseAudioOutpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
-  audio_url: z.string(),
-  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   extend_seconds_before: z.number().gte(0).lte(120).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
+  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3425,22 +3490,22 @@ export const zStableAudio3SmallMusicBaseAudioOutpaintingOutput = z.object({
  * AudioToAudioBaseInput
  */
 export const zStableAudio3SmallMusicBaseAudioToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
-  audio_url: z.string(),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  duration: z.number().gte(1).lte(120).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
+  duration: z.number().gte(1).lte(120).optional().default(30),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3456,20 +3521,20 @@ export const zStableAudio3SmallMusicBaseAudioToAudioOutput = z.object({
  * TextToAudioBaseInput
  */
 export const zStableAudio3SmallMusicBaseTextToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
   negative_prompt: z.string().optional().default(''),
   bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  duration: z.number().gte(1).lte(120).optional().default(30),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
+  duration: z.number().gte(1).lte(120).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3485,20 +3550,20 @@ export const zStableAudio3SmallMusicBaseTextToAudioOutput = z.object({
  * TextToAudioInput
  */
 export const zStableAudio3SmallMusicTextToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
   negative_prompt: z.string().optional().default(''),
   bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  duration: z.number().gte(1).lte(120).optional().default(30),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
+  duration: z.number().gte(1).lte(120).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3514,22 +3579,22 @@ export const zStableAudio3SmallMusicTextToAudioOutput = z.object({
  * AudioInpaintingInput
  */
 export const zStableAudio3SmallSfxAudioInpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_start_seconds: z.number().gte(0).lte(120),
-  audio_url: z.string(),
-  prompt: z.string(),
-  mask_end_seconds: z.number().gte(0).lte(120),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  mask_start_seconds: z.number().gte(0).lte(120),
+  mask_end_seconds: z.number().gte(0).lte(120),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3545,22 +3610,22 @@ export const zStableAudio3SmallSfxAudioInpaintingOutput = z.object({
  * AudioOutpaintingInput
  */
 export const zStableAudio3SmallSfxAudioOutpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
-  audio_url: z.string(),
-  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   extend_seconds_before: z.number().gte(0).lte(120).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
+  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3576,22 +3641,22 @@ export const zStableAudio3SmallSfxAudioOutpaintingOutput = z.object({
  * AudioToAudioInput
  */
 export const zStableAudio3SmallSfxAudioToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
-  audio_url: z.string(),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  duration: z.number().gte(1).lte(120).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
+  duration: z.number().gte(1).lte(120).optional().default(30),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3607,22 +3672,22 @@ export const zStableAudio3SmallSfxAudioToAudioOutput = z.object({
  * AudioInpaintingBaseInput
  */
 export const zStableAudio3SmallSfxBaseAudioInpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_start_seconds: z.number().gte(0).lte(120),
-  audio_url: z.string(),
-  prompt: z.string(),
-  mask_end_seconds: z.number().gte(0).lte(120),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  mask_start_seconds: z.number().gte(0).lte(120),
+  mask_end_seconds: z.number().gte(0).lte(120),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3638,22 +3703,22 @@ export const zStableAudio3SmallSfxBaseAudioInpaintingOutput = z.object({
  * AudioOutpaintingBaseInput
  */
 export const zStableAudio3SmallSfxBaseAudioOutpaintingInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
-  audio_url: z.string(),
-  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
   extend_seconds_before: z.number().gte(0).lte(120).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
+  extend_seconds_after: z.number().gte(0).lte(120).optional().default(0),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3669,22 +3734,22 @@ export const zStableAudio3SmallSfxBaseAudioOutpaintingOutput = z.object({
  * AudioToAudioBaseInput
  */
 export const zStableAudio3SmallSfxBaseAudioToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
-  audio_url: z.string(),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  duration: z.number().gte(1).lte(120).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
+  audio_url: z.string(),
+  bitrate: z.string().optional().default('192k'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
+  duration: z.number().gte(1).lte(120).optional().default(30),
   sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  init_noise_level: z.number().gte(0).lte(1).optional().default(0.9),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3700,20 +3765,20 @@ export const zStableAudio3SmallSfxBaseAudioToAudioOutput = z.object({
  * TextToAudioBaseInput
  */
 export const zStableAudio3SmallSfxBaseTextToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
   negative_prompt: z.string().optional().default(''),
   bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  duration: z.number().gte(1).lte(120).optional().default(30),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(7),
+  duration: z.number().gte(1).lte(120).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3729,20 +3794,20 @@ export const zStableAudio3SmallSfxBaseTextToAudioOutput = z.object({
  * TextToAudioInput
  */
 export const zStableAudio3SmallSfxTextToAudioInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
   negative_prompt: z.string().optional().default(''),
   bitrate: z.string().optional().default('192k'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(8),
-  duration: z.number().gte(1).lte(120).optional().default(30),
   output_format: z
     .enum(['mp3', 'wav', 'flac', 'ogg', 'opus', 'm4a', 'aac'])
     .optional()
     .default('mp3'),
-  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(25).optional().default(1),
+  duration: z.number().gte(1).lte(120).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -3758,10 +3823,10 @@ export const zStableAudio3SmallSfxTextToAudioOutput = z.object({
  * Input
  */
 export const zStableAudioInput = z.object({
-  seconds_total: z.int().gte(0).lte(47).optional().default(30),
-  steps: z.int().gte(2).lte(1000).optional().default(100),
   prompt: z.string(),
+  steps: z.int().gte(2).lte(1000).optional().default(100),
   seconds_start: z.int().gte(0).lte(47).optional().default(0),
+  seconds_total: z.int().gte(0).lte(47).optional().default(30),
 })
 
 /**
@@ -3776,21 +3841,21 @@ export const zStableAudioOutput = z.object({
  */
 export const zTada1bTextToSpeechInput = z.object({
   noise_temperature: z.number().gte(0).lte(2).optional().default(0.9),
-  speed_up_factor: z.number().gte(0.5).lte(2).optional().default(1),
-  num_extra_steps: z.int().gte(0).lte(50).optional().default(0),
-  acoustic_cfg_scale: z.number().gte(0).lte(10).optional().default(1.6),
-  audio_url: z.string(),
-  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  top_p: z.number().gte(0).lte(1).optional().default(0.9),
-  temperature: z.number().gte(0).lte(2).optional().default(0.6),
   transcript: z.string().optional().default(''),
+  temperature: z.number().gte(0).lte(2).optional().default(0.6),
+  repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
   language: z
     .enum(['en', 'ar', 'ch', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'pt'])
     .optional()
     .default('en'),
+  num_extra_steps: z.int().gte(0).lte(50).optional().default(0),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(20),
+  audio_url: z.string(),
+  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
   prompt: z.string(),
-  repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
+  acoustic_cfg_scale: z.number().gte(0).lte(10).optional().default(1.6),
+  top_p: z.number().gte(0).lte(1).optional().default(0.9),
+  speed_up_factor: z.number().gte(0.5).lte(2).optional().default(1),
 })
 
 /**
@@ -3805,21 +3870,21 @@ export const zTada1bTextToSpeechOutput = z.object({
  */
 export const zTada3bTextToSpeechInput = z.object({
   noise_temperature: z.number().gte(0).lte(2).optional().default(0.9),
-  speed_up_factor: z.number().gte(0.5).lte(2).optional().default(1),
-  num_extra_steps: z.int().gte(0).lte(50).optional().default(0),
-  acoustic_cfg_scale: z.number().gte(0).lte(10).optional().default(1.6),
-  audio_url: z.string(),
-  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
-  top_p: z.number().gte(0).lte(1).optional().default(0.9),
-  temperature: z.number().gte(0).lte(2).optional().default(0.6),
   transcript: z.string().optional().default(''),
+  temperature: z.number().gte(0).lte(2).optional().default(0.6),
+  repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
   language: z
     .enum(['en', 'ar', 'ch', 'de', 'es', 'fr', 'it', 'ja', 'pl', 'pt'])
     .optional()
     .default('en'),
+  num_extra_steps: z.int().gte(0).lte(50).optional().default(0),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(20),
+  audio_url: z.string(),
+  output_format: z.enum(['wav', 'mp3']).optional().default('wav'),
   prompt: z.string(),
-  repetition_penalty: z.number().gte(1).lte(2).optional().default(1.1),
+  acoustic_cfg_scale: z.number().gte(0).lte(10).optional().default(1.6),
+  top_p: z.number().gte(0).lte(1).optional().default(0.9),
+  speed_up_factor: z.number().gte(0.5).lte(2).optional().default(1),
 })
 
 /**
@@ -3833,20 +3898,20 @@ export const zTada3bTextToSpeechOutput = z.object({
  * TranscriptionWord
  */
 export const zTranscriptionWord = z.object({
-  start: z.union([z.number(), z.unknown()]).optional(),
   text: z.string(),
-  end: z.union([z.number(), z.unknown()]).optional(),
-  speaker_id: z.union([z.string(), z.unknown()]).optional(),
   type: z.string(),
+  speaker_id: z.union([z.string(), z.unknown()]).optional(),
+  start: z.union([z.number(), z.unknown()]).optional(),
+  end: z.union([z.number(), z.unknown()]).optional(),
 })
 
 /**
  * TranscriptionOutput
  */
 export const zElevenlabsSpeechToTextOutput = z.object({
+  language_probability: z.number(),
   text: z.string(),
   words: z.array(zTranscriptionWord),
-  language_probability: z.number(),
   language_code: z.string(),
 })
 
@@ -3854,9 +3919,9 @@ export const zElevenlabsSpeechToTextOutput = z.object({
  * TranscriptionOutputV2
  */
 export const zElevenlabsSpeechToTextScribeV2Output = z.object({
+  language_probability: z.number(),
   text: z.string(),
   words: z.array(zTranscriptionWord),
-  language_probability: z.number(),
   language_code: z.string(),
 })
 
@@ -3918,25 +3983,25 @@ export const zTurn = z.object({
  * Input
  */
 export const zCsm1bInput = z.object({
-  context: z.array(zSpeaker).optional(),
   scene: z.array(zTurn),
+  context: z.array(zSpeaker).optional(),
 })
 
 /**
  * UsageInfo
  */
 export const zUsageInfo = z.object({
-  output_tokens: z.int(),
   input_tokens: z.int(),
+  output_tokens: z.int(),
 })
 
 /**
  * BaseOutput
  */
 export const zNemotron3NanoOmniAudioOutput = z.object({
-  finish_reason: z.string().optional().default('stop'),
-  output: z.string(),
   usage: zUsageInfo,
+  output: z.string(),
+  finish_reason: z.string().optional().default('stop'),
 })
 
 /**
@@ -3981,10 +4046,10 @@ export const zV11VideoToMusicOutput = z.object({
  * Input schema for VibeVoice-0.5b TTS generation
  */
 export const zVibevoice05bInput = z.object({
-  cfg_scale: z.number().gte(1).lte(2).optional().default(1.3),
-  script: z.string().max(90000),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(1).lte(2).optional().default(1.3),
   speaker: z.enum(['Frank', 'Wayne', 'Carter', 'Emma', 'Grace', 'Mike']),
+  script: z.string().max(90000),
 })
 
 /**
@@ -3993,10 +4058,10 @@ export const zVibevoice05bInput = z.object({
  * Output schema for VibeVoice-0.5b TTS generation
  */
 export const zVibevoice05bOutput = z.object({
+  rtf: z.number(),
+  duration: z.number(),
   sample_rate: z.int(),
   audio: zFile,
-  duration: z.number(),
-  rtf: z.number(),
   generation_time: z.number(),
 })
 
@@ -4006,10 +4071,10 @@ export const zVibevoice05bOutput = z.object({
  * Output schema for VibeVoice TTS generation
  */
 export const zVibevoice7bOutput = z.object({
+  rtf: z.number(),
+  duration: z.number(),
   sample_rate: z.int(),
   audio: zFile,
-  duration: z.number(),
-  rtf: z.number(),
   generation_time: z.number(),
 })
 
@@ -4019,10 +4084,10 @@ export const zVibevoice7bOutput = z.object({
  * Output schema for VibeVoice TTS generation
  */
 export const zVibevoiceOutput = z.object({
+  rtf: z.number(),
+  duration: z.number(),
   sample_rate: z.int(),
   audio: zFile,
-  duration: z.number(),
-  rtf: z.number(),
   generation_time: z.number(),
 })
 
@@ -4030,7 +4095,6 @@ export const zVibevoiceOutput = z.object({
  * VibeVoiceSpeaker
  */
 export const zVibeVoiceSpeaker = z.object({
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
   preset: z
     .enum([
       'Alice [EN]',
@@ -4044,6 +4108,7 @@ export const zVibeVoiceSpeaker = z.object({
     ])
     .optional()
     .default('Alice [EN]'),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -4052,10 +4117,10 @@ export const zVibeVoiceSpeaker = z.object({
  * Input schema for VibeVoice-7b TTS generation
  */
 export const zVibevoice7bInput = z.object({
-  speakers: z.array(zVibeVoiceSpeaker),
-  cfg_scale: z.number().gte(1).lte(2).optional().default(1.3),
-  script: z.string().max(30000),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(1).lte(2).optional().default(1.3),
+  speakers: z.array(zVibeVoiceSpeaker),
+  script: z.string().max(30000),
 })
 
 /**
@@ -4064,10 +4129,10 @@ export const zVibevoice7bInput = z.object({
  * Input schema for VibeVoice TTS generation
  */
 export const zVibevoiceInput = z.object({
-  speakers: z.array(zVibeVoiceSpeaker),
-  cfg_scale: z.number().gte(1).lte(2).optional().default(1.3),
-  script: z.string().max(90000),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(1).lte(2).optional().default(1.3),
+  speakers: z.array(zVibeVoiceSpeaker),
+  script: z.string().max(90000),
 })
 
 /**
@@ -4076,19 +4141,20 @@ export const zVibevoiceInput = z.object({
  * Voice modification settings for Speech 2.8 models.
  */
 export const zVoiceModify = z.object({
-  intensity: z.int().gte(-100).lte(100).optional().default(0),
   timbre: z.int().gte(-100).lte(100).optional().default(0),
   pitch: z.int().gte(-100).lte(100).optional().default(0),
+  intensity: z.int().gte(-100).lte(100).optional().default(0),
 })
 
 /**
  * VoiceSetting
  */
 export const zVoiceSetting = z.object({
-  english_normalization: z.boolean().optional().default(false),
-  vol: z.number().gte(0.01).lte(10).optional().default(1),
-  speed: z.number().gte(0.5).lte(2).optional().default(1),
   voice_id: z.string().min(1).optional().default('Wise_Woman'),
+  speed: z.number().gte(0.5).lte(2).optional().default(1),
+  english_normalization: z.boolean().optional().default(false),
+  pitch: z.int().gte(-12).lte(12).optional().default(0),
+  vol: z.number().gte(0.01).lte(10).optional().default(1),
   emotion: z
     .union([
       z.enum([
@@ -4103,17 +4169,16 @@ export const zVoiceSetting = z.object({
       z.unknown(),
     ])
     .optional(),
-  pitch: z.int().gte(-12).lte(12).optional().default(0),
 })
 
 /**
  * TextToSpeechHDv25Request
  */
 export const zMinimaxPreviewSpeech25HdInput = z.object({
+  text: z.string().min(1).max(5000),
+  audio_setting: zAudioSetting.optional(),
   output_format: z.enum(['url', 'hex']).optional().default('hex'),
   voice_setting: zVoiceSetting.optional(),
-  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
-  audio_setting: zAudioSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4162,17 +4227,17 @@ export const zMinimaxPreviewSpeech25HdInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  text: z.string().min(1).max(5000),
+  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
 })
 
 /**
  * TextToSpeechTurbov25Request
  */
 export const zMinimaxPreviewSpeech25TurboInput = z.object({
+  text: z.string().min(1).max(5000),
+  audio_setting: zAudioSetting.optional(),
   output_format: z.enum(['url', 'hex']).optional().default('hex'),
   voice_setting: zVoiceSetting.optional(),
-  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
-  audio_setting: zAudioSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4221,17 +4286,17 @@ export const zMinimaxPreviewSpeech25TurboInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  text: z.string().min(1).max(5000),
+  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
 })
 
 /**
  * TextToSpeechHDRequest
  */
 export const zMinimaxSpeech02HdInput = z.object({
+  text: z.string().min(1).max(5000),
+  audio_setting: zAudioSetting.optional(),
   output_format: z.enum(['url', 'hex']).optional().default('hex'),
   voice_setting: zVoiceSetting.optional(),
-  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
-  audio_setting: zAudioSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4277,17 +4342,17 @@ export const zMinimaxSpeech02HdInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  text: z.string().min(1).max(5000),
+  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
 })
 
 /**
  * TextToSpeechTurboRequest
  */
 export const zMinimaxSpeech02TurboInput = z.object({
+  text: z.string().min(1).max(5000),
+  audio_setting: zAudioSetting.optional(),
   output_format: z.enum(['url', 'hex']).optional().default('hex'),
   voice_setting: zVoiceSetting.optional(),
-  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
-  audio_setting: zAudioSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4333,18 +4398,18 @@ export const zMinimaxSpeech02TurboInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  text: z.string().min(1).max(5000),
+  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
 })
 
 /**
  * TextToSpeechHD26Request
  */
 export const zMinimaxSpeech26HdInput = z.object({
-  output_format: z.enum(['url', 'hex']).optional().default('hex'),
-  voice_setting: zVoiceSetting.optional(),
   prompt: z.string().min(1).max(10000),
-  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
+  output_format: z.enum(['url', 'hex']).optional().default('hex'),
   audio_setting: zAudioSetting.optional(),
+  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
+  voice_setting: zVoiceSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4397,11 +4462,11 @@ export const zMinimaxSpeech26HdInput = z.object({
  * TextToSpeechTurbo26Request
  */
 export const zMinimaxSpeech26TurboInput = z.object({
-  output_format: z.enum(['url', 'hex']).optional().default('hex'),
-  voice_setting: zVoiceSetting.optional(),
   prompt: z.string().min(1).max(10000),
-  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
+  output_format: z.enum(['url', 'hex']).optional().default('hex'),
   audio_setting: zAudioSetting.optional(),
+  pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
+  voice_setting: zVoiceSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4456,8 +4521,10 @@ export const zMinimaxSpeech26TurboInput = z.object({
  * Request model for Speech 2.8 HD - highest quality speech synthesis.
  */
 export const zMinimaxSpeech28HdInput = z.object({
+  prompt: z.string().min(1).max(10000),
   output_format: z.enum(['url', 'hex']).optional().default('hex'),
-  normalization_setting: zLoudnessNormalizationSetting.optional(),
+  voice_modify: z.union([zVoiceModify, z.unknown()]).optional(),
+  voice_setting: zVoiceSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4503,11 +4570,9 @@ export const zMinimaxSpeech28HdInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  voice_modify: z.union([zVoiceModify, z.unknown()]).optional(),
-  prompt: z.string().min(1).max(10000),
+  normalization_setting: zLoudnessNormalizationSetting.optional(),
   pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
   audio_setting: zAudioSetting.optional(),
-  voice_setting: zVoiceSetting.optional(),
 })
 
 /**
@@ -4516,8 +4581,10 @@ export const zMinimaxSpeech28HdInput = z.object({
  * Request model for Speech 2.8 Turbo - faster speech synthesis with good quality.
  */
 export const zMinimaxSpeech28TurboInput = z.object({
+  prompt: z.string().min(1).max(10000),
   output_format: z.enum(['url', 'hex']).optional().default('hex'),
-  normalization_setting: zLoudnessNormalizationSetting.optional(),
+  voice_modify: z.union([zVoiceModify, z.unknown()]).optional(),
+  voice_setting: zVoiceSetting.optional(),
   language_boost: z
     .union([
       z.enum([
@@ -4563,11 +4630,9 @@ export const zMinimaxSpeech28TurboInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  voice_modify: z.union([zVoiceModify, z.unknown()]).optional(),
-  prompt: z.string().min(1).max(10000),
+  normalization_setting: zLoudnessNormalizationSetting.optional(),
   pronunciation_dict: z.union([zPronunciationDict, z.unknown()]).optional(),
   audio_setting: zAudioSetting.optional(),
-  voice_setting: zVoiceSetting.optional(),
 })
 
 /**
@@ -4582,8 +4647,9 @@ export const zWhisperChunk = z.object({
  * WhisperInput
  */
 export const zWizperInput = z.object({
-  max_segment_len: z.int().gte(10).lte(29).optional().default(29),
   audio_url: z.string(),
+  merge_chunks: z.boolean().optional().default(true),
+  chunk_level: z.string().optional().default('segment'),
   task: z.enum(['transcribe', 'translate']).optional().default('transcribe'),
   version: z.string().optional().default('3'),
   language: z
@@ -4692,14 +4758,15 @@ export const zWizperInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  chunk_level: z.string().optional().default('segment'),
-  merge_chunks: z.boolean().optional().default(true),
+  max_segment_len: z.int().gte(10).lte(29).optional().default(29),
 })
 
 /**
  * WhisperOutput
  */
 export const zWizperOutput = z.object({
+  text: z.string(),
+  chunks: z.array(zWhisperChunk),
   languages: z.array(
     z.enum([
       'af',
@@ -4803,8 +4870,6 @@ export const zWizperOutput = z.object({
       'zh',
     ]),
   ),
-  chunks: z.array(zWhisperChunk),
-  text: z.string(),
 })
 
 /**
@@ -4814,16 +4879,16 @@ export const zWizperOutput = z.object({
  */
 export const zWorkflowUtilitiesAudioCompressorInput = z.object({
   makeup: z.number().gte(0).lte(64).optional().default(8),
-  knee: z.number().gte(1).lte(8).optional().default(2.83),
   output_bitrate: z
     .enum(['128k', '192k', '256k', '320k'])
     .optional()
     .default('192k'),
+  knee: z.number().gte(1).lte(8).optional().default(2.83),
   attack: z.number().gte(0.01).lte(2000).optional().default(5),
   ratio: z.number().gte(1).lte(20).optional().default(3),
   audio_url: z.string(),
-  release: z.number().gte(0.01).lte(9000).optional().default(50),
   threshold: z.number().gte(-60).lte(0).optional().default(-18),
+  release: z.number().gte(0.01).lte(9000).optional().default(50),
 })
 
 /**
@@ -4841,17 +4906,17 @@ export const zWorkflowUtilitiesAudioCompressorOutput = z.object({
  * Input model for applying impulse response (IR) convolution reverb to audio
  */
 export const zWorkflowUtilitiesImpulseResponseInput = z.object({
+  impulse_response_url: z.string(),
   loudness_lra: z.number().gte(1).lte(50).optional().default(8),
-  loudness_i: z.number().gte(-70).lte(0).optional().default(-18),
-  wet_level: z.number().gte(0).lte(1).optional().default(0.3),
   output_bitrate: z
     .enum(['128k', '192k', '256k', '320k'])
     .optional()
     .default('192k'),
-  loudness_tp: z.number().gte(-10).lte(0).optional().default(-1.5),
-  audio_url: z.string(),
   dry_level: z.number().gte(0).lte(1).optional().default(0.7),
-  impulse_response_url: z.string(),
+  wet_level: z.number().gte(0).lte(1).optional().default(0.3),
+  audio_url: z.string(),
+  loudness_tp: z.number().gte(-10).lte(0).optional().default(-1.5),
+  loudness_i: z.number().gte(-70).lte(0).optional().default(-18),
 })
 
 /**
@@ -4867,8 +4932,8 @@ export const zWorkflowUtilitiesImpulseResponseOutput = z.object({
  * ZonosInput
  */
 export const zZonosInput = z.object({
-  reference_audio_url: z.string(),
   prompt: z.string(),
+  reference_audio_url: z.string(),
 })
 
 /**
@@ -10654,6 +10719,54 @@ export const zGetNvidiaNemotron3NanoOmniAudioRequestsByRequestIdStatusQuery =
  * The request status.
  */
 export const zGetNvidiaNemotron3NanoOmniAudioRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostNvidiaNemotronAsrMultilingualAsrBody =
+  zNemotronAsrMultilingualAsrInput
+
+/**
+ * The request status.
+ */
+export const zPostNvidiaNemotronAsrMultilingualAsrResponse = zQueueStatus
+
+export const zGetNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdResponse =
+  zNemotronAsrMultilingualAsrOutput
+
+export const zPutNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetNvidiaNemotronAsrMultilingualAsrRequestsByRequestIdStatusResponse =
   zQueueStatus
 
 export const zPostResembleAiChatterboxhdSpeechToSpeechBody =

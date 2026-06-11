@@ -409,7 +409,7 @@
     "/v1/embedding-models": {
       "get": {
         "tags": ["v1"],
-        "summary": "List all embedding models available to the authenticating API key with full information. Additional information compared to /v1/models includes modalities, pricing, fingerprint and alias(es).",
+        "summary": "List all embedding models available to the authenticating API key with full information. Additional information compared to /v1/models includes modalities, fingerprint and alias(es).",
         "operationId": "handle_embedding_models_list_request",
         "responses": {
           "200": {
@@ -824,10 +824,108 @@
         ]
       }
     },
+    "/v1/files/{file_id}/public-url": {
+      "post": {
+        "tags": ["v1"],
+        "summary": "Create a permanent, unauthenticated public URL for an existing file. The\nunderlying file is unaffected and can still be fetched through the\nauthenticated content endpoint. Use this when you want to share a stored\nasset (image, video, PDF) outside your API-keyed environment. Public URLs\ncan be revoked at any time via `POST /v1/files/{file_id}/public-url/revoke`.",
+        "operationId": "handle_create_public_url_request",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "The file's `id`.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePublicUrlRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePublicUrlResponse"
+                },
+                "example": {
+                  "public_url": "https://files-cdn.x.ai/ZsqeMtdcSYWPPHTQdxXDKQ/file_a128090d-f0c9-4873-bd84-e499777e7417.png",
+                  "expires_at": 1755600000
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Common causes: `expires_after` outside [3600, 2592000], `expires_after` greater than the file's remaining lifetime, unsupported content type, file is empty or larger than 50 MiB."
+          },
+          "404": {
+            "description": "File not found, deleted, or belongs to another team."
+          },
+          "429": {
+            "description": "Per-team active-URL quota exhausted (1000 max) or rate limit exceeded."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/files/{file_id}/public-url/revoke": {
+      "post": {
+        "tags": ["v1"],
+        "summary": "Revoke the active public URL for a file. The underlying file remains\navailable through the authenticated content endpoint. Revoke is idempotent\n— calling it on a file without an active public URL returns\n`revoked: false` without an error.",
+        "operationId": "handle_revoke_public_url_request",
+        "parameters": [
+          {
+            "name": "file_id",
+            "in": "path",
+            "description": "The file's `id`.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RevokePublicUrlResponse"
+                },
+                "example": {
+                  "id": "file_a128090d-f0c9-4873-bd84-e499777e7417",
+                  "revoked": true,
+                  "public_url": "https://files-cdn.x.ai/ZsqeMtdcSYWPPHTQdxXDKQ/file_a128090d-f0c9-4873-bd84-e499777e7417.png"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/v1/image-generation-models": {
       "get": {
         "tags": ["v1"],
-        "summary": "List all image generation models available to the authenticating API key with full information. Additional information compared to /v1/models includes modalities, pricing, fingerprint and alias(es).",
+        "summary": "List all image generation models available to the authenticating API key with full information. Additional information compared to /v1/models includes modalities, fingerprint and alias(es).",
         "operationId": "handle_image_generation_models_list_request",
         "responses": {
           "200": {
@@ -1035,7 +1133,7 @@
     "/v1/language-models": {
       "get": {
         "tags": ["v1"],
-        "summary": "List all chat and image understanding models available to the authenticating API key with full information. Additional information compared to /v1/models includes modalities, pricing, fingerprint and alias(es).",
+        "summary": "List all chat and image understanding models available to the authenticating API key with full information. Additional information compared to /v1/models includes modalities, fingerprint and alias(es).",
         "operationId": "handle_language_models_list_request",
         "responses": {
           "200": {
@@ -1048,49 +1146,43 @@
                 "example": {
                   "models": [
                     {
-                      "id": "grok-3",
-                      "fingerprint": "fp_898ae9f31c",
-                      "created": 1743724800,
+                      "id": "latest",
+                      "fingerprint": "fp_777a9f8466",
+                      "created": 1776556800,
                       "object": "model",
                       "owned_by": "xai",
                       "version": "1.0",
-                      "input_modalities": ["text"],
-                      "output_modalities": ["text"],
-                      "prompt_text_token_price": 30000,
-                      "cached_prompt_text_token_price": 7500,
-                      "prompt_image_token_price": 0,
-                      "completion_text_token_price": 150000,
-                      "search_price": 250000000,
-                      "aliases": ["grok-3-latest", "grok-3-beta"]
-                    },
-                    {
-                      "id": "grok-3-mini",
-                      "fingerprint": "fp_6a09108ff5",
-                      "created": 1743724800,
-                      "object": "model",
-                      "owned_by": "xai",
-                      "version": "1.0",
-                      "input_modalities": ["text"],
-                      "output_modalities": ["text"],
-                      "prompt_text_token_price": 3000,
-                      "cached_prompt_text_token_price": 750,
-                      "prompt_image_token_price": 0,
-                      "completion_text_token_price": 5000,
-                      "search_price": 250000000,
-                      "aliases": ["grok-3-mini-latest", "grok-3-mini-beta"]
-                    },
-                    {
-                      "id": "grok-2-vision-1212",
-                      "fingerprint": "fp_daba7546e5",
-                      "created": 1733961600,
-                      "object": "model",
-                      "owned_by": "xai",
-                      "version": "0.1.0",
                       "input_modalities": ["text", "image"],
                       "output_modalities": ["text"],
+                      "prompt_text_token_price": 12500,
+                      "cached_prompt_text_token_price": 2000,
+                      "prompt_image_token_price": 12500,
+                      "completion_text_token_price": 25000,
+                      "search_price": 0,
+                      "prompt_text_token_price_long_context": 0,
+                      "cached_prompt_text_token_price_long_context": 0,
+                      "completion_text_token_price_long_context": 0,
+                      "long_context_threshold": 0,
+                      "aliases": ["grok-4.3-latest", "grok-latest"]
+                    },
+                    {
+                      "id": "grok-420-reasoning",
+                      "fingerprint": "fp_5319828d69",
+                      "created": 1768003200,
+                      "object": "model",
+                      "owned_by": "xai",
+                      "version": "1.0",
+                      "input_modalities": ["text"],
+                      "output_modalities": ["text"],
                       "prompt_text_token_price": 20000,
-                      "prompt_image_token_price": 20000,
-                      "completion_text_token_price": 100000,
+                      "cached_prompt_text_token_price": 2000,
+                      "prompt_image_token_price": 0,
+                      "completion_text_token_price": 80000,
+                      "search_price": 250000000,
+                      "prompt_text_token_price_long_context": 40000,
+                      "cached_prompt_text_token_price_long_context": 0,
+                      "completion_text_token_price_long_context": 160000,
+                      "long_context_threshold": 128000,
                       "aliases": []
                     }
                   ]
@@ -1277,7 +1369,7 @@
     "/v1/models": {
       "get": {
         "tags": ["v1"],
-        "summary": "List all models available to the authenticating API key with minimalized information, including model names (ID), creation times, etc.",
+        "summary": "List all models available to the authenticating API key, including model names (ID), creation times, and pricing.",
         "operationId": "handle_models_list_request",
         "responses": {
           "200": {
@@ -1290,40 +1382,34 @@
                 "example": {
                   "data": [
                     {
-                      "id": "grok-4-0709",
-                      "created": 1752019200,
+                      "id": "latest",
+                      "created": 1776556800,
                       "object": "model",
-                      "owned_by": "xai"
+                      "owned_by": "xai",
+                      "prompt_text_token_price": 12500,
+                      "cached_prompt_text_token_price": 2000,
+                      "prompt_image_token_price": 12500,
+                      "completion_text_token_price": 25000
                     },
                     {
-                      "id": "grok-code-fast-1",
-                      "created": 1755993600,
+                      "id": "grok-420-reasoning",
+                      "created": 1768003200,
                       "object": "model",
-                      "owned_by": "xai"
+                      "owned_by": "xai",
+                      "prompt_text_token_price": 20000,
+                      "cached_prompt_text_token_price": 2000,
+                      "prompt_image_token_price": 0,
+                      "completion_text_token_price": 80000,
+                      "prompt_text_token_price_long_context": 40000,
+                      "completion_text_token_price_long_context": 160000,
+                      "long_context_threshold": 128000
                     },
                     {
-                      "id": "grok-3",
-                      "created": 1743724800,
+                      "id": "grok-imagine-image",
+                      "created": 1769472000,
                       "object": "model",
-                      "owned_by": "xai"
-                    },
-                    {
-                      "id": "grok-3-mini",
-                      "created": 1743724800,
-                      "object": "model",
-                      "owned_by": "xai"
-                    },
-                    {
-                      "id": "grok-2-image-1212",
-                      "created": 1736726400,
-                      "object": "model",
-                      "owned_by": "xai"
-                    },
-                    {
-                      "id": "grok-2-vision-1212",
-                      "created": 1733961600,
-                      "object": "model",
-                      "owned_by": "xai"
+                      "owned_by": "xai",
+                      "image_price": 200000000
                     }
                   ],
                   "object": "list"
@@ -1345,7 +1431,7 @@
     "/v1/models/{model_id}": {
       "get": {
         "tags": ["v1"],
-        "summary": "Get minimalized information about a model with its model_id.",
+        "summary": "Get information about a model with its model_id, including pricing.",
         "operationId": "handle_model_get_request",
         "parameters": [
           {
@@ -1368,9 +1454,13 @@
                 },
                 "example": {
                   "id": "latest",
-                  "created": 1743724800,
+                  "created": 1776556800,
                   "object": "model",
-                  "owned_by": "xai"
+                  "owned_by": "xai",
+                  "prompt_text_token_price": 12500,
+                  "cached_prompt_text_token_price": 2000,
+                  "prompt_image_token_price": 12500,
+                  "completion_text_token_price": 25000
                 }
               }
             }
@@ -1485,6 +1575,69 @@
           },
           "422": {
             "description": "Unprocessable Entity. There are missing fields in the request body."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/responses/compact": {
+      "post": {
+        "tags": ["v1"],
+        "summary": "Compacts a full Responses API input window into a shorter canonical window.",
+        "description": "The client sends its current input (the same items that would be passed\nto `POST /v1/responses`) and receives a compacted output window.\nThe output should be used **verbatim** as the `input` of the next\n`/v1/responses` call (appending only the new user turn).\n\nThis generalizes the compaction approach used by the coding-agent\nharness (`generate_session_compact` in xai-grok-shell):\n\n1. Strip tool-result noise from the history.\n2. Ask the model to produce a structured `<summary>` of the conversation.\n3. Rebuild a compact window:  system message → summary → last user query.\n4. Return that window to the client.",
+        "operationId": "handle_compact_request",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompactRequest"
+              },
+              "example": {
+                "model": "latest",
+                "input": [
+                  {
+                    "role": "system",
+                    "content": "You are a helpful assistant."
+                  },
+                  {
+                    "role": "user",
+                    "content": "Tell me about Rust."
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Rust is a systems programming language..."
+                  },
+                  {
+                    "role": "user",
+                    "content": "How does ownership work?"
+                  },
+                  {
+                    "role": "assistant",
+                    "content": "Ownership in Rust is..."
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success – compacted window returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompactResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request."
           }
         },
         "security": [
@@ -1708,6 +1861,205 @@
           },
           "404": {
             "description": "Not found. No responses could be found with the given response_id."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/skills": {
+      "get": {
+        "tags": ["v1"],
+        "operationId": "handle_list_skills_request",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "The maximum number of objects to be returned in a single response.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "Identifier for the last item from the previous pagination request.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Sort order. Use `asc` for ascending and `desc` for descending order.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["v1"],
+        "operationId": "handle_upload_skill_request",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadSkillMultipartRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid skill upload."
+          },
+          "413": {
+            "description": "Payload too large."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/skills/{skill_id}": {
+      "get": {
+        "tags": ["v1"],
+        "operationId": "handle_retrieve_skill_request",
+        "parameters": [
+          {
+            "name": "skill_id",
+            "in": "path",
+            "description": "The skill ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Skill"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["v1"],
+        "operationId": "handle_delete_skill_request",
+        "parameters": [
+          {
+            "name": "skill_id",
+            "in": "path",
+            "description": "The skill ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedSkill"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/skills/{skill_id}/content": {
+      "get": {
+        "tags": ["v1"],
+        "operationId": "handle_download_skill_content_request",
+        "parameters": [
+          {
+            "name": "skill_id",
+            "in": "path",
+            "description": "The skill ID.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success -- raw skill zip bytes streamed in chunks.",
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Skill not found."
           }
         },
         "security": [
@@ -2255,9 +2607,13 @@
             "maximum": 2,
             "minimum": -2
           },
+          "prompt_cache_key": {
+            "type": ["string", "null"],
+            "description": "A stable cache key for best-effort sticky routing / prompt-cache hits\nacross requests sharing a prompt prefix. Plumbed to `x-grok-conv-id`,\nsame as on `/v1/responses`."
+          },
           "reasoning_effort": {
             "type": ["string", "null"],
-            "description": "Constrains how hard a reasoning model thinks before responding. Not supported by `grok-4` and will result in error if used with `grok-4`. Possible values are `low` (uses fewer reasoning tokens) and `high` (uses more reasoning tokens)."
+            "description": "Constrains how hard a reasoning model thinks before responding. Only supported by `grok-4.3`. Possible values are `none` (disables reasoning completely), `low` (this is the default if not specified), `medium` and `high` (uses the most reasoning tokens)."
           },
           "response_format": {
             "oneOf": [
@@ -2285,6 +2641,17 @@
             "type": ["integer", "null"],
             "format": "int32",
             "description": "If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same `seed` and parameters should return the same result. Determinism is not guaranteed, and you should refer to the `system_fingerprint` response parameter to monitor changes in the backend."
+          },
+          "service_tier": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ServiceTier",
+                "description": "Specifies the processing tier for this request. Set to `\"priority\"` for higher scheduling\npriority at a higher token price. Valid values: `\"auto\"` (default), `\"priority\"`."
+              }
+            ]
           },
           "stop": {
             "type": ["array", "null"],
@@ -2373,7 +2740,14 @@
       "ChatResponse": {
         "type": "object",
         "description": "The chat response body for `/v1/chat/completions` endpoint.",
-        "required": ["id", "object", "created", "model", "choices"],
+        "required": [
+          "id",
+          "object",
+          "created",
+          "model",
+          "choices",
+          "service_tier"
+        ],
         "properties": {
           "choices": {
             "type": "array",
@@ -2414,6 +2788,10 @@
             },
             "description": "Files generated during the response (e.g., by the code execution tool).\nOnly populated when `code_execution_files_output` is included."
           },
+          "service_tier": {
+            "$ref": "#/components/schemas/ServiceTier",
+            "description": "The processing tier used for this request."
+          },
           "system_fingerprint": {
             "type": ["string", "null"],
             "description": "System fingerprint, used to indicate xAI system configuration changes."
@@ -2433,7 +2811,14 @@
       },
       "ChatResponseChunk": {
         "type": "object",
-        "required": ["id", "object", "created", "model", "choices"],
+        "required": [
+          "id",
+          "object",
+          "created",
+          "model",
+          "choices",
+          "service_tier"
+        ],
         "properties": {
           "choices": {
             "type": "array",
@@ -2473,6 +2858,10 @@
               "$ref": "#/components/schemas/OutputFile"
             },
             "description": "Files generated during the response (e.g., by the code execution tool).\nOnly populated for the final chunk when `code_execution_files_output` is included."
+          },
+          "service_tier": {
+            "$ref": "#/components/schemas/ServiceTier",
+            "description": "The processing tier used for this request."
           },
           "system_fingerprint": {
             "type": ["string", "null"],
@@ -2643,6 +3032,129 @@
             }
           }
         ]
+      },
+      "CompactRequest": {
+        "type": "object",
+        "description": "The request body for `POST /v1/responses/compact`.\n\nClients send the full current input window (the same items they would\npass to `/v1/responses`) and receive back a compacted window suitable\nfor use as the `input` of the next `/v1/responses` call.",
+        "required": ["input", "model"],
+        "properties": {
+          "input": {
+            "$ref": "#/components/schemas/ModelInput",
+            "description": "The full input window to compact."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model to use for compaction summarization (required)."
+          }
+        }
+      },
+      "CompactResponse": {
+        "type": "object",
+        "description": "The response body for `POST /v1/responses/compact`.\n\nThe `output` list contains a single compaction item wrapping the entire\ncompacted conversation in an encrypted blob. Clients should spread\n`output` into their next `/v1/responses` input:\n\n```python\nnext_input = [*compacted.output, new_user_msg]\n```",
+        "required": ["object", "id", "created_at", "model", "output"],
+        "properties": {
+          "created_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix timestamp (in seconds) when the compacted conversation was created."
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique ID for this compaction (e.g. `cmp_<uuid>`)."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model used for the compaction summary."
+          },
+          "object": {
+            "type": "string",
+            "description": "Always `\"response.compaction\"`."
+          },
+          "output": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModelInputPart"
+            },
+            "description": "Compacted output containing a single compaction item.\nPass this verbatim as input to the next `/v1/responses` call."
+          },
+          "usage": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CompactUsage",
+                "description": "Token usage information for the compaction call."
+              }
+            ]
+          }
+        }
+      },
+      "CompactUsage": {
+        "type": "object",
+        "description": "Token usage details for a compaction call.\n\nMirrors OpenAI's `ResponseUsage` shape (`input_tokens`,\n`input_tokens_details.cached_tokens`, `output_tokens`,\n`output_tokens_details.reasoning_tokens`, `total_tokens`) and adds\n`dropped_message_count` as an xAI-specific extension.",
+        "required": [
+          "input_tokens",
+          "input_tokens_details",
+          "output_tokens",
+          "output_tokens_details",
+          "total_tokens",
+          "dropped_message_count"
+        ],
+        "properties": {
+          "dropped_message_count": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of messages dropped/summarized during compaction."
+          },
+          "input_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of tokens in the original (pre-compaction) input."
+          },
+          "input_tokens_details": {
+            "$ref": "#/components/schemas/CompactUsageInputTokensDetails",
+            "description": "Detailed breakdown of input tokens."
+          },
+          "output_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of tokens in the compacted output."
+          },
+          "output_tokens_details": {
+            "$ref": "#/components/schemas/CompactUsageOutputTokensDetails",
+            "description": "Detailed breakdown of output tokens."
+          },
+          "total_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Total number of tokens used (input + output, including reasoning)."
+          }
+        }
+      },
+      "CompactUsageInputTokensDetails": {
+        "type": "object",
+        "description": "Breakdown of input tokens for a compaction call.",
+        "required": ["cached_tokens"],
+        "properties": {
+          "cached_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of input tokens that were served from the prompt cache."
+          }
+        }
+      },
+      "CompactUsageOutputTokensDetails": {
+        "type": "object",
+        "description": "Breakdown of output tokens for a compaction call.",
+        "required": ["reasoning_tokens"],
+        "properties": {
+          "reasoning_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of reasoning tokens generated during compaction."
+          }
+        }
       },
       "CompactionOutputItem": {
         "type": "object",
@@ -2842,6 +3354,50 @@
           }
         }
       },
+      "ContextDetails": {
+        "type": "object",
+        "description": "Token counts for the latest context window seen by the model.\n\nIn the non-agentic path these mirror `input_tokens` / `output_tokens`.\nIn the agentic path (multi-agents) these are reset on every step and\nreflect the most recent step's prompt and output sizes — useful for\nunderstanding how the live context window evolves across tool calls.\nInformational only; not used for billing.",
+        "required": ["input_tokens", "output_tokens"],
+        "properties": {
+          "input_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Prompt tokens in the latest context (sourced from\n`SamplingUsage.context_prompt_tokens`)."
+          },
+          "output_tokens": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Completion + reasoning tokens in the latest context (sourced from\n`SamplingUsage.context_output_tokens`)."
+          }
+        }
+      },
+      "CreatePublicUrlRequest": {
+        "type": "object",
+        "description": "Request body for `POST /v1/files/{file_id}/public-url`.",
+        "properties": {
+          "expires_after": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Seconds from now until the public URL expires. Must be between `3600` (1\nhour) and `2592000` (30 days). Omit to inherit the file's expiry (if it\nhas one) or to make the URL valid indefinitely."
+          }
+        }
+      },
+      "CreatePublicUrlResponse": {
+        "type": "object",
+        "description": "Response for creating a public URL for a file.",
+        "required": ["public_url"],
+        "properties": {
+          "expires_at": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Unix timestamp (seconds) when the public URL expires. Present when\nthe public URL has an expiry, either from an explicit `expires_after`\nin the request or inherited from the file's TTL. Absent when the\npublic URL is valid indefinitely."
+          },
+          "public_url": {
+            "type": "string",
+            "description": "The full public URL."
+          }
+        }
+      },
       "CustomToolCall": {
         "type": "object",
         "description": "The output of a custom tool call.",
@@ -2907,6 +3463,25 @@
           "object": {
             "type": "string",
             "description": "The deleted object type, which is always `response`."
+          }
+        }
+      },
+      "DeletedSkill": {
+        "type": "object",
+        "description": "Response for deleting a hosted skill.",
+        "required": ["id", "deleted", "object"],
+        "properties": {
+          "deleted": {
+            "type": "boolean",
+            "description": "Whether the skill was deleted."
+          },
+          "id": {
+            "type": "string",
+            "description": "The ID of the skill."
+          },
+          "object": {
+            "type": "string",
+            "description": "The object type, which is always `\"skill.deleted\"`."
           }
         }
       },
@@ -3043,6 +3618,17 @@
             "description": "Response format to return the image in. Can be `url` or `b64_json`. If `b64_json` is specified, the image will be returned as a base64-encoded string instead of a url to the generated image file.",
             "default": "url"
           },
+          "storage_options": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StorageOptions",
+                "description": "Optional output storage configuration. When present, the generated\nimage(s) are stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL."
+              }
+            ]
+          },
           "user": {
             "type": ["string", "null"],
             "description": "A unique identifier representing your end-user, which can help xAI to monitor and detect abuse."
@@ -3073,6 +3659,17 @@
           "prompt": {
             "type": "string",
             "description": "Prompt for video editing."
+          },
+          "storage_options": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StorageOptions",
+                "description": "Optional output storage configuration. When present, the generated\nvideo is stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL."
+              }
+            ]
           },
           "user": {
             "type": ["string", "null"],
@@ -3365,6 +3962,17 @@
             "type": "string",
             "description": "Prompt describing what should happen next in the video."
           },
+          "storage_options": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StorageOptions",
+                "description": "Optional output storage configuration. When present, the generated\nvideo is stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL."
+              }
+            ]
+          },
           "video": {
             "$ref": "#/components/schemas/VideoUrl",
             "description": "Input video to extend. The extension continues from the end of this video.\nInput video must be between 2 and 30 seconds long."
@@ -3403,9 +4011,51 @@
             "type": "string",
             "description": "The object type, which is always `file`. Only included for compatability."
           },
+          "public_url": {
+            "type": ["string", "null"],
+            "description": "Public URL for the file. Only present when the file has an active public URL."
+          },
+          "public_url_expires_at": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Unix timestamp (seconds) when the public URL expires. Only present when\nthe public URL has an independent expiry."
+          },
           "purpose": {
             "type": "string",
             "description": "The intended purpose of the uploaded file. Only included for OAI compatability."
+          }
+        }
+      },
+      "FileOutput": {
+        "type": "object",
+        "description": "Information about a generated file stored in the Files API.",
+        "required": ["file_id", "filename"],
+        "properties": {
+          "expires_at": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Unix timestamp (seconds) when the stored file expires and will be\nautomatically deleted. Only present when the file has an expiration."
+          },
+          "file_id": {
+            "type": "string",
+            "description": "Files API file_id of the stored file."
+          },
+          "filename": {
+            "type": "string",
+            "description": "Filename of the stored file."
+          },
+          "public_url": {
+            "type": ["string", "null"],
+            "description": "Public URL for the stored file. Only present when the request included\n`storage_options.public_url` and creation succeeded."
+          },
+          "public_url_error": {
+            "type": ["string", "null"],
+            "description": "Human-readable error when `storage_options.public_url` was set but\npublic URL creation failed. The file was stored successfully."
+          },
+          "public_url_expires_at": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Unix timestamp (seconds) when the public URL expires. Present when\nthe public URL has an expiry, either from an explicit `expires_after`\nin the request or inherited from the file's TTL."
           }
         }
       },
@@ -3633,6 +4283,17 @@
             "description": "Response format to return the image in. Can be url or b64_json. If b64_json is specified, the image will be returned as a base64-encoded string instead of a url to the generated image file.",
             "default": "url"
           },
+          "storage_options": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StorageOptions",
+                "description": "Optional output storage configuration. When present, the generated\nimage(s) are stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL."
+              }
+            ]
+          },
           "user": {
             "type": ["string", "null"],
             "description": "A unique identifier representing your end-user, which can help xAI to monitor and detect abuse."
@@ -3711,6 +4372,17 @@
               }
             ]
           },
+          "storage_options": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StorageOptions",
+                "description": "Optional output storage configuration. When present, the generated\nvideo is stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL."
+              }
+            ]
+          },
           "user": {
             "type": ["string", "null"],
             "description": "A unique identifier representing your end-user."
@@ -3725,9 +4397,24 @@
             "type": ["string", "null"],
             "description": "A base64-encoded string representation of the generated image (without the data-URI prefix), if `b64_json` is specified as `response_format` in the request."
           },
+          "file_output": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FileOutput",
+                "description": "Storage info for the generated image. Only present when the request\nincluded a `storage_options` configuration and the upload succeeded."
+              }
+            ]
+          },
           "mime_type": {
             "type": ["string", "null"],
             "description": "The MIME type of the generated image (e.g. `image/png`, `image/jpeg`, `image/webp`)."
+          },
+          "storage_error": {
+            "type": ["string", "null"],
+            "description": "Human-readable error when `storage_options` was set but the upload\nfailed. Absent on success or when storage was not requested."
           },
           "url": {
             "type": ["string", "null"],
@@ -3770,9 +4457,24 @@
             "format": "int32",
             "description": "Duration of the generated video in seconds."
           },
+          "file_output": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FileOutput",
+                "description": "Storage info for the generated video. Only present when the request\nincluded a `storage_options` configuration and the upload succeeded."
+              }
+            ]
+          },
           "respect_moderation": {
             "type": "boolean",
             "description": "Whether the video generated by the model respects moderation rules.\nThe field will be true if the video respects moderation rules. Otherwise\nthe field will be false and the video url field will be empty."
+          },
+          "storage_error": {
+            "type": ["string", "null"],
+            "description": "Human-readable error when `storage_options` was set but the upload\nfailed. Absent on success or when storage was not requested."
           },
           "url": {
             "type": ["string", "null"],
@@ -3853,7 +4555,7 @@
             "description": "User ID associated with the credentials."
           },
           "zdr_status": {
-            "type": "string",
+            "$ref": "#/components/schemas/ZdrStatus",
             "description": "Zero Data Retention status: `\"no_zdr\"`, `\"zdr\"`, or `\"pii_scrubbing\"`."
           }
         }
@@ -4217,6 +4919,10 @@
           "prompt_image_token_price",
           "completion_text_token_price",
           "search_price",
+          "prompt_text_token_price_long_context",
+          "cached_prompt_text_token_price_long_context",
+          "completion_text_token_price_long_context",
+          "long_context_threshold",
           "aliases"
         ],
         "properties": {
@@ -4232,10 +4938,20 @@
             "format": "int64",
             "description": "Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously."
           },
+          "cached_prompt_text_token_price_long_context": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Price of the cached prompt text token for long context requests (USD cents per 100 million tokens).\nWhen 0, falls back to cached_prompt_text_token_price."
+          },
           "completion_text_token_price": {
             "type": "integer",
             "format": "int64",
             "description": "Price of the completion text token in USD cents per 100 million token."
+          },
+          "completion_text_token_price_long_context": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Price of the completion text token for long context requests (USD cents per 100 million tokens).\nWhen 0, the standard completion_text_token_price applies."
           },
           "created": {
             "type": "integer",
@@ -4256,6 +4972,11 @@
               "type": "string"
             },
             "description": "The input modalities supported by the model, e.g. `\"text\"`, `\"image\"`."
+          },
+          "long_context_threshold": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Token count at or above which the long context prices apply.\nWhen 0, the model has no long context pricing tier."
           },
           "object": {
             "type": "string",
@@ -4281,6 +5002,11 @@
             "type": "integer",
             "format": "int64",
             "description": "Price of the prompt text token in USD cents per 100 million token."
+          },
+          "prompt_text_token_price_long_context": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Price of the prompt text token for long context requests (USD cents per 100 million tokens).\nWhen 0, the standard prompt_text_token_price applies at all context lengths."
           },
           "search_price": {
             "type": "integer",
@@ -4431,6 +5157,30 @@
           "object": {
             "type": "string",
             "description": "The object type of `data` field, which is always `\"list\"`."
+          }
+        }
+      },
+      "ListSkillsParams": {
+        "type": "object",
+        "description": "Parameters to control listing of skills.",
+        "properties": {
+          "after": {
+            "type": ["string", "null"],
+            "description": "Identifier for the last item from the previous pagination request."
+          },
+          "limit": {
+            "type": ["integer", "null"],
+            "format": "int32",
+            "description": "The maximum number of objects to be returned in a single response.",
+            "default": 100,
+            "example": 100,
+            "maximum": 100,
+            "minimum": 1
+          },
+          "order": {
+            "type": ["string", "null"],
+            "description": "Sort order. Use `asc` for ascending and `desc` for descending order.",
+            "default": "desc"
           }
         }
       },
@@ -5210,9 +5960,29 @@
       },
       "Model": {
         "type": "object",
-        "description": "Same as `LanguageModel` but fully compliant with the OpenAI API.",
+        "description": "OpenAI-compatible model response returned by `/v1/models`.\nIncludes optional pricing fields populated based on the model type.",
         "required": ["id", "created", "object", "owned_by"],
         "properties": {
+          "cached_prompt_text_token_price": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of a prompt text token (in USD cents per 100 million tokens) that was cached previously."
+          },
+          "cached_prompt_text_token_price_long_context": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of the cached prompt text token for long context requests (USD cents per 100 million tokens)."
+          },
+          "completion_text_token_price": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of the completion text token in USD cents per 100 million tokens."
+          },
+          "completion_text_token_price_long_context": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of the completion text token for long context requests (USD cents per 100 million tokens)."
+          },
           "created": {
             "type": "integer",
             "format": "int64",
@@ -5222,6 +5992,16 @@
             "type": "string",
             "description": "Model ID. Obtainable from <https://console.x.ai/team/default/models> or <https://docs.x.ai/docs/models>."
           },
+          "image_price": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price per image in USD cents (image generation models)."
+          },
+          "long_context_threshold": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Token count at or above which the long context prices apply."
+          },
           "object": {
             "type": "string",
             "description": "The object type, which is always `\"model\"`."
@@ -5229,6 +6009,21 @@
           "owned_by": {
             "type": "string",
             "description": "Owner of the model."
+          },
+          "prompt_image_token_price": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of the prompt image token in USD cents per 100 million tokens."
+          },
+          "prompt_text_token_price": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of the prompt text token in USD cents per 100 million tokens."
+          },
+          "prompt_text_token_price_long_context": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Price of the prompt text token for long context requests (USD cents per 100 million tokens)."
           }
         }
       },
@@ -5561,8 +6356,15 @@
             ]
           },
           "service_tier": {
-            "type": ["string", "null"],
-            "description": "Not supported. Only maintained for compatibility reasons."
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ServiceTier",
+                "description": "Specifies the processing tier for this request. Set to `\"priority\"` for higher scheduling\npriority at a higher token price. Valid values: `\"auto\"` (default), `\"priority\"`."
+              }
+            ]
           },
           "store": {
             "type": ["boolean", "null"],
@@ -5766,8 +6568,12 @@
             "description": "A stable identifier used to help detect users of your application that may be violating xAI's usage policies."
           },
           "service_tier": {
-            "type": "string",
-            "description": "Specifies the processing tier used for serving the request.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ServiceTier",
+                "description": "Specifies the processing tier used for serving the request."
+              }
+            ],
             "default": "default"
           },
           "status": {
@@ -6200,6 +7006,17 @@
           "num_server_side_tools_used"
         ],
         "properties": {
+          "context_details": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ContextDetails",
+                "description": "Token counts for the **latest context** sent to / produced by the\nmodel. For agentic responses this reflects the most recent step\nrather than the cumulative total. Informational only — not used\nfor billing."
+              }
+            ]
+          },
           "cost_in_nano_usd": {
             "type": ["integer", "null"],
             "format": "int64",
@@ -6392,6 +7209,30 @@
           }
         }
       },
+      "PublicUrlInput": {
+        "oneOf": [
+          {
+            "type": "boolean",
+            "description": "`true` = create public URL with default options (no independent expiry).\n`false` = no public URL (equivalent to omitting the field)."
+          },
+          {
+            "$ref": "#/components/schemas/PublicUrlOptions",
+            "description": "Full configuration object."
+          }
+        ],
+        "description": "Accepts either `true` (create public URL with defaults) or a configuration\nobject with explicit options.\n\n**Variant order matters for `#[serde(untagged)]`:** `Flag` must come before\n`Options` so that JSON `true`/`false` match `Flag` rather than falling\nthrough to the object variant.\n\n**Serialization note:** Proto→REST readback always constructs\n`Options(...)`, never `Flag`, so responses always emit the object form.\n`Flag` only appears on the deserialization (request) path."
+      },
+      "PublicUrlOptions": {
+        "type": "object",
+        "description": "Configuration for creating a public URL alongside file storage.",
+        "properties": {
+          "expires_after": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`."
+          }
+        }
+      },
       "RagPipeline": {
         "type": "string",
         "enum": ["chroma_db", "es"]
@@ -6447,8 +7288,8 @@
         "properties": {
           "effort": {
             "type": ["string", "null"],
-            "description": "Constrains how hard a reasoning model thinks before responding. Possible values are `low` (uses fewer reasoning tokens), `medium` and `high` (uses more reasoning tokens).",
-            "default": "medium"
+            "description": "Constrains how hard a reasoning model thinks before responding. Only supported by `grok-4.3`. Possible values are `none` (disables reasoning completely), `low` (this is the default if not specified), `medium` and `high` (uses the most reasoning tokens).",
+            "default": "low"
           },
           "generate_summary": {
             "type": ["string", "null"],
@@ -6611,6 +7452,25 @@
           }
         ],
         "description": "Retrieval mode configuration for document search."
+      },
+      "RevokePublicUrlResponse": {
+        "type": "object",
+        "description": "Response for revoking a public URL for a file.",
+        "required": ["id", "revoked"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The file ID whose public URL was revoked."
+          },
+          "public_url": {
+            "type": ["string", "null"],
+            "description": "The full public URL that was revoked. Only present when `revoked` is `true`."
+          },
+          "revoked": {
+            "type": "boolean",
+            "description": "Whether a public URL was actually revoked. `false` if the file had no\nactive public URL (no-op)."
+          }
+        }
       },
       "SampleChoice": {
         "type": "object",
@@ -7166,6 +8026,11 @@
           }
         }
       },
+      "ServiceTier": {
+        "type": "string",
+        "description": "Processing tier for a request. Determines scheduling priority and billing.",
+        "enum": ["default", "priority"]
+      },
       "ShellCall": {
         "type": "object",
         "description": "A shell command call emitted by the model for local execution.",
@@ -7328,6 +8193,80 @@
           }
         }
       },
+      "Skill": {
+        "type": "object",
+        "description": "A hosted skill.",
+        "required": [
+          "id",
+          "created_at",
+          "default_version",
+          "description",
+          "latest_version",
+          "name",
+          "object"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix timestamp (seconds) for when the skill was created."
+          },
+          "default_version": {
+            "type": "string",
+            "description": "Default version for the skill. Currently always `\"1\"`."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description extracted from `SKILL.md` frontmatter."
+          },
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the skill."
+          },
+          "latest_version": {
+            "type": "string",
+            "description": "Latest version for the skill. Currently always `\"1\"`."
+          },
+          "name": {
+            "type": "string",
+            "description": "Skill name extracted from `SKILL.md` frontmatter."
+          },
+          "object": {
+            "type": "string",
+            "description": "The object type, which is always `\"skill\"`."
+          }
+        }
+      },
+      "SkillList": {
+        "type": "object",
+        "description": "A list of hosted skills.",
+        "required": ["data", "first_id", "has_more", "last_id", "object"],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Skill"
+            },
+            "description": "A list of skills."
+          },
+          "first_id": {
+            "type": "string",
+            "description": "The ID of the first item in the list."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "Whether there are more items available."
+          },
+          "last_id": {
+            "type": "string",
+            "description": "The ID of the last item in the list."
+          },
+          "object": {
+            "type": "string",
+            "description": "The object type, which is always `\"list\"`."
+          }
+        }
+      },
       "SortOrder": {
         "type": "string",
         "description": "Sort order for paginated listings.",
@@ -7351,6 +8290,33 @@
           "request_id": {
             "type": "string",
             "description": "A unique request ID to poll for the result."
+          }
+        }
+      },
+      "StorageOptions": {
+        "type": "object",
+        "description": "Configuration for storing generation output in the Files API.\nWhen provided in a generation request, the output is stored as a\npermanent file and a `file_output` reference is included in the response.",
+        "required": ["filename"],
+        "properties": {
+          "expires_after": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Seconds from now until the file auto-expires. Maximum 2592000 (30 days).\nIf omitted, the file does not expire."
+          },
+          "filename": {
+            "type": "string",
+            "description": "Filename for the stored file."
+          },
+          "public_url": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PublicUrlInput",
+                "description": "`true` = create public URL with default options (no independent expiry).\nObject = create public URL with explicit configuration.\nOmit = no public URL (file stored privately)."
+              }
+            ]
           }
         }
       },
@@ -7681,6 +8647,21 @@
           }
         }
       },
+      "UploadSkillMultipartRequest": {
+        "type": "object",
+        "description": "Multipart form fields accepted by `POST /v1/skills`.",
+        "required": ["files"],
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            },
+            "description": "Skill zip file or one file from a directory upload. Clients may send\nthis field once with a zip file, or repeatedly with directory files."
+          }
+        }
+      },
       "Usage": {
         "type": "object",
         "required": [
@@ -7750,11 +8731,12 @@
       },
       "VideoErrorCode": {
         "type": "string",
-        "description": "Machine-readable error codes for video generation failures.\n\nThese are the codes that can appear in `VideoError.code` when polling a\ndeferred video generation result. Authentication errors, model-not-found\nerrors, and rate-limit errors are returned synchronously as HTTP errors\nand never appear in `VideoError`.\n\nSerializes to/from snake_case strings (e.g. `\"invalid_argument\"`,\n`\"internal_error\"`) for JSON compatibility.",
+        "description": "Machine-readable error codes for video generation failures.\n\nThese are the codes that can appear in `VideoError.code` when polling a\ndeferred video generation result. Authentication, model-not-found, and\nsynchronous rate-limit errors are returned as HTTP errors and never\nappear in `VideoError`. Engine overload encountered mid-generation\nsurfaces here as `service_unavailable` (HTTP 503).\n\nSerializes to/from snake_case strings (e.g. `\"invalid_argument\"`,\n`\"internal_error\"`) for JSON compatibility.",
         "enum": [
           "invalid_argument",
           "permission_denied",
           "failed_precondition",
+          "service_unavailable",
           "internal_error"
         ]
       },
@@ -7840,7 +8822,7 @@
       "VideoResponse": {
         "type": "object",
         "description": "Video generation response.",
-        "required": ["status", "progress"],
+        "required": ["status"],
         "properties": {
           "error": {
             "oneOf": [
@@ -7858,9 +8840,9 @@
             "description": "The model used to generate the video. Omitted when status is \"failed\"."
           },
           "progress": {
-            "type": "integer",
+            "type": ["integer", "null"],
             "format": "int32",
-            "description": "Approximate completion percentage for the video generation task (0-100).\n- When status is \"pending\": progress is between 0-99, indicating current completion.\n- When status is \"done\": progress is 100.\n- When status is \"failed\": progress is 0.",
+            "description": "Approximate completion percentage for the video generation task (0-100).\n- When status is \"pending\": progress is between 0-99, indicating current completion.\n- When status is \"done\": progress is 100.\n- When status is \"failed\": progress is omitted.",
             "maximum": 100,
             "minimum": 0
           },
@@ -8068,6 +9050,11 @@
             "description": "Type is always `\"approximate\"`."
           }
         }
+      },
+      "ZdrStatus": {
+        "type": "string",
+        "description": "Zero Data Retention status for a team.",
+        "enum": ["no_zdr", "zdr", "pii_scrubbing"]
       }
     },
     "securitySchemes": {

@@ -103,6 +103,34 @@ export const zCompletionUsageDetail = z.object({
 })
 
 /**
+ * Token counts for the latest context window seen by the model.
+ *
+ * In the non-agentic path these mirror `input_tokens` / `output_tokens`.
+ * In the agentic path (multi-agents) these are reset on every step and
+ * reflect the most recent step's prompt and output sizes — useful for
+ * understanding how the live context window evolves across tool calls.
+ * Informational only; not used for billing.
+ */
+export const zContextDetails = z.object({
+  input_tokens: z
+    .int()
+    .min(-2147483648, {
+      error: 'Invalid value: Expected int32 to be >= -2147483648',
+    })
+    .max(2147483647, {
+      error: 'Invalid value: Expected int32 to be <= 2147483647',
+    }),
+  output_tokens: z
+    .int()
+    .min(-2147483648, {
+      error: 'Invalid value: Expected int32 to be >= -2147483648',
+    })
+    .max(2147483647, {
+      error: 'Invalid value: Expected int32 to be <= 2147483647',
+    }),
+})
+
+/**
  * The output of a custom tool call.
  */
 export const zCustomToolCall = z.object({
@@ -561,7 +589,7 @@ export const zPromptUsageDetail = z.object({
 })
 
 export const zReasoningConfiguration = z.object({
-  effort: z.unknown().optional().default('medium'),
+  effort: z.unknown().optional().default('low'),
   generate_summary: z.unknown().optional(),
   summary: z.unknown().optional(),
 })
@@ -694,6 +722,7 @@ export const zServerSideToolUsageDetails = z.object({
 })
 
 export const zModelUsage = z.object({
+  context_details: z.union([z.unknown(), zContextDetails]).optional(),
   cost_in_nano_usd: z.unknown().optional(),
   cost_in_usd_ticks: z.unknown().optional(),
   input_tokens: z
@@ -742,6 +771,11 @@ export const zModelUsage = z.object({
       error: 'Invalid value: Expected int32 to be <= 2147483647',
     }),
 })
+
+/**
+ * Processing tier for a request. Determines scheduling priority and billing.
+ */
+export const zServiceTier = z.enum(['default', 'priority'])
 
 /**
  * The shell commands and limits that describe how to run the tool call.
@@ -1123,6 +1157,7 @@ export const zChatResponse = z.object({
   model: z.string(),
   object: z.string(),
   output_files: z.unknown().optional(),
+  service_tier: zServiceTier,
   system_fingerprint: z.unknown().optional(),
   usage: z.union([z.unknown(), zUsage]).optional(),
 })
@@ -1173,10 +1208,12 @@ export const zChatRequest = z.object({
   n: z.unknown().optional().default(1),
   parallel_tool_calls: z.unknown().optional().default(true),
   presence_penalty: z.unknown().optional().default(0),
+  prompt_cache_key: z.unknown().optional(),
   reasoning_effort: z.unknown().optional(),
   response_format: z.union([z.unknown(), zResponseFormat]).optional(),
   search_parameters: z.union([z.unknown(), zSearchParameters]).optional(),
   seed: z.unknown().optional(),
+  service_tier: z.union([z.unknown(), zServiceTier]).optional(),
   stop: z.unknown().optional(),
   stream: z.unknown().optional().default(false),
   stream_options: z.union([z.unknown(), zStreamOptions]).optional(),
@@ -1270,7 +1307,7 @@ export const zModelRequest = z.object({
   prompt_cache_key: z.unknown().optional(),
   reasoning: z.union([z.unknown(), zReasoningConfiguration]).optional(),
   search_parameters: z.union([z.unknown(), zSearchParameters]).optional(),
-  service_tier: z.unknown().optional(),
+  service_tier: z.union([z.unknown(), zServiceTier]).optional(),
   store: z.unknown().optional().default(true),
   stream: z.unknown().optional().default(false),
   temperature: z.unknown().optional().default(1),
@@ -1388,7 +1425,7 @@ export const zModelResponse = z.object({
   prompt_cache_key: z.unknown().optional(),
   reasoning: z.union([z.unknown(), zReasoningConfiguration]).optional(),
   safety_identifier: z.unknown().optional(),
-  service_tier: z.string().default('default'),
+  service_tier: zServiceTier,
   status: z.string(),
   store: z.boolean().default(true),
   temperature: z.unknown().optional().default(1),

@@ -47,6 +47,8 @@ export const zAnthropicBeta = z.union([
     'managed-agents-2026-04-01',
     'cache-diagnosis-2026-04-07',
     'thinking-token-count-2026-05-13',
+    'server-side-fallback-2026-06-01',
+    'fallback-credit-2026-06-01',
   ]),
 ])
 
@@ -105,6 +107,7 @@ export const zBetaAdvisorToolResultErrorCode = z.enum([
   'overloaded',
   'unavailable',
   'execution_time_exceeded',
+  'model_not_found',
 ])
 
 /**
@@ -676,20 +679,6 @@ export const zBetaMemoryTool20250818 = z.object({
 })
 
 /**
- * MessageIterationUsage
- *
- * Token usage for a sampling iteration.
- */
-export const zBetaMessageIterationUsage = z.object({
-  cache_creation: z.union([zBetaCacheCreation, z.unknown()]),
-  cache_creation_input_tokens: z.int().gte(0).default(0),
-  cache_read_input_tokens: z.int().gte(0).default(0),
-  input_tokens: z.int().gte(0),
-  output_tokens: z.int().gte(0),
-  type: z.string().default('message'),
-})
-
-/**
  * Metadata
  */
 export const zBetaMetadata = z.object({
@@ -702,6 +691,13 @@ export const zBetaMetadata = z.object({
 export const zBetaNotFoundError = z.object({
   message: z.string().default('Not found'),
   type: z.string().default('not_found_error'),
+})
+
+/**
+ * OutputTokensDetails
+ */
+export const zBetaOutputTokensDetails = z.object({
+  thinking_tokens: z.int().gte(0).default(0),
 })
 
 /**
@@ -766,8 +762,14 @@ export const zBetaErrorResponse = z.object({
  * Structured information about a refusal.
  */
 export const zBetaRefusalStopDetails = z.object({
-  category: z.union([z.enum(['cyber', 'bio']), z.unknown()]),
+  category: z.union([
+    z.enum(['cyber', 'bio', 'frontier_llm', 'reasoning_extraction']),
+    z.unknown(),
+  ]),
   explanation: z.union([z.string(), z.unknown()]),
+  fallback_credit_token: z.union([z.string(), z.unknown()]),
+  fallback_has_prefill_claim: z.union([z.boolean(), z.unknown()]),
+  recommended_model: z.union([z.string(), z.unknown()]),
   type: z.string().default('refusal'),
 })
 
@@ -776,6 +778,7 @@ export const zBetaRefusalStopDetails = z.object({
  */
 export const zBetaRequestAdvisorRedactedResultBlock = z.object({
   encrypted_content: z.string(),
+  stop_reason: z.union([z.string(), z.unknown()]).optional(),
   type: z.string(),
 })
 
@@ -783,6 +786,7 @@ export const zBetaRequestAdvisorRedactedResultBlock = z.object({
  * RequestAdvisorResultBlock
  */
 export const zBetaRequestAdvisorResultBlock = z.object({
+  stop_reason: z.union([z.string(), z.unknown()]).optional(),
   text: z.string(),
   type: z.string(),
 })
@@ -1253,6 +1257,35 @@ export const zBetaRequestMcpToolResultBlock = z.object({
 })
 
 /**
+ * RequestMidConvSystemBlock
+ *
+ * System instructions that appear mid-conversation.
+ *
+ * Use this block to provide or update system-level instructions at a specific
+ * point in the conversation, rather than only via the top-level `system` parameter.
+ */
+export const zBetaRequestMidConvSystemBlock = z.object({
+  cache_control: z
+    .union([
+      z
+        .object({
+          type: z.literal('ephemeral'),
+        })
+        .and(zBetaCacheControlEphemeral),
+      z.unknown(),
+    ])
+    .optional(),
+  content: z.array(
+    z
+      .object({
+        type: z.literal('text'),
+      })
+      .and(zBetaRequestTextBlock),
+  ),
+  type: z.string(),
+})
+
+/**
  * RequestSearchResultBlock
  */
 export const zBetaRequestSearchResultBlock = z.object({
@@ -1278,6 +1311,7 @@ export const zBetaRequestSearchResultBlock = z.object({
  */
 export const zBetaResponseAdvisorRedactedResultBlock = z.object({
   encrypted_content: z.string(),
+  stop_reason: z.union([z.string(), z.unknown()]),
   type: z.string().default('advisor_redacted_result'),
 })
 
@@ -1285,6 +1319,7 @@ export const zBetaResponseAdvisorRedactedResultBlock = z.object({
  * ResponseAdvisorResultBlock
  */
 export const zBetaResponseAdvisorResultBlock = z.object({
+  stop_reason: z.union([z.string(), z.unknown()]),
   text: z.string(),
   type: z.string().default('advisor_result'),
 })
@@ -2289,6 +2324,7 @@ export const zBetaToolSearchToolResultErrorCode = z.enum([
  */
 export const zBetaRequestToolSearchToolResultError = z.object({
   error_code: zBetaToolSearchToolResultErrorCode,
+  error_message: z.union([z.string(), z.unknown()]).optional(),
   type: z.string(),
 })
 
@@ -2656,6 +2692,7 @@ export const zBetaWebFetchToolResultErrorCode = z.enum([
   'invalid_tool_input',
   'url_too_long',
   'url_not_allowed',
+  'url_not_in_prior_context',
   'url_not_accessible',
   'unsupported_content_type',
   'too_many_requests',
@@ -2838,55 +2875,6 @@ export const zBetaRequestWebSearchToolResultBlock = z.object({
   type: z.string(),
 })
 
-export const zBetaInputContentBlock = z.discriminatedUnion('type', [
-  zBetaRequestTextBlock.extend({ type: z.literal('text') }),
-  zBetaRequestImageBlock.extend({ type: z.literal('image') }),
-  zBetaRequestDocumentBlock.extend({ type: z.literal('document') }),
-  zBetaRequestSearchResultBlock.extend({ type: z.literal('search_result') }),
-  zBetaRequestThinkingBlock.extend({ type: z.literal('thinking') }),
-  zBetaRequestRedactedThinkingBlock.extend({
-    type: z.literal('redacted_thinking'),
-  }),
-  zBetaRequestToolUseBlock.extend({ type: z.literal('tool_use') }),
-  zBetaRequestToolResultBlock.extend({ type: z.literal('tool_result') }),
-  zBetaRequestServerToolUseBlock.extend({ type: z.literal('server_tool_use') }),
-  zBetaRequestWebSearchToolResultBlock.extend({
-    type: z.literal('web_search_tool_result'),
-  }),
-  zBetaRequestWebFetchToolResultBlock.extend({
-    type: z.literal('web_fetch_tool_result'),
-  }),
-  zBetaRequestAdvisorToolResultBlock.extend({
-    type: z.literal('advisor_tool_result'),
-  }),
-  zBetaRequestCodeExecutionToolResultBlock.extend({
-    type: z.literal('code_execution_tool_result'),
-  }),
-  zBetaRequestBashCodeExecutionToolResultBlock.extend({
-    type: z.literal('bash_code_execution_tool_result'),
-  }),
-  zBetaRequestTextEditorCodeExecutionToolResultBlock.extend({
-    type: z.literal('text_editor_code_execution_tool_result'),
-  }),
-  zBetaRequestToolSearchToolResultBlock.extend({
-    type: z.literal('tool_search_tool_result'),
-  }),
-  zBetaRequestMcpToolUseBlock.extend({ type: z.literal('mcp_tool_use') }),
-  zBetaRequestMcpToolResultBlock.extend({ type: z.literal('mcp_tool_result') }),
-  zBetaRequestContainerUploadBlock.extend({
-    type: z.literal('container_upload'),
-  }),
-  zBetaRequestCompactionBlock.extend({ type: z.literal('compaction') }),
-])
-
-/**
- * InputMessage
- */
-export const zBetaInputMessage = z.object({
-  content: z.union([z.string(), z.array(zBetaInputContentBlock)]),
-  role: z.enum(['user', 'assistant']),
-})
-
 /**
  * ResponseWebSearchToolResultError
  */
@@ -2917,47 +2905,6 @@ export const zBetaResponseWebSearchToolResultBlock = z.object({
   tool_use_id: z.string().regex(/^srvtoolu_[a-zA-Z0-9_]+$/),
   type: z.string().default('web_search_tool_result'),
 })
-
-export const zBetaContentBlock = z.discriminatedUnion('type', [
-  zBetaResponseTextBlock.extend({ type: z.literal('text') }),
-  zBetaResponseThinkingBlock.extend({ type: z.literal('thinking') }),
-  zBetaResponseRedactedThinkingBlock.extend({
-    type: z.literal('redacted_thinking'),
-  }),
-  zBetaResponseToolUseBlock.extend({ type: z.literal('tool_use') }),
-  zBetaResponseServerToolUseBlock.extend({
-    type: z.literal('server_tool_use'),
-  }),
-  zBetaResponseWebSearchToolResultBlock.extend({
-    type: z.literal('web_search_tool_result'),
-  }),
-  zBetaResponseWebFetchToolResultBlock.extend({
-    type: z.literal('web_fetch_tool_result'),
-  }),
-  zBetaResponseAdvisorToolResultBlock.extend({
-    type: z.literal('advisor_tool_result'),
-  }),
-  zBetaResponseCodeExecutionToolResultBlock.extend({
-    type: z.literal('code_execution_tool_result'),
-  }),
-  zBetaResponseBashCodeExecutionToolResultBlock.extend({
-    type: z.literal('bash_code_execution_tool_result'),
-  }),
-  zBetaResponseTextEditorCodeExecutionToolResultBlock.extend({
-    type: z.literal('text_editor_code_execution_tool_result'),
-  }),
-  zBetaResponseToolSearchToolResultBlock.extend({
-    type: z.literal('tool_search_tool_result'),
-  }),
-  zBetaResponseMcpToolUseBlock.extend({ type: z.literal('mcp_tool_use') }),
-  zBetaResponseMcpToolResultBlock.extend({
-    type: z.literal('mcp_tool_result'),
-  }),
-  zBetaResponseContainerUploadBlock.extend({
-    type: z.literal('container_upload'),
-  }),
-  zBetaResponseCompactionBlock.extend({ type: z.literal('compaction') }),
-])
 
 /**
  * BillingError
@@ -3182,7 +3129,9 @@ export const zMetadata = z.object({
 /**
  * Model
  *
- * The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.
+ * The model that will complete your prompt.
+ *
+ * See [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.
  */
 export const zModel = z.union([z.string(), z.unknown()])
 
@@ -3227,11 +3176,197 @@ export const zBetaAdvisorTool20260301 = z.object({
     ])
     .optional(),
   defer_loading: z.boolean().optional(),
+  max_tokens: z.union([z.int().gte(1024), z.unknown()]).optional(),
   max_uses: z.union([z.int(), z.unknown()]).optional(),
   model: zModel,
   name: z.string(),
   strict: z.boolean().optional(),
   type: z.string(),
+})
+
+/**
+ * FallbackConfigV2
+ *
+ * One entry in the `fallbacks` chain on a `/v1/messages` request.
+ *
+ * `model` is required. The four override fields (`max_tokens`, `thinking`,
+ * `output_config`, and `speed`) replace the corresponding top-level field
+ * for this attempt only and are validated as if the request were made to
+ * `model`. Any other key is rejected at parse time.
+ */
+export const zBetaFallbackConfigV2 = z.object({
+  max_tokens: z.union([z.int(), z.unknown()]).optional(),
+  model: zModel,
+  output_config: z.union([zBetaOutputConfig, z.unknown()]).optional(),
+  speed: z.union([zBetaSpeed, z.unknown()]).optional(),
+  thinking: z
+    .union([
+      z.discriminatedUnion('type', [
+        zBetaThinkingConfigEnabled.extend({ type: z.literal('enabled') }),
+        zBetaThinkingConfigDisabled.extend({ type: z.literal('disabled') }),
+        zBetaThinkingConfigAdaptive.extend({ type: z.literal('adaptive') }),
+      ]),
+      z.unknown(),
+    ])
+    .optional(),
+})
+
+/**
+ * FallbackMessageIterationUsage
+ *
+ * Token usage for the fallback-model attempt of a server-side fallback request.
+ *
+ * Produced in place of a `message` entry for whichever hop served the
+ * response. A declined hop produces the existing `message` entry. Whether
+ * a fallback model served the response is signalled by the presence of this
+ * entry in `usage.iterations`.
+ */
+export const zBetaFallbackMessageIterationUsage = z.object({
+  cache_creation: z.union([zBetaCacheCreation, z.unknown()]),
+  cache_creation_input_tokens: z.int().gte(0).default(0),
+  cache_read_input_tokens: z.int().gte(0).default(0),
+  input_tokens: z.int().gte(0),
+  model: zModel,
+  output_tokens: z.int().gte(0),
+  type: z.string().default('fallback_message'),
+})
+
+/**
+ * MessageIterationUsage
+ *
+ * Token usage for a sampling iteration.
+ */
+export const zBetaMessageIterationUsage = z.object({
+  cache_creation: z.union([zBetaCacheCreation, z.unknown()]),
+  cache_creation_input_tokens: z.int().gte(0).default(0),
+  cache_read_input_tokens: z.int().gte(0).default(0),
+  input_tokens: z.int().gte(0),
+  model: zModel,
+  output_tokens: z.int().gte(0),
+  type: z.string().default('message'),
+})
+
+/**
+ * Iterations
+ *
+ * Per-iteration token usage breakdown.
+ *
+ * Each entry represents one sampling iteration, with its own input/output token counts and cache statistics. This allows you to:
+ * - Determine which iterations exceeded long context thresholds (>=200k tokens)
+ * - Calculate the true context window size from the last iteration
+ * - Understand token accumulation across server-side tool use loops
+ */
+export const zBetaIterationsUsage = z.union([
+  z.array(
+    z.union([
+      z
+        .object({
+          type: z.literal('message'),
+        })
+        .and(zBetaMessageIterationUsage),
+      z
+        .object({
+          type: z.literal('compaction'),
+        })
+        .and(zBetaCompactionIterationUsage),
+      z
+        .object({
+          type: z.literal('advisor_message'),
+        })
+        .and(zBetaAdvisorMessageIterationUsage),
+      z
+        .object({
+          type: z.literal('fallback_message'),
+        })
+        .and(zBetaFallbackMessageIterationUsage),
+    ]),
+  ),
+  z.unknown(),
+])
+
+/**
+ * RequestFallbackHopInfo
+ *
+ * Identifies one hop of a fallback transition.
+ */
+export const zBetaRequestFallbackHopInfo = z.object({
+  model: zModel,
+})
+
+/**
+ * RequestFallbackBlock
+ *
+ * A `fallback` block echoed back from a prior response.
+ *
+ * Accepted in `messages[].content` and never rendered into the prompt,
+ * not validated against the request's `fallbacks` chain or top-level
+ * `model`, and stripped before the sticky-routing cache key is computed.
+ *
+ * Callers should echo the assistant turn verbatim — block included. The
+ * block's position is load-bearing for thinking verification: the thinking
+ * runs on either side of a fallback hop carry independently-rooted
+ * verification hash chains, and this block is the only record of where one
+ * chain ends and the next begins. When thinking runs flank the boundary,
+ * omitting the block merges the runs into one contiguous span whose hashes
+ * cannot verify (the request is rejected), and moving it into the middle of
+ * a single run splits that run's chain and is likewise rejected; between
+ * non-thinking blocks the block's placement has no verification effect.
+ */
+export const zBetaRequestFallbackBlock = z.object({
+  from: zBetaRequestFallbackHopInfo,
+  to: zBetaRequestFallbackHopInfo,
+  type: z.string(),
+})
+
+export const zBetaInputContentBlock = z.discriminatedUnion('type', [
+  zBetaRequestTextBlock.extend({ type: z.literal('text') }),
+  zBetaRequestImageBlock.extend({ type: z.literal('image') }),
+  zBetaRequestDocumentBlock.extend({ type: z.literal('document') }),
+  zBetaRequestSearchResultBlock.extend({ type: z.literal('search_result') }),
+  zBetaRequestThinkingBlock.extend({ type: z.literal('thinking') }),
+  zBetaRequestRedactedThinkingBlock.extend({
+    type: z.literal('redacted_thinking'),
+  }),
+  zBetaRequestToolUseBlock.extend({ type: z.literal('tool_use') }),
+  zBetaRequestToolResultBlock.extend({ type: z.literal('tool_result') }),
+  zBetaRequestServerToolUseBlock.extend({ type: z.literal('server_tool_use') }),
+  zBetaRequestWebSearchToolResultBlock.extend({
+    type: z.literal('web_search_tool_result'),
+  }),
+  zBetaRequestWebFetchToolResultBlock.extend({
+    type: z.literal('web_fetch_tool_result'),
+  }),
+  zBetaRequestAdvisorToolResultBlock.extend({
+    type: z.literal('advisor_tool_result'),
+  }),
+  zBetaRequestCodeExecutionToolResultBlock.extend({
+    type: z.literal('code_execution_tool_result'),
+  }),
+  zBetaRequestBashCodeExecutionToolResultBlock.extend({
+    type: z.literal('bash_code_execution_tool_result'),
+  }),
+  zBetaRequestTextEditorCodeExecutionToolResultBlock.extend({
+    type: z.literal('text_editor_code_execution_tool_result'),
+  }),
+  zBetaRequestToolSearchToolResultBlock.extend({
+    type: z.literal('tool_search_tool_result'),
+  }),
+  zBetaRequestMcpToolUseBlock.extend({ type: z.literal('mcp_tool_use') }),
+  zBetaRequestMcpToolResultBlock.extend({ type: z.literal('mcp_tool_result') }),
+  zBetaRequestContainerUploadBlock.extend({
+    type: z.literal('container_upload'),
+  }),
+  zBetaRequestCompactionBlock.extend({ type: z.literal('compaction') }),
+  zBetaRequestMidConvSystemBlock.extend({ type: z.literal('mid_conv_system') }),
+  zBetaRequestFallbackBlock.extend({ type: z.literal('fallback') }),
+])
+
+/**
+ * InputMessage
+ */
+export const zBetaInputMessage = z.object({
+  content: z.union([z.string(), z.array(zBetaInputContentBlock)]),
+  role: z.enum(['user', 'assistant', 'system']),
 })
 
 /**
@@ -3314,6 +3449,12 @@ export const zBetaCreateMessageParams = z.object({
     .union([zBetaContextManagementConfig, z.unknown()])
     .optional(),
   diagnostics: z.union([zBetaDiagnosticsParam, z.unknown()]).optional(),
+  fallback_credit_token: z
+    .union([z.string().min(1).max(2048), z.unknown()])
+    .optional(),
+  fallbacks: z
+    .union([z.array(zBetaFallbackConfigV2).min(1).max(3), z.unknown()])
+    .optional(),
   inference_geo: z.union([z.string(), z.unknown()]).optional(),
   max_tokens: z.int().gte(0),
   mcp_servers: z.array(zBetaRequestMcpServerUrlDefinition).max(20).optional(),
@@ -3363,36 +3504,75 @@ export const zBetaCreateMessageParams = z.object({
 })
 
 /**
- * Iterations
+ * ResponseFallbackHopInfo
  *
- * Per-iteration token usage breakdown.
- *
- * Each entry represents one sampling iteration, with its own input/output token counts and cache statistics. This allows you to:
- * - Determine which iterations exceeded long context thresholds (>=200k tokens)
- * - Calculate the true context window size from the last iteration
- * - Understand token accumulation across server-side tool use loops
+ * Identifies one hop of a fallback transition.
  */
-export const zBetaIterationsUsage = z.union([
-  z.array(
-    z.union([
-      z
-        .object({
-          type: z.literal('message'),
-        })
-        .and(zBetaMessageIterationUsage),
-      z
-        .object({
-          type: z.literal('compaction'),
-        })
-        .and(zBetaCompactionIterationUsage),
-      z
-        .object({
-          type: z.literal('advisor_message'),
-        })
-        .and(zBetaAdvisorMessageIterationUsage),
-    ]),
-  ),
-  z.unknown(),
+export const zBetaResponseFallbackHopInfo = z.object({
+  model: zModel,
+})
+
+/**
+ * ResponseFallbackBlock
+ *
+ * Marks the point in `content` where one model's output gives way to the next.
+ *
+ * One block appears per hop where a preceding model actually ran this turn and
+ * declined. A turn routed directly by the sticky decision has no such boundary
+ * and carries no block — the signal for whether a fallback model served the
+ * response is the presence of a `fallback_message` entry in
+ * `usage.iterations`, not this block.
+ *
+ * The block is treated like a server-tool content block for streaming: it
+ * arrives via the standard `content_block_start` / `content_block_stop`
+ * pair and carries no deltas.
+ */
+export const zBetaResponseFallbackBlock = z.object({
+  from: zBetaResponseFallbackHopInfo,
+  to: zBetaResponseFallbackHopInfo,
+  type: z.string().default('fallback'),
+})
+
+export const zBetaContentBlock = z.discriminatedUnion('type', [
+  zBetaResponseTextBlock.extend({ type: z.literal('text') }),
+  zBetaResponseThinkingBlock.extend({ type: z.literal('thinking') }),
+  zBetaResponseRedactedThinkingBlock.extend({
+    type: z.literal('redacted_thinking'),
+  }),
+  zBetaResponseToolUseBlock.extend({ type: z.literal('tool_use') }),
+  zBetaResponseServerToolUseBlock.extend({
+    type: z.literal('server_tool_use'),
+  }),
+  zBetaResponseWebSearchToolResultBlock.extend({
+    type: z.literal('web_search_tool_result'),
+  }),
+  zBetaResponseWebFetchToolResultBlock.extend({
+    type: z.literal('web_fetch_tool_result'),
+  }),
+  zBetaResponseAdvisorToolResultBlock.extend({
+    type: z.literal('advisor_tool_result'),
+  }),
+  zBetaResponseCodeExecutionToolResultBlock.extend({
+    type: z.literal('code_execution_tool_result'),
+  }),
+  zBetaResponseBashCodeExecutionToolResultBlock.extend({
+    type: z.literal('bash_code_execution_tool_result'),
+  }),
+  zBetaResponseTextEditorCodeExecutionToolResultBlock.extend({
+    type: z.literal('text_editor_code_execution_tool_result'),
+  }),
+  zBetaResponseToolSearchToolResultBlock.extend({
+    type: z.literal('tool_search_tool_result'),
+  }),
+  zBetaResponseMcpToolUseBlock.extend({ type: z.literal('mcp_tool_use') }),
+  zBetaResponseMcpToolResultBlock.extend({
+    type: z.literal('mcp_tool_result'),
+  }),
+  zBetaResponseContainerUploadBlock.extend({
+    type: z.literal('container_upload'),
+  }),
+  zBetaResponseCompactionBlock.extend({ type: z.literal('compaction') }),
+  zBetaResponseFallbackBlock.extend({ type: z.literal('fallback') }),
 ])
 
 /**
@@ -3406,6 +3586,7 @@ export const zBetaUsage = z.object({
   input_tokens: z.int().gte(0),
   iterations: zBetaIterationsUsage,
   output_tokens: z.int().gte(0),
+  output_tokens_details: z.union([zBetaOutputTokensDetails, z.unknown()]),
   server_tool_use: z.union([zBetaServerToolUsage, z.unknown()]),
   service_tier: z.union([
     z.enum(['standard', 'priority', 'batch']),
@@ -3475,6 +3656,13 @@ export const zOutputConfig = z.object({
 })
 
 /**
+ * OutputTokensDetails
+ */
+export const zOutputTokensDetails = z.object({
+  thinking_tokens: z.int().gte(0).default(0),
+})
+
+/**
  * OverloadedError
  */
 export const zOverloadedError = z.object({
@@ -3532,7 +3720,10 @@ export const zErrorResponse = z.object({
  * Structured information about a refusal.
  */
 export const zRefusalStopDetails = z.object({
-  category: z.union([z.enum(['cyber', 'bio']), z.unknown()]),
+  category: z.union([
+    z.enum(['cyber', 'bio', 'frontier_llm', 'reasoning_extraction']),
+    z.unknown(),
+  ]),
   explanation: z.union([z.string(), z.unknown()]),
   type: z.string().default('refusal'),
 })
@@ -3878,6 +4069,35 @@ export const zRequestTextBlock = z.object({
     ])
     .optional(),
   text: z.string().min(1),
+  type: z.string(),
+})
+
+/**
+ * RequestMidConvSystemBlock
+ *
+ * System instructions that appear mid-conversation.
+ *
+ * Use this block to provide or update system-level instructions at a specific
+ * point in the conversation, rather than only via the top-level `system` parameter.
+ */
+export const zRequestMidConvSystemBlock = z.object({
+  cache_control: z
+    .union([
+      z
+        .object({
+          type: z.literal('ephemeral'),
+        })
+        .and(zCacheControlEphemeral),
+      z.unknown(),
+    ])
+    .optional(),
+  content: z.array(
+    z
+      .object({
+        type: z.literal('text'),
+      })
+      .and(zRequestTextBlock),
+  ),
   type: z.string(),
 })
 
@@ -4676,6 +4896,7 @@ export const zToolSearchToolResultErrorCode = z.enum([
  */
 export const zRequestToolSearchToolResultError = z.object({
   error_code: zToolSearchToolResultErrorCode,
+  error_message: z.union([z.string(), z.unknown()]).optional(),
   type: z.string(),
 })
 
@@ -4882,6 +5103,7 @@ export const zUsage = z.object({
   inference_geo: z.union([z.string(), z.unknown()]),
   input_tokens: z.int().gte(0),
   output_tokens: z.int().gte(0),
+  output_tokens_details: z.union([zOutputTokensDetails, z.unknown()]),
   server_tool_use: z.union([zServerToolUsage, z.unknown()]),
   service_tier: z.union([
     z.enum(['standard', 'priority', 'batch']),
@@ -4988,6 +5210,7 @@ export const zWebFetchToolResultErrorCode = z.enum([
   'invalid_tool_input',
   'url_too_long',
   'url_not_allowed',
+  'url_not_in_prior_context',
   'url_not_accessible',
   'unsupported_content_type',
   'too_many_requests',
@@ -5193,6 +5416,7 @@ export const zInputContentBlock = z.discriminatedUnion('type', [
     type: z.literal('tool_search_tool_result'),
   }),
   zRequestContainerUploadBlock.extend({ type: z.literal('container_upload') }),
+  zRequestMidConvSystemBlock.extend({ type: z.literal('mid_conv_system') }),
 ])
 
 /**
@@ -5200,7 +5424,7 @@ export const zInputContentBlock = z.discriminatedUnion('type', [
  */
 export const zInputMessage = z.object({
   content: z.union([z.string(), z.array(zInputContentBlock)]),
-  role: z.enum(['user', 'assistant']),
+  role: z.enum(['user', 'assistant', 'system']),
 })
 
 /**

@@ -137,6 +137,140 @@
         "required": ["data"],
         "type": "object"
       },
+      "AdvisorNestedTool": {
+        "additionalProperties": {
+          "nullable": true
+        },
+        "description": "A tool made available to the advisor sub-agent. Accepts function tools and OpenRouter server tools (e.g. openrouter:web_search). The advisor tool may not list itself.",
+        "example": {
+          "type": "openrouter:web_search"
+        },
+        "properties": {
+          "function": {
+            "additionalProperties": {
+              "nullable": true
+            },
+            "type": "object"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "nullable": true
+            },
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": ["type"],
+        "type": "object"
+      },
+      "AdvisorReasoning": {
+        "description": "Reasoning configuration forwarded to the advisor call. Use this to control reasoning effort and token budget for models that support extended thinking.",
+        "example": {
+          "effort": "high"
+        },
+        "properties": {
+          "effort": {
+            "description": "Reasoning effort level for the advisor call.",
+            "enum": ["xhigh", "high", "medium", "low", "minimal", "none"],
+            "type": "string",
+            "x-speakeasy-unknown-values": "allow"
+          },
+          "max_tokens": {
+            "description": "Maximum number of reasoning tokens the advisor may use.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "AdvisorServerTool_OpenRouter": {
+        "description": "OpenRouter built-in server tool: consults a higher-intelligence advisor model (any OpenRouter model) for guidance mid-generation and returns its response. The advisor may run as a sub-agent with its own tools. Include multiple entries to offer several named advisors; at most one entry may omit `name` to act as the default advisor.",
+        "example": {
+          "parameters": {
+            "model": "~anthropic/claude-opus-latest",
+            "name": "reviewer"
+          },
+          "type": "openrouter:advisor"
+        },
+        "properties": {
+          "parameters": {
+            "$ref": "#/components/schemas/AdvisorServerToolConfig"
+          },
+          "type": {
+            "enum": ["openrouter:advisor"],
+            "type": "string"
+          }
+        },
+        "required": ["type"],
+        "type": "object"
+      },
+      "AdvisorServerToolConfig": {
+        "description": "Configuration for one openrouter:advisor server tool entry.",
+        "example": {
+          "model": "~anthropic/claude-opus-latest",
+          "name": "reviewer"
+        },
+        "properties": {
+          "forward_transcript": {
+            "description": "When true, the full parent conversation is forwarded to the advisor so it sees the same context the executor does (and the tool-call `prompt`, if given, is appended as a final user turn). When false or omitted, the advisor receives only the `prompt` the executor passes in the tool call.",
+            "example": false,
+            "type": "boolean"
+          },
+          "instructions": {
+            "description": "System instructions for the advisor sub-agent. When omitted, the advisor responds with no system prompt of its own.",
+            "example": "You are a senior staff engineer. Give a focused, decisive plan.",
+            "type": "string"
+          },
+          "max_completion_tokens": {
+            "description": "Maximum number of output tokens (including reasoning) the advisor may produce. When omitted, the provider's default applies.",
+            "example": 2048,
+            "type": "integer"
+          },
+          "max_tool_calls": {
+            "description": "Maximum number of tool-calling steps the advisor sub-agent may take during its agentic loop. Capped at 25. Only relevant when the advisor is given tools.",
+            "example": 5,
+            "maximum": 25,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "model": {
+            "description": "Slug of the advisor model to consult (any OpenRouter model). When omitted, the executor can choose it via the tool call's `model` argument; if neither is set, the model from the outer API request is used. The advisor tool itself cannot be the advisor model.",
+            "example": "~anthropic/claude-opus-latest",
+            "type": "string"
+          },
+          "name": {
+            "description": "Optional name for this advisor. The model sees one tool per named advisor (and one default for an unnamed entry). Names must be unique across advisor entries. Letters, digits, spaces, underscores, and dashes; trimmed; 1–64 chars.",
+            "example": "reviewer",
+            "maxLength": 64,
+            "minLength": 1,
+            "pattern": "^[a-zA-Z0-9 _-]+$",
+            "type": "string"
+          },
+          "reasoning": {
+            "$ref": "#/components/schemas/AdvisorReasoning"
+          },
+          "stream": {
+            "description": "When true, the advisor's advice streams incrementally as it is produced. In the Responses API this emits `response.output_text.delta` events targeting the advisor output item; the final `advice` field is still set on the completed item. Has no effect on the Chat Completions API (where the advice arrives only as the final tool result). When false or omitted, the advice arrives only as the final result.",
+            "example": false,
+            "type": "boolean"
+          },
+          "temperature": {
+            "description": "Sampling temperature forwarded to the advisor call. When omitted, the provider's default applies.",
+            "example": 0.7,
+            "format": "double",
+            "type": "number"
+          },
+          "tools": {
+            "description": "Tools the advisor sub-agent may use while forming its advice. The advisor runs as an agentic sub-agent over these tools, then returns its text. Must not include the advisor tool itself.",
+            "items": {
+              "$ref": "#/components/schemas/AdvisorNestedTool"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "AnnotationAddedEvent": {
         "allOf": [
           {
@@ -4242,6 +4376,76 @@
         ],
         "type": "object"
       },
+      "BashServerTool": {
+        "description": "OpenRouter built-in server tool: runs shell commands server-side in a sandboxed container",
+        "example": {
+          "parameters": {
+            "environment": {
+              "type": "container_auto"
+            }
+          },
+          "type": "openrouter:bash"
+        },
+        "properties": {
+          "parameters": {
+            "$ref": "#/components/schemas/BashServerToolConfig"
+          },
+          "type": {
+            "enum": ["openrouter:bash"],
+            "type": "string"
+          }
+        },
+        "required": ["type"],
+        "type": "object"
+      },
+      "BashServerToolConfig": {
+        "description": "Configuration for the openrouter:bash server tool",
+        "example": {
+          "environment": {
+            "type": "container_auto"
+          }
+        },
+        "properties": {
+          "engine": {
+            "$ref": "#/components/schemas/BashServerToolEngine"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/BashServerToolEnvironment"
+          },
+          "sleep_after_seconds": {
+            "$ref": "#/components/schemas/SandboxSleepAfterSeconds"
+          }
+        },
+        "type": "object"
+      },
+      "BashServerToolEngine": {
+        "description": "Which bash engine to use. \"openrouter\" runs commands server-side in the OpenRouter sandbox. \"auto\" (default) and \"native\" use native passthrough, returning the tool call to your application to run client-side; OpenRouter does not execute the commands.",
+        "enum": ["auto", "native", "openrouter"],
+        "example": "auto",
+        "type": "string",
+        "x-speakeasy-unknown-values": "allow"
+      },
+      "BashServerToolEnvironment": {
+        "description": "Execution environment for the bash server tool.",
+        "discriminator": {
+          "mapping": {
+            "container_auto": "#/components/schemas/ContainerAutoEnvironment",
+            "container_reference": "#/components/schemas/ContainerReferenceEnvironment"
+          },
+          "propertyName": "type"
+        },
+        "example": {
+          "type": "container_auto"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ContainerAutoEnvironment"
+          },
+          {
+            "$ref": "#/components/schemas/ContainerReferenceEnvironment"
+          }
+        ]
+      },
       "BigNumberUnion": {
         "description": "Price per million prompt tokens",
         "example": 1000,
@@ -4606,6 +4810,7 @@
           "cohere",
           "crusoe",
           "darkbloom",
+          "decart",
           "deepinfra",
           "deepseek",
           "dekallm",
@@ -4659,6 +4864,7 @@
           "together",
           "upstage",
           "venice",
+          "wafer",
           "wandb",
           "xai",
           "xiaomi",
@@ -5234,6 +5440,12 @@
             },
             "required": ["type", "function"],
             "type": "object"
+          },
+          {
+            "$ref": "#/components/schemas/AdvisorServerTool_OpenRouter"
+          },
+          {
+            "$ref": "#/components/schemas/BashServerTool"
           },
           {
             "$ref": "#/components/schemas/DatetimeServerTool"
@@ -6888,6 +7100,43 @@
         "required": ["code", "message"],
         "type": "object"
       },
+      "ContainerAutoEnvironment": {
+        "description": "An OpenRouter-managed, auto-provisioned ephemeral container.",
+        "example": {
+          "type": "container_auto"
+        },
+        "properties": {
+          "type": {
+            "enum": ["container_auto"],
+            "type": "string"
+          }
+        },
+        "required": ["type"],
+        "type": "object"
+      },
+      "ContainerReferenceEnvironment": {
+        "description": "Reference to a previously created container to reuse.",
+        "example": {
+          "container_id": "cntr_abc123",
+          "type": "container_reference"
+        },
+        "properties": {
+          "container_id": {
+            "description": "Identifier of an existing container to reuse (max 20 characters).",
+            "example": "cntr_abc123",
+            "maxLength": 20,
+            "minLength": 1,
+            "pattern": "^[\\w-]+$",
+            "type": "string"
+          },
+          "type": {
+            "enum": ["container_reference"],
+            "type": "string"
+          }
+        },
+        "required": ["type", "container_id"],
+        "type": "object"
+      },
       "ContentFilterAction": {
         "description": "Action taken when the pattern matches",
         "enum": ["redact", "block"],
@@ -7037,6 +7286,31 @@
           "type": "response.content_part.added"
         }
       },
+      "ContentPartAudio": {
+        "example": {
+          "audio_url": {
+            "url": "https://example.com/audio.mp3"
+          },
+          "type": "audio_url"
+        },
+        "properties": {
+          "audio_url": {
+            "properties": {
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": ["url"],
+            "type": "object"
+          },
+          "type": {
+            "enum": ["audio_url"],
+            "type": "string"
+          }
+        },
+        "required": ["type", "audio_url"],
+        "type": "object"
+      },
       "ContentPartDoneEvent": {
         "allOf": [
           {
@@ -7158,6 +7432,31 @@
           }
         },
         "required": ["type", "input_video"],
+        "type": "object"
+      },
+      "ContentPartVideo": {
+        "example": {
+          "type": "video_url",
+          "video_url": {
+            "url": "https://example.com/clip.mp4"
+          }
+        },
+        "properties": {
+          "type": {
+            "enum": ["video_url"],
+            "type": "string"
+          },
+          "video_url": {
+            "properties": {
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": ["url"],
+            "type": "object"
+          }
+        },
+        "required": ["type", "video_url"],
         "type": "object"
       },
       "ContextCompressionEngine": {
@@ -8924,6 +9223,460 @@
         "required": ["type", "name", "parameters"],
         "type": "object"
       },
+      "FusionAnalysisResult": {
+        "description": "Structured analysis produced by the fusion judge model.",
+        "example": {
+          "blind_spots": [
+            "No model considered the impact on existing API consumers."
+          ],
+          "consensus": [
+            "All panel models agree the request is asking for a concise summary."
+          ],
+          "contradictions": [
+            {
+              "stances": [
+                {
+                  "model": "openai/gpt-5",
+                  "stance": "Favors an incremental rollout."
+                },
+                {
+                  "model": "anthropic/claude-sonnet-4.5",
+                  "stance": "Favors a single coordinated migration."
+                }
+              ],
+              "topic": "Recommended approach"
+            }
+          ],
+          "partial_coverage": [
+            {
+              "models": ["openai/gpt-5"],
+              "point": "Only one model addressed the rollback strategy."
+            }
+          ],
+          "unique_insights": [
+            {
+              "insight": "Highlighted a backwards-compatibility risk the other models missed.",
+              "model": "anthropic/claude-sonnet-4.5"
+            }
+          ]
+        },
+        "properties": {
+          "blind_spots": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "consensus": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "contradictions": {
+            "items": {
+              "properties": {
+                "stances": {
+                  "items": {
+                    "properties": {
+                      "model": {
+                        "type": "string"
+                      },
+                      "stance": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["model", "stance"],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "topic": {
+                  "type": "string"
+                }
+              },
+              "required": ["topic", "stances"],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "partial_coverage": {
+            "items": {
+              "properties": {
+                "models": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "point": {
+                  "type": "string"
+                }
+              },
+              "required": ["models", "point"],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "unique_insights": {
+            "items": {
+              "properties": {
+                "insight": {
+                  "type": "string"
+                },
+                "model": {
+                  "type": "string"
+                }
+              },
+              "required": ["model", "insight"],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "consensus",
+          "contradictions",
+          "partial_coverage",
+          "unique_insights",
+          "blind_spots"
+        ],
+        "type": "object"
+      },
+      "FusionCallAnalysisCompletedEvent": {
+        "description": "Emitted when the fusion judge completes with the structured analysis.",
+        "example": {
+          "analysis": {
+            "blind_spots": [],
+            "consensus": [],
+            "contradictions": [],
+            "partial_coverage": [],
+            "unique_insights": []
+          },
+          "item_id": "st_fusion_abc",
+          "output_index": 0,
+          "sequence_number": 40,
+          "type": "response.fusion_call.analysis.completed"
+        },
+        "properties": {
+          "analysis": {
+            "$ref": "#/components/schemas/FusionAnalysisResult"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.analysis.completed"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "analysis",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
+      "FusionCallAnalysisInProgressEvent": {
+        "description": "Emitted when the fusion judge starts producing the structured analysis.",
+        "example": {
+          "item_id": "st_fusion_abc",
+          "judge_model": "openai/gpt-5",
+          "output_index": 0,
+          "sequence_number": 25,
+          "type": "response.fusion_call.analysis.in_progress"
+        },
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "judge_model": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.analysis.in_progress"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "judge_model",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
+      "FusionCallCompletedEvent": {
+        "description": "Emitted when the openrouter:fusion tool call finishes.",
+        "example": {
+          "item_id": "st_fusion_abc",
+          "output_index": 0,
+          "sequence_number": 41,
+          "type": "response.fusion_call.completed"
+        },
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.completed"],
+            "type": "string"
+          }
+        },
+        "required": ["type", "output_index", "item_id", "sequence_number"],
+        "type": "object"
+      },
+      "FusionCallInProgressEvent": {
+        "description": "Emitted when an openrouter:fusion tool call begins executing.",
+        "example": {
+          "item_id": "st_fusion_abc",
+          "output_index": 0,
+          "sequence_number": 3,
+          "type": "response.fusion_call.in_progress"
+        },
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.in_progress"],
+            "type": "string"
+          }
+        },
+        "required": ["type", "output_index", "item_id", "sequence_number"],
+        "type": "object"
+      },
+      "FusionCallPanelAddedEvent": {
+        "description": "Emitted when a fusion analysis-panel model starts.",
+        "example": {
+          "item_id": "st_fusion_abc",
+          "model": "openai/gpt-5",
+          "output_index": 0,
+          "sequence_number": 4,
+          "type": "response.fusion_call.panel.added"
+        },
+        "properties": {
+          "item_id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.panel.added"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "model",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
+      "FusionCallPanelCompletedEvent": {
+        "description": "Emitted when a fusion panel model finishes with its full content.",
+        "example": {
+          "content": "Full panel response text...",
+          "item_id": "st_fusion_abc",
+          "model": "openai/gpt-5",
+          "output_index": 0,
+          "sequence_number": 20,
+          "type": "response.fusion_call.panel.completed"
+        },
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.panel.completed"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "model",
+          "content",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
+      "FusionCallPanelDeltaEvent": {
+        "description": "Incremental content token from a fusion panel model.",
+        "example": {
+          "delta": "Carbon taxes",
+          "item_id": "st_fusion_abc",
+          "model": "openai/gpt-5",
+          "output_index": 0,
+          "sequence_number": 5,
+          "type": "response.fusion_call.panel.delta"
+        },
+        "properties": {
+          "delta": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.panel.delta"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "model",
+          "delta",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
+      "FusionCallPanelFailedEvent": {
+        "description": "Emitted when a fusion panel model fails.",
+        "example": {
+          "error": "Upstream provider error",
+          "item_id": "st_fusion_abc",
+          "model": "openai/gpt-5",
+          "output_index": 0,
+          "sequence_number": 18,
+          "status_code": 502,
+          "type": "response.fusion_call.panel.failed"
+        },
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "status_code": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.panel.failed"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "model",
+          "error",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
+      "FusionCallPanelReasoningDeltaEvent": {
+        "description": "Incremental reasoning token from a fusion panel model.",
+        "example": {
+          "delta": "Considering both sides",
+          "item_id": "st_fusion_abc",
+          "model": "openai/gpt-5",
+          "output_index": 0,
+          "sequence_number": 6,
+          "type": "response.fusion_call.panel.reasoning.delta"
+        },
+        "properties": {
+          "delta": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "output_index": {
+            "type": "integer"
+          },
+          "sequence_number": {
+            "type": "integer"
+          },
+          "type": {
+            "enum": ["response.fusion_call.panel.reasoning.delta"],
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "model",
+          "delta",
+          "output_index",
+          "item_id",
+          "sequence_number"
+        ],
+        "type": "object"
+      },
       "FusionPlugin": {
         "example": {
           "analysis_models": [
@@ -8969,6 +9722,102 @@
             "description": "Slug of the model that performs both the judge step (with web_search + web_fetch) and the final synthesis. When omitted, defaults to the first model in the Quality preset.",
             "example": "~anthropic/claude-opus-latest",
             "type": "string"
+          },
+          "tools": {
+            "description": "Server tools available to panelist and judge inner calls. Each entry uses the same `{ type, parameters? }` shorthand as the outer Chat Completions request. When omitted, defaults to `[{ type: \"openrouter:web_search\" }, { type: \"openrouter:web_fetch\" }]`. Pass an empty array to disable tools entirely (panelists answer from parametric knowledge only).",
+            "example": [
+              {
+                "parameters": {
+                  "excluded_domains": ["example.com"]
+                },
+                "type": "openrouter:web_search"
+              },
+              {
+                "type": "openrouter:web_fetch"
+              }
+            ],
+            "items": {
+              "properties": {
+                "parameters": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "format": "double",
+                        "type": "number"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "nullable": true
+                      },
+                      {
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "format": "double",
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "nullable": true
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
+                        },
+                        "type": "array"
+                      },
+                      {
+                        "additionalProperties": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "format": "double",
+                              "type": "number"
+                            },
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "nullable": true
+                            },
+                            {
+                              "nullable": true
+                            }
+                          ]
+                        },
+                        "type": "object"
+                      },
+                      {
+                        "nullable": true
+                      }
+                    ]
+                  },
+                  "description": "Optional configuration forwarded as the tool's `parameters` object.",
+                  "type": "object"
+                },
+                "type": {
+                  "description": "Server tool type identifier (e.g. \"openrouter:web_search\", \"openrouter:web_fetch\").",
+                  "type": "string"
+                }
+              },
+              "required": ["type"],
+              "type": "object"
+            },
+            "maxItems": 8,
+            "type": "array"
           }
         },
         "required": ["id"],
@@ -9059,6 +9908,39 @@
             "example": 0.7,
             "format": "double",
             "type": "number"
+          },
+          "tools": {
+            "description": "Server tools available to panelist and judge inner calls. Each entry uses the same `{ type, parameters? }` shorthand as the outer Chat Completions request. When omitted, defaults to `[{ type: \"openrouter:web_search\" }, { type: \"openrouter:web_fetch\" }]`. Pass an empty array to disable tools entirely (panelists answer from parametric knowledge only).",
+            "example": [
+              {
+                "parameters": {
+                  "excluded_domains": ["example.com"]
+                },
+                "type": "openrouter:web_search"
+              },
+              {
+                "type": "openrouter:web_fetch"
+              }
+            ],
+            "items": {
+              "properties": {
+                "parameters": {
+                  "additionalProperties": {
+                    "nullable": true
+                  },
+                  "description": "Optional configuration forwarded as the tool's `parameters` object.",
+                  "type": "object"
+                },
+                "type": {
+                  "description": "Server tool type identifier (e.g. \"openrouter:web_search\", \"openrouter:web_fetch\").",
+                  "type": "string"
+                }
+              },
+              "required": ["type"],
+              "type": "object"
+            },
+            "maxItems": 8,
+            "type": "array"
           }
         },
         "type": "object"
@@ -9250,6 +10132,13 @@
                 "description": "ISO 8601 timestamp of when the generation was created",
                 "example": "2024-07-15T23:33:19.433273+00:00",
                 "type": "string"
+              },
+              "data_region": {
+                "description": "The data region this generation was routed through. 'europe' for EU-routed requests, 'global' otherwise.",
+                "enum": ["global", "europe"],
+                "example": "global",
+                "type": "string",
+                "x-speakeasy-unknown-values": "allow"
               },
               "external_user": {
                 "description": "External user identifier",
@@ -9518,7 +10407,8 @@
               "router",
               "provider_responses",
               "user_agent",
-              "http_referer"
+              "http_referer",
+              "data_region"
             ],
             "type": "object"
           }
@@ -10399,6 +11289,34 @@
         "type": "string",
         "x-speakeasy-unknown-values": "allow"
       },
+      "InputReference": {
+        "description": "A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).",
+        "discriminator": {
+          "mapping": {
+            "audio_url": "#/components/schemas/ContentPartAudio",
+            "image_url": "#/components/schemas/ContentPartImage",
+            "video_url": "#/components/schemas/ContentPartVideo"
+          },
+          "propertyName": "type"
+        },
+        "example": {
+          "image_url": {
+            "url": "https://example.com/image.png"
+          },
+          "type": "image_url"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ContentPartImage"
+          },
+          {
+            "$ref": "#/components/schemas/ContentPartAudio"
+          },
+          {
+            "$ref": "#/components/schemas/ContentPartVideo"
+          }
+        ]
+      },
       "Inputs": {
         "anyOf": [
           {
@@ -10578,6 +11496,9 @@
                 },
                 {
                   "$ref": "#/components/schemas/OutputSearchModelsServerToolItem"
+                },
+                {
+                  "$ref": "#/components/schemas/OutputAdvisorServerToolItem"
                 },
                 {
                   "$ref": "#/components/schemas/LocalShellCallItem"
@@ -13019,6 +13940,9 @@
                   "type": "object"
                 },
                 {
+                  "$ref": "#/components/schemas/BashServerTool"
+                },
+                {
                   "$ref": "#/components/schemas/DatetimeServerTool"
                 },
                 {
@@ -13275,6 +14199,7 @@
                   "Crucible",
                   "Crusoe",
                   "Darkbloom",
+                  "Decart",
                   "DeepInfra",
                   "DeepSeek",
                   "DekaLLM",
@@ -13329,6 +14254,7 @@
                   "Together",
                   "Upstage",
                   "Venice",
+                  "Wafer",
                   "WandB",
                   "Xiaomi",
                   "xAI",
@@ -17306,6 +18232,49 @@
         "type": "string",
         "x-speakeasy-unknown-values": "allow"
       },
+      "OutputAdvisorServerToolItem": {
+        "description": "An openrouter:advisor server tool output item",
+        "example": {
+          "id": "st_tmp_abc123",
+          "status": "completed",
+          "type": "openrouter:advisor"
+        },
+        "properties": {
+          "advice": {
+            "description": "The advisor model's response (the advice text returned to the executor).",
+            "type": "string"
+          },
+          "error": {
+            "description": "Error message when the advisor call did not produce advice.",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "instance_name": {
+            "description": "Provider-safe function name of the specific advisor instance that produced this item (e.g. `openrouter_advisor__1`). Present only when more than one advisor tool is configured; omitted for the default single advisor. Echo this field back unchanged so the advisor's cross-request memory stays namespaced to the correct instance. This identity is positional: it is derived from the index of the advisor entry in the request `tools` array, so clients must keep the order of advisor tool entries stable across requests in a conversation. Reordering or inserting advisor entries shifts these names and causes each advisor's cross-request memory to be attributed to the wrong instance.",
+            "example": "openrouter_advisor__1",
+            "type": "string"
+          },
+          "model": {
+            "description": "Slug of the advisor model that was consulted.",
+            "type": "string"
+          },
+          "prompt": {
+            "description": "The prompt the executor sent to the advisor.",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ToolCallStatus"
+          },
+          "type": {
+            "enum": ["openrouter:advisor"],
+            "type": "string"
+          }
+        },
+        "required": ["status", "type"],
+        "type": "object"
+      },
       "OutputApplyPatchCallItem": {
         "description": "A native `apply_patch_call` output item matching OpenAI's Responses API shape. Emitted when the client requested the `apply_patch` shorthand.",
         "example": {
@@ -17698,89 +18667,7 @@
         },
         "properties": {
           "analysis": {
-            "description": "Structured analysis produced by the fusion judge model.",
-            "properties": {
-              "blind_spots": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "consensus": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array"
-              },
-              "contradictions": {
-                "items": {
-                  "properties": {
-                    "stances": {
-                      "items": {
-                        "properties": {
-                          "model": {
-                            "type": "string"
-                          },
-                          "stance": {
-                            "type": "string"
-                          }
-                        },
-                        "required": ["model", "stance"],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "topic": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["topic", "stances"],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "partial_coverage": {
-                "items": {
-                  "properties": {
-                    "models": {
-                      "items": {
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    "point": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["models", "point"],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "unique_insights": {
-                "items": {
-                  "properties": {
-                    "insight": {
-                      "type": "string"
-                    },
-                    "model": {
-                      "type": "string"
-                    }
-                  },
-                  "required": ["model", "insight"],
-                  "type": "object"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "consensus",
-              "contradictions",
-              "partial_coverage",
-              "unique_insights",
-              "blind_spots"
-            ],
-            "type": "object"
+            "$ref": "#/components/schemas/FusionAnalysisResult"
           },
           "error": {
             "description": "Error message when the fusion run did not produce an analysis result.",
@@ -17816,9 +18703,12 @@
             "type": "string"
           },
           "responses": {
-            "description": "Slugs of the analysis models that produced a response in this fusion run.",
+            "description": "Analysis models that produced a response in this fusion run, with each model's full panel content.",
             "items": {
               "properties": {
+                "content": {
+                  "type": "string"
+                },
                 "model": {
                   "type": "string"
                 }
@@ -18300,6 +19190,7 @@
             "function_call": "#/components/schemas/OutputFunctionCallItem",
             "image_generation_call": "#/components/schemas/OutputImageGenerationCallItem",
             "message": "#/components/schemas/OutputMessageItem",
+            "openrouter:advisor": "#/components/schemas/OutputAdvisorServerToolItem",
             "openrouter:apply_patch": "#/components/schemas/OutputApplyPatchServerToolItem",
             "openrouter:bash": "#/components/schemas/OutputBashServerToolItem",
             "openrouter:browser_use": "#/components/schemas/OutputBrowserUseServerToolItem",
@@ -18316,6 +19207,8 @@
             "openrouter:web_fetch": "#/components/schemas/OutputWebFetchServerToolItem",
             "openrouter:web_search": "#/components/schemas/OutputWebSearchServerToolItem",
             "reasoning": "#/components/schemas/OutputReasoningItem",
+            "shell_call": "#/components/schemas/OutputShellCallItem",
+            "shell_call_output": "#/components/schemas/OutputShellCallOutputItem",
             "web_search_call": "#/components/schemas/OutputWebSearchCallItem"
           },
           "propertyName": "type"
@@ -18388,6 +19281,12 @@
             "$ref": "#/components/schemas/OutputApplyPatchCallItem"
           },
           {
+            "$ref": "#/components/schemas/OutputShellCallItem"
+          },
+          {
+            "$ref": "#/components/schemas/OutputShellCallOutputItem"
+          },
+          {
             "$ref": "#/components/schemas/OutputWebFetchServerToolItem"
           },
           {
@@ -18404,6 +19303,9 @@
           },
           {
             "$ref": "#/components/schemas/OutputFusionServerToolItem"
+          },
+          {
+            "$ref": "#/components/schemas/OutputAdvisorServerToolItem"
           },
           {
             "$ref": "#/components/schemas/OutputCustomToolCallItem"
@@ -18756,6 +19658,139 @@
           }
         },
         "required": ["status", "type"],
+        "type": "object"
+      },
+      "OutputShellCallItem": {
+        "description": "A native `shell_call` output item matching OpenAI's Responses API shape. Emitted for the sandbox-backed `shell` tool.",
+        "example": {
+          "action": {
+            "commands": ["echo hello"],
+            "max_output_length": null,
+            "timeout_ms": null
+          },
+          "call_id": "call_abc123",
+          "id": "shc_abc123",
+          "status": "completed",
+          "type": "shell_call"
+        },
+        "properties": {
+          "action": {
+            "properties": {
+              "commands": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "max_output_length": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "timeout_ms": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": ["commands", "max_output_length", "timeout_ms"],
+            "type": "object"
+          },
+          "call_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ShellCallStatus"
+          },
+          "type": {
+            "enum": ["shell_call"],
+            "type": "string"
+          }
+        },
+        "required": ["type", "id", "call_id", "status"],
+        "type": "object"
+      },
+      "OutputShellCallOutputItem": {
+        "description": "A native `shell_call_output` item matching OpenAI's Responses API shape. Carries per-command stdout, stderr, and the exit/timeout outcome.",
+        "example": {
+          "call_id": "call_abc123",
+          "id": "sho_abc123",
+          "output": [
+            {
+              "outcome": {
+                "exit_code": 0,
+                "type": "exit"
+              },
+              "stderr": "",
+              "stdout": "hello\n"
+            }
+          ],
+          "status": "completed",
+          "type": "shell_call_output"
+        },
+        "properties": {
+          "call_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "max_output_length": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "output": {
+            "items": {
+              "properties": {
+                "outcome": {
+                  "oneOf": [
+                    {
+                      "properties": {
+                        "exit_code": {
+                          "type": "integer"
+                        },
+                        "type": {
+                          "enum": ["exit"],
+                          "type": "string"
+                        }
+                      },
+                      "required": ["type", "exit_code"],
+                      "type": "object"
+                    },
+                    {
+                      "properties": {
+                        "type": {
+                          "enum": ["timeout"],
+                          "type": "string"
+                        }
+                      },
+                      "required": ["type"],
+                      "type": "object"
+                    }
+                  ]
+                },
+                "stderr": {
+                  "type": "string"
+                },
+                "stdout": {
+                  "type": "string"
+                }
+              },
+              "required": ["stdout", "stderr", "outcome"],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ShellCallStatus"
+          },
+          "type": {
+            "enum": ["shell_call_output"],
+            "type": "string"
+          }
+        },
+        "required": ["type", "id", "call_id", "status", "output"],
         "type": "object"
       },
       "OutputTextEditorServerToolItem": {
@@ -19611,6 +20646,7 @@
           "Crucible",
           "Crusoe",
           "Darkbloom",
+          "Decart",
           "DeepInfra",
           "DeepSeek",
           "DekaLLM",
@@ -19665,6 +20701,7 @@
           "Together",
           "Upstage",
           "Venice",
+          "Wafer",
           "WandB",
           "Xiaomi",
           "xAI",
@@ -19858,6 +20895,12 @@
             "type": "object"
           },
           "darkbloom": {
+            "additionalProperties": {
+              "nullable": true
+            },
+            "type": "object"
+          },
+          "decart": {
             "additionalProperties": {
               "nullable": true
             },
@@ -20337,6 +21380,12 @@
             },
             "type": "object"
           },
+          "wafer": {
+            "additionalProperties": {
+              "nullable": true
+            },
+            "type": "object"
+          },
           "wandb": {
             "additionalProperties": {
               "nullable": true
@@ -20612,6 +21661,7 @@
           "latency": {
             "description": "Response latency in milliseconds",
             "example": 1200,
+            "format": "double",
             "type": "number"
           },
           "model_permaslug": {
@@ -20676,6 +21726,7 @@
               "Crucible",
               "Crusoe",
               "Darkbloom",
+              "Decart",
               "DeepInfra",
               "DeepSeek",
               "DekaLLM",
@@ -20730,6 +21781,7 @@
               "Together",
               "Upstage",
               "Venice",
+              "Wafer",
               "WandB",
               "Xiaomi",
               "xAI",
@@ -20744,7 +21796,7 @@
             "description": "HTTP status code from the provider",
             "example": 200,
             "nullable": true,
-            "type": "number"
+            "type": "integer"
           }
         },
         "required": ["status"],
@@ -20879,6 +21931,7 @@
                 ]
               },
               "discount": {
+                "format": "double",
                 "type": "number"
               },
               "image": {
@@ -21102,6 +22155,7 @@
             ]
           },
           "discount": {
+            "format": "double",
             "type": "number"
           },
           "image": {
@@ -22214,6 +23268,9 @@
                   "$ref": "#/components/schemas/CustomTool"
                 },
                 {
+                  "$ref": "#/components/schemas/AdvisorServerTool_OpenRouter"
+                },
+                {
                   "$ref": "#/components/schemas/DatetimeServerTool"
                 },
                 {
@@ -22233,6 +23290,12 @@
                 },
                 {
                   "$ref": "#/components/schemas/ApplyPatchServerTool_OpenRouter"
+                },
+                {
+                  "$ref": "#/components/schemas/BashServerTool"
+                },
+                {
+                  "$ref": "#/components/schemas/ShellServerTool_OpenRouter"
                 }
               ]
             },
@@ -22336,6 +23399,11 @@
         "example": "direct",
         "type": "string",
         "x-speakeasy-unknown-values": "allow"
+      },
+      "SandboxSleepAfterSeconds": {
+        "description": "How long (in seconds) the container stays warm after its last command before sleeping, freeing its capacity slot. Idle-based: each command renews the timer. Defaults to 900 (15 minutes); capped at 2592000 (30 days).",
+        "example": 900,
+        "type": "integer"
       },
       "SearchContextSizeEnum": {
         "description": "Size of the search context for web search tools",
@@ -22549,6 +23617,13 @@
         "required": ["type", "call_id", "output"],
         "type": "object"
       },
+      "ShellCallStatus": {
+        "description": "Status of a shell call or its output.",
+        "enum": ["in_progress", "completed", "incomplete"],
+        "example": "completed",
+        "type": "string",
+        "x-speakeasy-unknown-values": "allow"
+      },
       "ShellServerTool": {
         "description": "Shell tool configuration",
         "example": {
@@ -22562,6 +23637,78 @@
         },
         "required": ["type"],
         "type": "object"
+      },
+      "ShellServerTool_OpenRouter": {
+        "description": "OpenRouter built-in server tool: runs shell commands server-side in a sandboxed container (a sandbox-backed clone of OpenAI's hosted shell tool)",
+        "example": {
+          "parameters": {
+            "engine": "openrouter",
+            "environment": {
+              "type": "container_auto"
+            }
+          },
+          "type": "openrouter:shell"
+        },
+        "properties": {
+          "parameters": {
+            "$ref": "#/components/schemas/ShellServerToolConfig"
+          },
+          "type": {
+            "enum": ["openrouter:shell"],
+            "type": "string"
+          }
+        },
+        "required": ["type"],
+        "type": "object"
+      },
+      "ShellServerToolConfig": {
+        "description": "Configuration for the openrouter:shell server tool",
+        "example": {
+          "engine": "openrouter",
+          "environment": {
+            "type": "container_auto"
+          }
+        },
+        "properties": {
+          "engine": {
+            "$ref": "#/components/schemas/ShellServerToolEngine"
+          },
+          "environment": {
+            "$ref": "#/components/schemas/ShellServerToolEnvironment"
+          },
+          "sleep_after_seconds": {
+            "$ref": "#/components/schemas/SandboxSleepAfterSeconds"
+          }
+        },
+        "type": "object"
+      },
+      "ShellServerToolEngine": {
+        "description": "Which shell engine to use. \"openrouter\" runs commands server-side in the OpenRouter sandbox. \"auto\" (default) keeps the provider's native hosted shell when available (OpenAI); on other providers the call is routed to the OpenRouter sandbox.",
+        "enum": ["auto", "openrouter"],
+        "example": "openrouter",
+        "type": "string",
+        "x-speakeasy-unknown-values": "allow"
+      },
+      "ShellServerToolEnvironment": {
+        "description": "Server-side execution environment for the shell tool. Only container-backed environments are supported; \"local\" shells are not.",
+        "discriminator": {
+          "mapping": {
+            "container_auto": "#/components/schemas/ContainerAutoEnvironment",
+            "container_reference": "#/components/schemas/ContainerReferenceEnvironment"
+          },
+          "propertyName": "type"
+        },
+        "example": {
+          "type": "container_auto"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ContainerAutoEnvironment"
+          },
+          {
+            "$ref": "#/components/schemas/ContainerReferenceEnvironment"
+          }
+        ]
       },
       "SpeechRequest": {
         "description": "Text-to-speech request input",
@@ -22812,6 +23959,15 @@
             "response.failed": "#/components/schemas/StreamEventsResponseFailed",
             "response.function_call_arguments.delta": "#/components/schemas/FunctionCallArgsDeltaEvent",
             "response.function_call_arguments.done": "#/components/schemas/FunctionCallArgsDoneEvent",
+            "response.fusion_call.analysis.completed": "#/components/schemas/FusionCallAnalysisCompletedEvent",
+            "response.fusion_call.analysis.in_progress": "#/components/schemas/FusionCallAnalysisInProgressEvent",
+            "response.fusion_call.completed": "#/components/schemas/FusionCallCompletedEvent",
+            "response.fusion_call.in_progress": "#/components/schemas/FusionCallInProgressEvent",
+            "response.fusion_call.panel.added": "#/components/schemas/FusionCallPanelAddedEvent",
+            "response.fusion_call.panel.completed": "#/components/schemas/FusionCallPanelCompletedEvent",
+            "response.fusion_call.panel.delta": "#/components/schemas/FusionCallPanelDeltaEvent",
+            "response.fusion_call.panel.failed": "#/components/schemas/FusionCallPanelFailedEvent",
+            "response.fusion_call.panel.reasoning.delta": "#/components/schemas/FusionCallPanelReasoningDeltaEvent",
             "response.image_generation_call.completed": "#/components/schemas/ImageGenCallCompletedEvent",
             "response.image_generation_call.generating": "#/components/schemas/ImageGenCallGeneratingEvent",
             "response.image_generation_call.in_progress": "#/components/schemas/ImageGenCallInProgressEvent",
@@ -22961,6 +24117,33 @@
           },
           {
             "$ref": "#/components/schemas/ApplyPatchCallOperationDiffDoneEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallInProgressEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallPanelAddedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallPanelDeltaEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallPanelReasoningDeltaEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallPanelCompletedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallPanelFailedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallAnalysisInProgressEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallAnalysisCompletedEvent"
+          },
+          {
+            "$ref": "#/components/schemas/FusionCallCompletedEvent"
           }
         ]
       },
@@ -24288,9 +25471,9 @@
             "type": "boolean"
           },
           "input_references": {
-            "description": "Reference images to guide video generation",
+            "description": "Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.",
             "items": {
-              "$ref": "#/components/schemas/ContentPartImage"
+              "$ref": "#/components/schemas/InputReference"
             },
             "type": "array"
           },
@@ -26309,6 +27492,7 @@
                 "cohere",
                 "crusoe",
                 "darkbloom",
+                "decart",
                 "deepinfra",
                 "deepseek",
                 "dekallm",
@@ -26362,6 +27546,7 @@
                 "together",
                 "upstage",
                 "venice",
+                "wafer",
                 "wandb",
                 "xai",
                 "xiaomi",
@@ -26889,10 +28074,10 @@
         "operationId": "sendChatCompletionRequest",
         "parameters": [
           {
-            "description": "Opt-in to surface routing metadata on the response under `openrouter_metadata`. Defaults to `disabled`.",
+            "description": "Opt-in to surface routing metadata on the response under `openrouter_metadata`. Defaults to `disabled`. The legacy header `X-OpenRouter-Experimental-Metadata` is also accepted for backward compatibility.",
             "example": "enabled",
             "in": "header",
-            "name": "X-OpenRouter-Experimental-Metadata",
+            "name": "X-OpenRouter-Metadata",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/MetadataLevel"
@@ -27092,7 +28277,7 @@
                 }
               }
             },
-            "description": "Forbidden - Authentication successful but insufficient permissions, or a guardrail blocked the request. When guardrails block and the `X-OpenRouter-Experimental-Metadata: enabled` header is present, the response includes `openrouter_metadata` with full routing context and a `pipeline` array containing guardrail stage details."
+            "description": "Forbidden - Authentication successful but insufficient permissions, or a guardrail blocked the request. When guardrails block and the `X-OpenRouter-Metadata: enabled` header is present, the response includes `openrouter_metadata` with full routing context and a `pipeline` array containing guardrail stage details."
           },
           "404": {
             "content": {
@@ -32033,10 +33218,10 @@
         "operationId": "createMessages",
         "parameters": [
           {
-            "description": "Opt-in to surface routing metadata on the response under `openrouter_metadata`. Defaults to `disabled`.",
+            "description": "Opt-in to surface routing metadata on the response under `openrouter_metadata`. Defaults to `disabled`. The legacy header `X-OpenRouter-Experimental-Metadata` is also accepted for backward compatibility.",
             "example": "enabled",
             "in": "header",
-            "name": "X-OpenRouter-Experimental-Metadata",
+            "name": "X-OpenRouter-Metadata",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/MetadataLevel"
@@ -32206,7 +33391,7 @@
                 }
               }
             },
-            "description": "Forbidden - Authentication successful but insufficient permissions, or a guardrail blocked the request. When guardrails block and the `X-OpenRouter-Experimental-Metadata: enabled` header is present, the response includes `openrouter_metadata` with full routing context and a `pipeline` array containing guardrail stage details."
+            "description": "Forbidden - Authentication successful but insufficient permissions, or a guardrail blocked the request. When guardrails block and the `X-OpenRouter-Metadata: enabled` header is present, the response includes `openrouter_metadata` with full routing context and a `pipeline` array containing guardrail stage details."
           },
           "404": {
             "content": {
@@ -34772,14 +35957,36 @@
                 },
                 "properties": {
                   "documents": {
-                    "description": "The list of documents to rerank",
+                    "description": "The list of documents to rerank. Documents may be plain strings, or structured objects with `text` and/or `image` for multimodal models.",
                     "example": [
                       "Paris is the capital of France.",
                       "Berlin is the capital of Germany."
                     ],
                     "items": {
-                      "type": "string"
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "description": "A structured document with optional text and/or image content. At least one of `text` or `image` must be provided.",
+                          "properties": {
+                            "image": {
+                              "description": "An image associated with the document, as a remote URL (http/https) or a base64-encoded data URI (data:image/...).",
+                              "example": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Phytogenic.png",
+                              "type": "string"
+                            },
+                            "text": {
+                              "description": "The document text",
+                              "example": "AI enables robots to perceive, plan, and act autonomously.",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      ],
+                      "description": "A document to rerank. Either a plain string, or a structured object with optional `text` and/or `image`."
                     },
+                    "minItems": 1,
                     "type": "array"
                   },
                   "model": {
@@ -34877,15 +36084,19 @@
                         },
                         "properties": {
                           "document": {
-                            "description": "The document object containing the original text",
+                            "description": "The document object echoing the original input (text and/or image)",
                             "properties": {
+                              "image": {
+                                "description": "The image (URL or data URI) from the original document",
+                                "example": "https://example.com/image.png",
+                                "type": "string"
+                              },
                               "text": {
                                 "description": "The document text",
                                 "example": "Paris is the capital of France.",
                                 "type": "string"
                               }
                             },
-                            "required": ["text"],
                             "type": "object"
                           },
                           "index": {
@@ -35119,10 +36330,10 @@
         "operationId": "createResponses",
         "parameters": [
           {
-            "description": "Opt-in to surface routing metadata on the response under `openrouter_metadata`. Defaults to `disabled`.",
+            "description": "Opt-in to surface routing metadata on the response under `openrouter_metadata`. Defaults to `disabled`. The legacy header `X-OpenRouter-Experimental-Metadata` is also accepted for backward compatibility.",
             "example": "enabled",
             "in": "header",
-            "name": "X-OpenRouter-Experimental-Metadata",
+            "name": "X-OpenRouter-Metadata",
             "required": false,
             "schema": {
               "$ref": "#/components/schemas/MetadataLevel"
@@ -35302,7 +36513,7 @@
                 }
               }
             },
-            "description": "Forbidden - Authentication successful but insufficient permissions, or a guardrail blocked the request. When guardrails block and the `X-OpenRouter-Experimental-Metadata: enabled` header is present, the response includes `openrouter_metadata` with full routing context and a `pipeline` array containing guardrail stage details."
+            "description": "Forbidden - Authentication successful but insufficient permissions, or a guardrail blocked the request. When guardrails block and the `X-OpenRouter-Metadata: enabled` header is present, the response includes `openrouter_metadata` with full routing context and a `pipeline` array containing guardrail stage details."
           },
           "404": {
             "content": {

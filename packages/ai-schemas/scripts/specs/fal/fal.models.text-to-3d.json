@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.774Z",
+  "generated_at": "2026-06-11T02:20:29.651Z",
   "total_models": 10,
   "category": "text-to-3d",
   "models": [
@@ -91,22 +91,20 @@
               "required": ["status", "request_id"]
             },
             "Hunyuan3dV31ProTextTo3dInput": {
-              "type": "object",
+              "required": ["prompt"],
+              "x-fal-order-properties": [
+                "prompt",
+                "generate_type",
+                "enable_pbr",
+                "face_count"
+              ],
               "properties": {
                 "generate_type": {
                   "default": "Normal",
+                  "enum": ["Normal", "Geometry"],
                   "description": "Generation task type. Normal: textured model. Geometry: geometry-only white model (no textures). LowPoly/Sketch are not available in v3.1.",
                   "title": "Generate Type",
-                  "type": "string",
-                  "enum": ["Normal", "Geometry"]
-                },
-                "face_count": {
-                  "default": 500000,
-                  "description": "Target polygon face count. Range: 40,000-1,500,000. Default: 500,000.",
-                  "maximum": 1500000,
-                  "minimum": 40000,
-                  "title": "Face Count",
-                  "type": "integer"
+                  "type": "string"
                 },
                 "enable_pbr": {
                   "default": false,
@@ -114,61 +112,35 @@
                   "title": "Enable Pbr",
                   "type": "boolean"
                 },
+                "face_count": {
+                  "default": 500000,
+                  "maximum": 1500000,
+                  "minimum": 40000,
+                  "description": "Target polygon face count. Range: 40,000-1,500,000. Default: 500,000.",
+                  "title": "Face Count",
+                  "type": "integer"
+                },
                 "prompt": {
-                  "type": "string",
                   "description": "Text description of the 3D content to generate. Max 1024 UTF-8 characters.",
-                  "title": "Prompt",
+                  "examples": ["A super cool space ship with details"],
                   "maxLength": 1024,
-                  "examples": ["A super cool space ship with details"]
+                  "title": "Prompt",
+                  "type": "string"
                 }
               },
               "title": "ProTextTo3DInput",
-              "x-fal-order-properties": [
-                "prompt",
-                "generate_type",
-                "enable_pbr",
-                "face_count"
-              ],
-              "required": ["prompt"]
+              "type": "object"
             },
             "Hunyuan3dV31ProTextTo3dOutput": {
-              "type": "object",
+              "required": ["model_glb", "model_urls"],
+              "x-fal-order-properties": [
+                "model_glb",
+                "thumbnail",
+                "model_urls",
+                "seed"
+              ],
               "properties": {
-                "model_urls": {
-                  "$ref": "#/components/schemas/ModelUrls",
-                  "description": "URLs for different 3D model formats",
-                  "examples": [
-                    {
-                      "texture": {
-                        "url": "https://v3b.fal.media/files/b/0a8c5482/jOL2nBpcOGspwxQf0_U-z_texture_20250901.png",
-                        "content_type": "image/png",
-                        "file_name": "texture_20250901.png",
-                        "file_size": 19996580
-                      },
-                      "obj": {
-                        "url": "https://v3b.fal.media/files/b/0a8c5482/ZzC1xlOftyGQxhDkbZzVW_6168030a8817075aaa55c94cc5145000.obj",
-                        "content_type": "model/obj",
-                        "file_name": "6168030a8817075aaa55c94cc5145000.obj",
-                        "file_size": 34755929
-                      },
-                      "glb": {
-                        "url": "https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb",
-                        "content_type": "model/gltf-binary",
-                        "file_name": "model.glb",
-                        "file_size": 35833072
-                      },
-                      "mtl": {
-                        "url": "https://v3b.fal.media/files/b/0a8c5482/ZxJepsEkhM67VSugmZ7QT_material.mtl",
-                        "content_type": "text/plain",
-                        "file_name": "material.mtl",
-                        "file_size": 88
-                      }
-                    }
-                  ]
-                },
                 "seed": {
-                  "description": "The seed used for generation",
-                  "title": "Seed",
                   "anyOf": [
                     {
                       "type": "integer"
@@ -176,22 +148,63 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "Seed",
+                  "description": "The seed used for generation"
+                },
+                "model_urls": {
+                  "$ref": "#/components/schemas/ModelUrls",
+                  "examples": [
+                    {
+                      "glb": {
+                        "file_size": 35833072,
+                        "file_name": "model.glb",
+                        "url": "https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb",
+                        "content_type": "model/gltf-binary"
+                      },
+                      "obj": {
+                        "file_size": 34755929,
+                        "file_name": "6168030a8817075aaa55c94cc5145000.obj",
+                        "url": "https://v3b.fal.media/files/b/0a8c5482/ZzC1xlOftyGQxhDkbZzVW_6168030a8817075aaa55c94cc5145000.obj",
+                        "content_type": "model/obj"
+                      },
+                      "mtl": {
+                        "file_size": 88,
+                        "file_name": "material.mtl",
+                        "url": "https://v3b.fal.media/files/b/0a8c5482/ZxJepsEkhM67VSugmZ7QT_material.mtl",
+                        "content_type": "text/plain"
+                      },
+                      "texture": {
+                        "file_size": 19996580,
+                        "file_name": "texture_20250901.png",
+                        "url": "https://v3b.fal.media/files/b/0a8c5482/jOL2nBpcOGspwxQf0_U-z_texture_20250901.png",
+                        "content_type": "image/png"
+                      }
+                    }
+                  ],
+                  "description": "URLs for different 3D model formats"
                 },
                 "model_glb": {
                   "$ref": "#/components/schemas/File",
-                  "description": "Generated 3D object in GLB format.",
                   "examples": [
                     {
-                      "url": "https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb",
-                      "content_type": "model/gltf-binary",
+                      "file_size": 35833072,
                       "file_name": "model.glb",
-                      "file_size": 35833072
+                      "url": "https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb",
+                      "content_type": "model/gltf-binary"
                     }
-                  ]
+                  ],
+                  "description": "Generated 3D object in GLB format."
                 },
                 "thumbnail": {
-                  "description": "Preview thumbnail of the generated model",
+                  "examples": [
+                    {
+                      "file_size": 68927,
+                      "file_name": "preview.png",
+                      "url": "https://v3b.fal.media/files/b/0a8c5483/EE97ZV7cM-3UVG4peyWTQ_preview.png",
+                      "content_type": "image/png"
+                    }
+                  ],
                   "anyOf": [
                     {
                       "$ref": "#/components/schemas/File"
@@ -200,96 +213,13 @@
                       "type": "null"
                     }
                   ],
-                  "examples": [
-                    {
-                      "url": "https://v3b.fal.media/files/b/0a8c5483/EE97ZV7cM-3UVG4peyWTQ_preview.png",
-                      "content_type": "image/png",
-                      "file_name": "preview.png",
-                      "file_size": 68927
-                    }
-                  ]
+                  "description": "Preview thumbnail of the generated model"
                 }
               },
               "title": "ProTextTo3DOutput",
-              "x-fal-order-properties": [
-                "model_glb",
-                "thumbnail",
-                "model_urls",
-                "seed"
-              ],
-              "required": ["model_glb", "model_urls"]
+              "type": "object"
             },
             "ModelUrls": {
-              "type": "object",
-              "properties": {
-                "texture": {
-                  "description": "Texture image for the 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "usdz": {
-                  "description": "USDZ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "obj": {
-                  "description": "OBJ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "glb": {
-                  "description": "GLB format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "mtl": {
-                  "description": "MTL material file for OBJ model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "fbx": {
-                  "description": "FBX format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                }
-              },
-              "title": "ModelUrls",
               "x-fal-order-properties": [
                 "glb",
                 "fbx",
@@ -297,45 +227,89 @@
                 "mtl",
                 "texture",
                 "usdz"
-              ]
+              ],
+              "properties": {
+                "glb": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "GLB format 3D model"
+                },
+                "fbx": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "FBX format 3D model"
+                },
+                "obj": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "OBJ format 3D model"
+                },
+                "mtl": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "MTL material file for OBJ model"
+                },
+                "texture": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Texture image for the 3D model"
+                },
+                "usdz": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "USDZ format 3D model"
+                }
+              },
+              "title": "ModelUrls",
+              "type": "object"
             },
             "File": {
-              "type": "object",
+              "required": ["url"],
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
               "properties": {
-                "url": {
-                  "type": "string",
-                  "description": "The URL where the file can be downloaded from.",
-                  "title": "Url"
-                },
-                "content_type": {
-                  "description": "The mime type of the file.",
-                  "title": "Content Type",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["image/png"]
-                },
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
                 "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
+                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -344,17 +318,43 @@
                       "type": "null"
                     }
                   ],
-                  "examples": [4404019]
+                  "title": "File Size",
+                  "description": "The size of the file in bytes."
+                },
+                "file_name": {
+                  "examples": ["z9RV14K95DvU.png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "description": "The name of the file. It will be auto-generated if not provided."
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "title": "Url",
+                  "type": "string"
+                },
+                "content_type": {
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "description": "The mime type of the file."
                 }
               },
               "title": "File",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ],
-              "required": ["url"]
+              "type": "object"
             }
           }
         },
@@ -1369,21 +1369,21 @@
       }
     },
     {
-      "endpoint_id": "fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+      "endpoint_id": "fal-ai/hunyuan3d-v3/text-to-3d",
       "metadata": {
-        "display_name": "Hyper3D - Rodin V2.5 - Text to 3D",
+        "display_name": "Hunyuan3d V3",
         "category": "text-to-3d",
-        "description": "Rodin V2.5 by Hyper3D generates realistic and production ready 3D models from text or images. ",
+        "description": "Turn simple sketches into detailed, fully-textured 3D models. Instantly convert your concept designs into formats ready for Unity, Unreal, and Blender.",
         "status": "active",
-        "tags": ["text-to-3d"],
-        "updated_at": "2026-05-31T08:01:11.403Z",
+        "tags": [],
+        "updated_at": "2026-04-21T17:48:30.618Z",
         "is_favorited": false,
-        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c09f7/S7oXUUqZ5T_1m_3sQIQTZ_a9493c9cafed4ba1a43db14d36c9d243.jpg",
-        "model_url": "https://fal.run/fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a8696b5/YaGZtFEBFL6CEXjiVxdB__dbec569fa5d4418bbbc9d77354f7c86f.jpg",
+        "model_url": "https://fal.run/fal-ai/hunyuan3d-v3/text-to-3d",
         "license_type": "commercial",
-        "date": "2026-05-28T15:51:32.105Z",
+        "date": "2025-12-16T22:13:53.731Z",
         "group": {
-          "key": "rodin-v2.5",
+          "key": "hunyuan3d-v3",
           "label": "Text to 3D"
         },
         "highlighted": false,
@@ -1393,16 +1393,16 @@
       "openapi": {
         "openapi": "3.0.4",
         "info": {
-          "title": "Queue OpenAPI for fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+          "title": "Queue OpenAPI for fal-ai/hunyuan3d-v3/text-to-3d",
           "version": "1.0.0",
-          "description": "The OpenAPI schema for the fal-ai/hyper3d/rodin/v2.5/text-to-3d queue.",
+          "description": "The OpenAPI schema for the fal-ai/hunyuan3d-v3/text-to-3d queue.",
           "x-fal-metadata": {
-            "endpointId": "fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+            "endpointId": "fal-ai/hunyuan3d-v3/text-to-3d",
             "category": "text-to-3d",
-            "thumbnailUrl": "https://v3b.fal.media/files/b/0a9c09f7/S7oXUUqZ5T_1m_3sQIQTZ_a9493c9cafed4ba1a43db14d36c9d243.jpg",
-            "playgroundUrl": "https://fal.ai/models/fal-ai/hyper3d/rodin/v2.5/text-to-3d",
-            "documentationUrl": "https://fal.ai/models/fal-ai/hyper3d/rodin/v2.5/text-to-3d/api",
-            "about": "Text-to-3D generation using Rodin Gen-2.5"
+            "thumbnailUrl": "https://v3b.fal.media/files/b/0a8696b5/YaGZtFEBFL6CEXjiVxdB__dbec569fa5d4418bbbc9d77354f7c86f.jpg",
+            "playgroundUrl": "https://fal.ai/models/fal-ai/hunyuan3d-v3/text-to-3d",
+            "documentationUrl": "https://fal.ai/models/fal-ai/hunyuan3d-v3/text-to-3d/api",
+            "about": "Text To 3D"
           }
         },
         "components": {
@@ -1455,255 +1455,80 @@
               },
               "required": ["status", "request_id"]
             },
-            "Hyper3dRodinV25TextTo3dInput": {
+            "Hunyuan3dV3TextTo3dInput": {
+              "required": ["prompt"],
               "properties": {
-                "tier": {
-                  "default": "Gen-2.5-Medium",
-                  "title": "Tier",
-                  "description": "Generation tier. Higher tiers produce more detailed meshes but cost more. Extreme-High enables the highest-detail mode and bills at double the base rate. See more info in the [documentation](https://developer.hyper3d.ai/api-specification/rodin-gen2.5#use-gen-2.5-generation-with-following-gen-2.5-tiers).",
-                  "enum": [
-                    "Gen-2.5-Extreme-Low",
-                    "Gen-2.5-Low",
-                    "Gen-2.5-Medium",
-                    "Gen-2.5-High",
-                    "Gen-2.5-Extreme-High"
-                  ],
-                  "type": "string"
+                "polygon_type": {
+                  "description": "Polygon type. Only takes effect when GenerateType is LowPoly.",
+                  "type": "string",
+                  "default": "triangle",
+                  "enum": ["triangle", "quadrilateral"],
+                  "title": "Polygon Type"
                 },
-                "geometry_file_format": {
-                  "default": "glb",
-                  "title": "Geometry File Format",
-                  "description": "Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.",
-                  "enum": ["glb", "usdz", "fbx", "obj", "stl"],
-                  "type": "string"
-                },
-                "is_micro": {
+                "enable_pbr": {
+                  "description": "Whether to enable PBR material generation",
+                  "type": "boolean",
                   "default": false,
-                  "title": "Is Micro",
-                  "description": "Generate finer micro-scale geometric detail. Only effective with `tier=\"Gen-2.5-Extreme-High\"`.",
-                  "type": "boolean"
+                  "title": "Enable Pbr"
                 },
-                "geometry_instruct_mode": {
-                  "default": "faithful",
-                  "title": "Geometry Instruct Mode",
-                  "description": "Faithful mode follows the prompt closely; creative mode permits more variation. Only effective in the Medium and High tiers.",
-                  "enum": ["faithful", "creative"],
-                  "type": "string"
+                "generate_type": {
+                  "description": "Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.",
+                  "type": "string",
+                  "default": "Normal",
+                  "enum": ["Normal", "LowPoly", "Geometry"],
+                  "title": "Generate Type"
                 },
-                "TAPose": {
-                  "default": false,
-                  "title": "T/A Pose",
-                  "description": "Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.",
-                  "type": "boolean"
-                },
-                "texture_mode": {
-                  "anyOf": [
-                    {
-                      "enum": [
-                        "legacy",
-                        "extreme-low",
-                        "low",
-                        "medium",
-                        "high"
-                      ],
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Texture Mode",
-                  "description": "Texture generation quality. When unset, the API picks a default appropriate for the tier."
-                },
-                "material": {
-                  "default": "All",
-                  "title": "Material",
-                  "description": "Material type. PBR: physically-based materials with realistic lighting. Shaded: baked lighting with no PBR maps. All: both PBR and Shaded variants. None: geometry only with no textures.",
-                  "enum": ["PBR", "Shaded", "All", "None"],
-                  "type": "string"
-                },
-                "bbox_condition": {
-                  "anyOf": [
-                    {
-                      "maxItems": 3,
-                      "type": "array",
-                      "items": {
-                        "type": "integer"
-                      },
-                      "minItems": 3
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Bbox Condition",
-                  "description": "An array that specifies the bounding box dimensions [width, height, length]. Must be exactly three positive integers.",
-                  "example": [100, 50, 150]
-                },
-                "seed": {
-                  "anyOf": [
-                    {
-                      "type": "integer",
-                      "maximum": 65535,
-                      "minimum": 0
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Seed",
-                  "description": "Seed value for randomization, ranging from 0 to 65535. Optional."
-                },
-                "quality_mesh_option": {
-                  "default": "18K Quad",
-                  "title": "Quality Mesh Option",
-                  "description": "Combined quality and mesh type selection. Quad = smooth surfaces, Triangle = detailed geometry. Maps to `mesh_mode` (Quad/Raw) and `quality_override` (face count) on the Hyper3D API. Valid face counts depend on the selected tier. Up to 1M Triangle is supported for tiers Extreme-Low, Low, and Medium. Up to 2M Triangle (as low as 20K Triangle) is supported for tiers High and Extreme-High.",
-                  "enum": [
-                    "4K Quad",
-                    "8K Quad",
-                    "18K Quad",
-                    "50K Quad",
-                    "100K Quad",
-                    "200K Quad",
-                    "2K Triangle",
-                    "20K Triangle",
-                    "150K Triangle",
-                    "500K Triangle",
-                    "1M Triangle",
-                    "2M Triangle"
-                  ],
-                  "type": "string"
-                },
-                "hd_texture": {
-                  "default": false,
-                  "title": "Hd Texture",
-                  "description": "Enables enhanced texture post-processing for higher visual fidelity.",
-                  "type": "boolean"
-                },
-                "addons": {
-                  "anyOf": [
-                    {
-                      "items": {
-                        "const": "HighPack",
-                        "type": "string"
-                      },
-                      "type": "array"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Addons",
-                  "description": "Optional add-ons. Possible values are `HighPack`. HighPack provides 4K resolution textures and high-poly geometry, instead of default 2K. If in `quality_mesh_option` Quad is selected, the number of faces will be ~16 times of the number of faces selected in the quality part. Single values are accepted as a shorthand for a list with one item."
-                },
-                "texture_delight": {
-                  "default": false,
-                  "title": "Texture Delight",
-                  "description": "Removes baked lighting/highlights from the generated textures.",
-                  "type": "boolean"
-                },
-                "is_symmetric": {
-                  "default": "unknown",
-                  "title": "Is Symmetric",
-                  "description": "Symmetry mode for the generated mesh. `symmetric` forces left-right symmetry; `balanced` favors symmetry without enforcing it; `asymmetric` allows freely asymmetric geometry; `unknown` lets the model decide based on the inputs.",
-                  "enum": ["symmetric", "balanced", "asymmetric", "unknown"],
-                  "type": "string"
+                "face_count": {
+                  "minimum": 40000,
+                  "maximum": 1500000,
+                  "description": "Target face count. Range: 40000-1500000",
+                  "type": "integer",
+                  "default": 500000,
+                  "title": "Face Count"
                 },
                 "prompt": {
-                  "title": "Prompt",
-                  "description": "A textual prompt to guide model generation. Required for Text-to-3D mode.",
-                  "examples": [
-                    "A futuristic robot with sleek metallic design."
-                  ],
+                  "description": "Text description of the 3D content to generate. Supports up to 1024 UTF-8 characters.",
+                  "type": "string",
                   "maxLength": 1024,
-                  "type": "string"
+                  "title": "Prompt",
+                  "examples": [
+                    "A rustic wooden treasure chest with metal bands and ornate lock"
+                  ]
                 }
               },
-              "title": "RodinGen25TextTo3DInput",
               "x-fal-order-properties": [
                 "prompt",
-                "tier",
-                "seed",
-                "geometry_file_format",
-                "material",
-                "quality_mesh_option",
-                "texture_mode",
-                "geometry_instruct_mode",
-                "hd_texture",
-                "texture_delight",
-                "is_symmetric",
-                "is_micro",
-                "TAPose",
-                "bbox_condition",
-                "addons"
+                "enable_pbr",
+                "face_count",
+                "generate_type",
+                "polygon_type"
               ],
-              "required": ["prompt"],
-              "type": "object"
+              "type": "object",
+              "title": "TextTo3DInput"
             },
-            "Hyper3dRodinV25TextTo3dOutput": {
+            "Hunyuan3dV3TextTo3dOutput": {
+              "required": ["model_glb", "model_urls"],
               "properties": {
-                "model_mesh": {
-                  "description": "Generated 3D object file.",
-                  "examples": [
-                    {
-                      "url": "https://storage.googleapis.com/falserverless/model_tests/video_models/base_basic_shaded.glb"
-                    }
-                  ],
-                  "$ref": "#/components/schemas/File"
-                },
-                "textures": {
-                  "title": "Textures",
-                  "description": "Generated textures for the 3D object.",
-                  "items": {
-                    "$ref": "#/components/schemas/Image"
-                  },
-                  "type": "array"
-                },
-                "seed": {
-                  "title": "Seed",
-                  "description": "Seed value used for generation.",
-                  "type": "integer"
-                },
-                "model_meshes": {
-                  "title": "Model Meshes",
-                  "description": "Additional generated 3D object files returned by Hyper3D besides model_mesh.",
-                  "items": {
-                    "$ref": "#/components/schemas/File"
-                  },
-                  "type": "array"
-                }
-              },
-              "title": "ObjectOutputv2",
-              "x-fal-order-properties": [
-                "model_mesh",
-                "model_meshes",
-                "seed",
-                "textures"
-              ],
-              "required": ["model_mesh", "seed", "textures"],
-              "type": "object"
-            },
-            "File": {
-              "properties": {
-                "url": {
-                  "title": "Url",
-                  "description": "The URL where the file can be downloaded from.",
-                  "type": "string"
-                },
-                "file_name": {
+                "thumbnail": {
                   "anyOf": [
                     {
-                      "type": "string"
+                      "$ref": "#/components/schemas/File"
                     },
                     {
                       "type": "null"
                     }
                   ],
-                  "title": "File Name",
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "examples": ["z9RV14K95DvU.png"]
+                  "description": "Preview thumbnail of the generated model",
+                  "examples": [
+                    {
+                      "url": "https://v3b.fal.media/files/b/0a8686a8/khgYO1d6xqWOJPi6_IR_j_preview.png",
+                      "file_size": 172757,
+                      "content_type": "image/png",
+                      "file_name": "preview.png"
+                    }
+                  ]
                 },
-                "file_size": {
+                "seed": {
                   "anyOf": [
                     {
                       "type": "integer"
@@ -1712,94 +1537,96 @@
                       "type": "null"
                     }
                   ],
-                  "title": "File Size",
-                  "description": "The size of the file in bytes.",
-                  "examples": [4404019]
+                  "description": "The seed used for generation",
+                  "title": "Seed"
                 },
-                "content_type": {
-                  "anyOf": [
+                "model_glb": {
+                  "$ref": "#/components/schemas/File",
+                  "description": "Generated 3D object in GLB format.",
+                  "examples": [
                     {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
+                      "url": "https://v3b.fal.media/files/b/0a8686a8/1hPquv3AqqkfnqSM9fpmB_model.glb",
+                      "file_size": 64724836,
+                      "content_type": "model/gltf-binary",
+                      "file_name": "model.glb"
                     }
-                  ],
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"]
+                  ]
+                },
+                "model_urls": {
+                  "$ref": "#/components/schemas/ModelUrls",
+                  "description": "URLs for different 3D model formats",
+                  "examples": [
+                    {
+                      "glb": {
+                        "url": "https://v3b.fal.media/files/b/0a8686a8/1hPquv3AqqkfnqSM9fpmB_model.glb",
+                        "file_size": 64724836,
+                        "content_type": "model/gltf-binary",
+                        "file_name": "model.glb"
+                      },
+                      "obj": {
+                        "url": "https://v3b.fal.media/files/b/0a8686a8/AVgdsVFrGAKGAFr4e2g56_model.obj",
+                        "file_size": 44084728,
+                        "content_type": "text/plain",
+                        "file_name": "model.obj"
+                      }
+                    }
+                  ]
                 }
               },
+              "x-fal-order-properties": [
+                "model_glb",
+                "thumbnail",
+                "model_urls",
+                "seed"
+              ],
+              "type": "object",
+              "title": "TextTo3DOutput"
+            },
+            "File": {
               "title": "File",
+              "required": ["url"],
+              "type": "object",
               "x-fal-order-properties": [
                 "url",
                 "content_type",
                 "file_name",
                 "file_size"
               ],
-              "required": ["url"],
-              "type": "object"
-            },
-            "Image": {
               "properties": {
-                "file_size": {
+                "content_type": {
+                  "description": "The mime type of the file.",
+                  "title": "Content Type",
                   "anyOf": [
                     {
-                      "type": "integer"
+                      "type": "string"
                     },
                     {
                       "type": "null"
                     }
                   ],
-                  "title": "File Size",
-                  "description": "The size of the file in bytes.",
-                  "examples": [4404019]
+                  "examples": ["image/png"]
                 },
                 "url": {
                   "title": "Url",
-                  "description": "The URL where the file can be downloaded from.",
-                  "type": "string"
+                  "type": "string",
+                  "description": "The URL where the file can be downloaded from."
+                },
+                "file_size": {
+                  "description": "The size of the file in bytes.",
+                  "title": "File Size",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [4404019]
                 },
                 "file_name": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "File Name",
                   "description": "The name of the file. It will be auto-generated if not provided.",
-                  "examples": ["z9RV14K95DvU.png"]
-                },
-                "width": {
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Width",
-                  "description": "The width of the image in pixels.",
-                  "examples": [1024]
-                },
-                "height": {
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Height",
-                  "description": "The height of the image in pixels.",
-                  "examples": [1024]
-                },
-                "content_type": {
+                  "title": "File Name",
                   "anyOf": [
                     {
                       "type": "string"
@@ -1808,28 +1635,65 @@
                       "type": "null"
                     }
                   ],
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"]
+                  "examples": ["z9RV14K95DvU.png"]
                 }
-              },
-              "title": "Image",
-              "description": "Represents an image file.",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size",
-                "width",
-                "height"
-              ],
-              "required": ["url"],
-              "type": "object"
+              }
+            },
+            "ModelUrls": {
+              "title": "ModelUrls",
+              "type": "object",
+              "x-fal-order-properties": ["glb", "fbx", "obj", "usdz"],
+              "properties": {
+                "obj": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "OBJ format 3D model"
+                },
+                "fbx": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "FBX format 3D model"
+                },
+                "usdz": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "USDZ format 3D model"
+                },
+                "glb": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "GLB format 3D model"
+                }
+              }
             }
           }
         },
         "paths": {
-          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d/requests/{request_id}/status": {
+          "/fal-ai/hunyuan3d-v3/text-to-3d/requests/{request_id}/status": {
             "get": {
               "parameters": [
                 {
@@ -1865,7 +1729,7 @@
               }
             }
           },
-          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d/requests/{request_id}/cancel": {
+          "/fal-ai/hunyuan3d-v3/text-to-3d/requests/{request_id}/cancel": {
             "put": {
               "parameters": [
                 {
@@ -1898,14 +1762,14 @@
               }
             }
           },
-          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d": {
+          "/fal-ai/hunyuan3d-v3/text-to-3d": {
             "post": {
               "requestBody": {
                 "required": true,
                 "content": {
                   "application/json": {
                     "schema": {
-                      "$ref": "#/components/schemas/Hyper3dRodinV25TextTo3dInput"
+                      "$ref": "#/components/schemas/Hunyuan3dV3TextTo3dInput"
                     }
                   }
                 }
@@ -1924,7 +1788,7 @@
               }
             }
           },
-          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d/requests/{request_id}": {
+          "/fal-ai/hunyuan3d-v3/text-to-3d/requests/{request_id}": {
             "get": {
               "parameters": [
                 {
@@ -1943,7 +1807,7 @@
                   "content": {
                     "application/json": {
                       "schema": {
-                        "$ref": "#/components/schemas/Hyper3dRodinV25TextTo3dOutput"
+                        "$ref": "#/components/schemas/Hunyuan3dV3TextTo3dOutput"
                       }
                     }
                   }
@@ -2052,19 +1916,42 @@
               "required": ["status", "request_id"]
             },
             "HunyuanMotionInput": {
-              "title": "HYMotionInput",
-              "required": ["prompt"],
+              "x-fal-order-properties": [
+                "prompt",
+                "seed",
+                "duration",
+                "guidance_scale",
+                "output_format"
+              ],
               "type": "object",
               "properties": {
-                "output_format": {
-                  "title": "Output Format",
-                  "enum": ["fbx", "dict"],
+                "prompt": {
+                  "description": "Text prompt describing the motion to generate.",
+                  "examples": [
+                    "A person is running then takes a big leap.",
+                    "Someone waves hello with their right hand.",
+                    "A dancer performs a spinning pirouette."
+                  ],
                   "type": "string",
+                  "title": "Prompt"
+                },
+                "output_format": {
+                  "enum": ["fbx", "dict"],
                   "description": "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
-                  "default": "fbx"
+                  "type": "string",
+                  "default": "fbx",
+                  "title": "Output Format"
+                },
+                "guidance_scale": {
+                  "minimum": 1,
+                  "description": "Classifier-free guidance scale. Higher = more faithful to prompt.",
+                  "examples": [3, 5, 7.5],
+                  "maximum": 10,
+                  "type": "number",
+                  "default": 5,
+                  "title": "Guidance Scale"
                 },
                 "seed": {
-                  "title": "Seed",
                   "description": "Random seed for reproducible generation.",
                   "examples": [42, 12345],
                   "anyOf": [
@@ -2074,60 +1961,31 @@
                     {
                       "type": "null"
                     }
-                  ]
-                },
-                "guidance_scale": {
-                  "title": "Guidance Scale",
-                  "minimum": 1,
-                  "type": "number",
-                  "description": "Classifier-free guidance scale. Higher = more faithful to prompt.",
-                  "examples": [3, 5, 7.5],
-                  "default": 5,
-                  "maximum": 10
-                },
-                "prompt": {
-                  "title": "Prompt",
-                  "type": "string",
-                  "description": "Text prompt describing the motion to generate.",
-                  "examples": [
-                    "A person is running then takes a big leap.",
-                    "Someone waves hello with their right hand.",
-                    "A dancer performs a spinning pirouette."
-                  ]
+                  ],
+                  "title": "Seed"
                 },
                 "duration": {
-                  "title": "Duration",
                   "minimum": 0.5,
-                  "type": "number",
                   "description": "Motion duration in seconds (0.5-12.0).",
                   "examples": [3, 5, 10],
+                  "maximum": 12,
+                  "type": "number",
                   "default": 5,
-                  "maximum": 12
+                  "title": "Duration"
                 }
               },
-              "x-fal-order-properties": [
-                "prompt",
-                "seed",
-                "duration",
-                "guidance_scale",
-                "output_format"
-              ]
+              "required": ["prompt"],
+              "title": "HYMotionInput"
             },
             "HunyuanMotionOutput": {
-              "title": "HYMotionOutput",
-              "required": ["seed"],
+              "x-fal-order-properties": ["fbx_file", "motion_json", "seed"],
               "type": "object",
               "properties": {
-                "motion_json": {
-                  "description": "Generated motion data as JSON.",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                "seed": {
+                  "description": "Seed used for generation.",
+                  "examples": [42],
+                  "type": "integer",
+                  "title": "Seed"
                 },
                 "fbx_file": {
                   "description": "Generated FBX animation file.",
@@ -2145,40 +2003,31 @@
                     }
                   ]
                 },
-                "seed": {
-                  "title": "Seed",
-                  "type": "integer",
-                  "description": "Seed used for generation.",
-                  "examples": [42]
-                }
-              },
-              "x-fal-order-properties": ["fbx_file", "motion_json", "seed"]
-            },
-            "File": {
-              "title": "File",
-              "required": ["url"],
-              "type": "object",
-              "properties": {
-                "url": {
-                  "title": "Url",
-                  "type": "string",
-                  "description": "The URL where the file can be downloaded from."
-                },
-                "content_type": {
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"],
+                "motion_json": {
+                  "description": "Generated motion data as JSON.",
                   "anyOf": [
                     {
-                      "type": "string"
+                      "$ref": "#/components/schemas/File"
                     },
                     {
                       "type": "null"
                     }
                   ]
-                },
+                }
+              },
+              "required": ["seed"],
+              "title": "HYMotionOutput"
+            },
+            "File": {
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
+              "type": "object",
+              "properties": {
                 "file_size": {
-                  "title": "File Size",
                   "description": "The size of the file in bytes.",
                   "examples": [4404019],
                   "anyOf": [
@@ -2188,10 +2037,28 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Size"
+                },
+                "content_type": {
+                  "description": "The mime type of the file.",
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type"
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "type": "string",
+                  "title": "Url"
                 },
                 "file_name": {
-                  "title": "File Name",
                   "description": "The name of the file. It will be auto-generated if not provided.",
                   "examples": ["z9RV14K95DvU.png"],
                   "anyOf": [
@@ -2201,15 +2068,12 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Name"
                 }
               },
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ]
+              "required": ["url"],
+              "title": "File"
             }
           }
         },
@@ -3311,14 +3175,13 @@
               "required": ["status", "request_id"]
             },
             "Hunyuan3dV31RapidTextTo3dInput": {
-              "type": "object",
+              "required": ["prompt"],
+              "x-fal-order-properties": [
+                "prompt",
+                "enable_pbr",
+                "enable_geometry"
+              ],
               "properties": {
-                "enable_geometry": {
-                  "default": false,
-                  "description": "Generate geometry-only white model without textures. When enabled, enable_pbr is ignored and OBJ is not supported (default output is GLB).",
-                  "title": "Enable Geometry",
-                  "type": "boolean"
-                },
                 "enable_pbr": {
                   "default": false,
                   "description": "Enable PBR material generation (metallic, roughness, normal textures). Does not take effect when enable_geometry is True.",
@@ -3326,130 +3189,26 @@
                   "type": "boolean"
                 },
                 "prompt": {
-                  "type": "string",
                   "description": "Text description of the 3D content to generate. Max 200 UTF-8 characters.",
-                  "title": "Prompt",
-                  "maxLength": 200,
                   "examples": [
                     "A rustic wooden treasure chest with metal bands and ornate lock"
-                  ]
+                  ],
+                  "maxLength": 200,
+                  "title": "Prompt",
+                  "type": "string"
+                },
+                "enable_geometry": {
+                  "default": false,
+                  "description": "Generate geometry-only white model without textures. When enabled, enable_pbr is ignored and OBJ is not supported (default output is GLB).",
+                  "title": "Enable Geometry",
+                  "type": "boolean"
                 }
               },
               "title": "RapidTextTo3DInput",
-              "x-fal-order-properties": [
-                "prompt",
-                "enable_pbr",
-                "enable_geometry"
-              ],
-              "required": ["prompt"]
+              "type": "object"
             },
             "Hunyuan3dV31RapidTextTo3dOutput": {
-              "type": "object",
-              "properties": {
-                "texture": {
-                  "description": "Texture image for the 3D model.",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [
-                    {
-                      "url": "https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png",
-                      "content_type": "image/png",
-                      "file_name": "material.png",
-                      "file_size": 5915609
-                    }
-                  ]
-                },
-                "model_urls": {
-                  "$ref": "#/components/schemas/ModelUrls",
-                  "description": "URLs for different 3D model formats.",
-                  "examples": [
-                    {
-                      "texture": {
-                        "url": "https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png",
-                        "content_type": "image/png",
-                        "file_name": "material.png",
-                        "file_size": 5915609
-                      },
-                      "obj": {
-                        "url": "https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
-                        "content_type": "model/obj",
-                        "file_name": "0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
-                        "file_size": 5306476
-                      },
-                      "mtl": {
-                        "url": "https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl",
-                        "content_type": "text/plain",
-                        "file_name": "material.mtl",
-                        "file_size": 157
-                      }
-                    }
-                  ]
-                },
-                "material_mtl": {
-                  "description": "MTL material file for the OBJ model.",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [
-                    {
-                      "url": "https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl",
-                      "content_type": "text/plain",
-                      "file_name": "material.mtl",
-                      "file_size": 157
-                    }
-                  ]
-                },
-                "model_obj": {
-                  "description": "Generated 3D model in OBJ format.",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [
-                    {
-                      "url": "https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
-                      "content_type": "model/obj",
-                      "file_name": "0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
-                      "file_size": 5306476
-                    }
-                  ]
-                },
-                "thumbnail": {
-                  "description": "Preview thumbnail of the generated model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [
-                    {
-                      "url": "https://v3b.fal.media/files/b/0a8c44d6/D9_IYgpugP0deXvSwBC2J_preview.png",
-                      "content_type": "image/png",
-                      "file_name": "preview.png",
-                      "file_size": 281374
-                    }
-                  ]
-                }
-              },
-              "title": "RapidTextTo3DOutput",
+              "required": ["model_urls"],
               "x-fal-order-properties": [
                 "model_obj",
                 "material_mtl",
@@ -3457,45 +3216,204 @@
                 "thumbnail",
                 "model_urls"
               ],
-              "required": ["model_urls"]
+              "properties": {
+                "model_urls": {
+                  "$ref": "#/components/schemas/ModelUrls",
+                  "examples": [
+                    {
+                      "obj": {
+                        "file_size": 5306476,
+                        "file_name": "0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
+                        "url": "https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
+                        "content_type": "model/obj"
+                      },
+                      "mtl": {
+                        "file_size": 157,
+                        "file_name": "material.mtl",
+                        "url": "https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl",
+                        "content_type": "text/plain"
+                      },
+                      "texture": {
+                        "file_size": 5915609,
+                        "file_name": "material.png",
+                        "url": "https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png",
+                        "content_type": "image/png"
+                      }
+                    }
+                  ],
+                  "description": "URLs for different 3D model formats."
+                },
+                "material_mtl": {
+                  "examples": [
+                    {
+                      "file_size": 157,
+                      "file_name": "material.mtl",
+                      "url": "https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl",
+                      "content_type": "text/plain"
+                    }
+                  ],
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "MTL material file for the OBJ model."
+                },
+                "model_obj": {
+                  "examples": [
+                    {
+                      "file_size": 5306476,
+                      "file_name": "0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
+                      "url": "https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj",
+                      "content_type": "model/obj"
+                    }
+                  ],
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Generated 3D model in OBJ format."
+                },
+                "texture": {
+                  "examples": [
+                    {
+                      "file_size": 5915609,
+                      "file_name": "material.png",
+                      "url": "https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png",
+                      "content_type": "image/png"
+                    }
+                  ],
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Texture image for the 3D model."
+                },
+                "thumbnail": {
+                  "examples": [
+                    {
+                      "file_size": 281374,
+                      "file_name": "preview.png",
+                      "url": "https://v3b.fal.media/files/b/0a8c44d6/D9_IYgpugP0deXvSwBC2J_preview.png",
+                      "content_type": "image/png"
+                    }
+                  ],
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Preview thumbnail of the generated model"
+                }
+              },
+              "title": "RapidTextTo3DOutput",
+              "type": "object"
+            },
+            "ModelUrls": {
+              "x-fal-order-properties": [
+                "glb",
+                "fbx",
+                "obj",
+                "mtl",
+                "texture",
+                "usdz"
+              ],
+              "properties": {
+                "glb": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "GLB format 3D model"
+                },
+                "fbx": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "FBX format 3D model"
+                },
+                "obj": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "OBJ format 3D model"
+                },
+                "mtl": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "MTL material file for OBJ model"
+                },
+                "texture": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Texture image for the 3D model"
+                },
+                "usdz": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "USDZ format 3D model"
+                }
+              },
+              "title": "ModelUrls",
+              "type": "object"
             },
             "File": {
-              "type": "object",
+              "required": ["url"],
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
               "properties": {
-                "url": {
-                  "type": "string",
-                  "description": "The URL where the file can be downloaded from.",
-                  "title": "Url"
-                },
-                "content_type": {
-                  "description": "The mime type of the file.",
-                  "title": "Content Type",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["image/png"]
-                },
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
                 "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
+                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -3504,97 +3422,43 @@
                       "type": "null"
                     }
                   ],
-                  "examples": [4404019]
+                  "title": "File Size",
+                  "description": "The size of the file in bytes."
+                },
+                "file_name": {
+                  "examples": ["z9RV14K95DvU.png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "description": "The name of the file. It will be auto-generated if not provided."
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "title": "Url",
+                  "type": "string"
+                },
+                "content_type": {
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "description": "The mime type of the file."
                 }
               },
               "title": "File",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ],
-              "required": ["url"]
-            },
-            "ModelUrls": {
-              "type": "object",
-              "properties": {
-                "texture": {
-                  "description": "Texture image for the 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "usdz": {
-                  "description": "USDZ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "obj": {
-                  "description": "OBJ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "glb": {
-                  "description": "GLB format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "mtl": {
-                  "description": "MTL material file for OBJ model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "fbx": {
-                  "description": "FBX format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                }
-              },
-              "title": "ModelUrls",
-              "x-fal-order-properties": [
-                "glb",
-                "fbx",
-                "obj",
-                "mtl",
-                "texture",
-                "usdz"
-              ]
+              "type": "object"
             }
           }
         },
@@ -3735,466 +3599,6 @@
       }
     },
     {
-      "endpoint_id": "fal-ai/hunyuan3d-v3/text-to-3d",
-      "metadata": {
-        "display_name": "Hunyuan3d V3",
-        "category": "text-to-3d",
-        "description": "Turn simple sketches into detailed, fully-textured 3D models. Instantly convert your concept designs into formats ready for Unity, Unreal, and Blender.",
-        "status": "active",
-        "tags": [],
-        "updated_at": "2026-04-21T17:48:30.618Z",
-        "is_favorited": false,
-        "thumbnail_url": "https://v3b.fal.media/files/b/0a8696b5/YaGZtFEBFL6CEXjiVxdB__dbec569fa5d4418bbbc9d77354f7c86f.jpg",
-        "model_url": "https://fal.run/fal-ai/hunyuan3d-v3/text-to-3d",
-        "license_type": "commercial",
-        "date": "2025-12-16T22:13:53.731Z",
-        "group": {
-          "key": "hunyuan3d-v3",
-          "label": "Text to 3D"
-        },
-        "highlighted": false,
-        "kind": "inference",
-        "pinned": false
-      },
-      "openapi": {
-        "openapi": "3.0.4",
-        "info": {
-          "title": "Queue OpenAPI for fal-ai/hunyuan3d-v3/text-to-3d",
-          "version": "1.0.0",
-          "description": "The OpenAPI schema for the fal-ai/hunyuan3d-v3/text-to-3d queue.",
-          "x-fal-metadata": {
-            "endpointId": "fal-ai/hunyuan3d-v3/text-to-3d",
-            "category": "text-to-3d",
-            "thumbnailUrl": "https://v3b.fal.media/files/b/0a8696b5/YaGZtFEBFL6CEXjiVxdB__dbec569fa5d4418bbbc9d77354f7c86f.jpg",
-            "playgroundUrl": "https://fal.ai/models/fal-ai/hunyuan3d-v3/text-to-3d",
-            "documentationUrl": "https://fal.ai/models/fal-ai/hunyuan3d-v3/text-to-3d/api",
-            "about": "Text To 3D"
-          }
-        },
-        "components": {
-          "securitySchemes": {
-            "apiKeyAuth": {
-              "type": "apiKey",
-              "in": "header",
-              "name": "Authorization",
-              "description": "Fal Key"
-            }
-          },
-          "schemas": {
-            "QueueStatus": {
-              "type": "object",
-              "properties": {
-                "status": {
-                  "type": "string",
-                  "enum": ["IN_QUEUE", "IN_PROGRESS", "COMPLETED"]
-                },
-                "request_id": {
-                  "type": "string",
-                  "description": "The request id."
-                },
-                "response_url": {
-                  "type": "string",
-                  "description": "The response url."
-                },
-                "status_url": {
-                  "type": "string",
-                  "description": "The status url."
-                },
-                "cancel_url": {
-                  "type": "string",
-                  "description": "The cancel url."
-                },
-                "logs": {
-                  "type": "object",
-                  "description": "The logs.",
-                  "additionalProperties": true
-                },
-                "metrics": {
-                  "type": "object",
-                  "description": "The metrics.",
-                  "additionalProperties": true
-                },
-                "queue_position": {
-                  "type": "integer",
-                  "description": "The queue position."
-                }
-              },
-              "required": ["status", "request_id"]
-            },
-            "Hunyuan3dV3TextTo3dInput": {
-              "properties": {
-                "prompt": {
-                  "type": "string",
-                  "maxLength": 1024,
-                  "examples": [
-                    "A rustic wooden treasure chest with metal bands and ornate lock"
-                  ],
-                  "description": "Text description of the 3D content to generate. Supports up to 1024 UTF-8 characters.",
-                  "title": "Prompt"
-                },
-                "polygon_type": {
-                  "default": "triangle",
-                  "type": "string",
-                  "title": "Polygon Type",
-                  "description": "Polygon type. Only takes effect when GenerateType is LowPoly.",
-                  "enum": ["triangle", "quadrilateral"]
-                },
-                "enable_pbr": {
-                  "default": false,
-                  "type": "boolean",
-                  "title": "Enable Pbr",
-                  "description": "Whether to enable PBR material generation"
-                },
-                "generate_type": {
-                  "default": "Normal",
-                  "type": "string",
-                  "title": "Generate Type",
-                  "description": "Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.",
-                  "enum": ["Normal", "LowPoly", "Geometry"]
-                },
-                "face_count": {
-                  "default": 500000,
-                  "type": "integer",
-                  "title": "Face Count",
-                  "minimum": 40000,
-                  "description": "Target face count. Range: 40000-1500000",
-                  "maximum": 1500000
-                }
-              },
-              "type": "object",
-              "x-fal-order-properties": [
-                "prompt",
-                "enable_pbr",
-                "face_count",
-                "generate_type",
-                "polygon_type"
-              ],
-              "required": ["prompt"],
-              "title": "TextTo3DInput"
-            },
-            "Hunyuan3dV3TextTo3dOutput": {
-              "properties": {
-                "seed": {
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Seed",
-                  "description": "The seed used for generation"
-                },
-                "model_glb": {
-                  "$ref": "#/components/schemas/File",
-                  "examples": [
-                    {
-                      "file_size": 64724836,
-                      "file_name": "model.glb",
-                      "content_type": "model/gltf-binary",
-                      "url": "https://v3b.fal.media/files/b/0a8686a8/1hPquv3AqqkfnqSM9fpmB_model.glb"
-                    }
-                  ],
-                  "description": "Generated 3D object in GLB format."
-                },
-                "model_urls": {
-                  "$ref": "#/components/schemas/ModelUrls",
-                  "examples": [
-                    {
-                      "glb": {
-                        "file_size": 64724836,
-                        "file_name": "model.glb",
-                        "content_type": "model/gltf-binary",
-                        "url": "https://v3b.fal.media/files/b/0a8686a8/1hPquv3AqqkfnqSM9fpmB_model.glb"
-                      },
-                      "obj": {
-                        "file_size": 44084728,
-                        "file_name": "model.obj",
-                        "content_type": "text/plain",
-                        "url": "https://v3b.fal.media/files/b/0a8686a8/AVgdsVFrGAKGAFr4e2g56_model.obj"
-                      }
-                    }
-                  ],
-                  "description": "URLs for different 3D model formats"
-                },
-                "thumbnail": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [
-                    {
-                      "file_size": 172757,
-                      "file_name": "preview.png",
-                      "content_type": "image/png",
-                      "url": "https://v3b.fal.media/files/b/0a8686a8/khgYO1d6xqWOJPi6_IR_j_preview.png"
-                    }
-                  ],
-                  "description": "Preview thumbnail of the generated model"
-                }
-              },
-              "type": "object",
-              "x-fal-order-properties": [
-                "model_glb",
-                "thumbnail",
-                "model_urls",
-                "seed"
-              ],
-              "required": ["model_glb", "model_urls"],
-              "title": "TextTo3DOutput"
-            },
-            "File": {
-              "required": ["url"],
-              "type": "object",
-              "properties": {
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "examples": ["z9RV14K95DvU.png"],
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "content_type": {
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"],
-                  "title": "Content Type",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "url": {
-                  "description": "The URL where the file can be downloaded from.",
-                  "type": "string",
-                  "title": "Url"
-                },
-                "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "examples": [4404019],
-                  "title": "File Size",
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                }
-              },
-              "title": "File",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ]
-            },
-            "ModelUrls": {
-              "type": "object",
-              "properties": {
-                "fbx": {
-                  "description": "FBX format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "usdz": {
-                  "description": "USDZ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "glb": {
-                  "description": "GLB format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "obj": {
-                  "description": "OBJ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                }
-              },
-              "title": "ModelUrls",
-              "x-fal-order-properties": ["glb", "fbx", "obj", "usdz"]
-            }
-          }
-        },
-        "paths": {
-          "/fal-ai/hunyuan3d-v3/text-to-3d/requests/{request_id}/status": {
-            "get": {
-              "parameters": [
-                {
-                  "name": "request_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                    "type": "string",
-                    "description": "Request ID"
-                  }
-                },
-                {
-                  "name": "logs",
-                  "in": "query",
-                  "required": false,
-                  "schema": {
-                    "type": "number",
-                    "description": "Whether to include logs (`1`) in the response or not (`0`)."
-                  }
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "The request status.",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "$ref": "#/components/schemas/QueueStatus"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/fal-ai/hunyuan3d-v3/text-to-3d/requests/{request_id}/cancel": {
-            "put": {
-              "parameters": [
-                {
-                  "name": "request_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                    "type": "string",
-                    "description": "Request ID"
-                  }
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "The request was cancelled.",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "type": "object",
-                        "properties": {
-                          "success": {
-                            "type": "boolean",
-                            "description": "Whether the request was cancelled successfully."
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/fal-ai/hunyuan3d-v3/text-to-3d": {
-            "post": {
-              "requestBody": {
-                "required": true,
-                "content": {
-                  "application/json": {
-                    "schema": {
-                      "$ref": "#/components/schemas/Hunyuan3dV3TextTo3dInput"
-                    }
-                  }
-                }
-              },
-              "responses": {
-                "200": {
-                  "description": "The request status.",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "$ref": "#/components/schemas/QueueStatus"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "/fal-ai/hunyuan3d-v3/text-to-3d/requests/{request_id}": {
-            "get": {
-              "parameters": [
-                {
-                  "name": "request_id",
-                  "in": "path",
-                  "required": true,
-                  "schema": {
-                    "type": "string",
-                    "description": "Request ID"
-                  }
-                }
-              ],
-              "responses": {
-                "200": {
-                  "description": "Result of the request.",
-                  "content": {
-                    "application/json": {
-                      "schema": {
-                        "$ref": "#/components/schemas/Hunyuan3dV3TextTo3dOutput"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "servers": [
-          {
-            "url": "https://queue.fal.run"
-          }
-        ],
-        "security": [
-          {
-            "apiKeyAuth": []
-          }
-        ]
-      }
-    },
-    {
       "endpoint_id": "tripo3d/h3.1/text-to-3d",
       "metadata": {
         "display_name": "Tripo H3.1 Text to 3D",
@@ -4282,20 +3686,42 @@
               "required": ["status", "request_id"]
             },
             "H31TextTo3dInput": {
-              "description": "Input for Text to 3D generation using full-featured models (H3.1, v2.5).",
+              "x-fal-order-properties": [
+                "prompt",
+                "negative_prompt",
+                "face_limit",
+                "texture",
+                "pbr",
+                "model_seed",
+                "image_seed",
+                "texture_seed",
+                "texture_quality",
+                "geometry_quality",
+                "auto_size",
+                "quad"
+              ],
+              "title": "FullTextTo3DInput",
+              "required": ["prompt"],
               "type": "object",
               "properties": {
-                "auto_size": {
-                  "default": false,
-                  "type": "boolean",
-                  "title": "Auto Size",
-                  "description": "Auto-scale the model to real-world dimensions (meters)."
+                "image_seed": {
+                  "title": "Image Seed",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Seed for the text-to-image step."
                 },
-                "quad": {
-                  "default": false,
-                  "type": "boolean",
-                  "title": "Quad",
-                  "description": "Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX."
+                "texture_quality": {
+                  "title": "Texture Quality",
+                  "enum": ["standard", "detailed"],
+                  "type": "string",
+                  "default": "standard",
+                  "description": "Quality level for textures. 'detailed' produces higher-resolution textures."
                 },
                 "model_seed": {
                   "title": "Model Seed",
@@ -4308,6 +3734,37 @@
                     }
                   ],
                   "description": "Seed for geometry generation reproducibility."
+                },
+                "texture": {
+                  "title": "Texture",
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether to generate textures for the model."
+                },
+                "auto_size": {
+                  "title": "Auto Size",
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Auto-scale the model to real-world dimensions (meters)."
+                },
+                "quad": {
+                  "title": "Quad",
+                  "type": "boolean",
+                  "default": false,
+                  "description": "Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX."
+                },
+                "geometry_quality": {
+                  "title": "Geometry Quality",
+                  "enum": ["standard", "detailed"],
+                  "type": "string",
+                  "default": "standard",
+                  "description": "Quality level for geometry."
+                },
+                "pbr": {
+                  "title": "Pbr",
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled."
                 },
                 "face_limit": {
                   "title": "Face Limit",
@@ -4323,33 +3780,6 @@
                   ],
                   "description": "Target number of faces for the generated mesh. If not set, the model adaptively determines the count."
                 },
-                "negative_prompt": {
-                  "title": "Negative Prompt",
-                  "anyOf": [
-                    {
-                      "type": "string",
-                      "maxLength": 1024
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Text describing features to avoid in the generated model."
-                },
-                "geometry_quality": {
-                  "default": "standard",
-                  "type": "string",
-                  "enum": ["standard", "detailed"],
-                  "title": "Geometry Quality",
-                  "description": "Quality level for geometry."
-                },
-                "texture_quality": {
-                  "default": "standard",
-                  "type": "string",
-                  "enum": ["standard", "detailed"],
-                  "title": "Texture Quality",
-                  "description": "Quality level for textures. 'detailed' produces higher-resolution textures."
-                },
                 "texture_seed": {
                   "title": "Texture Seed",
                   "anyOf": [
@@ -4362,57 +3792,37 @@
                   ],
                   "description": "Seed for texture generation reproducibility."
                 },
-                "image_seed": {
-                  "title": "Image Seed",
+                "prompt": {
+                  "maxLength": 1024,
+                  "description": "Text description of the 3D object to generate. Maximum 1024 characters.",
+                  "title": "Prompt",
+                  "type": "string",
+                  "examples": ["A small house with a red roof and white walls"]
+                },
+                "negative_prompt": {
+                  "title": "Negative Prompt",
                   "anyOf": [
                     {
-                      "type": "integer"
+                      "type": "string",
+                      "maxLength": 1024
                     },
                     {
                       "type": "null"
                     }
                   ],
-                  "description": "Seed for the text-to-image step."
-                },
-                "prompt": {
-                  "examples": ["A small house with a red roof and white walls"],
-                  "type": "string",
-                  "title": "Prompt",
-                  "maxLength": 1024,
-                  "description": "Text description of the 3D object to generate. Maximum 1024 characters."
-                },
-                "texture": {
-                  "default": true,
-                  "type": "boolean",
-                  "title": "Texture",
-                  "description": "Whether to generate textures for the model."
-                },
-                "pbr": {
-                  "default": true,
-                  "type": "boolean",
-                  "title": "Pbr",
-                  "description": "Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled."
+                  "description": "Text describing features to avoid in the generated model."
                 }
               },
-              "title": "FullTextTo3DInput",
-              "x-fal-order-properties": [
-                "prompt",
-                "negative_prompt",
-                "face_limit",
-                "texture",
-                "pbr",
-                "model_seed",
-                "image_seed",
-                "texture_seed",
-                "texture_quality",
-                "geometry_quality",
-                "auto_size",
-                "quad"
-              ],
-              "required": ["prompt"]
+              "description": "Input for Text to 3D generation using full-featured models (H3.1, v2.5)."
             },
             "H31TextTo3dOutput": {
-              "description": "Output for Tripo3D generation",
+              "x-fal-order-properties": [
+                "model_mesh",
+                "model_urls",
+                "rendered_image"
+              ],
+              "title": "Tripo3DOutput",
+              "required": ["model_mesh", "model_urls"],
               "type": "object",
               "properties": {
                 "model_mesh": {
@@ -4435,43 +3845,13 @@
                   "description": "URLs for different 3D model variants."
                 }
               },
-              "title": "Tripo3DOutput",
-              "x-fal-order-properties": [
-                "model_mesh",
-                "model_urls",
-                "rendered_image"
-              ],
-              "required": ["model_mesh", "model_urls"]
+              "description": "Output for Tripo3D generation"
             },
             "File": {
+              "title": "File",
+              "required": ["url"],
               "type": "object",
               "properties": {
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
-                "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [4404019]
-                },
                 "content_type": {
                   "description": "The mime type of the file.",
                   "title": "Content Type",
@@ -4486,46 +3866,54 @@
                   "examples": ["image/png"]
                 },
                 "url": {
-                  "type": "string",
                   "title": "Url",
+                  "type": "string",
                   "description": "The URL where the file can be downloaded from."
+                },
+                "file_size": {
+                  "description": "The size of the file in bytes.",
+                  "title": "File Size",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [4404019]
+                },
+                "file_name": {
+                  "description": "The name of the file. It will be auto-generated if not provided.",
+                  "title": "File Name",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": ["z9RV14K95DvU.png"]
                 }
               },
-              "title": "File",
               "x-fal-order-properties": [
                 "url",
                 "content_type",
                 "file_name",
                 "file_size"
-              ],
-              "required": ["url"]
+              ]
             },
             "ModelUrls": {
-              "type": "object",
+              "x-fal-order-properties": [
+                "glb",
+                "fbx",
+                "base_model",
+                "pbr_model"
+              ],
               "title": "ModelUrls",
+              "type": "object",
               "properties": {
-                "base_model": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Base (untextured) model"
-                },
-                "glb": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "GLB format 3D model"
-                },
                 "pbr_model": {
                   "anyOf": [
                     {
@@ -4547,14 +3935,30 @@
                     }
                   ],
                   "description": "FBX format 3D model"
+                },
+                "base_model": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Base (untextured) model"
+                },
+                "glb": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "GLB format 3D model"
                 }
               },
-              "x-fal-order-properties": [
-                "glb",
-                "fbx",
-                "base_model",
-                "pbr_model"
-              ],
               "description": "3D model download URLs"
             }
           }
@@ -4696,6 +4100,626 @@
       }
     },
     {
+      "endpoint_id": "fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+      "metadata": {
+        "display_name": "Hyper3D - Rodin V2.5 - Text to 3D",
+        "category": "text-to-3d",
+        "description": "Rodin V2.5 by Hyper3D generates realistic and production ready 3D models from text or images. ",
+        "status": "active",
+        "tags": ["text-to-3d"],
+        "updated_at": "2026-05-31T08:01:11.403Z",
+        "is_favorited": false,
+        "thumbnail_url": "https://v3b.fal.media/files/b/0a9c09f7/S7oXUUqZ5T_1m_3sQIQTZ_a9493c9cafed4ba1a43db14d36c9d243.jpg",
+        "model_url": "https://fal.run/fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+        "license_type": "commercial",
+        "date": "2026-05-28T15:51:32.105Z",
+        "group": {
+          "key": "rodin-v2.5",
+          "label": "Text to 3D"
+        },
+        "highlighted": false,
+        "kind": "inference",
+        "pinned": false
+      },
+      "openapi": {
+        "openapi": "3.0.4",
+        "info": {
+          "title": "Queue OpenAPI for fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+          "version": "1.0.0",
+          "description": "The OpenAPI schema for the fal-ai/hyper3d/rodin/v2.5/text-to-3d queue.",
+          "x-fal-metadata": {
+            "endpointId": "fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+            "category": "text-to-3d",
+            "thumbnailUrl": "https://v3b.fal.media/files/b/0a9c09f7/S7oXUUqZ5T_1m_3sQIQTZ_a9493c9cafed4ba1a43db14d36c9d243.jpg",
+            "playgroundUrl": "https://fal.ai/models/fal-ai/hyper3d/rodin/v2.5/text-to-3d",
+            "documentationUrl": "https://fal.ai/models/fal-ai/hyper3d/rodin/v2.5/text-to-3d/api",
+            "about": "Text-to-3D generation using Rodin Gen-2.5"
+          }
+        },
+        "components": {
+          "securitySchemes": {
+            "apiKeyAuth": {
+              "type": "apiKey",
+              "in": "header",
+              "name": "Authorization",
+              "description": "Fal Key"
+            }
+          },
+          "schemas": {
+            "QueueStatus": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "type": "string",
+                  "enum": ["IN_QUEUE", "IN_PROGRESS", "COMPLETED"]
+                },
+                "request_id": {
+                  "type": "string",
+                  "description": "The request id."
+                },
+                "response_url": {
+                  "type": "string",
+                  "description": "The response url."
+                },
+                "status_url": {
+                  "type": "string",
+                  "description": "The status url."
+                },
+                "cancel_url": {
+                  "type": "string",
+                  "description": "The cancel url."
+                },
+                "logs": {
+                  "type": "object",
+                  "description": "The logs.",
+                  "additionalProperties": true
+                },
+                "metrics": {
+                  "type": "object",
+                  "description": "The metrics.",
+                  "additionalProperties": true
+                },
+                "queue_position": {
+                  "type": "integer",
+                  "description": "The queue position."
+                }
+              },
+              "required": ["status", "request_id"]
+            },
+            "Hyper3dRodinV25TextTo3dInput": {
+              "properties": {
+                "TAPose": {
+                  "description": "Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.",
+                  "default": false,
+                  "title": "T/A Pose",
+                  "type": "boolean"
+                },
+                "bbox_condition": {
+                  "description": "This is a controlnet that controls the maximum sized of the generated model.",
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RodinGen25BbboxField"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "hd_texture": {
+                  "description": "Enables enhanced texture post-processing for higher visual fidelity.",
+                  "default": false,
+                  "title": "Hd Texture",
+                  "type": "boolean"
+                },
+                "texture_delight": {
+                  "description": "Removes baked lighting/highlights from the generated textures.",
+                  "default": false,
+                  "title": "Texture Delight",
+                  "type": "boolean"
+                },
+                "seed": {
+                  "description": "Seed value for randomization, ranging from 0 to 65535. Optional.",
+                  "title": "Seed",
+                  "anyOf": [
+                    {
+                      "maximum": 65535,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "addons": {
+                  "description": "Optional add-ons",
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/RodinGen25Addons"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "prompt": {
+                  "description": "A textual prompt to guide model generation. Required for Text-to-3D mode.",
+                  "maxLength": 1024,
+                  "title": "Prompt",
+                  "type": "string",
+                  "examples": ["A futuristic robot with sleek metallic design."]
+                },
+                "is_micro": {
+                  "description": "Generate finer micro-scale geometric detail. Only effective with `tier=\"Gen-2.5-Extreme-High\"`.",
+                  "default": false,
+                  "title": "Is Micro",
+                  "type": "boolean"
+                },
+                "enable_creative_mode": {
+                  "description": "If enabled, the generation will have enhanced generative robustness while ensuring output consistency. This corresponds to `geometry_instruct_mode` being equal to `creative` on the Hyper3D API.",
+                  "default": false,
+                  "title": "Enable Creative Mode",
+                  "type": "boolean"
+                },
+                "material": {
+                  "description": "Material type. PBR: physically-based materials with realistic lighting. Shaded: baked lighting with no PBR maps. All: both PBR and Shaded variants. None: geometry only with no textures.",
+                  "default": "All",
+                  "enum": ["PBR", "Shaded", "All", "None"],
+                  "title": "Material",
+                  "type": "string"
+                },
+                "texture_mode": {
+                  "description": "Texture generation quality. When unset, the API picks a default appropriate for the tier.",
+                  "title": "Texture Mode",
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "legacy",
+                        "extreme-low",
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "quality_mesh_option": {
+                  "description": "Combined quality and mesh type selection. Quad = smooth surfaces, Triangle = detailed geometry. Maps to `mesh_mode` (Quad/Raw) and `quality_override` (face count) on the Hyper3D API. Valid face counts depend on the selected tier. Up to 1M Triangle is supported for tiers Extreme-Low, Low, and Medium. Up to 2M Triangle (as low as 20K Triangle) is supported for tiers High and Extreme-High.",
+                  "default": "Auto",
+                  "enum": [
+                    "Auto",
+                    "4K Quad",
+                    "8K Quad",
+                    "18K Quad",
+                    "50K Quad",
+                    "100K Quad",
+                    "200K Quad",
+                    "2K Triangle",
+                    "20K Triangle",
+                    "50K Triangle",
+                    "150K Triangle",
+                    "500K Triangle",
+                    "1M Triangle",
+                    "2M Triangle"
+                  ],
+                  "title": "Quality Mesh Option",
+                  "type": "string"
+                },
+                "tier": {
+                  "description": "Generation tier. Higher tiers produce more detailed meshes but cost more. Extreme-High enables the highest-detail mode and bills at double the base rate. See more info in the [documentation](https://developer.hyper3d.ai/api-specification/rodin-gen2.5#use-gen-2.5-generation-with-following-gen-2.5-tiers).",
+                  "default": "Gen-2.5-High",
+                  "enum": [
+                    "Gen-2.5-Minimum",
+                    "Gen-2.5-Extreme-Low",
+                    "Gen-2.5-Low",
+                    "Gen-2.5-Medium",
+                    "Gen-2.5-High",
+                    "Gen-2.5-Extreme-High"
+                  ],
+                  "title": "Tier",
+                  "type": "string"
+                },
+                "geometry_file_format": {
+                  "description": "Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.",
+                  "default": "glb",
+                  "enum": ["glb", "usdz", "fbx", "obj", "stl"],
+                  "title": "Geometry File Format",
+                  "type": "string"
+                }
+              },
+              "title": "RodinGen25TextTo3DInput",
+              "x-fal-order-properties": [
+                "prompt",
+                "tier",
+                "seed",
+                "geometry_file_format",
+                "material",
+                "quality_mesh_option",
+                "texture_mode",
+                "enable_creative_mode",
+                "hd_texture",
+                "texture_delight",
+                "is_micro",
+                "TAPose",
+                "bbox_condition",
+                "addons"
+              ],
+              "type": "object",
+              "required": ["prompt"]
+            },
+            "Hyper3dRodinV25TextTo3dOutput": {
+              "properties": {
+                "model_meshes": {
+                  "description": "Additional generated 3D object files returned by Hyper3D besides model_mesh.",
+                  "title": "Model Meshes",
+                  "items": {
+                    "$ref": "#/components/schemas/File"
+                  },
+                  "type": "array"
+                },
+                "seed": {
+                  "description": "Seed value used for generation.",
+                  "title": "Seed",
+                  "type": "integer"
+                },
+                "model_mesh": {
+                  "description": "Generated 3D object file.",
+                  "$ref": "#/components/schemas/File",
+                  "examples": [
+                    {
+                      "url": "https://storage.googleapis.com/falserverless/model_tests/video_models/base_basic_shaded.glb"
+                    }
+                  ]
+                },
+                "textures": {
+                  "description": "Generated textures for the 3D object.",
+                  "title": "Textures",
+                  "items": {
+                    "$ref": "#/components/schemas/Image"
+                  },
+                  "type": "array"
+                }
+              },
+              "title": "ObjectOutputv2",
+              "x-fal-order-properties": [
+                "model_mesh",
+                "model_meshes",
+                "seed",
+                "textures"
+              ],
+              "type": "object",
+              "required": ["model_mesh", "seed", "textures"]
+            },
+            "RodinGen25BbboxField": {
+              "properties": {
+                "length": {
+                  "description": "Length (z axis) dimension for the bounding box constraint.",
+                  "default": 100,
+                  "title": "Length",
+                  "maximum": 2048,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "height": {
+                  "description": "Height (y axis) dimension for the bounding box constraint.",
+                  "default": 100,
+                  "title": "Height",
+                  "maximum": 2048,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "width": {
+                  "description": "Width (x axis) dimension for the bounding box constraint.",
+                  "default": 100,
+                  "title": "Width",
+                  "maximum": 2048,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "title": "RodinGen25BbboxField",
+              "x-fal-order-properties": ["width", "height", "length"],
+              "type": "object"
+            },
+            "RodinGen25Addons": {
+              "properties": {
+                "high_pack": {
+                  "description": "Selecting HighPack generates 4K resolution texture instead of the default 2K. In Quad mode, the number of faces becomes ~16× the count set in the quality parameter.",
+                  "default": false,
+                  "title": "High Pack",
+                  "type": "boolean"
+                }
+              },
+              "title": "RodinGen25Addons",
+              "x-fal-order-properties": ["high_pack"],
+              "type": "object"
+            },
+            "File": {
+              "properties": {
+                "file_name": {
+                  "description": "The name of the file. It will be auto-generated if not provided.",
+                  "title": "File Name",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": ["z9RV14K95DvU.png"]
+                },
+                "file_size": {
+                  "description": "The size of the file in bytes.",
+                  "title": "File Size",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [4404019]
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "title": "Url",
+                  "type": "string"
+                },
+                "content_type": {
+                  "description": "The mime type of the file.",
+                  "title": "Content Type",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": ["image/png"]
+                }
+              },
+              "title": "File",
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
+              "type": "object",
+              "required": ["url"]
+            },
+            "Image": {
+              "description": "Represents an image file.",
+              "properties": {
+                "file_name": {
+                  "description": "The name of the file. It will be auto-generated if not provided.",
+                  "title": "File Name",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": ["z9RV14K95DvU.png"]
+                },
+                "file_size": {
+                  "description": "The size of the file in bytes.",
+                  "title": "File Size",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [4404019]
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "title": "Url",
+                  "type": "string"
+                },
+                "content_type": {
+                  "description": "The mime type of the file.",
+                  "title": "Content Type",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": ["image/png"]
+                },
+                "height": {
+                  "description": "The height of the image in pixels.",
+                  "title": "Height",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [1024]
+                },
+                "width": {
+                  "description": "The width of the image in pixels.",
+                  "title": "Width",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [1024]
+                }
+              },
+              "title": "Image",
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size",
+                "width",
+                "height"
+              ],
+              "type": "object",
+              "required": ["url"]
+            }
+          }
+        },
+        "paths": {
+          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d/requests/{request_id}/status": {
+            "get": {
+              "parameters": [
+                {
+                  "name": "request_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                    "type": "string",
+                    "description": "Request ID"
+                  }
+                },
+                {
+                  "name": "logs",
+                  "in": "query",
+                  "required": false,
+                  "schema": {
+                    "type": "number",
+                    "description": "Whether to include logs (`1`) in the response or not (`0`)."
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "The request status.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/QueueStatus"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d/requests/{request_id}/cancel": {
+            "put": {
+              "parameters": [
+                {
+                  "name": "request_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                    "type": "string",
+                    "description": "Request ID"
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "The request was cancelled.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "success": {
+                            "type": "boolean",
+                            "description": "Whether the request was cancelled successfully."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d": {
+            "post": {
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/Hyper3dRodinV25TextTo3dInput"
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "200": {
+                  "description": "The request status.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/QueueStatus"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/fal-ai/hyper3d/rodin/v2.5/text-to-3d/requests/{request_id}": {
+            "get": {
+              "parameters": [
+                {
+                  "name": "request_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {
+                    "type": "string",
+                    "description": "Request ID"
+                  }
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Result of the request.",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/Hyper3dRodinV25TextTo3dOutput"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "https://queue.fal.run"
+          }
+        ],
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      }
+    },
+    {
       "endpoint_id": "fal-ai/hunyuan-motion/fast",
       "metadata": {
         "display_name": "Hunyuan Motion [0.46B]",
@@ -4783,19 +4807,42 @@
               "required": ["status", "request_id"]
             },
             "HunyuanMotionFastInput": {
-              "title": "HYMotionInput",
-              "required": ["prompt"],
+              "x-fal-order-properties": [
+                "prompt",
+                "seed",
+                "duration",
+                "guidance_scale",
+                "output_format"
+              ],
               "type": "object",
               "properties": {
-                "output_format": {
-                  "title": "Output Format",
-                  "enum": ["fbx", "dict"],
+                "prompt": {
+                  "description": "Text prompt describing the motion to generate.",
+                  "examples": [
+                    "A person is running then takes a big leap.",
+                    "Someone waves hello with their right hand.",
+                    "A dancer performs a spinning pirouette."
+                  ],
                   "type": "string",
+                  "title": "Prompt"
+                },
+                "output_format": {
+                  "enum": ["fbx", "dict"],
                   "description": "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
-                  "default": "fbx"
+                  "type": "string",
+                  "default": "fbx",
+                  "title": "Output Format"
+                },
+                "guidance_scale": {
+                  "minimum": 1,
+                  "description": "Classifier-free guidance scale. Higher = more faithful to prompt.",
+                  "examples": [3, 5, 7.5],
+                  "maximum": 10,
+                  "type": "number",
+                  "default": 5,
+                  "title": "Guidance Scale"
                 },
                 "seed": {
-                  "title": "Seed",
                   "description": "Random seed for reproducible generation.",
                   "examples": [42, 12345],
                   "anyOf": [
@@ -4805,60 +4852,31 @@
                     {
                       "type": "null"
                     }
-                  ]
-                },
-                "guidance_scale": {
-                  "title": "Guidance Scale",
-                  "minimum": 1,
-                  "type": "number",
-                  "description": "Classifier-free guidance scale. Higher = more faithful to prompt.",
-                  "examples": [3, 5, 7.5],
-                  "default": 5,
-                  "maximum": 10
-                },
-                "prompt": {
-                  "title": "Prompt",
-                  "type": "string",
-                  "description": "Text prompt describing the motion to generate.",
-                  "examples": [
-                    "A person is running then takes a big leap.",
-                    "Someone waves hello with their right hand.",
-                    "A dancer performs a spinning pirouette."
-                  ]
+                  ],
+                  "title": "Seed"
                 },
                 "duration": {
-                  "title": "Duration",
                   "minimum": 0.5,
-                  "type": "number",
                   "description": "Motion duration in seconds (0.5-12.0).",
                   "examples": [3, 5, 10],
+                  "maximum": 12,
+                  "type": "number",
                   "default": 5,
-                  "maximum": 12
+                  "title": "Duration"
                 }
               },
-              "x-fal-order-properties": [
-                "prompt",
-                "seed",
-                "duration",
-                "guidance_scale",
-                "output_format"
-              ]
+              "required": ["prompt"],
+              "title": "HYMotionInput"
             },
             "HunyuanMotionFastOutput": {
-              "title": "HYMotionOutput",
-              "required": ["seed"],
+              "x-fal-order-properties": ["fbx_file", "motion_json", "seed"],
               "type": "object",
               "properties": {
-                "motion_json": {
-                  "description": "Generated motion data as JSON.",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
+                "seed": {
+                  "description": "Seed used for generation.",
+                  "examples": [42],
+                  "type": "integer",
+                  "title": "Seed"
                 },
                 "fbx_file": {
                   "description": "Generated FBX animation file.",
@@ -4876,40 +4894,31 @@
                     }
                   ]
                 },
-                "seed": {
-                  "title": "Seed",
-                  "type": "integer",
-                  "description": "Seed used for generation.",
-                  "examples": [42]
-                }
-              },
-              "x-fal-order-properties": ["fbx_file", "motion_json", "seed"]
-            },
-            "File": {
-              "title": "File",
-              "required": ["url"],
-              "type": "object",
-              "properties": {
-                "url": {
-                  "title": "Url",
-                  "type": "string",
-                  "description": "The URL where the file can be downloaded from."
-                },
-                "content_type": {
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"],
+                "motion_json": {
+                  "description": "Generated motion data as JSON.",
                   "anyOf": [
                     {
-                      "type": "string"
+                      "$ref": "#/components/schemas/File"
                     },
                     {
                       "type": "null"
                     }
                   ]
-                },
+                }
+              },
+              "required": ["seed"],
+              "title": "HYMotionOutput"
+            },
+            "File": {
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
+              "type": "object",
+              "properties": {
                 "file_size": {
-                  "title": "File Size",
                   "description": "The size of the file in bytes.",
                   "examples": [4404019],
                   "anyOf": [
@@ -4919,10 +4928,28 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Size"
+                },
+                "content_type": {
+                  "description": "The mime type of the file.",
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type"
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "type": "string",
+                  "title": "Url"
                 },
                 "file_name": {
-                  "title": "File Name",
                   "description": "The name of the file. It will be auto-generated if not provided.",
                   "examples": ["z9RV14K95DvU.png"],
                   "anyOf": [
@@ -4932,15 +4959,12 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Name"
                 }
               },
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ]
+              "required": ["url"],
+              "title": "File"
             }
           }
         },
@@ -5168,9 +5192,22 @@
               "required": ["status", "request_id"]
             },
             "P1TextTo3dInput": {
-              "description": "Input for Text to 3D generation using the P1 model.\n\nP1 is optimized for clean low-poly mesh generation in ~2 seconds.\nIt supports a restricted parameter set compared to H3.1/v2.5.",
+              "x-fal-order-properties": [
+                "prompt",
+                "face_limit",
+                "texture",
+                "model_seed"
+              ],
+              "title": "P1TextTo3DInput",
+              "required": ["prompt"],
               "type": "object",
               "properties": {
+                "texture": {
+                  "title": "Texture",
+                  "type": "boolean",
+                  "default": true,
+                  "description": "Whether to generate textures for the model."
+                },
                 "model_seed": {
                   "title": "Model Seed",
                   "anyOf": [
@@ -5197,31 +5234,24 @@
                   ],
                   "description": "Target number of faces for the generated mesh. If not set, the model adaptively determines the count."
                 },
-                "texture": {
-                  "default": true,
-                  "type": "boolean",
-                  "title": "Texture",
-                  "description": "Whether to generate textures for the model."
-                },
                 "prompt": {
-                  "examples": ["A simple wooden chair"],
-                  "type": "string",
-                  "title": "Prompt",
                   "maxLength": 1024,
-                  "description": "Text description of the 3D object to generate. Maximum 1024 characters."
+                  "description": "Text description of the 3D object to generate. Maximum 1024 characters.",
+                  "title": "Prompt",
+                  "type": "string",
+                  "examples": ["A simple wooden chair"]
                 }
               },
-              "title": "P1TextTo3DInput",
-              "x-fal-order-properties": [
-                "prompt",
-                "face_limit",
-                "texture",
-                "model_seed"
-              ],
-              "required": ["prompt"]
+              "description": "Input for Text to 3D generation using the P1 model.\n\nP1 is optimized for clean low-poly mesh generation in ~2 seconds.\nIt supports a restricted parameter set compared to H3.1/v2.5."
             },
             "P1TextTo3dOutput": {
-              "description": "Output for Tripo3D generation",
+              "x-fal-order-properties": [
+                "model_mesh",
+                "model_urls",
+                "rendered_image"
+              ],
+              "title": "Tripo3DOutput",
+              "required": ["model_mesh", "model_urls"],
               "type": "object",
               "properties": {
                 "model_mesh": {
@@ -5244,43 +5274,13 @@
                   "description": "URLs for different 3D model variants."
                 }
               },
-              "title": "Tripo3DOutput",
-              "x-fal-order-properties": [
-                "model_mesh",
-                "model_urls",
-                "rendered_image"
-              ],
-              "required": ["model_mesh", "model_urls"]
+              "description": "Output for Tripo3D generation"
             },
             "File": {
+              "title": "File",
+              "required": ["url"],
               "type": "object",
               "properties": {
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
-                "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [4404019]
-                },
                 "content_type": {
                   "description": "The mime type of the file.",
                   "title": "Content Type",
@@ -5295,46 +5295,54 @@
                   "examples": ["image/png"]
                 },
                 "url": {
-                  "type": "string",
                   "title": "Url",
+                  "type": "string",
                   "description": "The URL where the file can be downloaded from."
+                },
+                "file_size": {
+                  "description": "The size of the file in bytes.",
+                  "title": "File Size",
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": [4404019]
+                },
+                "file_name": {
+                  "description": "The name of the file. It will be auto-generated if not provided.",
+                  "title": "File Name",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "examples": ["z9RV14K95DvU.png"]
                 }
               },
-              "title": "File",
               "x-fal-order-properties": [
                 "url",
                 "content_type",
                 "file_name",
                 "file_size"
-              ],
-              "required": ["url"]
+              ]
             },
             "ModelUrls": {
-              "type": "object",
+              "x-fal-order-properties": [
+                "glb",
+                "fbx",
+                "base_model",
+                "pbr_model"
+              ],
               "title": "ModelUrls",
+              "type": "object",
               "properties": {
-                "base_model": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Base (untextured) model"
-                },
-                "glb": {
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "GLB format 3D model"
-                },
                 "pbr_model": {
                   "anyOf": [
                     {
@@ -5356,14 +5364,30 @@
                     }
                   ],
                   "description": "FBX format 3D model"
+                },
+                "base_model": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Base (untextured) model"
+                },
+                "glb": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "GLB format 3D model"
                 }
               },
-              "x-fal-order-properties": [
-                "glb",
-                "fbx",
-                "base_model",
-                "pbr_model"
-              ],
               "description": "3D model download URLs"
             }
           }

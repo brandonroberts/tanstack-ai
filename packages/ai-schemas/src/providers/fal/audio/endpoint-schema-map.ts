@@ -144,6 +144,8 @@ import {
   MusicGeneratorOutputSchema,
   Nemotron3NanoOmniAudioInputSchema,
   Nemotron3NanoOmniAudioOutputSchema,
+  NemotronAsrMultilingualAsrInputSchema,
+  NemotronAsrMultilingualAsrOutputSchema,
   OrpheusTtsInputSchema,
   OrpheusTtsOutputSchema,
   Qwen3TtsCloneVoice06bInputSchema,
@@ -784,6 +786,10 @@ export const falAudioEndpointSchemaMap: {
     readonly input: typeof Nemotron3NanoOmniAudioInputSchema
     readonly output: typeof Nemotron3NanoOmniAudioOutputSchema
   }
+  readonly 'nvidia/nemotron-asr-multilingual/asr': {
+    readonly input: typeof NemotronAsrMultilingualAsrInputSchema
+    readonly output: typeof NemotronAsrMultilingualAsrOutputSchema
+  }
   readonly 'resemble-ai/chatterboxhd/speech-to-speech': {
     readonly input: typeof ChatterboxhdSpeechToSpeechInputSchema
     readonly output: typeof ChatterboxhdSpeechToSpeechOutputSchema
@@ -1282,6 +1288,10 @@ export const falAudioEndpointSchemaMap: {
   'nvidia/nemotron-3-nano-omni/audio': {
     input: Nemotron3NanoOmniAudioInputSchema,
     output: Nemotron3NanoOmniAudioOutputSchema,
+  },
+  'nvidia/nemotron-asr-multilingual/asr': {
+    input: NemotronAsrMultilingualAsrInputSchema,
+    output: NemotronAsrMultilingualAsrOutputSchema,
   },
   'resemble-ai/chatterboxhd/speech-to-speech': {
     input: ChatterboxhdSpeechToSpeechInputSchema,

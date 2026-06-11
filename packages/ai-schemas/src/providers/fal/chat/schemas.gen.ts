@@ -7,26 +7,26 @@ export const BytedanceSeedV2MiniInputSchema = {
   required: ['prompt'],
   properties: {
     video_urls: {
-      items: { type: 'string', 'x-fal-file-input': true },
       description:
         'URLs of videos for video understanding. Supported formats: MP4, MOV. Audio comprehension is not supported. A maximum of 3 videos is supported. Any additional videos will be ignored.',
       title: 'Video Urls',
+      items: { type: 'string', 'x-fal-file-input': true },
       type: 'array',
     },
     image_urls: {
-      items: { type: 'string', 'x-fal-file-input': true },
       description:
         'URLs of images for visual understanding. Supported formats: JPEG, PNG, WebP. A maximum of 6 images is supported. Any additional images will be ignored.',
       title: 'Image Urls',
+      items: { type: 'string', 'x-fal-file-input': true },
       type: 'array',
     },
     max_completion_tokens: {
       description:
         "Controls the maximum length of the model's output, including both the model's response and its chain-of-thought content, measured in tokens.",
-      title: 'Max Completion Tokens',
+      minimum: 1,
       default: 4096,
       maximum: 65536,
-      minimum: 1,
+      title: 'Max Completion Tokens',
       type: 'integer',
     },
     system_prompt: {
@@ -37,9 +37,9 @@ export const BytedanceSeedV2MiniInputSchema = {
     thinking: {
       description:
         "Controls the model's chain-of-thought reasoning. `enabled` always includes reasoning, `disabled` never includes reasoning, `auto` lets the model decide based on the query.",
-      title: 'Thinking',
-      default: 'enabled',
       enum: ['enabled', 'disabled', 'auto'],
+      default: 'enabled',
+      title: 'Thinking',
       type: 'string',
     },
     messages: {
@@ -70,19 +70,19 @@ export const BytedanceSeedV2MiniInputSchema = {
     temperature: {
       description:
         'Controls randomness in the response. Lower values make output more focused and deterministic, higher values make it more creative.',
-      title: 'Temperature',
+      minimum: 0,
       default: 1,
       maximum: 2,
-      minimum: 0,
+      title: 'Temperature',
       type: 'number',
     },
     top_p: {
       description:
         'Nucleus sampling parameter. The model considers tokens with top_p cumulative probability mass. Lower values narrow the token selection.',
-      title: 'Top P',
+      minimum: 0,
       default: 0.7,
       maximum: 1,
-      minimum: 0,
+      title: 'Top P',
       type: 'number',
     },
   },
@@ -106,8 +106,8 @@ export const BytedanceSeedV2MiniInputSchema = {
       properties: {
         role: {
           description: 'The role of the message author.',
-          title: 'Role',
           enum: ['system', 'user', 'assistant'],
+          title: 'Role',
           type: 'string',
         },
         content: {
@@ -158,8 +158,8 @@ export const BytedanceSeedV2MiniOutputSchema = {
       properties: {
         role: {
           description: 'The role of the message author.',
-          title: 'Role',
           enum: ['system', 'user', 'assistant'],
+          title: 'Role',
           type: 'string',
         },
         content: {
@@ -179,55 +179,56 @@ export const BytedanceSeedV2MiniOutputSchema = {
 } as const
 
 export const Nemotron3NanoOmniInputSchema = {
+  type: 'object',
+  required: ['prompt'],
   properties: {
-    top_p: {
-      default: 0.95,
-      description: 'Nucleus sampling probability mass.',
-      title: 'Top P',
-      type: 'number',
-      minimum: 0,
-      maximum: 1,
-    },
-    temperature: {
-      default: 0.7,
-      description: 'Sampling temperature. Lower is more deterministic.',
-      title: 'Temperature',
-      type: 'number',
-      minimum: 0,
-      maximum: 2,
-    },
     system_prompt: {
+      examples: ['You are a concise enterprise assistant.'],
       description:
         'Optional system prompt to steer the model. Reasoning behavior is controlled by the separate `reasoning_mode` field.',
       title: 'System Prompt',
-      examples: ['You are a concise enterprise assistant.'],
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
-    reasoning_mode: {
-      description:
-        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
-      title: 'Reasoning Mode',
-      type: 'string',
-      enum: ['think', 'no_think'],
-      default: 'no_think',
+    temperature: {
+      default: 0.7,
+      type: 'number',
+      title: 'Temperature',
+      description: 'Sampling temperature. Lower is more deterministic.',
+      minimum: 0,
+      maximum: 2,
     },
     max_tokens: {
       default: 1024,
-      description: 'Maximum number of tokens to generate.',
-      title: 'Max Tokens',
       type: 'integer',
+      title: 'Max Tokens',
+      description: 'Maximum number of tokens to generate.',
       minimum: 1,
       maximum: 20000,
     },
     prompt: {
-      description: 'Text prompt to send to the model. English only.',
-      title: 'Prompt',
       minLength: 1,
       examples: ['Summarize the key capabilities of a multimodal agent.'],
+      description: 'Text prompt to send to the model. English only.',
+      title: 'Prompt',
+      type: 'string',
+    },
+    top_p: {
+      default: 0.95,
+      type: 'number',
+      title: 'Top P',
+      description: 'Nucleus sampling probability mass.',
+      minimum: 0,
+      maximum: 1,
+    },
+    reasoning_mode: {
+      default: 'no_think',
+      title: 'Reasoning Mode',
+      description:
+        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
+      enum: ['think', 'no_think'],
       type: 'string',
     },
   },
-  type: 'object',
   title: 'ChatInput',
   'x-fal-order-properties': [
     'prompt',
@@ -237,118 +238,118 @@ export const Nemotron3NanoOmniInputSchema = {
     'temperature',
     'top_p',
   ],
-  required: ['prompt'],
 } as const
 
 export const Nemotron3NanoOmniOutputSchema = {
+  type: 'object',
+  required: ['output', 'usage'],
   properties: {
-    finish_reason: {
-      description: 'Reason generation stopped.',
-      title: 'Finish Reason',
-      type: 'string',
-      examples: ['stop', 'length'],
-      default: 'stop',
+    usage: {
+      $ref: '#/$defs/UsageInfo',
+      examples: [{ input_tokens: 412, output_tokens: 87 }],
+      description: 'Token usage for the request.',
     },
     output: {
-      description: 'Generated text response.',
-      title: 'Output',
-      type: 'string',
       examples: [
         'The image shows a golden retriever puppy sitting on a wooden floor.',
       ],
+      description: 'Generated text response.',
+      title: 'Output',
+      type: 'string',
     },
-    usage: {
-      $ref: '#/$defs/UsageInfo',
-      description: 'Token usage for the request.',
-      examples: [{ output_tokens: 87, input_tokens: 412 }],
+    finish_reason: {
+      default: 'stop',
+      examples: ['stop', 'length'],
+      description: 'Reason generation stopped.',
+      title: 'Finish Reason',
+      type: 'string',
     },
   },
-  type: 'object',
   title: 'BaseOutput',
   'x-fal-order-properties': ['output', 'finish_reason', 'usage'],
-  required: ['output', 'usage'],
   $defs: {
     UsageInfo: {
+      type: 'object',
+      required: ['input_tokens', 'output_tokens'],
       properties: {
-        output_tokens: {
-          description: 'Number of output tokens generated.',
-          title: 'Output Tokens',
-          type: 'integer',
-        },
         input_tokens: {
           description: 'Number of input tokens processed.',
           title: 'Input Tokens',
           type: 'integer',
         },
+        output_tokens: {
+          description: 'Number of output tokens generated.',
+          title: 'Output Tokens',
+          type: 'integer',
+        },
       },
-      type: 'object',
       title: 'UsageInfo',
       'x-fal-order-properties': ['input_tokens', 'output_tokens'],
-      required: ['input_tokens', 'output_tokens'],
     },
   },
 } as const
 
 export const Nemotron3NanoOmniVideoInputSchema = {
+  type: 'object',
+  required: ['prompt', 'video_url'],
   properties: {
-    top_p: {
-      default: 0.95,
-      description: 'Nucleus sampling probability mass.',
-      title: 'Top P',
-      type: 'number',
-      minimum: 0,
-      maximum: 1,
-    },
-    temperature: {
-      default: 0.7,
-      description: 'Sampling temperature. Lower is more deterministic.',
-      title: 'Temperature',
-      type: 'number',
-      minimum: 0,
-      maximum: 2,
-    },
     system_prompt: {
+      examples: ['You are a concise enterprise assistant.'],
       description:
         'Optional system prompt to steer the model. Reasoning behavior is controlled by the separate `reasoning_mode` field.',
       title: 'System Prompt',
-      examples: ['You are a concise enterprise assistant.'],
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
-    reasoning_mode: {
-      description:
-        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
-      title: 'Reasoning Mode',
-      type: 'string',
-      enum: ['think', 'no_think'],
-      default: 'no_think',
-    },
     video_url: {
-      description:
-        'URL of the video to reason about. mp4, up to 1080p, max 2 minutes.',
       title: 'Video URL',
-      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/video_in.mp4',
       ],
+      description:
+        'URL of the video to reason about. mp4, up to 1080p, max 2 minutes.',
+      type: 'string',
       'x-fal-file-input': true,
+    },
+    temperature: {
+      default: 0.7,
+      type: 'number',
+      title: 'Temperature',
+      description: 'Sampling temperature. Lower is more deterministic.',
+      minimum: 0,
+      maximum: 2,
     },
     max_tokens: {
       default: 1024,
-      description: 'Maximum number of tokens to generate.',
-      title: 'Max Tokens',
       type: 'integer',
+      title: 'Max Tokens',
+      description: 'Maximum number of tokens to generate.',
       minimum: 1,
       maximum: 20000,
     },
     prompt: {
-      description: 'Text prompt to send to the model. English only.',
-      title: 'Prompt',
       minLength: 1,
       examples: ['Summarize the key capabilities of a multimodal agent.'],
+      description: 'Text prompt to send to the model. English only.',
+      title: 'Prompt',
+      type: 'string',
+    },
+    top_p: {
+      default: 0.95,
+      type: 'number',
+      title: 'Top P',
+      description: 'Nucleus sampling probability mass.',
+      minimum: 0,
+      maximum: 1,
+    },
+    reasoning_mode: {
+      default: 'no_think',
+      title: 'Reasoning Mode',
+      description:
+        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
+      enum: ['think', 'no_think'],
       type: 'string',
     },
   },
-  type: 'object',
   title: 'VideoInput',
   'x-fal-order-properties': [
     'prompt',
@@ -359,117 +360,117 @@ export const Nemotron3NanoOmniVideoInputSchema = {
     'top_p',
     'video_url',
   ],
-  required: ['prompt', 'video_url'],
 } as const
 
 export const Nemotron3NanoOmniVideoOutputSchema = {
+  type: 'object',
+  required: ['output', 'usage'],
   properties: {
-    finish_reason: {
-      description: 'Reason generation stopped.',
-      title: 'Finish Reason',
-      type: 'string',
-      examples: ['stop', 'length'],
-      default: 'stop',
+    usage: {
+      $ref: '#/$defs/UsageInfo',
+      examples: [{ input_tokens: 412, output_tokens: 87 }],
+      description: 'Token usage for the request.',
     },
     output: {
-      description: 'Generated text response.',
-      title: 'Output',
-      type: 'string',
       examples: [
         'The image shows a golden retriever puppy sitting on a wooden floor.',
       ],
+      description: 'Generated text response.',
+      title: 'Output',
+      type: 'string',
     },
-    usage: {
-      $ref: '#/$defs/UsageInfo',
-      description: 'Token usage for the request.',
-      examples: [{ output_tokens: 87, input_tokens: 412 }],
+    finish_reason: {
+      default: 'stop',
+      examples: ['stop', 'length'],
+      description: 'Reason generation stopped.',
+      title: 'Finish Reason',
+      type: 'string',
     },
   },
-  type: 'object',
   title: 'BaseOutput',
   'x-fal-order-properties': ['output', 'finish_reason', 'usage'],
-  required: ['output', 'usage'],
   $defs: {
     UsageInfo: {
+      type: 'object',
+      required: ['input_tokens', 'output_tokens'],
       properties: {
-        output_tokens: {
-          description: 'Number of output tokens generated.',
-          title: 'Output Tokens',
-          type: 'integer',
-        },
         input_tokens: {
           description: 'Number of input tokens processed.',
           title: 'Input Tokens',
           type: 'integer',
         },
+        output_tokens: {
+          description: 'Number of output tokens generated.',
+          title: 'Output Tokens',
+          type: 'integer',
+        },
       },
-      type: 'object',
       title: 'UsageInfo',
       'x-fal-order-properties': ['input_tokens', 'output_tokens'],
-      required: ['input_tokens', 'output_tokens'],
     },
   },
 } as const
 
 export const Nemotron3NanoOmniVisionInputSchema = {
+  type: 'object',
+  required: ['prompt', 'image_url'],
   properties: {
-    top_p: {
-      default: 0.95,
-      description: 'Nucleus sampling probability mass.',
-      title: 'Top P',
-      type: 'number',
-      minimum: 0,
-      maximum: 1,
-    },
-    temperature: {
-      default: 0.7,
-      description: 'Sampling temperature. Lower is more deterministic.',
-      title: 'Temperature',
-      type: 'number',
-      minimum: 0,
-      maximum: 2,
-    },
     system_prompt: {
+      examples: ['You are a concise enterprise assistant.'],
       description:
         'Optional system prompt to steer the model. Reasoning behavior is controlled by the separate `reasoning_mode` field.',
       title: 'System Prompt',
-      examples: ['You are a concise enterprise assistant.'],
       anyOf: [{ type: 'string' }, { type: 'null' }],
     },
-    reasoning_mode: {
-      description:
-        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
-      title: 'Reasoning Mode',
-      type: 'string',
-      enum: ['think', 'no_think'],
-      default: 'no_think',
-    },
-    image_url: {
-      description: 'URL of the image to reason about. RGB JPEG or PNG.',
-      title: 'Image URL',
-      type: 'string',
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/vision_in.jpg',
-      ],
-      'x-fal-file-input': true,
+    temperature: {
+      default: 0.7,
+      type: 'number',
+      title: 'Temperature',
+      description: 'Sampling temperature. Lower is more deterministic.',
+      minimum: 0,
+      maximum: 2,
     },
     max_tokens: {
       default: 1024,
-      description: 'Maximum number of tokens to generate.',
-      title: 'Max Tokens',
       type: 'integer',
+      title: 'Max Tokens',
+      description: 'Maximum number of tokens to generate.',
       minimum: 1,
       maximum: 20000,
     },
     prompt: {
-      description: 'Text prompt to send to the model. English only.',
-      title: 'Prompt',
       minLength: 1,
       examples: ['Summarize the key capabilities of a multimodal agent.'],
+      description: 'Text prompt to send to the model. English only.',
+      title: 'Prompt',
+      type: 'string',
+    },
+    top_p: {
+      default: 0.95,
+      type: 'number',
+      title: 'Top P',
+      description: 'Nucleus sampling probability mass.',
+      minimum: 0,
+      maximum: 1,
+    },
+    image_url: {
+      title: 'Image URL',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/vision_in.jpg',
+      ],
+      description: 'URL of the image to reason about. RGB JPEG or PNG.',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    reasoning_mode: {
+      default: 'no_think',
+      title: 'Reasoning Mode',
+      description:
+        'Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.',
+      enum: ['think', 'no_think'],
       type: 'string',
     },
   },
-  type: 'object',
   title: 'VisionInput',
   'x-fal-order-properties': [
     'prompt',
@@ -480,54 +481,53 @@ export const Nemotron3NanoOmniVisionInputSchema = {
     'top_p',
     'image_url',
   ],
-  required: ['prompt', 'image_url'],
 } as const
 
 export const Nemotron3NanoOmniVisionOutputSchema = {
+  type: 'object',
+  required: ['output', 'usage'],
   properties: {
-    finish_reason: {
-      description: 'Reason generation stopped.',
-      title: 'Finish Reason',
-      type: 'string',
-      examples: ['stop', 'length'],
-      default: 'stop',
+    usage: {
+      $ref: '#/$defs/UsageInfo',
+      examples: [{ input_tokens: 412, output_tokens: 87 }],
+      description: 'Token usage for the request.',
     },
     output: {
-      description: 'Generated text response.',
-      title: 'Output',
-      type: 'string',
       examples: [
         'The image shows a golden retriever puppy sitting on a wooden floor.',
       ],
+      description: 'Generated text response.',
+      title: 'Output',
+      type: 'string',
     },
-    usage: {
-      $ref: '#/$defs/UsageInfo',
-      description: 'Token usage for the request.',
-      examples: [{ output_tokens: 87, input_tokens: 412 }],
+    finish_reason: {
+      default: 'stop',
+      examples: ['stop', 'length'],
+      description: 'Reason generation stopped.',
+      title: 'Finish Reason',
+      type: 'string',
     },
   },
-  type: 'object',
   title: 'BaseOutput',
   'x-fal-order-properties': ['output', 'finish_reason', 'usage'],
-  required: ['output', 'usage'],
   $defs: {
     UsageInfo: {
+      type: 'object',
+      required: ['input_tokens', 'output_tokens'],
       properties: {
-        output_tokens: {
-          description: 'Number of output tokens generated.',
-          title: 'Output Tokens',
-          type: 'integer',
-        },
         input_tokens: {
           description: 'Number of input tokens processed.',
           title: 'Input Tokens',
           type: 'integer',
         },
+        output_tokens: {
+          description: 'Number of output tokens generated.',
+          title: 'Output Tokens',
+          type: 'integer',
+        },
       },
-      type: 'object',
       title: 'UsageInfo',
       'x-fal-order-properties': ['input_tokens', 'output_tokens'],
-      required: ['input_tokens', 'output_tokens'],
     },
   },
 } as const
@@ -1063,8 +1063,8 @@ export const Seed2MiniMessageSchema = {
   properties: {
     role: {
       description: 'The role of the message author.',
-      title: 'Role',
       enum: ['system', 'user', 'assistant'],
+      title: 'Role',
       type: 'string',
     },
     content: {
@@ -1079,22 +1079,22 @@ export const Seed2MiniMessageSchema = {
 } as const
 
 export const UsageInfoSchema = {
+  type: 'object',
+  required: ['input_tokens', 'output_tokens'],
   properties: {
-    output_tokens: {
-      description: 'Number of output tokens generated.',
-      title: 'Output Tokens',
-      type: 'integer',
-    },
     input_tokens: {
       description: 'Number of input tokens processed.',
       title: 'Input Tokens',
       type: 'integer',
     },
+    output_tokens: {
+      description: 'Number of output tokens generated.',
+      title: 'Output Tokens',
+      type: 'integer',
+    },
   },
-  type: 'object',
   title: 'UsageInfo',
   'x-fal-order-properties': ['input_tokens', 'output_tokens'],
-  required: ['input_tokens', 'output_tokens'],
 } as const
 
 export const UsageInfoType2Schema = {
@@ -1141,110 +1141,12 @@ export const UsageInfoType2Schema = {
 } as const
 
 export const VideoPromptGeneratorInputSchema = {
-  title: 'InputModel',
   required: ['input_concept'],
+  title: 'InputModel',
   type: 'object',
   properties: {
-    style: {
-      enum: [
-        'Minimalist',
-        'Simple',
-        'Detailed',
-        'Descriptive',
-        'Dynamic',
-        'Cinematic',
-        'Documentary',
-        'Animation',
-        'Action',
-        'Experimental',
-      ],
-      title: 'Style',
-      type: 'string',
-      description: 'Style of the video prompt',
-      default: 'Simple',
-    },
-    prompt_length: {
-      enum: ['Short', 'Medium', 'Long'],
-      title: 'Prompt Length',
-      type: 'string',
-      description: 'Length of the prompt',
-      default: 'Medium',
-    },
-    pacing: {
-      enum: [
-        'None',
-        'Slow burn',
-        'Rhythmic pulse',
-        'Frantic energy',
-        'Ebb and flow',
-        'Hypnotic drift',
-        'Time-lapse rush',
-        'Stop-motion staccato',
-        'Gradual build',
-        'Quick cut rhythm',
-        'Long take meditation',
-        'Jump cut energy',
-        'Match cut flow',
-        'Cross-dissolve dreamscape',
-        'Parallel action',
-        'Slow motion impact',
-        'Ramping dynamics',
-        'Montage tempo',
-        'Continuous flow',
-        'Episodic breaks',
-      ],
-      title: 'Pacing',
-      type: 'string',
-      description: 'Pacing rhythm',
-      default: 'None',
-    },
-    camera_direction: {
-      enum: [
-        'None',
-        'Zoom in',
-        'Zoom out',
-        'Pan left',
-        'Pan right',
-        'Tilt up',
-        'Tilt down',
-        'Orbital rotation',
-        'Push in',
-        'Pull out',
-        'Track forward',
-        'Track backward',
-        'Spiral in',
-        'Spiral out',
-        'Arc movement',
-        'Diagonal traverse',
-        'Vertical rise',
-        'Vertical descent',
-      ],
-      title: 'Camera Direction',
-      type: 'string',
-      description: 'Camera direction',
-      default: 'None',
-    },
-    model: {
-      enum: [
-        'anthropic/claude-3.5-sonnet',
-        'anthropic/claude-3-5-haiku',
-        'anthropic/claude-3-haiku',
-        'google/gemini-2.5-flash-lite',
-        'google/gemini-2.0-flash-001',
-        'meta-llama/llama-3.2-1b-instruct',
-        'meta-llama/llama-3.2-3b-instruct',
-        'meta-llama/llama-3.1-8b-instruct',
-        'meta-llama/llama-3.1-70b-instruct',
-        'openai/gpt-4o-mini',
-        'openai/gpt-4o',
-        'deepseek/deepseek-r1',
-      ],
-      title: 'Model',
-      type: 'string',
-      description: 'Model to use',
-      default: 'google/gemini-2.0-flash-001',
-    },
     special_effects: {
+      title: 'Special Effects',
       enum: [
         'None',
         'Practical effects',
@@ -1268,18 +1170,40 @@ export const VideoPromptGeneratorInputSchema = {
         'Mixed media composite',
         'Neural style transfer',
       ],
-      title: 'Special Effects',
       type: 'string',
-      description: 'Special effects approach',
       default: 'None',
+      description: 'Special effects approach',
     },
-    custom_elements: {
-      title: 'Custom Elements',
+    pacing: {
+      title: 'Pacing',
+      enum: [
+        'None',
+        'Slow burn',
+        'Rhythmic pulse',
+        'Frantic energy',
+        'Ebb and flow',
+        'Hypnotic drift',
+        'Time-lapse rush',
+        'Stop-motion staccato',
+        'Gradual build',
+        'Quick cut rhythm',
+        'Long take meditation',
+        'Jump cut energy',
+        'Match cut flow',
+        'Cross-dissolve dreamscape',
+        'Parallel action',
+        'Slow motion impact',
+        'Ramping dynamics',
+        'Montage tempo',
+        'Continuous flow',
+        'Episodic breaks',
+      ],
       type: 'string',
-      description: 'Custom technical elements (optional)',
-      default: '',
+      default: 'None',
+      description: 'Pacing rhythm',
     },
     camera_style: {
+      title: 'Camera Style',
       enum: [
         'None',
         'Steadicam flow',
@@ -1303,10 +1227,9 @@ export const VideoPromptGeneratorInputSchema = {
         'Underwater housing',
         'Periscope lens',
       ],
-      title: 'Camera Style',
       type: 'string',
-      description: 'Camera movement style',
       default: 'None',
+      description: 'Camera movement style',
     },
     image_url: {
       title: 'Image Url',
@@ -1316,10 +1239,87 @@ export const VideoPromptGeneratorInputSchema = {
       'x-fal-file-input': true,
     },
     input_concept: {
+      description: 'Core concept or thematic input for the video prompt',
       title: 'Input Concept',
       type: 'string',
-      description: 'Core concept or thematic input for the video prompt',
       examples: ['A futuristic city at dusk'],
+    },
+    model: {
+      title: 'Model',
+      enum: [
+        'anthropic/claude-3.5-sonnet',
+        'anthropic/claude-3-5-haiku',
+        'anthropic/claude-3-haiku',
+        'google/gemini-2.5-flash-lite',
+        'google/gemini-2.0-flash-001',
+        'meta-llama/llama-3.2-1b-instruct',
+        'meta-llama/llama-3.2-3b-instruct',
+        'meta-llama/llama-3.1-8b-instruct',
+        'meta-llama/llama-3.1-70b-instruct',
+        'openai/gpt-4o-mini',
+        'openai/gpt-4o',
+        'deepseek/deepseek-r1',
+      ],
+      type: 'string',
+      default: 'google/gemini-2.0-flash-001',
+      description: 'Model to use',
+    },
+    custom_elements: {
+      title: 'Custom Elements',
+      type: 'string',
+      default: '',
+      description: 'Custom technical elements (optional)',
+    },
+    prompt_length: {
+      title: 'Prompt Length',
+      enum: ['Short', 'Medium', 'Long'],
+      type: 'string',
+      default: 'Medium',
+      description: 'Length of the prompt',
+    },
+    style: {
+      title: 'Style',
+      enum: [
+        'Minimalist',
+        'Simple',
+        'Detailed',
+        'Descriptive',
+        'Dynamic',
+        'Cinematic',
+        'Documentary',
+        'Animation',
+        'Action',
+        'Experimental',
+      ],
+      type: 'string',
+      default: 'Simple',
+      description: 'Style of the video prompt',
+    },
+    camera_direction: {
+      title: 'Camera Direction',
+      enum: [
+        'None',
+        'Zoom in',
+        'Zoom out',
+        'Pan left',
+        'Pan right',
+        'Tilt up',
+        'Tilt down',
+        'Orbital rotation',
+        'Push in',
+        'Pull out',
+        'Track forward',
+        'Track backward',
+        'Spiral in',
+        'Spiral out',
+        'Arc movement',
+        'Diagonal traverse',
+        'Vertical rise',
+        'Vertical descent',
+      ],
+      type: 'string',
+      default: 'None',
+      description: 'Camera direction',
     },
   },
   'x-fal-order-properties': [
@@ -1337,14 +1337,14 @@ export const VideoPromptGeneratorInputSchema = {
 } as const
 
 export const VideoPromptGeneratorOutputSchema = {
-  title: 'OutputModel',
   required: ['prompt'],
+  title: 'OutputModel',
   type: 'object',
   properties: {
     prompt: {
+      description: 'Generated video prompt',
       title: 'Prompt',
       type: 'string',
-      description: 'Generated video prompt',
       examples: [
         'A futuristic city glows softly at dusk, captured with smooth gimbal movements and a slow burn pacing, enhanced by subtle holographic overlays.',
       ],

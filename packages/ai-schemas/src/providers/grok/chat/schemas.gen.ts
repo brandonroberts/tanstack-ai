@@ -112,10 +112,15 @@ export const ChatRequestSchema = {
       maximum: 2,
       minimum: -2,
     },
+    prompt_cache_key: {
+      type: ['string', 'null'],
+      description:
+        'A stable cache key for best-effort sticky routing / prompt-cache hits\nacross requests sharing a prompt prefix. Plumbed to `x-grok-conv-id`,\nsame as on `/v1/responses`.',
+    },
     reasoning_effort: {
       type: ['string', 'null'],
       description:
-        'Constrains how hard a reasoning model thinks before responding. Not supported by `grok-4` and will result in error if used with `grok-4`. Possible values are `low` (uses fewer reasoning tokens) and `high` (uses more reasoning tokens).',
+        'Constrains how hard a reasoning model thinks before responding. Only supported by `grok-4.3`. Possible values are `none` (disables reasoning completely), `low` (this is the default if not specified), `medium` and `high` (uses the most reasoning tokens).',
     },
     response_format: {
       oneOf: [
@@ -142,6 +147,16 @@ export const ChatRequestSchema = {
       format: 'int32',
       description:
         'If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same `seed` and parameters should return the same result. Determinism is not guaranteed, and you should refer to the `system_fingerprint` response parameter to monitor changes in the backend.',
+    },
+    service_tier: {
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/ServiceTier',
+          description:
+            'Specifies the processing tier for this request. Set to `"priority"` for higher scheduling\npriority at a higher token price. Valid values: `"auto"` (default), `"priority"`.',
+        },
+      ],
     },
     stop: {
       type: ['array', 'null'],
@@ -643,6 +658,12 @@ export const ChatRequestSchema = {
         },
       ],
     },
+    ServiceTier: {
+      type: 'string',
+      description:
+        'Processing tier for a request. Determines scheduling priority and billing.',
+      enum: ['default', 'priority'],
+    },
     StreamOptions: {
       type: 'object',
       description: 'Options available when using streaming response.',
@@ -753,7 +774,7 @@ export const ChatRequestSchema = {
 export const ChatResponseSchema = {
   type: 'object',
   description: 'The chat response body for `/v1/chat/completions` endpoint.',
-  required: ['id', 'object', 'created', 'model', 'choices'],
+  required: ['id', 'object', 'created', 'model', 'choices', 'service_tier'],
   properties: {
     choices: {
       type: 'array',
@@ -787,6 +808,10 @@ export const ChatResponseSchema = {
       items: { $ref: '#/$defs/OutputFile' },
       description:
         'Files generated during the response (e.g., by the code execution tool).\nOnly populated when `code_execution_files_output` is included.',
+    },
+    service_tier: {
+      $ref: '#/$defs/ServiceTier',
+      description: 'The processing tier used for this request.',
     },
     system_fingerprint: {
       type: ['string', 'null'],
@@ -959,6 +984,12 @@ export const ChatResponseSchema = {
             'Total text prompt token used (cached + non-cached text tokens).',
         },
       },
+    },
+    ServiceTier: {
+      type: 'string',
+      description:
+        'Processing tier for a request. Determines scheduling priority and billing.',
+      enum: ['default', 'priority'],
     },
     TokenLogProb: {
       type: 'object',
@@ -1671,6 +1702,27 @@ export const ContentPartSchema = {
             'Public URL or base64-encoded data URL of the image (JPEG, PNG, or WebP).\nAlso accepts `image_url` for compatibility.\nRequired when `file_id` is not set.',
         },
       },
+    },
+  },
+} as const
+
+export const ContextDetailsSchema = {
+  type: 'object',
+  description:
+    "Token counts for the latest context window seen by the model.\n\nIn the non-agentic path these mirror `input_tokens` / `output_tokens`.\nIn the agentic path (multi-agents) these are reset on every step and\nreflect the most recent step's prompt and output sizes — useful for\nunderstanding how the live context window evolves across tool calls.\nInformational only; not used for billing.",
+  required: ['input_tokens', 'output_tokens'],
+  properties: {
+    input_tokens: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Prompt tokens in the latest context (sourced from\n`SamplingUsage.context_prompt_tokens`).',
+    },
+    output_tokens: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Completion + reasoning tokens in the latest context (sourced from\n`SamplingUsage.context_output_tokens`).',
     },
   },
 } as const
@@ -6157,8 +6209,14 @@ export const ModelRequestSchema = {
       ],
     },
     service_tier: {
-      type: ['string', 'null'],
-      description: 'Not supported. Only maintained for compatibility reasons.',
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/ServiceTier',
+          description:
+            'Specifies the processing tier for this request. Set to `"priority"` for higher scheduling\npriority at a higher token price. Valid values: `"auto"` (default), `"priority"`.',
+        },
+      ],
     },
     store: {
       type: ['boolean', 'null'],
@@ -7127,8 +7185,8 @@ export const ModelRequestSchema = {
         effort: {
           type: ['string', 'null'],
           description:
-            'Constrains how hard a reasoning model thinks before responding. Possible values are `low` (uses fewer reasoning tokens), `medium` and `high` (uses more reasoning tokens).',
-          default: 'medium',
+            'Constrains how hard a reasoning model thinks before responding. Only supported by `grok-4.3`. Possible values are `none` (disables reasoning completely), `low` (this is the default if not specified), `medium` and `high` (uses the most reasoning tokens).',
+          default: 'low',
         },
         generate_summary: {
           type: ['string', 'null'],
@@ -7316,6 +7374,12 @@ export const ModelRequestSchema = {
           },
         },
       ],
+    },
+    ServiceTier: {
+      type: 'string',
+      description:
+        'Processing tier for a request. Determines scheduling priority and billing.',
+      enum: ['default', 'priority'],
     },
     ShellCall: {
       type: 'object',
@@ -7806,9 +7870,13 @@ export const ModelResponseSchema = {
         "A stable identifier used to help detect users of your application that may be violating xAI's usage policies.",
     },
     service_tier: {
-      type: 'string',
-      description:
-        'Specifies the processing tier used for serving the request.',
+      oneOf: [
+        {
+          $ref: '#/$defs/ServiceTier',
+          description:
+            'Specifies the processing tier used for serving the request.',
+        },
+      ],
       default: 'default',
     },
     status: {
@@ -7962,6 +8030,26 @@ export const ModelResponseSchema = {
           },
         },
       ],
+    },
+    ContextDetails: {
+      type: 'object',
+      description:
+        "Token counts for the latest context window seen by the model.\n\nIn the non-agentic path these mirror `input_tokens` / `output_tokens`.\nIn the agentic path (multi-agents) these are reset on every step and\nreflect the most recent step's prompt and output sizes — useful for\nunderstanding how the live context window evolves across tool calls.\nInformational only; not used for billing.",
+      required: ['input_tokens', 'output_tokens'],
+      properties: {
+        input_tokens: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Prompt tokens in the latest context (sourced from\n`SamplingUsage.context_prompt_tokens`).',
+        },
+        output_tokens: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Completion + reasoning tokens in the latest context (sourced from\n`SamplingUsage.context_output_tokens`).',
+        },
+      },
     },
     CustomToolCall: {
       type: 'object',
@@ -8520,6 +8608,16 @@ export const ModelResponseSchema = {
         'num_server_side_tools_used',
       ],
       properties: {
+        context_details: {
+          oneOf: [
+            { type: 'null' },
+            {
+              $ref: '#/$defs/ContextDetails',
+              description:
+                'Token counts for the **latest context** sent to / produced by the\nmodel. For agentic responses this reflects the most recent step\nrather than the cumulative total. Informational only — not used\nfor billing.',
+            },
+          ],
+        },
         cost_in_nano_usd: {
           type: ['integer', 'null'],
           format: 'int64',
@@ -8697,8 +8795,8 @@ export const ModelResponseSchema = {
         effort: {
           type: ['string', 'null'],
           description:
-            'Constrains how hard a reasoning model thinks before responding. Possible values are `low` (uses fewer reasoning tokens), `medium` and `high` (uses more reasoning tokens).',
-          default: 'medium',
+            'Constrains how hard a reasoning model thinks before responding. Only supported by `grok-4.3`. Possible values are `none` (disables reasoning completely), `low` (this is the default if not specified), `medium` and `high` (uses the most reasoning tokens).',
+          default: 'low',
         },
         generate_summary: {
           type: ['string', 'null'],
@@ -8765,6 +8863,12 @@ export const ModelResponseSchema = {
           description: 'Number of X search calls.',
         },
       },
+    },
+    ServiceTier: {
+      type: 'string',
+      description:
+        'Processing tier for a request. Determines scheduling priority and billing.',
+      enum: ['default', 'priority'],
     },
     ShellCall: {
       type: 'object',
@@ -9526,6 +9630,16 @@ export const ModelUsageSchema = {
     'num_server_side_tools_used',
   ],
   properties: {
+    context_details: {
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/ContextDetails',
+          description:
+            'Token counts for the **latest context** sent to / produced by the\nmodel. For agentic responses this reflects the most recent step\nrather than the cumulative total. Informational only — not used\nfor billing.',
+        },
+      ],
+    },
     cost_in_nano_usd: {
       type: ['integer', 'null'],
       format: 'int64',
@@ -9581,6 +9695,26 @@ export const ModelUsageSchema = {
     },
   },
   $defs: {
+    ContextDetails: {
+      type: 'object',
+      description:
+        "Token counts for the latest context window seen by the model.\n\nIn the non-agentic path these mirror `input_tokens` / `output_tokens`.\nIn the agentic path (multi-agents) these are reset on every step and\nreflect the most recent step's prompt and output sizes — useful for\nunderstanding how the live context window evolves across tool calls.\nInformational only; not used for billing.",
+      required: ['input_tokens', 'output_tokens'],
+      properties: {
+        input_tokens: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Prompt tokens in the latest context (sourced from\n`SamplingUsage.context_prompt_tokens`).',
+        },
+        output_tokens: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Completion + reasoning tokens in the latest context (sourced from\n`SamplingUsage.context_output_tokens`).',
+        },
+      },
+    },
     InputTokensDetails: {
       type: 'object',
       required: ['cached_tokens'],
@@ -10018,8 +10152,8 @@ export const ReasoningConfigurationSchema = {
     effort: {
       type: ['string', 'null'],
       description:
-        'Constrains how hard a reasoning model thinks before responding. Possible values are `low` (uses fewer reasoning tokens), `medium` and `high` (uses more reasoning tokens).',
-      default: 'medium',
+        'Constrains how hard a reasoning model thinks before responding. Only supported by `grok-4.3`. Possible values are `none` (disables reasoning completely), `low` (this is the default if not specified), `medium` and `high` (uses the most reasoning tokens).',
+      default: 'low',
     },
     generate_summary: {
       type: ['string', 'null'],
@@ -10753,6 +10887,13 @@ export const ServerSideToolUsageDetailsSchema = {
       description: 'Number of X search calls.',
     },
   },
+} as const
+
+export const ServiceTierSchema = {
+  type: 'string',
+  description:
+    'Processing tier for a request. Determines scheduling priority and billing.',
+  enum: ['default', 'priority'],
 } as const
 
 export const ShellCallSchema = {

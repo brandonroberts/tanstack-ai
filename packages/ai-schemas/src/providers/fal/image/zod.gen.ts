@@ -6,9 +6,9 @@ import * as z from 'zod'
  * Aesthetics
  */
 export const zAesthetics = z.object({
+  mood_atmosphere: z.union([z.string(), z.unknown()]).optional(),
   color_scheme: z.union([z.string(), z.unknown()]).optional(),
   composition: z.union([z.string(), z.unknown()]).optional(),
-  mood_atmosphere: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -36,6 +36,70 @@ export const zAestheticsType2 = z.object({
 })
 
 /**
+ * ImageEditRequest
+ */
+export const zAgentUni1V1EditInput = z.object({
+  reference_image_urls: z
+    .union([z.array(z.string()).max(8), z.unknown()])
+    .optional(),
+  style: z.enum(['auto', 'manga']).optional().default('auto'),
+  prompt: z.string().min(1).max(6000),
+  image_url: z.string(),
+  output_format: z.union([z.enum(['png', 'jpeg']), z.unknown()]).optional(),
+})
+
+/**
+ * ImageEditRequest
+ */
+export const zAgentUni1V1MaxEditInput = z.object({
+  reference_image_urls: z
+    .union([z.array(z.string()).max(8), z.unknown()])
+    .optional(),
+  style: z.enum(['auto', 'manga']).optional().default('auto'),
+  prompt: z.string().min(1).max(6000),
+  image_url: z.string(),
+  output_format: z.union([z.enum(['png', 'jpeg']), z.unknown()]).optional(),
+})
+
+/**
+ * TextToImageRequest
+ */
+export const zAgentUni1V1MaxInput = z.object({
+  output_format: z.union([z.enum(['png', 'jpeg']), z.unknown()]).optional(),
+  enable_web_search: z.boolean().optional().default(false),
+  style: z.enum(['auto', 'manga']).optional().default('auto'),
+  prompt: z.string().min(1).max(6000),
+  reference_image_urls: z
+    .union([z.array(z.string()).max(9), z.unknown()])
+    .optional(),
+  aspect_ratio: z
+    .union([
+      z.enum(['3:1', '2:1', '16:9', '3:2', '1:1', '2:3', '9:16', '1:2', '1:3']),
+      z.unknown(),
+    ])
+    .optional(),
+})
+
+/**
+ * TextToImageRequest
+ */
+export const zAgentUni1V1TextToImageInput = z.object({
+  output_format: z.union([z.enum(['png', 'jpeg']), z.unknown()]).optional(),
+  enable_web_search: z.boolean().optional().default(false),
+  style: z.enum(['auto', 'manga']).optional().default('auto'),
+  prompt: z.string().min(1).max(6000),
+  reference_image_urls: z
+    .union([z.array(z.string()).max(9), z.unknown()])
+    .optional(),
+  aspect_ratio: z
+    .union([
+      z.enum(['3:1', '2:1', '16:9', '3:2', '1:1', '2:3', '9:16', '1:2', '1:3']),
+      z.unknown(),
+    ])
+    .optional(),
+})
+
+/**
  * AspectRatio
  *
  * Aspect ratio model that calculates 4K resolution dimensions
@@ -51,22 +115,22 @@ export const zAspectRatio = z.object({
  * Input
  */
 export const zAuraFlowInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(20).lte(50).optional().default(50),
   expand_prompt: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(2).optional().default(1),
+  num_inference_steps: z.int().gte(20).lte(50).optional().default(50),
   sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
 })
 
 /**
  * Input
  */
 export const zAuraSrInput = z.object({
-  overlapping_tiles: z.boolean().optional().default(false),
   upscale_factor: z.int().optional().default(4),
   image_url: z.string(),
+  overlapping_tiles: z.boolean().optional().default(false),
   checkpoint: z.enum(['v1', 'v2']).optional().default('v1'),
 })
 
@@ -74,8 +138,8 @@ export const zAuraSrInput = z.object({
  * BgrmInput
  */
 export const zBackgroundRemovalInput = z.object({
-  image_url: z.string(),
   sync_mode: z.boolean().optional().default(true),
+  image_url: z.string(),
   output_format: z.enum(['rgba', 'alpha', 'zip']).optional().default('rgba'),
 })
 
@@ -83,21 +147,21 @@ export const zBackgroundRemovalInput = z.object({
  * ImageEditInput
  */
 export const zBagelEditInput = z.object({
+  use_thought: z.boolean().optional().default(false),
+  prompt: z.string(),
+  image_url: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   seed: z.int().optional(),
-  prompt: z.string(),
-  use_thought: z.boolean().optional().default(false),
-  image_url: z.string(),
 })
 
 /**
  * ImageGenInput
  */
 export const zBagelInput = z.object({
+  use_thought: z.boolean().optional().default(false),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   seed: z.int().optional(),
-  prompt: z.string(),
-  use_thought: z.boolean().optional().default(false),
 })
 
 /**
@@ -105,44 +169,65 @@ export const zBagelInput = z.object({
  */
 export const zBBoxPromptBase = z.object({
   x_max: z.number().gte(0).lte(1).optional().default(0),
-  y_max: z.number().gte(0).lte(1).optional().default(0),
-  y_min: z.number().gte(0).lte(1).optional().default(0),
   x_min: z.number().gte(0).lte(1).optional().default(0),
+  y_min: z.number().gte(0).lte(1).optional().default(0),
+  y_max: z.number().gte(0).lte(1).optional().default(0),
 })
 
 /**
  * Ben2InputImage
  */
 export const zBenV2ImageInput = z.object({
-  image_url: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+})
+
+/**
+ * EditImageInput
+ */
+export const zBerniniREditImageInput = z.object({
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  max_image_size: z.int().gte(256).lte(1280).optional().default(848),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Input
  */
 export const zBirefnetInput = z.object({
+  refine_foreground: z.boolean().optional().default(true),
+  output_mask: z.boolean().optional().default(false),
+  output_format: z.enum(['webp', 'png', 'gif']).optional().default('png'),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   operating_resolution: z
     .enum(['1024x1024', '2048x2048'])
     .optional()
     .default('1024x1024'),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
   model: z
     .enum(['General Use (Light)', 'General Use (Heavy)', 'Portrait'])
     .optional()
     .default('General Use (Light)'),
-  refine_foreground: z.boolean().optional().default(true),
-  output_mask: z.boolean().optional().default(false),
-  output_format: z.enum(['webp', 'png', 'gif']).optional().default('png'),
 })
 
 /**
  * InputV2
  */
 export const zBirefnetV2Input = z.object({
-  mask_only: z.boolean().optional().default(false),
+  refine_foreground: z.boolean().optional().default(true),
+  output_mask: z.boolean().optional().default(false),
+  sync_mode: z.boolean().optional().default(false),
+  operating_resolution: z
+    .enum(['1024x1024', '2048x2048', '2304x2304'])
+    .optional()
+    .default('1024x1024'),
   output_format: z.enum(['webp', 'png', 'gif']).optional().default('png'),
+  mask_only: z.boolean().optional().default(false),
+  image_url: z.string(),
   model: z
     .enum([
       'General Use (Light)',
@@ -154,25 +239,17 @@ export const zBirefnetV2Input = z.object({
     ])
     .optional()
     .default('General Use (Light)'),
-  operating_resolution: z
-    .enum(['1024x1024', '2048x2048', '2304x2304'])
-    .optional()
-    .default('1024x1024'),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  refine_foreground: z.boolean().optional().default(true),
-  output_mask: z.boolean().optional().default(false),
 })
 
 /**
  * BoundingBox
  */
 export const zBoundingBox = z.object({
-  w: z.number(),
   y: z.number(),
   h: z.number(),
-  x: z.number(),
+  w: z.number(),
   label: z.string(),
+  x: z.number(),
 })
 
 /**
@@ -186,11 +263,11 @@ export const zBoundingBoxes = z.object({
  * BoxPrompt
  */
 export const zBoxPrompt = z.object({
-  x_min: z.union([z.int(), z.unknown()]).optional(),
-  y_max: z.union([z.int(), z.unknown()]).optional(),
-  frame_index: z.union([z.int(), z.unknown()]).optional(),
-  x_max: z.union([z.int(), z.unknown()]).optional(),
   y_min: z.union([z.int(), z.unknown()]).optional(),
+  y_max: z.union([z.int(), z.unknown()]).optional(),
+  x_max: z.union([z.int(), z.unknown()]).optional(),
+  frame_index: z.union([z.int(), z.unknown()]).optional(),
+  x_min: z.union([z.int(), z.unknown()]).optional(),
   object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -198,98 +275,97 @@ export const zBoxPrompt = z.object({
  * BoxPromptBase
  */
 export const zBoxPromptBase = z.object({
+  y_max: z.int().optional().default(0),
+  y_min: z.int().optional().default(0),
   x_max: z.int().optional().default(0),
   x_min: z.int().optional().default(0),
-  y_min: z.int().optional().default(0),
-  y_max: z.int().optional().default(0),
 })
 
 /**
  * BoxPrompt
  */
 export const zBoxPromptType2 = z.object({
-  x_max: z.int().optional().default(0),
-  y_min: z.int().optional().default(0),
-  x_min: z.int().optional().default(0),
   frame_index: z.int().optional().default(0),
   y_max: z.int().optional().default(0),
+  x_min: z.int().optional().default(0),
+  y_min: z.int().optional().default(0),
+  x_max: z.int().optional().default(0),
 })
 
 /**
  * InputModel
  */
 export const zBriaBackgroundRemoveInput = z.object({
-  image_url: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
 })
 
 /**
  * BGReplaceInput
  */
 export const zBriaBackgroundReplaceInput = z.object({
-  prompt: z.union([z.string().min(1), z.unknown()]).optional(),
   image_url: z.string(),
-  fast: z.boolean().optional().default(true),
   seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
-  ref_image_url: z.string().optional().default(''),
-  negative_prompt: z.string().optional().default(''),
-  refine_prompt: z.boolean().optional().default(true),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.union([z.string().min(1), z.unknown()]).optional(),
+  refine_prompt: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   sync_mode: z.boolean().optional().default(false),
+  ref_image_url: z.string().optional().default(''),
+  fast: z.boolean().optional().default(true),
 })
 
 /**
  * EraserInput
  */
 export const zBriaEraserInput = z.object({
-  mask_url: z.string(),
-  preserve_alpha: z.boolean().optional().default(false),
-  image_url: z.string(),
   mask_type: z.enum(['manual', 'automatic']).optional().default('manual'),
   sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  mask_url: z.string(),
+  preserve_alpha: z.boolean().optional().default(false),
 })
 
 /**
  * ImageExpansionInput
  */
 export const zBriaExpandInput = z.object({
-  prompt: z.string().optional().default(''),
-  original_image_size: z.union([z.array(z.int()), z.unknown()]).optional(),
-  image_url: z.string(),
-  canvas_size: z.array(z.int()),
-  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum(['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9']),
       z.unknown(),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
+  original_image_size: z.union([z.array(z.int()), z.unknown()]).optional(),
+  prompt: z.string().optional().default(''),
   original_image_location: z.union([z.array(z.int()), z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(''),
   sync_mode: z.boolean().optional().default(false),
+  canvas_size: z.array(z.int()),
+  image_url: z.string(),
 })
 
 /**
  * GenFillInput
  */
 export const zBriaGenfillInput = z.object({
-  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
-  prompt: z.string(),
-  mask_url: z.string(),
-  negative_prompt: z.string().optional().default(''),
-  image_url: z.string(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
+  mask_url: z.string(),
+  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
 })
 
 /**
  * ProductShotInput
  */
 export const zBriaProductShotInput = z.object({
+  shot_size: z.array(z.int()).optional().default([1000, 1000]),
   scene_description: z.union([z.string(), z.unknown()]).optional(),
-  original_quality: z.boolean().optional().default(false),
-  num_results: z.int().gte(1).lte(4).optional().default(1),
-  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   manual_placement_selection: z
     .enum([
       'upper_left',
@@ -305,68 +381,69 @@ export const zBriaProductShotInput = z.object({
     ])
     .optional()
     .default('bottom_center'),
-  fast: z.boolean().optional().default(true),
-  padding_values: z.array(z.int()).optional(),
+  num_results: z.int().gte(1).lte(4).optional().default(1),
   optimize_description: z.boolean().optional().default(true),
   placement_type: z
     .enum(['original', 'automatic', 'manual_placement', 'manual_padding'])
     .optional()
     .default('manual_placement'),
+  padding_values: z.array(z.int()).optional(),
+  fast: z.boolean().optional().default(true),
+  image_url: z.string(),
   ref_image_url: z.string().optional().default(''),
-  shot_size: z.array(z.int()).optional().default([1000, 1000]),
-  sync_mode: z.boolean().optional().default(false),
+  original_quality: z.boolean().optional().default(false),
 })
 
 /**
  * ReimagineInput
  */
 export const zBriaReimagineInput = z.object({
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
   num_results: z.int().gte(1).lte(4).optional().default(1),
-  fast: z.boolean().optional().default(true),
-  structure_ref_influence: z.number().optional().default(0.75),
   seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
   structure_image_url: z.string().optional().default(''),
+  prompt: z.string(),
+  structure_ref_influence: z.number().optional().default(0.75),
+  fast: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
 })
 
 /**
  * CartoonifyInput
  */
 export const zCartoonifyInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  image_url: z.string(),
+  use_cfg_zero: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   scale: z.number().gte(0.1).lte(2).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
-  use_cfg_zero: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  image_url: z.string(),
 })
 
 /**
  * CCSRInput
  */
 export const zCcsrInput = z.object({
-  tile_vae_encoder_size: z.int().gte(128).lte(2048).optional().default(1024),
-  tile_diffusion_stride: z.int().gte(128).lte(1024).optional().default(512),
-  t_max: z.number().gte(0).lte(1).optional().default(0.6667),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  tile_vae: z.boolean().optional().default(false),
   tile_vae_decoder_size: z.int().gte(64).lte(2048).optional().default(226),
-  tile_diffusion: z
-    .enum(['none', 'mix', 'gaussian'])
-    .optional()
-    .default('none'),
+  tile_diffusion_stride: z.int().gte(128).lte(1024).optional().default(512),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  t_max: z.number().gte(0).lte(1).optional().default(0.6667),
+  image_url: z.string(),
+  tile_vae_encoder_size: z.int().gte(128).lte(2048).optional().default(1024),
   t_min: z.number().gte(0).lte(1).optional().default(0.3333),
-  scale: z.number().gte(1).lte(4).optional().default(2),
+  tile_diffusion_size: z.int().gte(256).lte(2048).optional().default(1024),
+  steps: z.int().gte(10).lte(100).optional().default(50),
   color_fix_type: z
     .enum(['none', 'wavelet', 'adain'])
     .optional()
     .default('adain'),
-  steps: z.int().gte(10).lte(100).optional().default(50),
-  tile_diffusion_size: z.int().gte(256).lte(2048).optional().default(1024),
-  image_url: z.string(),
+  tile_vae: z.boolean().optional().default(false),
+  tile_diffusion: z
+    .enum(['none', 'mix', 'gaussian'])
+    .optional()
+    .default('none'),
+  scale: z.number().gte(1).lte(4).optional().default(2),
 })
 
 /**
@@ -375,19 +452,19 @@ export const zCcsrInput = z.object({
  * Input model for ChronoEdit standard editing operations
  */
 export const zChronoEditInput = z.object({
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
   enable_prompt_expansion: z.boolean().optional().default(true),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
   turbo_mode: z.boolean().optional().default(true),
   guidance_scale: z.number().gte(0).lte(10).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
   enable_temporal_reasoning: z.boolean().optional().default(false),
   prompt: z.string(),
   num_temporal_reasoning_steps: z.int().gte(2).lte(12).optional().default(8),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(8),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -404,19 +481,19 @@ export const zChronoLoraWeight = z.object({
  * Input for paintbrush mode
  */
 export const zChronoEditLoraGalleryPaintbrushInput = z.object({
-  loras: z.array(zChronoLoraWeight).optional().default([]),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
-  turbo_mode: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(10).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  image_url: z.string(),
   lora_scale: z.number().gte(0).lte(2).optional().default(1),
   mask_url: z.union([z.string(), z.unknown()]).optional(),
+  turbo_mode: z.boolean().optional().default(true),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
+  loras: z.array(zChronoLoraWeight).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(10).optional().default(1),
 })
 
 /**
@@ -425,16 +502,16 @@ export const zChronoEditLoraGalleryPaintbrushInput = z.object({
  * Input for upscaler mode
  */
 export const zChronoEditLoraGalleryUpscalerInput = z.object({
-  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  enable_safety_checker: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
+  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
-  loras: z.array(zChronoLoraWeight).optional().default([]),
-  guidance_scale: z.number().gte(0).lte(10).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
   lora_scale: z.number().gte(0).lte(2).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  loras: z.array(zChronoLoraWeight).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(10).optional().default(1),
 })
 
 /**
@@ -443,52 +520,52 @@ export const zChronoEditLoraGalleryUpscalerInput = z.object({
  * ChronoEdit input with optional custom LoRAs.
  */
 export const zChronoEditLoraInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
-  turbo_mode: z.boolean().optional().default(true),
   enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(8),
-  num_temporal_reasoning_steps: z.int().gte(2).lte(12).optional().default(8),
-  guidance_scale: z.number().gte(0).lte(10).optional().default(1),
-  image_url: z.string(),
   enable_temporal_reasoning: z.boolean().optional().default(false),
+  image_url: z.string(),
+  turbo_mode: z.boolean().optional().default(true),
+  num_temporal_reasoning_steps: z.int().gte(2).lte(12).optional().default(8),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
+  loras: z.array(zChronoLoraWeight).optional().default([]),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
   sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
-  loras: z.array(zChronoLoraWeight).optional().default([]),
+  guidance_scale: z.number().gte(0).lte(10).optional().default(1),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(8),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * Input
  */
 export const zClarityUpscalerInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  creativity: z.number().gte(0).lte(1).optional().default(0.35),
-  image_url: z.string(),
+  prompt: z.string().optional().default('masterpiece, best quality, highres'),
   seed: z.union([z.int().gte(0), z.unknown()]).optional(),
+  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
+  image_url: z.string(),
+  creativity: z.number().gte(0).lte(1).optional().default(0.35),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(18),
   negative_prompt: z
     .string()
     .optional()
     .default('(worst quality, low quality, normal quality:2)'),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(18),
   resemblance: z.number().gte(0).lte(1).optional().default(0.6),
-  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string().optional().default('masterpiece, best quality, highres'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
 })
 
 /**
  * CodeformerInput
  */
 export const zCodeformerInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  only_center_face: z.boolean().optional().default(false),
+  upscale_factor: z.number().optional().default(2),
   fidelity: z.number().optional().default(0.5),
   face_upscale: z.boolean().optional().default(true),
   aligned: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  upscale_factor: z.number().optional().default(2),
   image_url: z.string(),
-  only_center_face: z.boolean().optional().default(false),
 })
 
 /**
@@ -526,8 +603,8 @@ export const zControlLightInput = z.object({
  */
 export const zControlLoraWeight = z.object({
   path: z.string(),
-  scale: z.union([z.record(z.string(), z.unknown()), z.number()]).optional(),
   preprocess: z.enum(['canny', 'depth', 'None']).optional().default('None'),
+  scale: z.union([z.record(z.string(), z.unknown()), z.number()]).optional(),
   control_image_url: z.string(),
 })
 
@@ -535,15 +612,15 @@ export const zControlLoraWeight = z.object({
  * ControlNet
  */
 export const zControlNet = z.object({
-  end_percentage: z.number().gte(0).lte(1).optional().default(1),
-  start_percentage: z.number().gte(0).lte(1).optional().default(0),
-  control_image_url: z.string(),
-  mask_image_url: z.string().nullish(),
   path: z.string(),
   conditioning_scale: z.number().gte(0).lte(2).optional().default(1),
+  start_percentage: z.number().gte(0).lte(1).optional().default(0),
+  end_percentage: z.number().gte(0).lte(1).optional().default(1),
   mask_threshold: z.number().gte(0.01).lte(0.99).optional().default(0.5),
-  config_url: z.union([z.string(), z.unknown()]).optional(),
+  control_image_url: z.string(),
+  mask_image_url: z.string().nullish(),
   variant: z.union([z.string(), z.unknown()]).optional(),
+  config_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -565,20 +642,22 @@ export const zControlNetType2 = z.object({
  * ControlNet
  */
 export const zControlNetType3 = z.object({
-  control_image_url: z.string(),
   conditioning_scale: z.number().gte(0).lte(2).optional().default(1),
-  path: z.string(),
-  end_percentage: z.number().gte(0).lte(1).optional().default(1),
   start_percentage: z.number().gte(0).lte(1).optional().default(0),
+  end_percentage: z.number().gte(0).lte(1).optional().default(1),
+  control_image_url: z.string(),
+  path: z.string(),
 })
 
 /**
  * ControlNetUnionInput
  */
 export const zControlNetUnionInput = z.object({
+  mask_image_url: z.string().nullish(),
   conditioning_scale: z.number().gte(0).lte(2).optional().default(1),
-  mask_threshold: z.number().gte(0.01).lte(0.99).optional().default(0.5),
   start_percentage: z.number().gte(0).lte(1).optional().default(0),
+  end_percentage: z.number().gte(0).lte(1).optional().default(1),
+  mask_threshold: z.number().gte(0.01).lte(0.99).optional().default(0.5),
   control_mode: z.enum([
     'canny',
     'tile',
@@ -589,8 +668,6 @@ export const zControlNetUnionInput = z.object({
     'low-quality',
   ]),
   control_image_url: z.string(),
-  end_percentage: z.number().gte(0).lte(1).optional().default(1),
-  mask_image_url: z.string().nullish(),
 })
 
 /**
@@ -598,9 +675,9 @@ export const zControlNetUnionInput = z.object({
  */
 export const zControlNetUnion = z.object({
   path: z.string(),
+  variant: z.union([z.string(), z.unknown()]).optional(),
   controls: z.array(zControlNetUnionInput),
   config_url: z.union([z.string(), z.unknown()]).optional(),
-  variant: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -617,51 +694,51 @@ export const zCoordinates = z.object({
  * CreativeUpscalerInput
  */
 export const zCreativeUpscalerInput = z.object({
+  num_inference_steps: z.int().gte(1).lte(200).optional().default(20),
+  image_url: z.string(),
+  shape_preservation: z.number().gte(0).lte(3).optional().default(0.25),
   prompt: z.union([z.string(), z.unknown()]).nullish(),
+  additional_embedding_url: z.string().optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(16).optional().default(7.5),
+  base_model_url: z.union([z.string(), z.unknown()]).optional(),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'blurry, low resolution, bad, ugly, low quality, pixelated, interpolated, compression artifacts, noisey, grainy',
     ),
+  override_size_limits: z.boolean().optional().default(false),
+  creativity: z.number().gte(0).lte(1).optional().default(0.5),
   prompt_suffix: z
     .string()
     .optional()
     .default(' high quality, highly detailed, high resolution, sharp'),
-  additional_embedding_url: z.string().optional(),
-  skip_ccsr: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(16).optional().default(7.5),
-  additional_lora_scale: z.number().optional().default(1),
-  base_model_url: z.union([z.string(), z.unknown()]).optional(),
-  override_size_limits: z.boolean().optional().default(false),
   enable_safety_checks: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  creativity: z.number().gte(0).lte(1).optional().default(0.5),
-  shape_preservation: z.number().gte(0).lte(3).optional().default(0.25),
-  scale: z.number().gte(1).lte(5).optional().default(2),
-  model_type: z.enum(['SD_1_5', 'SDXL']).optional().default('SD_1_5'),
+  additional_lora_scale: z.number().optional().default(1),
+  skip_ccsr: z.boolean().optional().default(false),
   detail: z.number().gte(0).lte(5).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(200).optional().default(20),
-  image_url: z.string(),
+  scale: z.number().gte(1).lte(5).optional().default(2),
   additional_lora_url: z.string().optional(),
+  model_type: z.enum(['SD_1_5', 'SDXL']).optional().default('SD_1_5'),
 })
 
 /**
  * CrystalUpscaleInput
  */
 export const zCrystalUpscalerInput = z.object({
-  image_url: z.string(),
   scale_factor: z.number().gte(1).lte(200).optional().default(2),
-  creativity: z.number().gte(0).lte(10).optional().default(0),
   output_format: z.enum(['png', 'jpg']).optional().default('jpg'),
+  image_url: z.string(),
+  creativity: z.number().gte(0).lte(10).optional().default(0),
 })
 
 /**
  * DDColorInput
  */
 export const zDdcolorInput = z.object({
-  image_url: z.string(),
   seed: z.int().optional(),
+  image_url: z.string(),
 })
 
 /**
@@ -685,16 +762,16 @@ export const zDocresInput = z.object({
  * Input
  */
 export const zDrctSuperResolutionInput = z.object({
-  image_url: z.string(),
   upscale_factor: z.int().optional().default(4),
+  image_url: z.string(),
 })
 
 /**
  * DreamOmni2Request
  */
 export const zDreamomni2EditInput = z.object({
-  image_urls: z.array(z.string()),
   prompt: z.string(),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -720,9 +797,9 @@ export const zDwposeInput = z.object({
  * EasyControlWeight
  */
 export const zEasyControlWeight = z.object({
+  control_method_url: z.string(),
   scale: z.number().gte(0).lte(2).optional().default(1),
   image_control_type: z.enum(['subject', 'spatial']),
-  control_method_url: z.string(),
   image_url: z.string(),
 })
 
@@ -735,16 +812,16 @@ export const zEasyControlWeight = z.object({
  * All fields are optional - provide what you have available.
  */
 export const zElementInput = z.object({
-  frontal_image_url: z.union([z.string(), z.unknown()]).optional(),
   reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  frontal_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * Embedding
  */
 export const zEmbedding = z.object({
-  tokens: z.array(z.string()).optional().default(['<s0>', '<s1>']),
   path: z.string(),
+  tokens: z.array(z.string()).optional().default(['<s0>', '<s1>']),
 })
 
 /**
@@ -777,9 +854,13 @@ export const zEmbedProductInput = z.object({
  * Emu35ImageEditInput
  */
 export const zEmu35ImageEditImageInput = z.object({
-  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_url: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  enable_safety_checker: z.boolean().optional().default(true),
   aspect_ratio: z
     .enum([
       'auto',
@@ -795,34 +876,33 @@ export const zEmu35ImageEditImageInput = z.object({
     ])
     .optional()
     .default('auto'),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
 })
 
 /**
  * Emu35ImageInput
  */
 export const zEmu35ImageTextToImageInput = z.object({
+  prompt: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['21:9', '16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16', '9:21'])
     .optional()
     .default('1:1'),
   sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
 })
 
 /**
  * UpscaleInput
  */
 export const zEsrganInput = z.object({
-  face: z.boolean().optional().default(false),
+  output_format: z.enum(['png', 'jpeg']).optional().default('png'),
   scale: z.number().gte(1).lte(8).optional().default(2),
+  tile: z.int().optional().default(0),
+  face: z.boolean().optional().default(false),
+  image_url: z.string(),
   model: z
     .enum([
       'RealESRGAN_x4plus',
@@ -834,9 +914,6 @@ export const zEsrganInput = z.object({
     ])
     .optional()
     .default('RealESRGAN_x4plus'),
-  image_url: z.string(),
-  output_format: z.enum(['png', 'jpeg']).optional().default('png'),
-  tile: z.int().optional().default(0),
 })
 
 /**
@@ -844,15 +921,15 @@ export const zEsrganInput = z.object({
  */
 export const zEvfSamInput = z.object({
   fill_holes: z.boolean().optional().default(false),
-  revert_mask: z.boolean().optional().default(false),
+  blur_mask: z.int().gte(0).lte(50).optional().default(0),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   use_grounding_dino: z.boolean().optional().default(false),
-  image_url: z.string(),
-  semantic_type: z.boolean().optional().default(false),
-  mask_only: z.boolean().optional().default(true),
-  blur_mask: z.int().gte(0).lte(50).optional().default(0),
   expand_mask: z.int().gte(0).lte(20).optional().default(0),
+  image_url: z.string(),
   prompt: z.string(),
+  semantic_type: z.boolean().optional().default(false),
+  revert_mask: z.boolean().optional().default(false),
+  mask_only: z.boolean().optional().default(true),
 })
 
 /**
@@ -861,78 +938,78 @@ export const zEvfSamInput = z.object({
  * Represents an image file.
  */
 export const zFalToolkitImageImageImage = z.object({
-  width: z.union([z.int(), z.unknown()]).optional(),
-  content_type: z.union([z.string(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
-  file_size: z.union([z.int(), z.unknown()]).optional(),
-  url: z.string(),
   height: z.union([z.int(), z.unknown()]).optional(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+  url: z.string(),
+  width: z.union([z.int(), z.unknown()]).optional(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * LoRAInput
  */
 export const zFalAiFlux2KleinLoRaInput = z.object({
-  scale: z.number().gte(0).lte(4).optional().default(1),
   path: z.string(),
+  scale: z.number().gte(0).lte(4).optional().default(1),
 })
 
 /**
  * Input
  */
 export const zFashnTryonV15Input = z.object({
-  mode: z
-    .enum(['performance', 'balanced', 'quality'])
-    .optional()
-    .default('balanced'),
-  garment_image: z.string(),
-  num_samples: z.int().gte(1).lte(4).optional().default(1),
-  moderation_level: z
-    .enum(['none', 'permissive', 'conservative'])
-    .optional()
-    .default('permissive'),
-  output_format: z.enum(['png', 'jpeg']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
   category: z
     .enum(['tops', 'bottoms', 'one-pieces', 'auto'])
     .optional()
     .default('auto'),
-  segmentation_free: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  moderation_level: z
+    .enum(['none', 'permissive', 'conservative'])
+    .optional()
+    .default('permissive'),
   garment_photo_type: z
     .enum(['auto', 'model', 'flat-lay'])
     .optional()
     .default('auto'),
   model_image: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg']).optional().default('png'),
+  mode: z
+    .enum(['performance', 'balanced', 'quality'])
+    .optional()
+    .default('balanced'),
+  sync_mode: z.boolean().optional().default(false),
+  num_samples: z.int().gte(1).lte(4).optional().default(1),
+  segmentation_free: z.boolean().optional().default(true),
+  garment_image: z.string(),
 })
 
 /**
  * V16Input
  */
 export const zFashnTryonV16Input = z.object({
-  mode: z
-    .enum(['performance', 'balanced', 'quality'])
-    .optional()
-    .default('balanced'),
-  garment_image: z.string(),
-  num_samples: z.int().gte(1).lte(4).optional().default(1),
-  moderation_level: z
-    .enum(['none', 'permissive', 'conservative'])
-    .optional()
-    .default('permissive'),
-  output_format: z.enum(['png', 'jpeg']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
   category: z
     .enum(['tops', 'bottoms', 'one-pieces', 'auto'])
     .optional()
     .default('auto'),
-  segmentation_free: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  moderation_level: z
+    .enum(['none', 'permissive', 'conservative'])
+    .optional()
+    .default('permissive'),
   garment_photo_type: z
     .enum(['auto', 'model', 'flat-lay'])
     .optional()
     .default('auto'),
   model_image: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg']).optional().default('png'),
+  mode: z
+    .enum(['performance', 'balanced', 'quality'])
+    .optional()
+    .default('balanced'),
+  sync_mode: z.boolean().optional().default(false),
+  num_samples: z.int().gte(1).lte(4).optional().default(1),
+  segmentation_free: z.boolean().optional().default(true),
+  garment_image: z.string(),
 })
 
 /**
@@ -976,15 +1053,14 @@ export const zFiboEditColorizeInput = z.object({
  * EraseByTextInput
  */
 export const zFiboEditEraseByTextInput = z.object({
-  image_url: z.string(),
   object_name: z.string(),
+  image_url: z.string(),
 })
 
 /**
  * RelightInput
  */
 export const zFiboEditRelightInput = z.object({
-  image_url: z.string(),
   light_direction: z.union([
     z.enum(['front', 'side', 'bottom', 'top-down']),
     z.unknown(),
@@ -1004,6 +1080,7 @@ export const zFiboEditRelightInput = z.object({
     'soft bokeh lighting',
     'harsh studio lighting',
   ]),
+  image_url: z.string(),
 })
 
 /**
@@ -1018,8 +1095,8 @@ export const zFiboEditReplaceObjectByTextInput = z.object({
  * ReseasonInput
  */
 export const zFiboEditReseasonInput = z.object({
-  image_url: z.string(),
   season: z.enum(['spring', 'summer', 'autumn', 'winter']),
+  image_url: z.string(),
 })
 
 /**
@@ -1033,7 +1110,6 @@ export const zFiboEditRestoreInput = z.object({
  * RestyletInput
  */
 export const zFiboEditRestyleInput = z.object({
-  image_url: z.string(),
   style: z.enum([
     '3D Render',
     'Cubism',
@@ -1049,14 +1125,15 @@ export const zFiboEditRestyleInput = z.object({
     'Cross Etching',
     'Wood Cut',
   ]),
+  image_url: z.string(),
 })
 
 /**
  * RewriteTextInput
  */
 export const zFiboEditRewriteTextInput = z.object({
-  image_url: z.string(),
   new_text: z.string(),
+  image_url: z.string(),
 })
 
 /**
@@ -1070,10 +1147,38 @@ export const zFiboEditSketchToColoredImageInput = z.object({
  * File
  */
 export const zFile = z.object({
-  content_type: z.union([z.string(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
-  file_size: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * ImageOutput
+ */
+export const zAgentUni1V1EditOutput = z.object({
+  images: z.array(zFile),
+})
+
+/**
+ * ImageOutput
+ */
+export const zAgentUni1V1MaxEditOutput = z.object({
+  images: z.array(zFile),
+})
+
+/**
+ * ImageOutput
+ */
+export const zAgentUni1V1MaxOutput = z.object({
+  images: z.array(zFile),
+})
+
+/**
+ * ImageOutput
+ */
+export const zAgentUni1V1TextToImageOutput = z.object({
+  images: z.array(zFile),
 })
 
 /**
@@ -1101,86 +1206,86 @@ export const zFashnTryonV16Output = z.object({
  * FILMImageInput
  */
 export const zFilmInput = z.object({
-  sync_mode: z.boolean().optional().default(false),
-  start_image_url: z.string(),
-  end_image_url: z.string(),
-  output_type: z.enum(['images', 'video']).optional().default('images'),
-  include_end: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  output_type: z.enum(['images', 'video']).optional().default('images'),
+  include_end: z.boolean().optional().default(false),
+  end_image_url: z.string(),
+  include_start: z.boolean().optional().default(false),
+  fps: z.int().gte(1).lte(60).optional().default(8),
   num_frames: z.int().gte(1).lte(64).optional().default(1),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  include_start: z.boolean().optional().default(false),
+  start_image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
-  fps: z.int().gte(1).lte(60).optional().default(8),
 })
 
 /**
  * BBoxEraseRequest
  */
 export const zFinegrainEraserBboxInput = z.object({
-  seed: z.union([z.int().gte(0).lte(999), z.unknown()]).optional(),
   mode: z
     .enum(['express', 'standard', 'premium'])
     .optional()
     .default('standard'),
   image_url: z.string(),
   box_prompts: z.array(zBoxPromptBase),
+  seed: z.union([z.int().gte(0).lte(999), z.unknown()]).optional(),
 })
 
 /**
  * EraseOutput
  */
 export const zFinegrainEraserBboxOutput = z.object({
-  image: zFile,
   used_seed: z.int(),
+  image: zFile,
 })
 
 /**
  * PromptEraseRequest
  */
 export const zFinegrainEraserInput = z.object({
-  seed: z.union([z.int().gte(0).lte(999), z.unknown()]).optional(),
   prompt: z.string(),
   mode: z
     .enum(['express', 'standard', 'premium'])
     .optional()
     .default('standard'),
   image_url: z.string(),
+  seed: z.union([z.int().gte(0).lte(999), z.unknown()]).optional(),
 })
 
 /**
  * MaskEraseRequest
  */
 export const zFinegrainEraserMaskInput = z.object({
-  seed: z.union([z.int().gte(0).lte(999), z.unknown()]).optional(),
-  mask_url: z.string(),
   mode: z
     .enum(['express', 'standard', 'premium'])
     .optional()
     .default('standard'),
   image_url: z.string(),
+  mask_url: z.string(),
+  seed: z.union([z.int().gte(0).lte(999), z.unknown()]).optional(),
 })
 
 /**
  * EraseOutput
  */
 export const zFinegrainEraserMaskOutput = z.object({
-  image: zFile,
   used_seed: z.int(),
+  image: zFile,
 })
 
 /**
  * EraseOutput
  */
 export const zFinegrainEraserOutput = z.object({
-  image: zFile,
   used_seed: z.int(),
+  image: zFile,
 })
 
 /**
@@ -1242,87 +1347,87 @@ export const zFloweditInput = z.object({
   src_guidance_scale: z
     .union([z.number().gte(0).lte(30), z.unknown()])
     .optional(),
-  n_max: z.union([z.int(), z.unknown()]).optional(),
-  n_avg: z.union([z.int(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  target_prompt: z.string(),
-  source_prompt: z.string(),
   n_min: z.union([z.int(), z.unknown()]).optional(),
-  num_inference_steps: z
-    .union([z.int().gte(1).lte(50), z.unknown()])
-    .optional(),
   image_url: z.string(),
+  target_prompt: z.string(),
+  n_avg: z.union([z.int(), z.unknown()]).optional(),
   tar_guidance_scale: z
     .union([z.number().gte(0).lte(30), z.unknown()])
     .optional(),
+  n_max: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z
+    .union([z.int().gte(1).lte(50), z.unknown()])
+    .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  source_prompt: z.string(),
 })
 
 /**
  * BaseImageToInput
  */
 export const zFlux1DevImageToImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * BaseKreaImageToInput
  */
 export const zFlux1KreaImageToImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * BaseSRPOImageToInput
  */
 export const zFlux1SrpoImageToImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * RealtimeEditInput
  */
 export const zFlux2KleinRealtimeInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_interpolation: z.boolean().optional().default(false),
-  image_size: z.enum(['square', 'square_hd']).optional().default('square'),
-  output_feedback_strength: z.number().gte(0).lte(1).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(8).optional().default(3),
-  schedule_mu: z.number().gte(0.3).lte(2.5).optional().default(2.3),
+  image_size: z.enum(['square', 'square_hd']).optional().default('square'),
   image_url: z.string(),
+  schedule_mu: z.number().gte(0.3).lte(2.5).optional().default(2.3),
+  enable_interpolation: z.boolean().optional().default(false),
   prompt: z
     .string()
     .optional()
     .default('Turn this into "Living oil painting, melting gold and sapphire"'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_feedback_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
@@ -1344,17 +1449,17 @@ export const zFlux2ProOutpaintInput = z.object({
  * BaseImageToInput
  */
 export const zFluxDevImageToImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -1395,34 +1500,35 @@ export const zFluxKontextDevInput = z.object({
  * BaseKreaImageToInput
  */
 export const zFluxKreaImageToImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * FluxKontextInput
  */
 export const zFluxProKontextInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
   enhance_prompt: z.boolean().optional().default(false),
+  image_url: z.string().min(1),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_url: z.string().min(1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1439,24 +1545,24 @@ export const zFluxProKontextInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * FluxKontextInput
  */
 export const zFluxProKontextMaxInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
   enhance_prompt: z.boolean().optional().default(false),
+  image_url: z.string().min(1),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_url: z.string().min(1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1473,13 +1579,24 @@ export const zFluxProKontextMaxInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * FluxKontextMultiInput
  */
 export const zFluxProKontextMaxMultiInput = z.object({
+  enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  prompt: z.string(),
+  image_urls: z.array(z.string()),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1496,28 +1613,16 @@ export const zFluxProKontextMaxMultiInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  enhance_prompt: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * FluxKontextOutput
  */
 export const zFluxProKontextMaxOutput = z.object({
-  images: z.array(zFalToolkitImageImageImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zFalToolkitImageImageImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -1526,26 +1631,38 @@ export const zFluxProKontextMaxOutput = z.object({
  */
 export const zFluxProKontextMaxTextToImageInput = z.object({
   enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   aspect_ratio: z
     .enum(['21:9', '16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16', '9:21'])
     .optional()
     .default('1:1'),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * FluxKontextMultiInput
  */
 export const zFluxProKontextMultiInput = z.object({
+  enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  prompt: z.string(),
+  image_urls: z.array(z.string()),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1562,28 +1679,16 @@ export const zFluxProKontextMultiInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  enhance_prompt: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * FluxKontextOutput
  */
 export const zFluxProKontextOutput = z.object({
-  images: z.array(zFalToolkitImageImageImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zFalToolkitImageImageImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -1592,40 +1697,41 @@ export const zFluxProKontextOutput = z.object({
  */
 export const zFluxProKontextTextToImageInput = z.object({
   enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   aspect_ratio: z
     .enum(['21:9', '16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16', '9:21'])
     .optional()
     .default('1:1'),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * FluxProUltraTextToImageFinetunedInput
  */
 export const zFluxProV11UltraFinetunedInput = z.object({
-  finetune_id: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   enhance_prompt: z.boolean().optional().default(false),
+  finetune_id: z.string(),
   raw: z.boolean().optional().default(false),
-  image_prompt_strength: z.number().gte(0).lte(1).optional().default(0.1),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string(),
+  finetune_strength: z.number().gte(0).lte(2),
+  image_prompt_strength: z.number().gte(0).lte(1).optional().default(0.1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1642,26 +1748,25 @@ export const zFluxProV11UltraFinetunedInput = z.object({
       z.string(),
     ])
     .optional(),
-  finetune_strength: z.number().gte(0).lte(2),
 })
 
 /**
  * FluxProUltraTextToImageInput
  */
 export const zFluxProV11UltraInput = z.object({
-  image_prompt_strength: z.number().gte(0).lte(1).optional().default(0.1),
   enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   raw: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
+  prompt: z.string(),
+  image_prompt_strength: z.number().gte(0).lte(1).optional().default(0.1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1684,19 +1789,19 @@ export const zFluxProV11UltraInput = z.object({
  * FluxProUltraTextToImageInputRedux
  */
 export const zFluxProV11UltraReduxInput = z.object({
-  image_prompt_strength: z.number().gte(0).lte(1).optional().default(0.1),
   enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
   raw: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  image_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
+  prompt: z.string().optional().default(''),
+  image_prompt_strength: z.number().gte(0).lte(1).optional().default(0.1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1723,31 +1828,31 @@ export const zFluxProV11UltraReduxInput = z.object({
  * FLUX Erase removes content from images using a black/white mask.
  */
 export const zFluxProV1EraseInput = z.object({
-  image_url: z.string(),
   dilate_pixels: z.int().gte(0).lte(100).optional().default(10),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
   mask_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
 })
 
 /**
  * FluxProFillFinetunedInput
  */
 export const zFluxProV1FillFinetunedInput = z.object({
-  finetune_id: z.string(),
   enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  finetune_id: z.string(),
+  mask_url: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  finetune_strength: z.number().gte(0).lte(2),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  finetune_strength: z.number().gte(0).lte(2),
   image_url: z.string(),
-  mask_url: z.string(),
 })
 
 /**
@@ -1755,47 +1860,47 @@ export const zFluxProV1FillFinetunedInput = z.object({
  */
 export const zFluxProV1FillInput = z.object({
   enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  mask_url: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   image_url: z.string(),
-  mask_url: z.string(),
 })
 
 /**
  * FluxProVtoInput
  */
 export const zFluxProV1VtoInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  human_image_url: z.string(),
   num_inference_steps: z.int().gte(1).lte(4).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  human_image_url: z.string(),
   garment_image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * BaseSRPOImageToInput
  */
 export const zFluxSrpoImageToImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
+  sync_mode: z.boolean().optional().default(false),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -1803,28 +1908,21 @@ export const zFluxSrpoImageToImageInput = z.object({
  */
 export const zFluxVisionUpscalerInput = z.object({
   image_url: z.string(),
-  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
   steps: z.int().gte(4).lte(50).optional().default(20),
   guidance: z.number().gte(1).lte(4).optional().default(1),
-  creativity: z.number().gte(0).lte(1).optional().default(0.3),
   enable_safety_checker: z.boolean().optional().default(true),
+  creativity: z.number().gte(0).lte(1).optional().default(0.3),
 })
 
 /**
  * NanoBananaImageToImageInput
  */
 export const zGemini25FlashImageEditInput = z.object({
-  image_urls: z.array(z.string()),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  limit_generations: z.boolean().optional().default(false),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('4'),
   prompt: z.string().min(3).max(50000),
-  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  limit_generations: z.boolean().optional().default(false),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1843,6 +1941,13 @@ export const zGemini25FlashImageEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  image_urls: z.array(z.string()),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('4'),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -1850,15 +1955,9 @@ export const zGemini25FlashImageEditInput = z.object({
  * NanoBananaTextToImageInput
  */
 export const zGemini25FlashImageInput = z.object({
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  limit_generations: z.boolean().optional().default(false),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('4'),
   prompt: z.string().min(3).max(50000),
-  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  limit_generations: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum([
       '21:9',
@@ -1874,6 +1973,12 @@ export const zGemini25FlashImageInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  sync_mode: z.boolean().optional().default(false),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('4'),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -1881,21 +1986,13 @@ export const zGemini25FlashImageInput = z.object({
  * NanoBanana2ImageToImageInput
  */
 export const zGemini31FlashImagePreviewEditInput = z.object({
-  thinking_level: z
-    .union([z.enum(['minimal', 'high']), z.unknown()])
-    .optional(),
-  prompt: z.string().min(3).max(50000),
+  limit_generations: z.boolean().optional().default(true),
   resolution: z.enum(['0.5K', '1K', '2K', '4K']).optional().default('1K'),
   enable_web_search: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_urls: z.array(z.string()),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1919,27 +2016,26 @@ export const zGemini31FlashImagePreviewEditInput = z.object({
     ])
     .optional(),
   system_prompt: z.string().max(50000).optional().default(''),
-  limit_generations: z.boolean().optional().default(true),
+  thinking_level: z
+    .union([z.enum(['minimal', 'high']), z.unknown()])
+    .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().min(3).max(50000),
+  video_url: z.union([z.string(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  image_urls: z.array(z.string()).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  pdf_url: z.union([z.string(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * NanoBanana2TextToImageInput
  */
 export const zGemini31FlashImagePreviewInput = z.object({
-  thinking_level: z
-    .union([z.enum(['minimal', 'high']), z.unknown()])
-    .optional(),
-  prompt: z.string().min(3).max(50000),
+  limit_generations: z.boolean().optional().default(true),
   resolution: z.enum(['0.5K', '1K', '2K', '4K']).optional().default('1K'),
-  enable_web_search: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('4'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1962,19 +2058,31 @@ export const zGemini31FlashImagePreviewInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('4'),
+  enable_web_search: z.boolean().optional().default(false),
   system_prompt: z.string().max(50000).optional().default(''),
-  limit_generations: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  thinking_level: z
+    .union([z.enum(['minimal', 'high']), z.unknown()])
+    .optional(),
+  prompt: z.string().min(3).max(50000),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * NanoBananaImageToImageInput
  */
 export const zGemini3ProImagePreviewEditInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string().min(3).max(50000),
   enable_web_search: z.boolean().optional().default(false),
-  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  sync_mode: z.boolean().optional().default(false),
   aspect_ratio: z
     .union([
       z.enum([
@@ -1993,32 +2101,26 @@ export const zGemini3ProImagePreviewEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
+  limit_generations: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  image_urls: z.array(z.string()),
+  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   system_prompt: z.string().max(50000).optional().default(''),
-  limit_generations: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * NanoBananaTextToImageInput
  */
 export const zGemini3ProImagePreviewInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string().min(3).max(50000),
-  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   enable_web_search: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('4'),
   aspect_ratio: z
     .union([
       z.enum([
@@ -2037,8 +2139,26 @@ export const zGemini3ProImagePreviewInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  system_prompt: z.string().max(50000).optional().default(''),
   limit_generations: z.boolean().optional().default(false),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('4'),
+  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
+  system_prompt: z.string().max(50000).optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+})
+
+/**
+ * GenFillInput
+ */
+export const zGenfillV2Input = z.object({
+  seed: z.int().optional().default(5555),
+  image_url: z.string(),
+  steps_num: z.int().gte(20).lte(50).optional().default(30),
+  mask_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  instruction: z.string(),
 })
 
 /**
@@ -2046,8 +2166,8 @@ export const zGemini3ProImagePreviewInput = z.object({
  */
 export const zGhiblifyInput = z.object({
   enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2095,39 +2215,39 @@ export const zGptImage15Input = z.object({
  * EditImageRequest
  */
 export const zGptImage1EditImageInput = z.object({
-  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
-  sync_mode: z.boolean().optional().default(false),
-  input_fidelity: z.enum(['low', 'high']).optional().default('high'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  image_urls: z.array(z.string()),
   background: z
     .enum(['auto', 'transparent', 'opaque'])
     .optional()
     .default('auto'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  input_fidelity: z.enum(['low', 'high']).optional().default('high'),
   prompt: z.string().min(2),
+  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   image_size: z
     .enum(['auto', '1024x1024', '1536x1024', '1024x1536'])
     .optional()
     .default('auto'),
-  image_urls: z.array(z.string()),
+  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * EditImageRequestMini
  */
 export const zGptImage1MiniEditInput = z.object({
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  image_urls: z.array(z.string()),
-  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string().min(2),
-  sync_mode: z.boolean().optional().default(false),
-  image_size: z
-    .enum(['auto', '1024x1024', '1536x1024', '1024x1536'])
-    .optional()
-    .default('auto'),
   background: z
     .enum(['auto', 'transparent', 'opaque'])
+    .optional()
+    .default('auto'),
+  image_urls: z.array(z.string()),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string().min(2),
+  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  image_size: z
+    .enum(['auto', '1024x1024', '1536x1024', '1024x1536'])
     .optional()
     .default('auto'),
 })
@@ -2136,9 +2256,7 @@ export const zGptImage1MiniEditInput = z.object({
  * TextToImageRequestMini
  */
 export const zGptImage1MiniInput = z.object({
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
-  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
+  prompt: z.string().min(2),
   background: z
     .enum(['auto', 'transparent', 'opaque'])
     .optional()
@@ -2147,27 +2265,29 @@ export const zGptImage1MiniInput = z.object({
     .enum(['auto', '1024x1024', '1536x1024', '1024x1536'])
     .optional()
     .default('auto'),
-  prompt: z.string().min(2),
+  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
+  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * TextToImageRequest
  */
 export const zGptImage1TextToImageInput = z.object({
-  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   prompt: z.string().min(2),
-  image_size: z
-    .enum(['auto', '1024x1024', '1536x1024', '1024x1536'])
-    .optional()
-    .default('auto'),
   background: z
     .enum(['auto', 'transparent', 'opaque'])
     .optional()
     .default('auto'),
-  sync_mode: z.boolean().optional().default(false),
+  image_size: z
+    .enum(['auto', '1024x1024', '1536x1024', '1024x1536'])
+    .optional()
+    .default('auto'),
+  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('auto'),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -2175,10 +2295,10 @@ export const zGptImage1TextToImageInput = z.object({
  */
 export const zGrokImagineImageEditInput = z.object({
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
-  prompt: z.string().max(8000),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   resolution: z.enum(['1k', '2k']).optional().default('1k'),
+  prompt: z.string().max(8000),
   sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_urls: z.array(z.string()).optional(),
   aspect_ratio: z
     .enum([
@@ -2206,9 +2326,9 @@ export const zGrokImagineImageEditInput = z.object({
  */
 export const zGrokImagineImageInput = z.object({
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
+  resolution: z.enum(['1k', '2k']).optional().default('1k'),
   prompt: z.string().max(8000),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  resolution: z.enum(['1k', '2k']).optional().default('1k'),
   sync_mode: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum([
@@ -2235,10 +2355,10 @@ export const zGrokImagineImageInput = z.object({
  */
 export const zGrokImagineImageQualityEditInput = z.object({
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
-  prompt: z.string().max(8000),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   resolution: z.enum(['1k', '2k']).optional().default('1k'),
+  prompt: z.string().max(8000),
   sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_urls: z.array(z.string()).optional(),
   aspect_ratio: z
     .enum([
@@ -2266,9 +2386,9 @@ export const zGrokImagineImageQualityEditInput = z.object({
  */
 export const zGrokImagineImageQualityTextToImageInput = z.object({
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
+  resolution: z.enum(['1k', '2k']).optional().default('1k'),
   prompt: z.string().max(8000),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  resolution: z.enum(['1k', '2k']).optional().default('1k'),
   sync_mode: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum([
@@ -2302,76 +2422,76 @@ export const zGuidanceInput = z.object({
       'controlnet_color_grid',
     ])
     .optional(),
-  image_url: z.string(),
   scale: z.number().gte(0).lte(1).optional().default(1),
+  image_url: z.string(),
 })
 
 /**
  * TextToImageRequest
  */
 export const zBriaTextToImageBaseInput = z.object({
-  prompt: z.string().min(1),
-  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
-  prompt_enhancement: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  medium: z.enum(['photography', 'art']).optional(),
-  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
-  guidance: z.array(zGuidanceInput).optional().default([]),
   aspect_ratio: z
     .enum(['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9'])
     .optional()
     .default('1:1'),
-  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
+  prompt_enhancement: z.boolean().optional().default(false),
+  prompt: z.string().min(1),
+  guidance: z.array(zGuidanceInput).optional().default([]),
+  medium: z.enum(['photography', 'art']).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
   sync_mode: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
 })
 
 /**
  * FastTextToImageRequest
  */
 export const zBriaTextToImageFastInput = z.object({
-  prompt: z.string().min(1),
-  num_inference_steps: z.int().gte(4).lte(10).optional().default(8),
-  prompt_enhancement: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  medium: z.enum(['photography', 'art']).optional(),
-  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
-  guidance: z.array(zGuidanceInput).optional().default([]),
   aspect_ratio: z
     .enum(['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9'])
     .optional()
     .default('1:1'),
-  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
+  prompt_enhancement: z.boolean().optional().default(false),
+  prompt: z.string().min(1),
+  guidance: z.array(zGuidanceInput).optional().default([]),
+  medium: z.enum(['photography', 'art']).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
   sync_mode: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(4).lte(10).optional().default(8),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
 })
 
 /**
  * TextToImageRequest
  */
 export const zBriaTextToImageHdInput = z.object({
-  prompt: z.string().min(1),
-  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
-  prompt_enhancement: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  medium: z.enum(['photography', 'art']).optional(),
-  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
-  guidance: z.array(zGuidanceInput).optional().default([]),
   aspect_ratio: z
     .enum(['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9'])
     .optional()
     .default('1:1'),
-  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int().gte(0).lte(2147483647), z.unknown()]).optional(),
+  prompt_enhancement: z.boolean().optional().default(false),
+  prompt: z.string().min(1),
+  guidance: z.array(zGuidanceInput).optional().default([]),
+  medium: z.enum(['photography', 'art']).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
   sync_mode: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
 })
 
 /**
  * ImageToPanoramaRequest
  */
 export const zHunyuanWorldInput = z.object({
-  prompt: z.string(),
   image_url: z.string(),
+  prompt: z.string(),
 })
 
 /**
@@ -2402,13 +2522,17 @@ export const zIdeogramCharacterRemixOutput = z.object({
  * GenerateInput
  */
 export const zIdeogramCustomModelsGenerateInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
+  negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
   expand_prompt: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
+  prompt: z.string().min(1),
+  model_id: z.string().min(1),
   aspect_ratio: z
     .enum([
       '1:3',
@@ -2429,18 +2553,14 @@ export const zIdeogramCustomModelsGenerateInput = z.object({
     ])
     .optional()
     .default('1:1'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().min(1),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  model_id: z.string().min(1),
 })
 
 /**
  * GenerateOutput
  */
 export const zIdeogramCustomModelsGenerateOutput = z.object({
-  seed: z.int(),
   images: z.array(zFile),
+  seed: z.int(),
 })
 
 /**
@@ -2462,13 +2582,13 @@ export const zIdeogramRemoveBackgroundOutput = z.object({
  * UpscaleImageInput
  */
 export const zIdeogramUpscaleInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(false),
-  detail: z.int().gte(1).lte(100).optional().default(50),
   resemblance: z.int().gte(1).lte(100).optional().default(50),
+  detail: z.int().gte(1).lte(100).optional().default(50),
   image_url: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(false),
 })
 
 /**
@@ -2483,9 +2603,10 @@ export const zIdeogramUpscaleOutput = z.object({
  * BaseTextToImageInput
  */
 export const zIdeogramV2aInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  expand_prompt: z.boolean().optional().default(true),
+  style: z
+    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
+    .optional()
+    .default('auto'),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2502,11 +2623,10 @@ export const zIdeogramV2aInput = z.object({
     ])
     .optional()
     .default('1:1'),
-  style: z
-    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
-    .optional()
-    .default('auto'),
   sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  expand_prompt: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2521,10 +2641,6 @@ export const zIdeogramV2aOutput = z.object({
  * RemixImageInput
  */
 export const zIdeogramV2aRemixInput = z.object({
-  prompt: z.string(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2541,12 +2657,16 @@ export const zIdeogramV2aRemixInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  sync_mode: z.boolean().optional().default(false),
   expand_prompt: z.boolean().optional().default(true),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
   style: z
     .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
     .optional()
     .default('auto'),
-  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2561,9 +2681,10 @@ export const zIdeogramV2aRemixOutput = z.object({
  * BaseTextToImageInput
  */
 export const zIdeogramV2aTurboInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  expand_prompt: z.boolean().optional().default(true),
+  style: z
+    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
+    .optional()
+    .default('auto'),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2580,11 +2701,10 @@ export const zIdeogramV2aTurboInput = z.object({
     ])
     .optional()
     .default('1:1'),
-  style: z
-    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
-    .optional()
-    .default('auto'),
   sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  expand_prompt: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2599,10 +2719,6 @@ export const zIdeogramV2aTurboOutput = z.object({
  * RemixImageInput
  */
 export const zIdeogramV2aTurboRemixInput = z.object({
-  prompt: z.string(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2619,12 +2735,16 @@ export const zIdeogramV2aTurboRemixInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  sync_mode: z.boolean().optional().default(false),
   expand_prompt: z.boolean().optional().default(true),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
   style: z
     .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
     .optional()
     .default('auto'),
-  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2640,15 +2760,15 @@ export const zIdeogramV2aTurboRemixOutput = z.object({
  */
 export const zIdeogramV2EditInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  expand_prompt: z.boolean().optional().default(true),
-  mask_url: z.string(),
   style: z
     .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
     .optional()
     .default('auto'),
   image_url: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  expand_prompt: z.boolean().optional().default(true),
+  mask_url: z.string(),
 })
 
 /**
@@ -2664,8 +2784,10 @@ export const zIdeogramV2EditOutput = z.object({
  */
 export const zIdeogramV2Input = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  expand_prompt: z.boolean().optional().default(true),
+  style: z
+    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
+    .optional()
+    .default('auto'),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2682,12 +2804,10 @@ export const zIdeogramV2Input = z.object({
     ])
     .optional()
     .default('1:1'),
-  negative_prompt: z.string().optional().default(''),
-  style: z
-    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
-    .optional()
-    .default('auto'),
   sync_mode: z.boolean().optional().default(false),
+  expand_prompt: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  prompt: z.string(),
 })
 
 /**
@@ -2702,10 +2822,6 @@ export const zIdeogramV2Output = z.object({
  * RemixImageInput
  */
 export const zIdeogramV2RemixInput = z.object({
-  prompt: z.string(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2722,12 +2838,16 @@ export const zIdeogramV2RemixInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  sync_mode: z.boolean().optional().default(false),
   expand_prompt: z.boolean().optional().default(true),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
   style: z
     .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
     .optional()
     .default('auto'),
-  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2743,15 +2863,15 @@ export const zIdeogramV2RemixOutput = z.object({
  */
 export const zIdeogramV2TurboEditInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  expand_prompt: z.boolean().optional().default(true),
-  mask_url: z.string(),
   style: z
     .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
     .optional()
     .default('auto'),
   image_url: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  expand_prompt: z.boolean().optional().default(true),
+  mask_url: z.string(),
 })
 
 /**
@@ -2767,8 +2887,10 @@ export const zIdeogramV2TurboEditOutput = z.object({
  */
 export const zIdeogramV2TurboInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  expand_prompt: z.boolean().optional().default(true),
+  style: z
+    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
+    .optional()
+    .default('auto'),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2785,12 +2907,10 @@ export const zIdeogramV2TurboInput = z.object({
     ])
     .optional()
     .default('1:1'),
-  negative_prompt: z.string().optional().default(''),
-  style: z
-    .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
-    .optional()
-    .default('auto'),
   sync_mode: z.boolean().optional().default(false),
+  expand_prompt: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  prompt: z.string(),
 })
 
 /**
@@ -2805,10 +2925,6 @@ export const zIdeogramV2TurboOutput = z.object({
  * RemixImageInput
  */
 export const zIdeogramV2TurboRemixInput = z.object({
-  prompt: z.string(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum([
       '10:16',
@@ -2825,12 +2941,16 @@ export const zIdeogramV2TurboRemixInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  sync_mode: z.boolean().optional().default(false),
   expand_prompt: z.boolean().optional().default(true),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
   style: z
     .enum(['auto', 'general', 'realistic', 'design', 'render_3D', 'anime'])
     .optional()
     .default('auto'),
-  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2853,12 +2973,10 @@ export const zIdeogramV3EditOutput = z.object({
  * TransparentInputV3
  */
 export const zIdeogramV3GenerateTransparentInput = z.object({
-  prompt: z.string(),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum([
       '1:3',
@@ -2879,10 +2997,12 @@ export const zIdeogramV3GenerateTransparentInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  sync_mode: z.boolean().optional().default(false),
   expand_prompt: z.boolean().optional().default(true),
   negative_prompt: z.string().optional().default(''),
   num_images: z.int().gte(1).lte(8).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
 })
 
 /**
@@ -2897,32 +3017,32 @@ export const zIdeogramV3GenerateTransparentOutput = z.object({
  * LayerizeDesignInputV3
  */
 export const zIdeogramV3LayerizeTextInput = z.object({
-  font_name_body: z.union([z.string(), z.unknown()]).optional(),
-  font_name_h1: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  font_file_small_url: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
-  font_file_h1_url: z.union([z.string(), z.unknown()]).optional(),
-  font_name_small: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  font_name_h2: z.union([z.string(), z.unknown()]).optional(),
-  font_file_h2_url: z.union([z.string(), z.unknown()]).optional(),
   font_file_body_url: z.union([z.string(), z.unknown()]).optional(),
+  font_name_h2: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   sync_mode: z.boolean().optional().default(false),
+  font_name_h1: z.union([z.string(), z.unknown()]).optional(),
+  font_name_small: z.union([z.string(), z.unknown()]).optional(),
+  font_file_h2_url: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.string(),
+  font_file_small_url: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  font_name_body: z.union([z.string(), z.unknown()]).optional(),
+  font_file_h1_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * LayerizeDesignOutputV3
  */
 export const zIdeogramV3LayerizeTextOutput = z.object({
-  image: zFile,
-  prompt: z.string(),
-  image_layers: z.array(z.record(z.string(), z.unknown())).optional(),
-  seed: z.int(),
+  text_html: z.union([z.string(), z.unknown()]).optional(),
   text_containers: z
     .union([z.array(z.record(z.string(), z.unknown())), z.unknown()])
     .optional(),
-  text_html: z.union([z.string(), z.unknown()]).optional(),
+  image: zFile,
+  image_layers: z.array(z.record(z.string(), z.unknown())).optional(),
+  prompt: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -2964,9 +3084,9 @@ export const zIdeogramV3ReplaceBackgroundOutput = z.object({
  */
 export const zImage = z.object({
   file_size: z.union([z.int(), z.unknown()]).optional(),
-  width: z.union([z.int(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
+  width: z.union([z.int(), z.unknown()]).optional(),
   height: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
 })
@@ -2975,9 +3095,9 @@ export const zImage = z.object({
  * Output
  */
 export const zAuraFlowOutput = z.object({
-  seed: z.int(),
   images: z.array(zImage),
   prompt: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -3001,9 +3121,9 @@ export const zBackgroundRemovalOutput = z.object({
  */
 export const zBagelEditOutput = z.object({
   timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
   images: z.array(zImage),
   has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
   seed: z.int(),
 })
 
@@ -3012,9 +3132,9 @@ export const zBagelEditOutput = z.object({
  */
 export const zBagelOutput = z.object({
   timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
   images: z.array(zImage),
   has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
   seed: z.int(),
 })
 
@@ -3027,12 +3147,21 @@ export const zBenV2ImageOutput = z.object({
 })
 
 /**
+ * ImageOutput
+ */
+export const zBerniniREditImageOutput = z.object({
+  seed: z.int(),
+  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+  image: zImage,
+})
+
+/**
  * Output
  */
 export const zBitdanceOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImage),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
   prompt: z.string(),
 })
 
@@ -3204,10 +3333,10 @@ export const zCodeformerOutput = z.object({
  * ImageOutput
  */
 export const zCogview4Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  timings: z.record(z.string(), z.number()),
   images: z.array(zImage),
 })
 
@@ -3303,8 +3432,8 @@ export const zFiboBbqPreviewGenerateOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditAddObjectByTextOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3312,8 +3441,8 @@ export const zFiboEditAddObjectByTextOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditBlendOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3321,8 +3450,8 @@ export const zFiboEditBlendOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditColorizeOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3330,8 +3459,8 @@ export const zFiboEditColorizeOutput = z.object({
  * FiboEditOutputModel
  */
 export const zFiboEditEditOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3339,8 +3468,8 @@ export const zFiboEditEditOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditEraseByTextOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3348,8 +3477,8 @@ export const zFiboEditEraseByTextOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditRelightOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3357,8 +3486,8 @@ export const zFiboEditRelightOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditReplaceObjectByTextOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3366,8 +3495,8 @@ export const zFiboEditReplaceObjectByTextOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditReseasonOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3375,8 +3504,8 @@ export const zFiboEditReseasonOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditRestoreOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3384,8 +3513,8 @@ export const zFiboEditRestoreOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditRestyleOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3393,8 +3522,8 @@ export const zFiboEditRestyleOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditRewriteTextOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3402,8 +3531,8 @@ export const zFiboEditRewriteTextOutput = z.object({
  * FiboEditExtraEPOutputModel
  */
 export const zFiboEditSketchToColoredImageOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
   image: zImage,
 })
 
@@ -3468,109 +3597,109 @@ export const zFloweditOutput = z.object({
  * AddBackgroundOutput
  */
 export const zFlux2LoraGalleryAddBackgroundOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * ApartmentStagingOutput
  */
 export const zFlux2LoraGalleryApartmentStagingOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * BallpointPenSketchOutput
  */
 export const zFlux2LoraGalleryBallpointPenSketchOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * DigitalComicArtOutput
  */
 export const zFlux2LoraGalleryDigitalComicArtOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * FaceToFullPortraitOutput
  */
 export const zFlux2LoraGalleryFaceToFullPortraitOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * HdrStyleOutput
  */
 export const zFlux2LoraGalleryHdrStyleOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * MultipleAnglesOutput
  */
 export const zFlux2LoraGalleryMultipleAnglesOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * RealismOutput
  */
 export const zFlux2LoraGalleryRealismOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * SatelliteViewStyleOutput
  */
 export const zFlux2LoraGallerySatelliteViewStyleOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * SepiaVintageOutput
  */
 export const zFlux2LoraGallerySepiaVintageOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * VirtualTryonOutput
  */
 export const zFlux2LoraGalleryVirtualTryonOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxVisionUpscalerOutput = z.object({
-  timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  caption: z.string(),
+  timings: z.record(z.string(), z.number()),
   image: zImage,
+  caption: z.string(),
 })
 
 /**
@@ -3578,8 +3707,8 @@ export const zFluxVisionUpscalerOutput = z.object({
  */
 export const zFooocusImagePromptOutput = z.object({
   has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImage),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImage),
 })
 
 /**
@@ -3587,8 +3716,8 @@ export const zFooocusImagePromptOutput = z.object({
  */
 export const zFooocusInpaintOutput = z.object({
   has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImage),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImage),
 })
 
 /**
@@ -3596,8 +3725,8 @@ export const zFooocusInpaintOutput = z.object({
  */
 export const zFooocusOutput = z.object({
   has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImage),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImage),
 })
 
 /**
@@ -3605,8 +3734,17 @@ export const zFooocusOutput = z.object({
  */
 export const zFooocusUpscaleOrVaryOutput = z.object({
   has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImage),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImage),
+})
+
+/**
+ * GenFillOutputModel
+ */
+export const zGenfillV2Output = z.object({
+  structured_instruction: z.record(z.string(), z.unknown()),
+  images: z.array(zImage).optional().default([]),
+  image: zImage,
 })
 
 /**
@@ -3635,16 +3773,16 @@ export const zHunyuanImageV21TextToImageOutput = z.object({
  * HunyuanImageEditResponse
  */
 export const zHunyuanImageV3InstructEditOutput = z.object({
-  images: z.array(zImage),
   seed: z.int(),
+  images: z.array(zImage),
 })
 
 /**
  * HunyuanImageTextToImageResponse
  */
 export const zHunyuanImageV3InstructTextToImageOutput = z.object({
-  images: z.array(zImage),
   seed: z.int(),
+  images: z.array(zImage),
 })
 
 /**
@@ -3659,8 +3797,8 @@ export const zHunyuanImageV3TextToImageOutput = z.object({
  * HYWUEditOutput
  */
 export const zHyWuEditOutput = z.object({
-  timings: z.record(z.string(), z.number()).optional().default({}),
   images: z.array(zImage),
+  timings: z.record(z.string(), z.number()).optional().default({}),
   seed: z.int(),
 })
 
@@ -3668,55 +3806,55 @@ export const zHyWuEditOutput = z.object({
  * IllusionDiffusionOutput
  */
 export const zIllusionDiffusionOutput = z.object({
-  seed: z.int(),
   image: zImage,
+  seed: z.int(),
 })
 
 /**
  * Image2PixelInput
  */
 export const zImage2PixelInput = z.object({
-  image_url: z.string(),
-  trim_borders: z.boolean().optional().default(false),
   transparent_background: z.boolean().optional().default(false),
-  auto_color_detect: z.boolean().optional().default(false),
-  snap_grid: z.boolean().optional().default(true),
-  dominant_color_threshold: z.number().gte(0).lte(1).optional().default(0.05),
-  alpha_threshold: z.int().gte(0).lte(255).optional().default(128),
-  scale: z.union([z.int().gte(1).lte(64), z.unknown()]).optional(),
+  background_tolerance: z.int().gte(0).lte(255).optional().default(0),
+  detect_method: z.enum(['auto', 'runs', 'edge']).optional().default('auto'),
   background_mode: z
     .enum(['edges', 'corners', 'midpoints'])
     .optional()
     .default('corners'),
+  scale: z.union([z.int().gte(1).lte(64), z.unknown()]).optional(),
   fixed_palette: z.union([z.array(z.string()), z.unknown()]).optional(),
+  cleanup_jaggy: z.boolean().optional().default(false),
+  cleanup_morph: z.boolean().optional().default(false),
+  max_colors: z.union([z.int().gte(1).lte(256), z.unknown()]).optional(),
+  trim_borders: z.boolean().optional().default(false),
+  dominant_color_threshold: z.number().gte(0).lte(1).optional().default(0.05),
+  auto_color_detect: z.boolean().optional().default(false),
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   downscale_method: z
     .enum(['dominant', 'median', 'mode', 'mean', 'content-adaptive'])
     .optional()
     .default('dominant'),
-  cleanup_jaggy: z.boolean().optional().default(false),
-  detect_method: z.enum(['auto', 'runs', 'edge']).optional().default('auto'),
-  max_colors: z.union([z.int().gte(1).lte(256), z.unknown()]).optional(),
-  background_tolerance: z.int().gte(0).lte(255).optional().default(0),
-  sync_mode: z.boolean().optional().default(false),
-  cleanup_morph: z.boolean().optional().default(false),
+  alpha_threshold: z.int().gte(0).lte(255).optional().default(128),
+  snap_grid: z.boolean().optional().default(true),
 })
 
 /**
  * Image2SVGInput
  */
 export const zImage2SvgInput = z.object({
-  image_url: z.string(),
-  corner_threshold: z.int().gte(0).lte(180).optional().default(60),
-  colormode: z.enum(['color', 'binary']).optional().default('color'),
-  splice_threshold: z.int().gte(0).lte(90).optional().default(45),
-  max_iterations: z.int().gte(1).lte(20).optional().default(10),
-  path_precision: z.int().gte(1).lte(10).optional().default(3),
-  layer_difference: z.int().gte(1).lte(32).optional().default(16),
-  length_threshold: z.number().gte(0).lte(10).optional().default(4),
-  filter_speckle: z.int().gte(0).lte(20).optional().default(4),
   hierarchical: z.enum(['stacked', 'cutout']).optional().default('stacked'),
+  splice_threshold: z.int().gte(0).lte(90).optional().default(45),
+  length_threshold: z.number().gte(0).lte(10).optional().default(4),
+  corner_threshold: z.int().gte(0).lte(180).optional().default(60),
   mode: z.enum(['spline', 'polygon']).optional().default('spline'),
   color_precision: z.int().gte(1).lte(10).optional().default(6),
+  colormode: z.enum(['color', 'binary']).optional().default('color'),
+  max_iterations: z.int().gte(1).lte(20).optional().default(10),
+  image_url: z.string(),
+  layer_difference: z.int().gte(1).lte(32).optional().default(16),
+  path_precision: z.int().gte(1).lte(10).optional().default(3),
+  filter_speckle: z.int().gte(0).lte(20).optional().default(4),
 })
 
 /**
@@ -3730,9 +3868,9 @@ export const zImage2SvgOutput = z.object({
  * AgeModifyInput
  */
 export const zImageAppsV2AgeModifyInput = z.object({
-  aspect_ratio: zAspectRatio.optional(),
   image_url: z.string(),
   target_age: z.int().gte(6).lte(100).optional().default(30),
+  aspect_ratio: zAspectRatio.optional(),
   preserve_identity: z.boolean().optional().default(true),
 })
 
@@ -3747,21 +3885,6 @@ export const zImageAppsV2AgeModifyOutput = z.object({
  * CityTeleportInput
  */
 export const zImageAppsV2CityTeleportInput = z.object({
-  city_name: z.string(),
-  camera_angle: z
-    .enum([
-      'eye_level',
-      'low_angle',
-      'high_angle',
-      'dutch_angle',
-      'birds_eye_view',
-      'worms_eye_view',
-      'overhead',
-      'side_angle',
-    ])
-    .optional()
-    .default('eye_level'),
-  aspect_ratio: zAspectRatio.optional(),
   photo_shot: z
     .enum([
       'extreme_close_up',
@@ -3775,8 +3898,23 @@ export const zImageAppsV2CityTeleportInput = z.object({
     ])
     .optional()
     .default('medium_shot'),
-  person_image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
+  city_name: z.string(),
   city_image_url: z.union([z.string(), z.unknown()]).optional(),
+  camera_angle: z
+    .enum([
+      'eye_level',
+      'low_angle',
+      'high_angle',
+      'dutch_angle',
+      'birds_eye_view',
+      'worms_eye_view',
+      'overhead',
+      'side_angle',
+    ])
+    .optional()
+    .default('eye_level'),
+  person_image_url: z.string(),
 })
 
 /**
@@ -3790,6 +3928,8 @@ export const zImageAppsV2CityTeleportOutput = z.object({
  * ExpressionChangeInput
  */
 export const zImageAppsV2ExpressionChangeInput = z.object({
+  image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
   target_expression: z
     .enum([
       'smile',
@@ -3815,8 +3955,6 @@ export const zImageAppsV2ExpressionChangeInput = z.object({
     ])
     .optional()
     .default('smile'),
-  aspect_ratio: zAspectRatio.optional(),
-  image_url: z.string(),
 })
 
 /**
@@ -3853,6 +3991,7 @@ export const zImageAppsV2HairChangeInput = z.object({
     ])
     .optional()
     .default('long_hair'),
+  image_url: z.string(),
   aspect_ratio: zAspectRatio.optional(),
   hair_color: z
     .enum([
@@ -3877,7 +4016,6 @@ export const zImageAppsV2HairChangeInput = z.object({
     ])
     .optional()
     .default('natural'),
-  image_url: z.string(),
 })
 
 /**
@@ -3891,12 +4029,12 @@ export const zImageAppsV2HairChangeOutput = z.object({
  * HeadshotInput
  */
 export const zImageAppsV2HeadshotPhotoInput = z.object({
+  image_url: z.string(),
   background_style: z
     .enum(['professional', 'corporate', 'clean', 'gradient'])
     .optional()
     .default('professional'),
   aspect_ratio: zAspectRatio.optional(),
-  image_url: z.string(),
 })
 
 /**
@@ -3910,6 +4048,7 @@ export const zImageAppsV2HeadshotPhotoOutput = z.object({
  * MakeupApplicationInput
  */
 export const zImageAppsV2MakeupApplicationInput = z.object({
+  image_url: z.string(),
   makeup_style: z
     .enum([
       'natural',
@@ -3927,7 +4066,6 @@ export const zImageAppsV2MakeupApplicationInput = z.object({
     .optional()
     .default('natural'),
   aspect_ratio: zAspectRatio.optional(),
-  image_url: z.string(),
   intensity: z
     .enum(['light', 'medium', 'heavy', 'dramatic'])
     .optional()
@@ -3945,8 +4083,8 @@ export const zImageAppsV2MakeupApplicationOutput = z.object({
  * ObjectRemovalInput
  */
 export const zImageAppsV2ObjectRemovalInput = z.object({
-  aspect_ratio: zAspectRatio.optional(),
   image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
   object_to_remove: z.string(),
 })
 
@@ -3961,37 +4099,37 @@ export const zImageAppsV2ObjectRemovalOutput = z.object({
  * OutpaintInput
  */
 export const zImageAppsV2OutpaintInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
+  zoom_out_percentage: z.number().gte(0).lte(90).optional().default(20),
   expand_top: z.int().gte(0).lte(700).optional().default(0),
-  expand_left: z.int().gte(0).lte(700).optional().default(0),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_url: z.string(),
   expand_right: z.int().gte(0).lte(700).optional().default(0),
+  prompt: z.string().max(500).optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  expand_bottom: z.int().gte(0).lte(700).optional().default(0),
   output_format: z
     .enum(['png', 'jpeg', 'jpg', 'webp'])
     .optional()
     .default('png'),
-  prompt: z.string().max(500).optional().default(''),
-  expand_bottom: z.int().gte(0).lte(700).optional().default(0),
-  zoom_out_percentage: z.number().gte(0).lte(90).optional().default(20),
+  expand_left: z.int().gte(0).lte(700).optional().default(0),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * OutpaintOutput
  */
 export const zImageAppsV2OutpaintOutput = z.object({
-  seed: z.int(),
   images: z.array(zImage),
+  seed: z.int(),
 })
 
 /**
  * PerspectiveInput
  */
 export const zImageAppsV2PerspectiveInput = z.object({
-  aspect_ratio: zAspectRatio.optional(),
   image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
   target_perspective: z
     .enum([
       'front',
@@ -4019,6 +4157,7 @@ export const zImageAppsV2PerspectiveOutput = z.object({
  * PhotographyEffectsInput
  */
 export const zImageAppsV2PhotographyEffectsInput = z.object({
+  image_url: z.string(),
   effect_type: z
     .enum([
       'film',
@@ -4041,7 +4180,6 @@ export const zImageAppsV2PhotographyEffectsInput = z.object({
     .optional()
     .default('film'),
   aspect_ratio: zAspectRatio.optional(),
-  image_url: z.string(),
 })
 
 /**
@@ -4055,10 +4193,10 @@ export const zImageAppsV2PhotographyEffectsOutput = z.object({
  * PhotoRestorationInput
  */
 export const zImageAppsV2PhotoRestorationInput = z.object({
-  enhance_resolution: z.boolean().optional().default(true),
-  remove_scratches: z.boolean().optional().default(true),
-  aspect_ratio: zAspectRatio.optional(),
   image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
+  remove_scratches: z.boolean().optional().default(true),
+  enhance_resolution: z.boolean().optional().default(true),
   fix_colors: z.boolean().optional().default(true),
 })
 
@@ -4073,8 +4211,8 @@ export const zImageAppsV2PhotoRestorationOutput = z.object({
  * PortraitInput
  */
 export const zImageAppsV2PortraitEnhanceInput = z.object({
-  aspect_ratio: zAspectRatio.optional(),
   image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
 })
 
 /**
@@ -4088,8 +4226,8 @@ export const zImageAppsV2PortraitEnhanceOutput = z.object({
  * ProductHoldingInput
  */
 export const zImageAppsV2ProductHoldingInput = z.object({
-  product_image_url: z.string(),
   aspect_ratio: zAspectRatio.optional(),
+  product_image_url: z.string(),
   person_image_url: z.string(),
 })
 
@@ -4104,8 +4242,8 @@ export const zImageAppsV2ProductHoldingOutput = z.object({
  * ProductPhotographyInput
  */
 export const zImageAppsV2ProductPhotographyInput = z.object({
-  product_image_url: z.string(),
   aspect_ratio: zAspectRatio.optional(),
+  product_image_url: z.string(),
 })
 
 /**
@@ -4119,6 +4257,8 @@ export const zImageAppsV2ProductPhotographyOutput = z.object({
  * RelightingInput
  */
 export const zImageAppsV2RelightingInput = z.object({
+  image_url: z.string(),
+  aspect_ratio: zAspectRatio.optional(),
   lighting_style: z
     .enum([
       'natural',
@@ -4142,8 +4282,6 @@ export const zImageAppsV2RelightingInput = z.object({
     ])
     .optional()
     .default('natural'),
-  aspect_ratio: zAspectRatio.optional(),
-  image_url: z.string(),
 })
 
 /**
@@ -4158,6 +4296,7 @@ export const zImageAppsV2RelightingOutput = z.object({
  */
 export const zImageAppsV2StyleTransferInput = z.object({
   style_reference_image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.string(),
   aspect_ratio: zAspectRatio.optional(),
   target_style: z
     .enum([
@@ -4190,7 +4329,6 @@ export const zImageAppsV2StyleTransferInput = z.object({
     ])
     .optional()
     .default('impressionist'),
-  image_url: z.string(),
 })
 
 /**
@@ -4204,7 +4342,6 @@ export const zImageAppsV2StyleTransferOutput = z.object({
  * TextureTransformInput
  */
 export const zImageAppsV2TextureTransformInput = z.object({
-  aspect_ratio: zAspectRatio.optional(),
   image_url: z.string(),
   target_texture: z
     .enum([
@@ -4233,6 +4370,7 @@ export const zImageAppsV2TextureTransformInput = z.object({
     ])
     .optional()
     .default('marble'),
+  aspect_ratio: zAspectRatio.optional(),
 })
 
 /**
@@ -4263,14 +4401,9 @@ export const zImageAppsV2VirtualTryOnOutput = z.object({
  * AgeProgressionInput
  */
 export const zImageEditingAgeProgressionInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('20 years older'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4287,9 +4420,14 @@ export const zImageEditingAgeProgressionInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('20 years older'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4306,14 +4444,12 @@ export const zImageEditingAgeProgressionOutput = z.object({
  * Input model for baby version endpoint.
  */
 export const zImageEditingBabyVersionInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4332,6 +4468,8 @@ export const zImageEditingBabyVersionInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4346,14 +4484,9 @@ export const zImageEditingBabyVersionOutput = z.object({
  * BackgroundChangeInput
  */
 export const zImageEditingBackgroundChangeInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('beach sunset with palm trees'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4370,9 +4503,14 @@ export const zImageEditingBackgroundChangeInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('beach sunset with palm trees'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4389,12 +4527,12 @@ export const zImageEditingBackgroundChangeOutput = z.object({
  * Input model for broccoli haircut endpoint.
  */
 export const zImageEditingBroccoliHaircutInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   image_url: z.string(),
   lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -4410,14 +4548,12 @@ export const zImageEditingBroccoliHaircutOutput = z.object({
  * BaseInput
  */
 export const zImageEditingCartoonifyInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4436,6 +4572,8 @@ export const zImageEditingCartoonifyInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4450,14 +4588,12 @@ export const zImageEditingCartoonifyOutput = z.object({
  * BaseInput
  */
 export const zImageEditingColorCorrectionInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4476,6 +4612,8 @@ export const zImageEditingColorCorrectionInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4490,14 +4628,9 @@ export const zImageEditingColorCorrectionOutput = z.object({
  * ExpressionChangeInput
  */
 export const zImageEditingExpressionChangeInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('sad'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4514,9 +4647,14 @@ export const zImageEditingExpressionChangeInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('sad'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4531,14 +4669,12 @@ export const zImageEditingExpressionChangeOutput = z.object({
  * BaseInput
  */
 export const zImageEditingFaceEnhancementInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4557,6 +4693,8 @@ export const zImageEditingFaceEnhancementInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4571,14 +4709,9 @@ export const zImageEditingFaceEnhancementOutput = z.object({
  * HairChangeInput
  */
 export const zImageEditingHairChangeInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('bald'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4595,9 +4728,14 @@ export const zImageEditingHairChangeInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('bald'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4612,14 +4750,9 @@ export const zImageEditingHairChangeOutput = z.object({
  * ObjectRemovalInput
  */
 export const zImageEditingObjectRemovalInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('background people'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4636,9 +4769,14 @@ export const zImageEditingObjectRemovalInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('background people'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4655,14 +4793,12 @@ export const zImageEditingObjectRemovalOutput = z.object({
  * Input model for photo restoration endpoint.
  */
 export const zImageEditingPhotoRestorationInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4681,6 +4817,8 @@ export const zImageEditingPhotoRestorationInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4697,12 +4835,12 @@ export const zImageEditingPhotoRestorationOutput = z.object({
  * Input model for plushie style endpoint.
  */
 export const zImageEditingPlushieStyleInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   image_url: z.string(),
   lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -4718,14 +4856,12 @@ export const zImageEditingPlushieStyleOutput = z.object({
  * BaseInput
  */
 export const zImageEditingProfessionalPhotoInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4744,6 +4880,8 @@ export const zImageEditingProfessionalPhotoInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4760,12 +4898,12 @@ export const zImageEditingProfessionalPhotoOutput = z.object({
  * Input model for realism enhancement endpoint.
  */
 export const zImageEditingRealismInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   image_url: z.string(),
   lora_scale: z.number().gte(0).lte(2).optional().default(0.6),
-  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -4781,20 +4919,20 @@ export const zImageEditingRealismOutput = z.object({
  * ReframeInput
  */
 export const zImageEditingReframeInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['21:9', '16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16', '9:21'])
     .optional()
     .default('16:9'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4811,12 +4949,12 @@ export const zImageEditingReframeOutput = z.object({
  * Input model for retouch endpoint.
  */
 export const zImageEditingRetouchInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   image_url: z.string(),
   lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -4832,14 +4970,9 @@ export const zImageEditingRetouchOutput = z.object({
  * SceneCompositionInput
  */
 export const zImageEditingSceneCompositionInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('enchanted forest'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4856,9 +4989,14 @@ export const zImageEditingSceneCompositionInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('enchanted forest'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4873,14 +5011,9 @@ export const zImageEditingSceneCompositionOutput = z.object({
  * StyleTransferInput
  */
 export const zImageEditingStyleTransferInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default("Van Gogh's Starry Night"),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4897,9 +5030,14 @@ export const zImageEditingStyleTransferInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default("Van Gogh's Starry Night"),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4916,14 +5054,12 @@ export const zImageEditingStyleTransferOutput = z.object({
  * Input model for text removal endpoint.
  */
 export const zImageEditingTextRemovalInput = z.object({
+  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4942,6 +5078,8 @@ export const zImageEditingTextRemovalInput = z.object({
     .optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4956,14 +5094,9 @@ export const zImageEditingTextRemovalOutput = z.object({
  * TimeOfDayInput
  */
 export const zImageEditingTimeOfDayInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('golden hour'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -4980,9 +5113,14 @@ export const zImageEditingTimeOfDayInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('golden hour'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -4997,14 +5135,9 @@ export const zImageEditingTimeOfDayOutput = z.object({
  * WeatherEffectInput
  */
 export const zImageEditingWeatherEffectInput = z.object({
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('2'),
+  prompt: z.string().optional().default('heavy snowfall'),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -5021,9 +5154,14 @@ export const zImageEditingWeatherEffectInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('2'),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('heavy snowfall'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -5040,12 +5178,12 @@ export const zImageEditingWeatherEffectOutput = z.object({
  * Input model for wojak style endpoint.
  */
 export const zImageEditingWojakStyleInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   image_url: z.string(),
   lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -5063,14 +5201,14 @@ export const zImageEditingWojakStyleOutput = z.object({
  * Input model for YouTube thumbnails endpoint.
  */
 export const zImageEditingYoutubeThumbnailsInput = z.object({
+  prompt: z.string().optional().default('Generate youtube thumbnails'),
   enable_safety_checker: z.boolean().optional().default(true),
   image_url: z.string(),
   lora_scale: z.number().gte(0).lte(4).optional().default(0.5),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  prompt: z.string().optional().default('Generate youtube thumbnails'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -5085,12 +5223,12 @@ export const zImageEditingYoutubeThumbnailsOutput = z.object({
  * ImageFile
  */
 export const zImageFile = z.object({
-  content_type: z.union([z.string(), z.unknown()]).optional(),
-  height: z.union([z.int(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
-  file_size: z.union([z.int(), z.unknown()]).optional(),
   width: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
+  height: z.union([z.int(), z.unknown()]).optional(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -5115,9 +5253,9 @@ export const zBirefnetV2Output = z.object({
  * Unified output model for all ChronoEdit operations
  */
 export const zChronoEditLoraGalleryPaintbrushOutput = z.object({
+  prompt: z.string(),
   images: z.array(zImageFile),
   seed: z.int(),
-  prompt: z.string(),
 })
 
 /**
@@ -5126,9 +5264,9 @@ export const zChronoEditLoraGalleryPaintbrushOutput = z.object({
  * Unified output model for all ChronoEdit operations
  */
 export const zChronoEditLoraGalleryUpscalerOutput = z.object({
+  prompt: z.string(),
   images: z.array(zImageFile),
   seed: z.int(),
-  prompt: z.string(),
 })
 
 /**
@@ -5137,9 +5275,9 @@ export const zChronoEditLoraGalleryUpscalerOutput = z.object({
  * Unified output model for all ChronoEdit operations
  */
 export const zChronoEditLoraOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
 })
 
 /**
@@ -5148,8 +5286,8 @@ export const zChronoEditLoraOutput = z.object({
  * Unified output model for all ChronoEdit operations
  */
 export const zChronoEditOutput = z.object({
-  images: z.array(zImageFile),
   prompt: z.string(),
+  images: z.array(zImageFile),
   seed: z.int(),
 })
 
@@ -5191,274 +5329,274 @@ export const zEmu35ImageTextToImageOutput = z.object({
  * Flux2EditImageOutput
  */
 export const zFlux2EditOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Flux2FlashEditImageOutput
  */
 export const zFlux2FlashEditOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Flux2FlashT2IOutput
  */
 export const zFlux2FlashOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Flux2FlexEditOutput
  */
 export const zFlux2FlexEditOutput = z.object({
-  images: z.array(zImageFile),
   seed: z.int(),
+  images: z.array(zImageFile),
 })
 
 /**
  * Flux2FlexOutput
  */
 export const zFlux2FlexOutput = z.object({
-  images: z.array(zImageFile),
   seed: z.int(),
+  images: z.array(zImageFile),
 })
 
 /**
  * KleinT2IOutput
  */
 export const zFlux2Klein4bBaseEditLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein4BBaseEditOutput
  */
 export const zFlux2Klein4bBaseEditOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * KleinT2IOutput
  */
 export const zFlux2Klein4bBaseLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein4BT2IOutput
  */
 export const zFlux2Klein4bBaseOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein4BDistilledEditOutput
  */
 export const zFlux2Klein4bEditLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein4BDistilledEditOutput
  */
 export const zFlux2Klein4bEditOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein4BDistilledT2IOutput
  */
 export const zFlux2Klein4bLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein4BDistilledT2IOutput
  */
 export const zFlux2Klein4bOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * KleinT2IOutput
  */
 export const zFlux2Klein9bBaseEditLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein9BBaseEditOutput
  */
 export const zFlux2Klein9bBaseEditOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * KleinT2IOutput
  */
 export const zFlux2Klein9bBaseLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein9BT2IOutput
  */
 export const zFlux2Klein9bBaseOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * KleinT2IOutput
  */
 export const zFlux2Klein9bEditLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * KleinT2IOutput
  */
 export const zFlux2Klein9bEditOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein9BDistilledT2IOutput
  */
 export const zFlux2Klein9bLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Klein9BDistilledT2IOutput
  */
 export const zFlux2Klein9bOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Flux2EditImageLoRAOutput
  */
 export const zFlux2LoraEditOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Flux2T2ILoRAOutput
  */
 export const zFlux2LoraOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Flux2MaxEditOutput
  */
 export const zFlux2MaxEditOutput = z.object({
-  seed: z.int(),
   images: z.array(zImageFile),
+  seed: z.int(),
 })
 
 /**
  * Flux2MaxOutput
  */
 export const zFlux2MaxOutput = z.object({
-  seed: z.int(),
   images: z.array(zImageFile),
+  seed: z.int(),
 })
 
 /**
  * Flux2T2IOutput
  */
 export const zFlux2Output = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -5488,54 +5626,54 @@ export const zFlux2ProOutput = z.object({
  * Flux2TurboEditImageOutput
  */
 export const zFlux2TurboEditOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Flux2TurboT2IOutput
  */
 export const zFlux2TurboOutput = z.object({
-  seed: z.int(),
-  images: z.array(zImageFile),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * NanoBananaImageToImageOutput
  */
 export const zGemini25FlashImageEditOutput = z.object({
-  description: z.string(),
   images: z.array(zImageFile),
+  description: z.string(),
 })
 
 /**
  * NanoBananaTextToImageOutput
  */
 export const zGemini25FlashImageOutput = z.object({
-  description: z.string(),
   images: z.array(zImageFile),
+  description: z.string(),
 })
 
 /**
  * NanoBanana2ImageToImageOutput
  */
 export const zGemini31FlashImagePreviewEditOutput = z.object({
-  images: z.array(zImageFile),
   description: z.string(),
+  images: z.array(zImageFile),
 })
 
 /**
  * NanoBanana2TextToImageOutput
  */
 export const zGemini31FlashImagePreviewOutput = z.object({
-  images: z.array(zImageFile),
   description: z.string(),
+  images: z.array(zImageFile),
 })
 
 /**
@@ -5614,32 +5752,32 @@ export const zGptImage2Output = z.object({
  * XAIImageEditOutput
  */
 export const zGrokImagineImageEditOutput = z.object({
-  images: z.array(zImageFile),
   revised_prompt: z.union([z.string(), z.unknown()]).optional(),
+  images: z.array(zImageFile),
 })
 
 /**
  * XAIImageOutput
  */
 export const zGrokImagineImageOutput = z.object({
-  images: z.array(zImageFile),
   revised_prompt: z.union([z.string(), z.unknown()]).optional(),
+  images: z.array(zImageFile),
 })
 
 /**
  * XAIImageEditOutput
  */
 export const zGrokImagineImageQualityEditOutput = z.object({
-  images: z.array(zImageFile),
   revised_prompt: z.union([z.string(), z.unknown()]).optional(),
+  images: z.array(zImageFile),
 })
 
 /**
  * XAIImageOutput
  */
 export const zGrokImagineImageQualityTextToImageOutput = z.object({
-  images: z.array(zImageFile),
   revised_prompt: z.union([z.string(), z.unknown()]).optional(),
+  images: z.array(zImageFile),
 })
 
 /**
@@ -5690,10 +5828,10 @@ export const zHidreamO1ImageOutput = z.object({
  * Image2PixelOutput
  */
 export const zImage2PixelOutput = z.object({
-  palette: z.array(z.string()),
+  images: z.array(zImageFile),
   pixel_scale: z.int(),
   num_colors: z.int(),
-  images: z.array(zImageFile),
+  palette: z.array(z.string()),
 })
 
 /**
@@ -5737,9 +5875,9 @@ export const zImagePreprocessorsDepthAnythingV2Output = z.object({
  * HEDInput
  */
 export const zImagePreprocessorsHedInput = z.object({
+  image_url: z.string(),
   scribble: z.boolean().optional().default(false),
   safe: z.boolean().optional().default(false),
-  image_url: z.string(),
 })
 
 /**
@@ -5753,8 +5891,8 @@ export const zImagePreprocessorsHedOutput = z.object({
  * LineartInput
  */
 export const zImagePreprocessorsLineartInput = z.object({
-  coarse: z.boolean().optional().default(false),
   image_url: z.string(),
+  coarse: z.boolean().optional().default(false),
 })
 
 /**
@@ -5768,8 +5906,8 @@ export const zImagePreprocessorsLineartOutput = z.object({
  * MiDaSInput
  */
 export const zImagePreprocessorsMidasInput = z.object({
-  background_threshold: z.number().optional().default(0.1),
   image_url: z.string(),
+  background_threshold: z.number().optional().default(0.1),
   a: z.number().optional().default(6.283185307179586),
 })
 
@@ -5785,8 +5923,8 @@ export const zImagePreprocessorsMidasOutput = z.object({
  * MLSDInput
  */
 export const zImagePreprocessorsMlsdInput = z.object({
-  distance_threshold: z.number().optional().default(0.1),
   image_url: z.string(),
+  distance_threshold: z.number().optional().default(0.1),
   score_threshold: z.number().optional().default(0.1),
 })
 
@@ -5801,10 +5939,10 @@ export const zImagePreprocessorsMlsdOutput = z.object({
  * PiDiInput
  */
 export const zImagePreprocessorsPidiInput = z.object({
-  scribble: z.boolean().optional().default(false),
-  apply_filter: z.boolean().optional().default(false),
-  safe: z.boolean().optional().default(false),
   image_url: z.string(),
+  scribble: z.boolean().optional().default(false),
+  safe: z.boolean().optional().default(false),
+  apply_filter: z.boolean().optional().default(false),
 })
 
 /**
@@ -5832,9 +5970,9 @@ export const zImagePreprocessorsSamOutput = z.object({
  * ScribbleInput
  */
 export const zImagePreprocessorsScribbleInput = z.object({
+  image_url: z.string(),
   model: z.enum(['HED', 'PiDi']).optional().default('HED'),
   safe: z.boolean().optional().default(false),
-  image_url: z.string(),
 })
 
 /**
@@ -5877,11 +6015,11 @@ export const zImagePreprocessorsZoeOutput = z.object({
  */
 export const zImagePrompt = z.object({
   image_url: z.union([z.string(), z.unknown()]).optional(),
+  stop_at: z.number().gte(0).lte(1).optional().default(0.5),
   type: z
     .enum(['ImagePrompt', 'PyraCanny', 'CPDS', 'FaceSwap'])
     .optional()
     .default('ImagePrompt'),
-  stop_at: z.number().gte(0).lte(1).optional().default(0.5),
   weight: z.number().gte(0).lte(2).optional().default(1),
 })
 
@@ -5897,9 +6035,12 @@ export const zImageSize = z.object({
  * Input
  */
 export const zBitdanceInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(10).lte(100).optional().default(25),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(1).lte(15).optional().default(7.5),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -5913,11 +6054,8 @@ export const zBitdanceInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(10).lte(100).optional().default(25),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(15).optional().default(7.5),
   prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
@@ -5926,7 +6064,6 @@ export const zBitdanceInput = z.object({
 export const zBytedanceDreaminaV31TextToImageInput = z.object({
   prompt: z.string(),
   enhance_prompt: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -5940,6 +6077,7 @@ export const zBytedanceDreaminaV31TextToImageInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
@@ -5979,7 +6117,6 @@ export const zBytedanceSeedreamV45TextToImageInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
   max_images: z.int().gte(1).lte(6).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -5995,6 +6132,7 @@ export const zBytedanceSeedreamV45TextToImageInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(6).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
 })
@@ -6008,6 +6146,10 @@ export const zBytedanceSeedreamV4EditInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
   max_images: z.int().gte(1).lte(6).optional().default(1),
+  enhance_prompt_mode: z
+    .enum(['standard', 'fast'])
+    .optional()
+    .default('standard'),
   image_size: z
     .union([
       zImageSize,
@@ -6025,10 +6167,6 @@ export const zBytedanceSeedreamV4EditInput = z.object({
     ])
     .optional(),
   sync_mode: z.boolean().optional().default(false),
-  enhance_prompt_mode: z
-    .enum(['standard', 'fast'])
-    .optional()
-    .default('standard'),
   enable_safety_checker: z.boolean().optional().default(true),
 })
 
@@ -6039,7 +6177,12 @@ export const zBytedanceSeedreamV4TextToImageInput = z.object({
   num_images: z.int().gte(1).lte(6).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   max_images: z.int().gte(1).lte(6).optional().default(1),
+  enhance_prompt_mode: z
+    .enum(['standard', 'fast'])
+    .optional()
+    .default('standard'),
   image_size: z
     .union([
       zImageSize,
@@ -6056,11 +6199,6 @@ export const zBytedanceSeedreamV4TextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  enhance_prompt_mode: z
-    .enum(['standard', 'fast'])
-    .optional()
-    .default('standard'),
   enable_safety_checker: z.boolean().optional().default(true),
 })
 
@@ -6070,8 +6208,6 @@ export const zBytedanceSeedreamV4TextToImageInput = z.object({
 export const zBytedanceSeedreamV5LiteEditInput = z.object({
   prompt: z.string(),
   image_urls: z.array(z.string()),
-  max_images: z.int().gte(1).lte(6).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -6088,6 +6224,8 @@ export const zBytedanceSeedreamV5LiteEditInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  max_images: z.int().gte(1).lte(6).optional().default(1),
   num_images: z.int().gte(1).lte(6).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
 })
@@ -6098,8 +6236,6 @@ export const zBytedanceSeedreamV5LiteEditInput = z.object({
 export const zBytedanceSeedreamV5LiteTextToImageInput = z.object({
   return_byteplus_urls: z.boolean().optional().default(false),
   prompt: z.string(),
-  max_images: z.int().gte(1).lte(6).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -6116,6 +6252,8 @@ export const zBytedanceSeedreamV5LiteTextToImageInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  max_images: z.int().gte(1).lte(6).optional().default(1),
   num_images: z.int().gte(1).lte(6).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
 })
@@ -6124,8 +6262,12 @@ export const zBytedanceSeedreamV5LiteTextToImageInput = z.object({
  * CATVTONInput
  */
 export const zCatVtonInput = z.object({
-  cloth_type: z.enum(['upper', 'lower', 'overall', 'inner', 'outer']),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  human_image_url: z.string(),
+  garment_image_url: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  cloth_type: z.enum(['upper', 'lower', 'overall', 'inner', 'outer']),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   image_size: z
     .union([
       zImageSize,
@@ -6139,20 +6281,15 @@ export const zCatVtonInput = z.object({
       ]),
     ])
     .optional(),
-  human_image_url: z.string(),
-  garment_image_url: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
 })
 
 /**
  * TextToImageInput
  */
 export const zCogview4Input = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   image_size: z
     .union([
       zImageSize,
@@ -6166,11 +6303,12 @@ export const zCogview4Input = z.object({
       ]),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
@@ -6210,8 +6348,7 @@ export const zCosmos3SuperTextToImageInput = z.object({
  * ErnieImageInput
  */
 export const zErnieImageInput = z.object({
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -6230,26 +6367,26 @@ export const zErnieImageInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
   negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  prompt: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ErnieImageTurboInput
  */
 export const zErnieImageTurboInput = z.object({
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -6268,30 +6405,39 @@ export const zErnieImageTurboInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
   negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(20).optional().default(8),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(20).optional().default(8),
+  prompt: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * FireRedImageEditInput
  */
 export const zFireredImageEditInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_urls: z.array(z.string()),
   prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   guidance_scale: z.number().gte(1).lte(10).optional().default(4),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -6306,23 +6452,18 @@ export const zFireredImageEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * FireRedImageEdit11Input
  */
 export const zFireredImageEditV11Input = z.object({
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -6337,17 +6478,14 @@ export const zFireredImageEditV11Input = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_urls: z.array(z.string()),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   guidance_scale: z.number().gte(1).lte(10).optional().default(4),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
   prompt: z.string(),
-  image_urls: z.array(z.string()),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
   enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -6355,11 +6493,14 @@ export const zFireredImageEditV11Input = z.object({
  */
 export const zFlux1DevInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -6373,9 +6514,6 @@ export const zFlux1DevInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -6383,12 +6521,14 @@ export const zFlux1DevInput = z.object({
  */
 export const zFlux1DevReduxInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -6402,8 +6542,6 @@ export const zFlux1DevReduxInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
@@ -6411,11 +6549,14 @@ export const zFlux1DevReduxInput = z.object({
  */
 export const zFlux1KreaInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -6429,9 +6570,6 @@ export const zFlux1KreaInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -6439,12 +6577,14 @@ export const zFlux1KreaInput = z.object({
  */
 export const zFlux1KreaReduxInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -6458,8 +6598,6 @@ export const zFlux1KreaReduxInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
 })
 
 /**
@@ -6467,11 +6605,14 @@ export const zFlux1KreaReduxInput = z.object({
  */
 export const zFlux1SchnellInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -6485,9 +6626,6 @@ export const zFlux1SchnellInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -6495,12 +6633,13 @@ export const zFlux1SchnellInput = z.object({
  */
 export const zFlux1SchnellReduxInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -6514,7 +6653,6 @@ export const zFlux1SchnellReduxInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -6522,11 +6660,14 @@ export const zFlux1SchnellReduxInput = z.object({
  */
 export const zFlux1SrpoInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -6540,17 +6681,17 @@ export const zFlux1SrpoInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * Flux2EditImageInput
  */
 export const zFlux2EditInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -6565,26 +6706,23 @@ export const zFlux2EditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   image_urls: z.array(z.string()),
-  prompt: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Flux2FlashEditImageInput
  */
 export const zFlux2FlashEditInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -6599,21 +6737,20 @@ export const zFlux2FlashEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  image_urls: z.array(z.string()),
-  prompt: z.string(),
-  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Flux2FlashTextToImageInput
  */
 export const zFlux2FlashInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   image_size: z
     .union([
       zImageSize,
@@ -6628,18 +6765,19 @@ export const zFlux2FlashInput = z.object({
     ])
     .optional(),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Flux2FlexImageEditInput
  */
 export const zFlux2FlexEditInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -6654,21 +6792,21 @@ export const zFlux2FlexEditInput = z.object({
       ]),
     ])
     .optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_urls: z.array(z.string()),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(28),
+  guidance_scale: z.number().gte(1.5).lte(10).optional().default(3.5),
   prompt: z.string(),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   safety_tolerance: z.enum(['1', '2', '3', '4', '5']).optional().default('2'),
-  guidance_scale: z.number().gte(1.5).lte(10).optional().default(3.5),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(28),
+  image_urls: z.array(z.string()),
 })
 
 /**
  * Flux2FlexTextToImageInput
  */
 export const zFlux2FlexInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -6682,21 +6820,24 @@ export const zFlux2FlexInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  safety_tolerance: z.enum(['1', '2', '3', '4', '5']).optional().default('2'),
-  guidance_scale: z.number().gte(1.5).lte(10).optional().default(3.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(28),
+  guidance_scale: z.number().gte(1.5).lte(10).optional().default(3.5),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  safety_tolerance: z.enum(['1', '2', '3', '4', '5']).optional().default('2'),
 })
 
 /**
  * Flux2TextToImageInput
  */
 export const zFlux2Input = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -6710,40 +6851,43 @@ export const zFlux2Input = z.object({
       ]),
     ])
     .optional(),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Klein4BBaseEditInput
  */
 export const zFlux2Klein4bBaseEditInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  image_urls: z.array(z.string()),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -6758,42 +6902,42 @@ export const zFlux2Klein4bBaseEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinBaseEditLoRAInput
  */
 export const zFlux2Klein4bBaseEditLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  image_urls: z.array(z.string()),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -6808,40 +6952,41 @@ export const zFlux2Klein4bBaseEditLoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * Klein4BBaseInput
  */
 export const zFlux2Klein4bBaseInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -6855,41 +7000,41 @@ export const zFlux2Klein4bBaseInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinBaseLoRAInput
  */
 export const zFlux2Klein4bBaseLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -6903,40 +7048,37 @@ export const zFlux2Klein4bBaseLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinDistilledEditInput
  */
 export const zFlux2Klein4bEditInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  image_urls: z.array(z.string()),
-  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
   enable_safety_checker: z.boolean().optional().default(true),
-  enable_cns: z.boolean().optional().default(false),
+  prompt: z.string(),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
+  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -6951,36 +7093,36 @@ export const zFlux2Klein4bEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinDistilledEditLoRAInput
  */
 export const zFlux2Klein4bEditLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  image_urls: z.array(z.string()),
-  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
   enable_safety_checker: z.boolean().optional().default(true),
-  enable_cns: z.boolean().optional().default(false),
+  prompt: z.string(),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
+  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -6995,34 +7137,34 @@ export const zFlux2Klein4bEditLoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinDistilledInput
  */
 export const zFlux2Klein4bInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
   image_size: z
     .union([
       zImageSize,
@@ -7036,35 +7178,35 @@ export const zFlux2Klein4bInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinLoRAInput
  */
 export const zFlux2Klein4bLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
   image_size: z
     .union([
       zImageSize,
@@ -7078,36 +7220,38 @@ export const zFlux2Klein4bLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * Klein9BEditImageInput
  */
 export const zFlux2Klein9bBaseEditInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  image_urls: z.array(z.string()),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -7122,42 +7266,42 @@ export const zFlux2Klein9bBaseEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinBaseEditLoRAInput
  */
 export const zFlux2Klein9bBaseEditLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  image_urls: z.array(z.string()),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -7172,40 +7316,41 @@ export const zFlux2Klein9bBaseEditLoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * Klein9BBaseInput
  */
 export const zFlux2Klein9bBaseInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -7219,41 +7364,41 @@ export const zFlux2Klein9bBaseInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinBaseLoRAInput
  */
 export const zFlux2Klein9bBaseLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -7267,40 +7412,37 @@ export const zFlux2Klein9bBaseLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
   cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinDistilledEditInput
  */
 export const zFlux2Klein9bEditInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  image_urls: z.array(z.string()),
-  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
   enable_safety_checker: z.boolean().optional().default(true),
-  enable_cns: z.boolean().optional().default(false),
+  prompt: z.string(),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
+  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -7315,36 +7457,36 @@ export const zFlux2Klein9bEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * KleinDistilledEditLoRAInput
  */
 export const zFlux2Klein9bEditLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  image_urls: z.array(z.string()),
-  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
   enable_safety_checker: z.boolean().optional().default(true),
-  enable_cns: z.boolean().optional().default(false),
+  prompt: z.string(),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
+  cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -7359,34 +7501,34 @@ export const zFlux2Klein9bEditLoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * Klein9BDistilledInput
  */
 export const zFlux2Klein9bInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
   image_size: z
     .union([
       zImageSize,
@@ -7400,35 +7542,35 @@ export const zFlux2Klein9bInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
  * Klein9BDistilledLoRAInput
  */
 export const zFlux2Klein9bLoraInput = z.object({
-  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
-  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
-  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
-  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  cns_s_churn: z.number().gte(0).lte(2).optional().default(0.5),
+  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
+  prompt: z.string(),
+  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
+  sync_mode: z.boolean().optional().default(false),
   cns_alpha_tilt_end: z.number().gte(-2).lte(2).optional().default(-0.5),
-  enable_cns: z.boolean().optional().default(false),
+  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  cns_power_gamma: z.number().gte(0.1).lte(3).optional().default(0.75),
+  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
+  num_inference_steps: z.int().gte(4).lte(8).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_alpha_exp_interp: z.boolean().optional().default(true),
+  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
   cns_gamma_source: z
     .enum(['matrix', 'approximation'])
     .optional()
     .default('matrix'),
-  loras: z.array(zFalAiFlux2KleinLoRaInput).optional().default([]),
-  cns_alpha_use_fnorm: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
   image_size: z
     .union([
       zImageSize,
@@ -7442,13 +7584,9 @@ export const zFlux2Klein9bLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cns_alpha_exp_sharpness: z.number().gte(0.1).lte(10).optional().default(0.75),
-  cns_energy_scale: z.number().gte(0.5).lte(1.5).optional().default(0.98),
-  cns_alpha_exp_interp: z.boolean().optional().default(true),
-  cns_num_freq_bins: z.int().gte(8).lte(128).optional().default(32),
-  cns_alpha_tilt_start: z.number().gte(-2).lte(2).optional().default(0.15),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  cns_gamma_divider: z.number().gte(0.1).lte(50).optional().default(1.73),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_cns: z.boolean().optional().default(false),
 })
 
 /**
@@ -7457,12 +7595,10 @@ export const zFlux2Klein9bLoraInput = z.object({
  * Input model for Add Background endpoint - Add background to images
  */
 export const zFlux2LoraGalleryAddBackgroundInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().optional().default('Add Background forest'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -7477,11 +7613,13 @@ export const zFlux2LoraGalleryAddBackgroundInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_urls: z.array(z.string()),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string().optional().default('Add Background forest'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7490,12 +7628,10 @@ export const zFlux2LoraGalleryAddBackgroundInput = z.object({
  * Input model for Apartment Staging endpoint - Furnish rooms
  */
 export const zFlux2LoraGalleryApartmentStagingInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -7510,11 +7646,13 @@ export const zFlux2LoraGalleryApartmentStagingInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_urls: z.array(z.string()),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7523,12 +7661,10 @@ export const zFlux2LoraGalleryApartmentStagingInput = z.object({
  * Input model for Ballpoint Pen Sketch endpoint - Generate ballpoint pen sketch style images
  */
 export const zFlux2LoraGalleryBallpointPenSketchInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -7542,10 +7678,12 @@ export const zFlux2LoraGalleryBallpointPenSketchInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7554,12 +7692,10 @@ export const zFlux2LoraGalleryBallpointPenSketchInput = z.object({
  * Input model for Digital Comic Art endpoint - Generate digital comic art style images
  */
 export const zFlux2LoraGalleryDigitalComicArtInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -7573,10 +7709,12 @@ export const zFlux2LoraGalleryDigitalComicArtInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7585,12 +7723,10 @@ export const zFlux2LoraGalleryDigitalComicArtInput = z.object({
  * Input model for Face to Full Portrait endpoint - Generate full portrait from face
  */
 export const zFlux2LoraGalleryFaceToFullPortraitInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().optional().default('Face to full portrait'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -7605,11 +7741,13 @@ export const zFlux2LoraGalleryFaceToFullPortraitInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_urls: z.array(z.string()),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string().optional().default('Face to full portrait'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7618,12 +7756,10 @@ export const zFlux2LoraGalleryFaceToFullPortraitInput = z.object({
  * Input model for HDR Style endpoint - Generate HDR style images with vibrant colors
  */
 export const zFlux2LoraGalleryHdrStyleInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -7637,10 +7773,12 @@ export const zFlux2LoraGalleryHdrStyleInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7649,16 +7787,11 @@ export const zFlux2LoraGalleryHdrStyleInput = z.object({
  * Input model for Multiple Angles endpoint - Camera control with precise adjustments using <sks> trigger word. Prompt is built automatically from slider values.
  */
 export const zFlux2LoraGalleryMultipleAnglesInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  horizontal_angle: z.number().gte(0).lte(360).optional().default(0),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  vertical_angle: z.number().gte(0).lte(60).optional().default(0),
   enable_safety_checker: z.boolean().optional().default(true),
-  zoom: z.number().gte(0).lte(10).optional().default(5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  horizontal_angle: z.number().gte(0).lte(360).optional().default(0),
   image_size: z
     .union([
       zImageSize,
@@ -7673,9 +7806,14 @@ export const zFlux2LoraGalleryMultipleAnglesInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  image_urls: z.array(z.string()),
+  zoom: z.number().gte(0).lte(10).optional().default(5),
   sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
+  vertical_angle: z.number().gte(0).lte(60).optional().default(0),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
 })
 
 /**
@@ -7684,12 +7822,10 @@ export const zFlux2LoraGalleryMultipleAnglesInput = z.object({
  * Input model for Realism endpoint - Generate realistic style images
  */
 export const zFlux2LoraGalleryRealismInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -7703,10 +7839,12 @@ export const zFlux2LoraGalleryRealismInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7715,12 +7853,10 @@ export const zFlux2LoraGalleryRealismInput = z.object({
  * Input model for Satellite View Style endpoint - Generate satellite/aerial view style images
  */
 export const zFlux2LoraGallerySatelliteViewStyleInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -7734,10 +7870,12 @@ export const zFlux2LoraGallerySatelliteViewStyleInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7746,12 +7884,10 @@ export const zFlux2LoraGallerySatelliteViewStyleInput = z.object({
  * Input model for Sepia Vintage Photography endpoint - Generate vintage sepia style images
  */
 export const zFlux2LoraGallerySepiaVintageInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -7765,10 +7901,12 @@ export const zFlux2LoraGallerySepiaVintageInput = z.object({
       ]),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
@@ -7777,12 +7915,10 @@ export const zFlux2LoraGallerySepiaVintageInput = z.object({
  * Input model for Virtual Try-on endpoint - Generate virtual try-on images
  */
 export const zFlux2LoraGalleryVirtualTryonInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  lora_scale: z.number().gte(0).lte(2).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -7797,22 +7933,20 @@ export const zFlux2LoraGalleryVirtualTryonInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_urls: z.array(z.string()),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   num_inference_steps: z.int().gte(4).lte(50).optional().default(40),
-  enable_safety_checker: z.boolean().optional().default(true),
-  lora_scale: z.number().gte(0).lte(2).optional().default(1),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
 })
 
 /**
  * Flux2MaxImageEditInput
  */
 export const zFlux2MaxEditInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  safety_tolerance: z.enum(['1', '2', '3', '4', '5']).optional().default('2'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -7827,15 +7961,19 @@ export const zFlux2MaxEditInput = z.object({
       ]),
     ])
     .optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  safety_tolerance: z.enum(['1', '2', '3', '4', '5']).optional().default('2'),
+  image_urls: z.array(z.string()),
   sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * Flux2MaxTextToImageInput
  */
 export const zFlux2MaxInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -7849,11 +7987,11 @@ export const zFlux2MaxInput = z.object({
       ]),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
   safety_tolerance: z.enum(['1', '2', '3', '4', '5']).optional().default('2'),
   seed: z.union([z.int(), z.unknown()]).optional(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
 })
 
 /**
@@ -7912,8 +8050,8 @@ export const zFlux2ProInput = z.object({
  * Flux2TurboEditImageInput
  */
 export const zFlux2TurboEditInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -7928,21 +8066,20 @@ export const zFlux2TurboEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  image_urls: z.array(z.string()),
-  prompt: z.string(),
-  sync_mode: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Flux2TurboTextToImageInput
  */
 export const zFlux2TurboInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   image_size: z
     .union([
       zImageSize,
@@ -7957,11 +8094,12 @@ export const zFlux2TurboInput = z.object({
     ])
     .optional(),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string(),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -7969,11 +8107,14 @@ export const zFlux2TurboInput = z.object({
  */
 export const zFluxDevInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -7987,9 +8128,6 @@ export const zFluxDevInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -7997,12 +8135,14 @@ export const zFluxDevInput = z.object({
  */
 export const zFluxDevReduxInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -8016,8 +8156,6 @@ export const zFluxDevReduxInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
@@ -8025,11 +8163,14 @@ export const zFluxDevReduxInput = z.object({
  */
 export const zFluxKreaInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -8043,9 +8184,6 @@ export const zFluxKreaInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -8053,12 +8191,14 @@ export const zFluxKreaInput = z.object({
  */
 export const zFluxKreaReduxInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -8072,15 +8212,13 @@ export const zFluxKreaReduxInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
 })
 
 /**
  * FluxProPlusTextToImageInput
  */
 export const zFluxProV11Input = z.object({
-  enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -8094,22 +8232,22 @@ export const zFluxProV11Input = z.object({
       ]),
     ])
     .optional(),
+  enhance_prompt: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * FluxProRedux
  */
 export const zFluxProV11ReduxInput = z.object({
-  enhance_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -8123,18 +8261,18 @@ export const zFluxProV11ReduxInput = z.object({
       ]),
     ])
     .optional(),
+  enhance_prompt: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  prompt: z.string().optional().default(''),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('2'),
-  prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   image_url: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
@@ -8173,11 +8311,14 @@ export const zFluxPulidInput = z.object({
  */
 export const zFluxSchnellInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -8191,9 +8332,6 @@ export const zFluxSchnellInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -8201,12 +8339,13 @@ export const zFluxSchnellInput = z.object({
  */
 export const zFluxSchnellReduxInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -8220,7 +8359,6 @@ export const zFluxSchnellReduxInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -8228,11 +8366,14 @@ export const zFluxSchnellReduxInput = z.object({
  */
 export const zFluxSrpoInput = z.object({
   acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -8246,17 +8387,21 @@ export const zFluxSrpoInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * FluxSubjectInput
  */
 export const zFluxSubjectInput = z.object({
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(8),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -8270,22 +8415,22 @@ export const zFluxSubjectInput = z.object({
       ]),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
 })
 
 /**
  * GlmImageToImageInput
  */
 export const zGlmImageImageToImageInput = z.object({
-  num_inference_steps: z.int().gte(10).lte(100).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(1.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(10).lte(100).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  prompt: z.string(),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -8303,22 +8448,21 @@ export const zGlmImageImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(1.5),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  image_urls: z.array(z.string()),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * GlmImageInput
  */
 export const zGlmImageInput = z.object({
-  num_inference_steps: z.int().gte(10).lte(100).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(1.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(10).lte(100).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -8336,12 +8480,6 @@ export const zGlmImageInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(1.5),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -8362,20 +8500,21 @@ export const zGptImage2EditInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string().min(2).max(32000),
   mask_url: z.union([z.string(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('high'),
-  image_urls: z.array(z.string()),
   sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('high'),
+  prompt: z.string().min(2).max(32000),
+  image_urls: z.array(z.string()),
 })
 
 /**
  * TextToImageRequest
  */
 export const zGptImage2Input = z.object({
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('high'),
+  prompt: z.string().min(2).max(32000),
   image_size: z
     .union([
       zImageSize,
@@ -8390,18 +8529,23 @@ export const zGptImage2Input = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string().min(2).max(32000),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
-  quality: z.enum(['auto', 'low', 'medium', 'high']).optional().default('high'),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * DevInput
  */
 export const zHidreamI1DevInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -8415,20 +8559,18 @@ export const zHidreamI1DevInput = z.object({
       ]),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
 })
 
 /**
  * FastInput
  */
 export const zHidreamI1FastInput = z.object({
-  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(16),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -8442,21 +8584,18 @@ export const zHidreamI1FastInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   negative_prompt: z.string().optional().default(''),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(16),
 })
 
 /**
  * HiDreamO1ImageDevEditInput
  */
 export const zHidreamO1ImageDevEditInput = z.object({
+  reference_image_urls: z.array(z.string()).min(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(28).optional().default(28),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -8470,22 +8609,22 @@ export const zHidreamO1ImageDevEditInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  keep_original_aspect: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(0),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  reference_image_urls: z.array(z.string()).min(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   prompt: z.string().min(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(0),
+  keep_original_aspect: z.boolean().optional().default(false),
 })
 
 /**
  * HiDreamO1ImageDevInput
  */
 export const zHidreamO1ImageDevInput = z.object({
+  reference_image_urls: z.array(z.string()).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(28).optional().default(28),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -8499,13 +8638,12 @@ export const zHidreamO1ImageDevInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  keep_original_aspect: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(0),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  reference_image_urls: z.array(z.string()).optional().default([]),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   prompt: z.string().min(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(0),
+  keep_original_aspect: z.boolean().optional().default(false),
 })
 
 /**
@@ -8571,10 +8709,16 @@ export const zHidreamO1ImageInput = z.object({
  */
 export const zHunyuanImageV21TextToImageInput = z.object({
   use_refiner: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  use_reprompt: z.boolean().optional().default(true),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -8588,21 +8732,15 @@ export const zHunyuanImageV21TextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  use_reprompt: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * HunyuanImageEditRequest
  */
 export const zHunyuanImageV3InstructEditInput = z.object({
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  image_urls: z.array(z.string()),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -8617,19 +8755,19 @@ export const zHunyuanImageV3InstructEditInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * HunyuanImageRequest
  */
 export const zHunyuanImageV3InstructTextToImageInput = z.object({
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
@@ -8645,22 +8783,28 @@ export const zHunyuanImageV3InstructTextToImageInput = z.object({
       ]),
     ])
     .optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
 })
 
 /**
  * HunyuanTextToImageInputV3
  */
 export const zHunyuanImageV3TextToImageInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(7.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(7.5),
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -8674,24 +8818,21 @@ export const zHunyuanImageV3TextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * HYWUEditInput
  */
 export const zHyWuEditInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_urls: z.array(z.string()),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
   enable_thinking: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(30),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -8706,29 +8847,31 @@ export const zHyWuEditInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(30),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * BaseInput
  */
 export const zIclightV2Input = z.object({
+  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  cfg: z.number().gte(0.01).lte(5).optional().default(1),
   image_url: z.string(),
-  enable_hr_fix: z.boolean().optional().default(false),
-  hr_downscale: z.number().gte(0.01).lte(1).optional().default(0.5),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  background_threshold: z.number().gte(0.01).lte(1).optional().default(0.67),
   highres_denoise: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_hr_fix: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   initial_latent: z
     .enum(['None', 'Left', 'Right', 'Top', 'Bottom'])
     .optional()
     .default('None'),
-  cfg: z.number().gte(0.01).lte(5).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  hr_downscale: z.number().gte(0.01).lte(1).optional().default(0.5),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -8742,27 +8885,14 @@ export const zIclightV2Input = z.object({
       ]),
     ])
     .optional(),
-  background_threshold: z.number().gte(0.01).lte(1).optional().default(0.67),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   lowres_denoise: z.number().gte(0.01).lte(1).optional().default(0.98),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * IllusionDiffusionInput
  */
 export const zIllusionDiffusionInput = z.object({
-  prompt: z.string(),
-  control_guidance_start: z.number().gte(0).lte(1).optional().default(0),
-  guidance_scale: z.number().lte(50).optional().default(7.5),
-  image_url: z.string(),
-  control_guidance_end: z.number().gte(0).lte(1).optional().default(1),
-  controlnet_conditioning_scale: z.number().optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(0).lte(80).optional().default(40),
   image_size: z
     .union([
       zImageSize,
@@ -8776,37 +8906,31 @@ export const zIllusionDiffusionInput = z.object({
       ]),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(0).lte(80).optional().default(40),
+  control_guidance_start: z.number().gte(0).lte(1).optional().default(0),
+  controlnet_conditioning_scale: z.number().optional().default(1),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   scheduler: z.enum(['DPM++ Karras SDE', 'Euler']).optional().default('Euler'),
+  guidance_scale: z.number().lte(50).optional().default(7.5),
+  control_guidance_end: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * ImageSize
  */
 export const zImageSizeType2 = z.object({
-  width: z.int().lte(14142).optional().default(512),
   height: z.int().lte(14142).optional().default(512),
+  width: z.int().lte(14142).optional().default(512),
 })
 
 /**
  * ImageToImageFooocusInput
  */
 export const zFastFooocusSdxlImageToImageInput = z.object({
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2),
-  request_id: z.string().optional().default(''),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  expand_prompt: z.boolean().optional().default(true),
-  enable_refiner: z.boolean().optional().default(true),
-  image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(1).lte(24).optional().default(8),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   strength: z.number().gte(0.05).lte(1).optional().default(0.95),
-  embeddings: z.array(zEmbedding).optional().default([]),
-  preserve_aspect_ratio: z.boolean().optional().default(false),
-  crop_output: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSizeType2,
@@ -8822,7 +8946,21 @@ export const zFastFooocusSdxlImageToImageInput = z.object({
     ])
     .nullish(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  preserve_aspect_ratio: z.boolean().optional().default(false),
+  enable_refiner: z.boolean().optional().default(true),
+  expand_prompt: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(24).optional().default(8),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2),
+  crop_output: z.boolean().optional().default(false),
+  image_url: z.string(),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   negative_prompt: z.string().optional().default(''),
+  embeddings: z.array(zEmbedding).optional().default([]),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  request_id: z.string().optional().default(''),
 })
 
 /**
@@ -8929,15 +9067,17 @@ export const zFastLcmDiffusionInput = z.object({
  * ImageToImageLightningInput
  */
 export const zFastLightningSdxlImageToImageInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  embeddings: z.array(zEmbedding).optional().default([]),
-  num_inference_steps: z.enum(['1', '2', '4', '8']).optional(),
-  request_id: z.string().optional().default(''),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  request_id: z.string().optional().default(''),
+  crop_output: z.boolean().optional().default(false),
+  num_inference_steps: z.enum(['1', '2', '4', '8']).optional(),
+  expand_prompt: z.boolean().optional().default(false),
+  embeddings: z.array(zEmbedding).optional().default([]),
+  strength: z.number().gte(0.05).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
+  preserve_aspect_ratio: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSizeType2,
@@ -8951,28 +9091,26 @@ export const zFastLightningSdxlImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  preserve_aspect_ratio: z.boolean().optional().default(false),
-  strength: z.number().gte(0.05).lte(1).optional().default(0.95),
-  crop_output: z.boolean().optional().default(false),
-  expand_prompt: z.boolean().optional().default(false),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   prompt: z.string(),
+  image_url: z.string(),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
  * InpaintingLightningInput
  */
 export const zFastLightningSdxlInpaintingInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  embeddings: z.array(zEmbedding).optional().default([]),
-  num_inference_steps: z.enum(['1', '2', '4', '8']).optional(),
-  request_id: z.string().optional().default(''),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
+  request_id: z.string().optional().default(''),
+  prompt: z.string(),
   mask_url: z.string(),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
+  expand_prompt: z.boolean().optional().default(false),
   format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSizeType2,
@@ -8986,10 +9124,10 @@ export const zFastLightningSdxlInpaintingInput = z.object({
       ]),
     ])
     .optional(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  expand_prompt: z.boolean().optional().default(false),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  prompt: z.string(),
+  num_inference_steps: z.enum(['1', '2', '4', '8']).optional(),
+  image_url: z.string(),
+  embeddings: z.array(zEmbedding).optional().default([]),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
@@ -8997,8 +9135,10 @@ export const zFastLightningSdxlInpaintingInput = z.object({
  */
 export const zFastLightningSdxlInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  expand_prompt: z.boolean().optional().default(false),
+  request_id: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSizeType2,
@@ -9012,14 +9152,12 @@ export const zFastLightningSdxlInput = z.object({
       ]),
     ])
     .optional(),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.enum(['1', '2', '4', '8']).optional(),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   embeddings: z.array(zEmbedding).optional().default([]),
-  num_inference_steps: z.enum(['1', '2', '4', '8']).optional(),
-  expand_prompt: z.boolean().optional().default(false),
-  request_id: z.string().optional().default(''),
-  sync_mode: z.boolean().optional().default(false),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
@@ -9034,10 +9172,10 @@ export const zImageStyleReference = z.object({
  * Image
  */
 export const zImageType2 = z.object({
-  url: z.string(),
   height: z.int(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
   width: z.int(),
+  url: z.string(),
 })
 
 /**
@@ -9046,71 +9184,71 @@ export const zImageType2 = z.object({
 export const zCartoonifyOutput = z.object({
   seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Output
  */
 export const zDreamshaperOutput = z.object({
+  prompt: z.string(),
+  images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
-  images: z.array(zImageType2),
 })
 
 /**
  * ErnieImageOutput
  */
 export const zErnieImageLoraOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * ErnieImageOutput
  */
 export const zErnieImageLoraTurboOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * ErnieImageOutput
  */
 export const zErnieImageOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * ErnieImageOutput
  */
 export const zErnieImageTurboOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFastFooocusSdxlImageToImageOutput = z.object({
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -9151,10 +9289,10 @@ export const zFastLcmDiffusionOutput = z.object({
  */
 export const zFastLightningSdxlImageToImageOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
@@ -9162,10 +9300,10 @@ export const zFastLightningSdxlImageToImageOutput = z.object({
  */
 export const zFastLightningSdxlInpaintingOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
@@ -9173,10 +9311,10 @@ export const zFastLightningSdxlInpaintingOutput = z.object({
  */
 export const zFastLightningSdxlOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
@@ -9216,53 +9354,53 @@ export const zFastSdxlControlnetCannyOutput = z.object({
  * Output
  */
 export const zFastSdxlImageToImageOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFastSdxlInpaintingOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFastSdxlOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * FireRedImageEditOutput
  */
 export const zFireredImageEditOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageType2),
+  seed: z.int(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
 })
 
 /**
  * FireRedImageEdit11Output
  */
 export const zFireredImageEditV11Output = z.object({
-  timings: z.record(z.string(), z.number()),
   seed: z.int(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
 })
@@ -9271,242 +9409,242 @@ export const zFireredImageEditV11Output = z.object({
  * Output
  */
 export const zFlux1DevImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFlux1DevOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFlux1DevReduxOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFlux1KreaImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * KreaOutput
  */
 export const zFlux1KreaOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * KreaReduxOutput
  */
 export const zFlux1KreaReduxOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFlux1SchnellOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFlux1SchnellReduxOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFlux1SrpoImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * SRPOOutput
  */
 export const zFlux1SrpoOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxControlLoraCannyImageToImageOutput = z.object({
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zFluxControlLoraCannyOutput = z.object({
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zFluxControlLoraDepthImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zFluxControlLoraDepthOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zFluxDevImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxDevOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxDevReduxOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxGeneralDifferentialDiffusionOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFluxGeneralImageToImageOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFluxGeneralInpaintingOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFluxGeneralOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFluxGeneralRfInversionOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -9557,19 +9695,19 @@ export const zFluxKontextLoraTextToImageOutput = z.object({
  * Output
  */
 export const zFluxKreaImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxKreaLoraImageToImageOutput = z.object({
-  images: z.array(zImageType2),
   prompt: z.string(),
+  images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
@@ -9579,8 +9717,8 @@ export const zFluxKreaLoraImageToImageOutput = z.object({
  * Output
  */
 export const zFluxKreaLoraInpaintingOutput = z.object({
-  images: z.array(zImageType2),
   prompt: z.string(),
+  images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
@@ -9590,8 +9728,8 @@ export const zFluxKreaLoraInpaintingOutput = z.object({
  * Output
  */
 export const zFluxKreaLoraOutput = z.object({
-  images: z.array(zImageType2),
   prompt: z.string(),
+  images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
@@ -9601,8 +9739,8 @@ export const zFluxKreaLoraOutput = z.object({
  * Output
  */
 export const zFluxKreaLoraStreamOutput = z.object({
-  images: z.array(zImageType2),
   prompt: z.string(),
+  images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
@@ -9612,22 +9750,22 @@ export const zFluxKreaLoraStreamOutput = z.object({
  * KreaOutput
  */
 export const zFluxKreaOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * KreaReduxOutput
  */
 export const zFluxKreaReduxOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
@@ -9645,22 +9783,22 @@ export const zFluxLoraCannyOutput = z.object({
  * Output
  */
 export const zFluxLoraDepthOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * Output
  */
 export const zFluxLoraFillOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -9722,64 +9860,64 @@ export const zFluxPulidOutput = z.object({
  * Output
  */
 export const zFluxSchnellOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxSchnellReduxOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxSrpoImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * SRPOOutput
  */
 export const zFluxSrpoOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxSubjectOutput = z.object({
-  images: z.array(zImageType2),
-  timings: z.record(z.string(), z.number()),
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
 })
 
 /**
  * GlmImageToImageOutput
  */
 export const zGlmImageImageToImageOutput = z.object({
+  images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  images: z.array(zImageType2),
   prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
 })
@@ -9788,9 +9926,9 @@ export const zGlmImageImageToImageOutput = z.object({
  * GlmImageOutput
  */
 export const zGlmImageOutput = z.object({
+  images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  images: z.array(zImageType2),
   prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
 })
@@ -9799,11 +9937,11 @@ export const zGlmImageOutput = z.object({
  * Output
  */
 export const zHidreamI1DevOutput = z.object({
-  images: z.array(zImageType2),
+  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
+  images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
 })
 
 /**
@@ -9812,41 +9950,41 @@ export const zHidreamI1DevOutput = z.object({
 export const zHidreamI1FastOutput = z.object({
   images: z.array(zImageType2),
   has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * Img2ImgOutput
  */
 export const zHidreamI1FullImageToImageOutput = z.object({
+  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
   timings: z.record(z.string(), z.number()),
   images: z.array(zImageType2),
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zHidreamI1FullOutput = z.object({
+  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
   timings: z.record(z.string(), z.number()),
   images: z.array(zImageType2),
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zIclightV2Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   prompt: z.string(),
   images: z.array(zImageType2),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -10014,35 +10152,29 @@ export const zImagineart20PreviewTextToImageOutput = z.object({
  */
 export const zInpaintInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(0).lte(150).optional().default(30),
-  model_name: z.string(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  model_name: z.string(),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
   image_url: z.string(),
   mask_url: z.string(),
-  prompt: z.string(),
+  num_inference_steps: z.int().gte(0).lte(150).optional().default(30),
 })
 
 /**
  * InpaintOutput
  */
 export const zInpaintOutput = z.object({
-  seed: z.int(),
   image: zImage,
+  seed: z.int(),
 })
 
 /**
  * TextToImageInput
  */
 export const zInstantCharacterInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
   image_url: z.string(),
-  scale: z.number().gte(0).lte(2).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -10056,9 +10188,15 @@ export const zInstantCharacterInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  scale: z.number().gte(0).lte(2).optional().default(1),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -10066,28 +10204,28 @@ export const zInstantCharacterInput = z.object({
  */
 export const zInstantCharacterOutput = z.object({
   has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  prompt: z.string(),
-  timings: z.record(z.string(), z.number()),
   images: z.array(zImage),
+  prompt: z.string(),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * WatermarkInput
  */
 export const zInvisibleWatermarkInput = z.object({
-  length: z.int().optional().default(0),
   decode: z.boolean().optional().default(false),
-  watermark: z.string().optional().default('watermark'),
+  length: z.int().optional().default(0),
   image_url: z.string(),
+  watermark: z.string().optional().default('watermark'),
 })
 
 /**
  * WatermarkOutput
  */
 export const zInvisibleWatermarkOutput = z.object({
-  extracted_watermark: z.string().optional(),
   length: z.int().optional().default(0),
+  extracted_watermark: z.string().optional(),
   image: zImage.optional(),
 })
 
@@ -10095,42 +10233,37 @@ export const zInvisibleWatermarkOutput = z.object({
  * IPAdapter
  */
 export const zIpAdapter = z.object({
-  image_encoder_subfolder: z.union([z.string(), z.unknown()]).optional(),
-  image_encoder_path: z.string(),
-  image_encoder_weight_name: z.union([z.string(), z.unknown()]).optional(),
-  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
   path: z.string(),
-  scale: z.number(),
-  subfolder: z.union([z.string(), z.unknown()]).optional(),
-  weight_name: z.union([z.string(), z.unknown()]).optional(),
+  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
   mask_threshold: z.number().gte(0.01).lte(0.99).optional().default(0.5),
   image_url: z.string(),
+  weight_name: z.union([z.string(), z.unknown()]).optional(),
+  image_encoder_subfolder: z.union([z.string(), z.unknown()]).optional(),
+  image_encoder_path: z.string(),
+  scale: z.number(),
+  image_encoder_weight_name: z.union([z.string(), z.unknown()]).optional(),
+  subfolder: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * IpAdapterFaceIdInput
  */
 export const zIpAdapterFaceIdInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(200).optional().default(50),
+  base_sdxl_model_repo: z
+    .string()
+    .optional()
+    .default('SG161222/RealVisXL_V3.0'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  face_images_data_url: z.union([z.string(), z.unknown()]).optional(),
+  height: z.int().gte(512).lte(1024).optional().default(512),
   base_1_5_model_repo: z
     .string()
     .optional()
     .default('SG161222/Realistic_Vision_V4.0_noVAE'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, low resolution, bad, ugly, low quality, pixelated, interpolated, compression artifacts, noisey, grainy',
-    ),
-  face_image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_samples: z.int().gte(1).lte(4).optional().default(4),
-  height: z.int().gte(512).lte(1024).optional().default(512),
-  face_images_data_url: z.union([z.string(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(16).optional().default(7.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  face_id_det_size: z.int().gte(64).lte(640).optional().default(640),
-  prompt: z.string(),
   width: z.int().gte(512).lte(1024).optional().default(512),
+  face_image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(200).optional().default(50),
+  prompt: z.string(),
   model_type: z
     .enum([
       '1_5-v1',
@@ -10142,10 +10275,15 @@ export const zIpAdapterFaceIdInput = z.object({
     ])
     .optional()
     .default('1_5-v1'),
-  base_sdxl_model_repo: z
+  num_samples: z.int().gte(1).lte(4).optional().default(4),
+  guidance_scale: z.number().gte(0).lte(16).optional().default(7.5),
+  face_id_det_size: z.int().gte(64).lte(640).optional().default(640),
+  negative_prompt: z
     .string()
     .optional()
-    .default('SG161222/RealVisXL_V3.0'),
+    .default(
+      'blurry, low resolution, bad, ugly, low quality, pixelated, interpolated, compression artifacts, noisey, grainy',
+    ),
 })
 
 /**
@@ -10178,11 +10316,8 @@ export const zIpAdapterType2 = z.object({
  * JanusInput
  */
 export const zJanusInput = z.object({
-  num_images: z.int().gte(1).lte(16).optional().default(1),
-  enable_safety_checker: z.boolean().optional().default(true),
   temperature: z.number().gte(0.1).lte(2).optional().default(1),
-  cfg_weight: z.number().gte(1).lte(20).optional().default(5),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(16).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -10197,59 +10332,62 @@ export const zJanusInput = z.object({
     ])
     .optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_weight: z.number().gte(1).lte(20).optional().default(5),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * Output
  */
 export const zJanusOutput = z.object({
-  timings: z.record(z.string(), z.number()),
   images: z.array(zImageType2),
   seed: z.int(),
-  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
+  timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
 })
 
 /**
  * JoyAIImageEditInput
  */
 export const zJoyaiImageEditInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  guidance_scale: z.number().gte(1).lte(15).optional().default(5),
-  negative_prompt: z.string().optional().default(''),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  negative_prompt: z.string().optional().default(''),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  image_url: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(1).lte(15).optional().default(5),
 })
 
 /**
  * JoyAIImageEditOutput
  */
 export const zJoyaiImageEditOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImage),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * DevImageToImageInput
  */
 export const zJuggernautFluxBaseImageToImageInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
   sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
   guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   prompt: z.string(),
+  image_url: z.string(),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -10257,19 +10395,19 @@ export const zJuggernautFluxBaseImageToImageInput = z.object({
  */
 export const zJuggernautFluxBaseImageToImageOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * DevTextToImageInput
  */
 export const zJuggernautFluxBaseInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
   image_size: z
     .union([
       zImageSize,
@@ -10283,11 +10421,11 @@ export const zJuggernautFluxBaseInput = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -10295,19 +10433,18 @@ export const zJuggernautFluxBaseInput = z.object({
  */
 export const zJuggernautFluxBaseOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * SchnellTextToImageInput
  */
 export const zJuggernautFluxLightningInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   image_size: z
     .union([
       zImageSize,
@@ -10321,10 +10458,11 @@ export const zJuggernautFluxLightningInput = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -10332,48 +10470,48 @@ export const zJuggernautFluxLightningInput = z.object({
  */
 export const zJuggernautFluxLightningOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zJuggernautFluxLoraInpaintingOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * Output
  */
 export const zJuggernautFluxLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * DevImageToImageInput
  */
 export const zJuggernautFluxProImageToImageInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
   sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(10).lte(50).optional().default(40),
   guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   prompt: z.string(),
+  image_url: z.string(),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -10381,19 +10519,19 @@ export const zJuggernautFluxProImageToImageInput = z.object({
  */
 export const zJuggernautFluxProImageToImageOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * DevTextToImageInput
  */
 export const zJuggernautFluxProInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
   image_size: z
     .union([
       zImageSize,
@@ -10407,11 +10545,11 @@ export const zJuggernautFluxProInput = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -10419,10 +10557,10 @@ export const zJuggernautFluxProInput = z.object({
  */
 export const zJuggernautFluxProOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
@@ -10431,17 +10569,17 @@ export const zJuggernautFluxProOutput = z.object({
  * Request model for Kling O1 Omni Image (legacy).
  */
 export const zKlingImageO1Input = z.object({
-  prompt: z.string().max(2500),
+  resolution: z.enum(['1K', '2K']).optional().default('1K'),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1', '4:3', '3:4', '3:2', '2:3', '21:9'])
     .optional()
     .default('auto'),
-  num_images: z.int().gte(1).lte(9).optional().default(1),
-  resolution: z.enum(['1K', '2K']).optional().default('1K'),
   image_urls: z.array(z.string()),
+  num_images: z.int().gte(1).lte(9).optional().default(1),
+  prompt: z.string().max(2500),
+  sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   elements: z.union([z.array(zElementInput), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -10457,19 +10595,19 @@ export const zKlingImageO1Output = z.object({
  * Request model for Kling O3 Image-to-Image Generation.
  */
 export const zKlingImageO3ImageToImageInput = z.object({
-  prompt: z.string().max(2500),
+  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4', '3:2', '2:3', '21:9', 'auto'])
     .optional()
     .default('auto'),
   image_urls: z.array(z.string()),
-  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
-  num_images: z.int().gte(1).lte(9).optional().default(1),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   series_amount: z.union([z.int().gte(2).lte(9), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(9).optional().default(1),
+  prompt: z.string().max(2500),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   result_type: z.enum(['single', 'series']).optional().default('single'),
   elements: z.union([z.array(zElementInput), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -10487,18 +10625,18 @@ export const zKlingImageO3ImageToImageOutput = z.object({
  * Request model for Kling O3 Text-to-Image Generation.
  */
 export const zKlingImageO3TextToImageInput = z.object({
-  prompt: z.string().max(2500),
+  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4', '3:2', '2:3', '21:9'])
     .optional()
     .default('16:9'),
   num_images: z.int().gte(1).lte(9).optional().default(1),
-  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   series_amount: z.union([z.int().gte(2).lte(9), z.unknown()]).optional(),
+  prompt: z.string().max(2500),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   result_type: z.enum(['single', 'series']).optional().default('single'),
   elements: z.union([z.array(zElementInput), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -10516,17 +10654,17 @@ export const zKlingImageO3TextToImageOutput = z.object({
  * Request model for Kling V3 Image-to-Image Generation.
  */
 export const zKlingImageV3ImageToImageInput = z.object({
-  prompt: z.string().max(2500),
+  resolution: z.enum(['1K', '2K']).optional().default('1K'),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4', '3:2', '2:3', '21:9'])
     .optional()
     .default('16:9'),
   num_images: z.int().gte(1).lte(9).optional().default(1),
-  resolution: z.enum(['1K', '2K']).optional().default('1K'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   image_url: z.string(),
-  elements: z.union([z.array(zElementInput), z.unknown()]).optional(),
+  prompt: z.string().max(2500),
   sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  elements: z.union([z.array(zElementInput), z.unknown()]).optional(),
 })
 
 /**
@@ -10544,17 +10682,17 @@ export const zKlingImageV3ImageToImageOutput = z.object({
  * Request model for Kling V3 Text-to-Image Generation.
  */
 export const zKlingImageV3TextToImageInput = z.object({
-  prompt: z.string().max(2500),
+  resolution: z.enum(['1K', '2K']).optional().default('1K'),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4', '3:2', '2:3', '21:9'])
     .optional()
     .default('16:9'),
-  num_images: z.int().gte(1).lte(9).optional().default(1),
-  resolution: z.enum(['1K', '2K']).optional().default('1K'),
   negative_prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(9).optional().default(1),
+  prompt: z.string().max(2500),
+  sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   elements: z.union([z.array(zElementInput), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -10586,7 +10724,7 @@ export const zKlingV15KolorsVirtualTryOnOutput = z.object({
  * KolorsImg2ImgInput
  */
 export const zKolorsImageToImageInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  sync_mode: z.boolean().optional().default(false),
   scheduler: z
     .enum([
       'EulerDiscreteScheduler',
@@ -10598,6 +10736,10 @@ export const zKolorsImageToImageInput = z.object({
     ])
     .optional()
     .default('EulerDiscreteScheduler'),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
   image_size: z
     .union([
       zImageSize,
@@ -10611,34 +10753,30 @@ export const zKolorsImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  num_inference_steps: z.int().gte(1).lte(150).optional().default(50),
-  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   negative_prompt: z.string().optional().default(''),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(150).optional().default(50),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
  * Output
  */
 export const zKolorsImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
-  timings: z.record(z.string(), z.number()),
   seed: z.int(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * KolorsInput
  */
 export const zKolorsInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  sync_mode: z.boolean().optional().default(false),
   scheduler: z
     .enum([
       'EulerDiscreteScheduler',
@@ -10650,14 +10788,8 @@ export const zKolorsInput = z.object({
     ])
     .optional()
     .default('EulerDiscreteScheduler'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(150).optional().default(50),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
   image_size: z
     .union([
       zImageSize,
@@ -10671,69 +10803,75 @@ export const zKolorsInput = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  negative_prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(1).lte(150).optional().default(50),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
  * Output
  */
 export const zKolorsOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
-  timings: z.record(z.string(), z.number()),
   seed: z.int(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * LCMI2IInput
  */
 export const zLcmSd15I2iInput = z.object({
-  image_url: z.string(),
-  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  request_id: z.string().optional().default(''),
   enable_safety_checks: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  mask_url: z.union([z.string(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(16).optional().default(1),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  image_url: z.string(),
   strength: z.number().gte(0).lte(1).optional().default(0.8),
   num_images: z.int().gte(1).lte(8).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(16).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_url: z.union([z.string(), z.unknown()]).optional(),
-  request_id: z.string().optional().default(''),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
 })
 
 /**
  * LCMOutput
  */
 export const zLcmSd15I2iOutput = z.object({
-  num_inference_steps: z.int().optional().default(4),
   seed: z.int(),
   images: z.array(zImageType2),
-  nsfw_content_detected: z.array(z.boolean()),
-  request_id: z.string().optional().default(''),
   timings: z.record(z.string(), z.number()),
+  request_id: z.string().optional().default(''),
+  num_inference_steps: z.int().optional().default(4),
+  nsfw_content_detected: z.array(z.boolean()),
 })
 
 /**
  * PoseTransferInput
  */
 export const zLeffaPoseTransferInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   person_image_url: z.string(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  pose_image_url: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  pose_image_url: z.string(),
 })
 
 /**
  * PoseTransferOutput
  */
 export const zLeffaPoseTransferOutput = z.object({
-  has_nsfw_concepts: z.boolean(),
   image: zImage,
+  has_nsfw_concepts: z.boolean(),
   seed: z.int(),
 })
 
@@ -10741,23 +10879,23 @@ export const zLeffaPoseTransferOutput = z.object({
  * VTONInput
  */
 export const zLeffaVirtualTryonInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  garment_type: z.enum(['upper_body', 'lower_body', 'dresses']),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  human_image_url: z.string(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   garment_image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  garment_type: z.enum(['upper_body', 'lower_body', 'dresses']),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  human_image_url: z.string(),
 })
 
 /**
  * VTONOutput
  */
 export const zLeffaVirtualTryonOutput = z.object({
-  has_nsfw_concepts: z.boolean(),
   image: zImage,
+  has_nsfw_concepts: z.boolean(),
   seed: z.int(),
 })
 
@@ -10765,8 +10903,8 @@ export const zLeffaVirtualTryonOutput = z.object({
  * Lighting
  */
 export const zLighting = z.object({
-  shadows: z.union([z.string(), z.unknown()]).optional(),
   conditions: z.union([z.string(), z.unknown()]).optional(),
+  shadows: z.union([z.string(), z.unknown()]).optional(),
   direction: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -10794,29 +10932,29 @@ export const zLightingType2 = z.object({
  * LivePortraitImageInput
  */
 export const zLivePortraitImageInput = z.object({
-  image_url: z.string(),
-  pupil_y: z.number().gte(-45).lte(45).optional().default(0),
-  flag_pasteback: z.boolean().optional().default(true),
-  flag_do_rot: z.boolean().optional().default(true),
-  flag_lip_zero: z.boolean().optional().default(true),
-  dsize: z.int().optional().default(512),
-  smile: z.number().gte(-2).lte(2).optional().default(0),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  vy_ratio: z.number().optional().default(-0.125),
-  scale: z.number().optional().default(2.3),
-  eee: z.number().gte(-40).lte(40).optional().default(0),
-  rotate_yaw: z.number().gte(-45).lte(45).optional().default(0),
-  eyebrow: z.number().gte(-30).lte(30).optional().default(0),
-  flag_do_crop: z.boolean().optional().default(true),
-  rotate_pitch: z.number().gte(-45).lte(45).optional().default(0),
-  rotate_roll: z.number().gte(-45).lte(45).optional().default(0),
-  pupil_x: z.number().gte(-45).lte(45).optional().default(0),
-  blink: z.number().gte(-30).lte(30).optional().default(0),
-  aaa: z.number().gte(-200).lte(200).optional().default(0),
-  wink: z.number().gte(0).lte(25).optional().default(0),
   enable_safety_checker: z.boolean().optional().default(false),
-  vx_ratio: z.number().optional().default(0),
+  pupil_x: z.number().gte(-45).lte(45).optional().default(0),
+  aaa: z.number().gte(-200).lte(200).optional().default(0),
   woo: z.number().gte(-100).lte(100).optional().default(0),
+  vx_ratio: z.number().optional().default(0),
+  smile: z.number().gte(-2).lte(2).optional().default(0),
+  vy_ratio: z.number().optional().default(-0.125),
+  rotate_yaw: z.number().gte(-45).lte(45).optional().default(0),
+  scale: z.number().optional().default(2.3),
+  flag_do_rot: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  flag_lip_zero: z.boolean().optional().default(true),
+  eee: z.number().gte(-40).lte(40).optional().default(0),
+  dsize: z.int().optional().default(512),
+  rotate_pitch: z.number().gte(-45).lte(45).optional().default(0),
+  flag_pasteback: z.boolean().optional().default(true),
+  flag_do_crop: z.boolean().optional().default(true),
+  blink: z.number().gte(-30).lte(30).optional().default(0),
+  image_url: z.string(),
+  eyebrow: z.number().gte(-30).lte(30).optional().default(0),
+  rotate_roll: z.number().gte(-45).lte(45).optional().default(0),
+  wink: z.number().gte(0).lte(25).optional().default(0),
+  pupil_y: z.number().gte(-45).lte(45).optional().default(0),
 })
 
 /**
@@ -10830,38 +10968,42 @@ export const zLivePortraitImageOutput = z.object({
  * EditImageInput
  */
 export const zLongcatImageEditInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_url: z.string(),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
 })
 
 /**
  * ImageToImageOutput
  */
 export const zLongcatImageEditOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageType2),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * TextToImageInput
  */
 export const zLongcatImageInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   image_size: z
     .union([
       zImageSize,
@@ -10875,27 +11017,23 @@ export const zLongcatImageInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
 })
 
 /**
  * TextToImageOutput
  */
 export const zLongcatImageOutput = z.object({
-  images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  images: z.array(zImageType2),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -10934,8 +11072,11 @@ export const zLoRaInput = z.object({
  * Flux2EditImageLoRAInput
  */
 export const zFlux2LoraEditInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -10950,27 +11091,27 @@ export const zFlux2LoraEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   image_urls: z.array(z.string()),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
   loras: z.array(zLoRaInput).optional().default([]),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * Flux2TextToImageLoRAInput
  */
 export const zFlux2LoraInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -10984,18 +11125,25 @@ export const zFlux2LoraInput = z.object({
       ]),
     ])
     .optional(),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
   loras: z.array(zLoRaInput).optional().default([]),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
-  num_inference_steps: z.int().gte(4).lte(50).optional().default(28),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+})
+
+/**
+ * LoRAInput
+ *
+ * A single LoRA weight to apply.
+ */
+export const zLoRaInputType2 = z.object({
+  path: z.string(),
+  scale: z.number().gte(0).lte(4).optional().default(1),
 })
 
 /**
@@ -11021,8 +11169,7 @@ export const zLoraWeight = z.object({
  * ErnieImageLoRAInput
  */
 export const zErnieImageLoraInput = z.object({
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -11041,27 +11188,27 @@ export const zErnieImageLoraInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
   negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   loras: z.array(zLoraWeight).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  prompt: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ErnieImageTurboLoRAInput
  */
 export const zErnieImageLoraTurboInput = z.object({
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -11080,30 +11227,29 @@ export const zErnieImageLoraTurboInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
   negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   loras: z.array(zLoraWeight).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(20).optional().default(8),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(20).optional().default(8),
+  prompt: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ImageToImageInput
  */
 export const zFluxControlLoraCannyImageToImageInput = z.object({
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  image_url: z.string(),
+  loras: z.array(zLoraWeight).optional().default([]),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
@@ -11118,24 +11264,24 @@ export const zFluxControlLoraCannyImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   control_lora_image_url: z.string(),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  sync_mode: z.boolean().optional().default(false),
+  control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
 })
 
 /**
  * DepthLoraInput
  */
 export const zFluxControlLoraCannyInput = z.object({
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  loras: z.array(zLoraWeight).optional().default([]),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
@@ -11150,22 +11296,27 @@ export const zFluxControlLoraCannyInput = z.object({
       ]),
     ])
     .optional(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  control_lora_image_url: z.string(),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   preprocess_depth: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   sync_mode: z.boolean().optional().default(false),
   control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
-  control_lora_image_url: z.string(),
 })
 
 /**
  * ImageToImageInput
  */
 export const zFluxControlLoraDepthImageToImageInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
+  control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  control_lora_image_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   image_size: z
     .union([
       zImageSize,
@@ -11179,25 +11330,25 @@ export const zFluxControlLoraDepthImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  image_url: z.string(),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   loras: z.array(zLoraWeight).optional().default([]),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  image_url: z.string(),
   prompt: z.string(),
-  control_lora_image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * DepthLoraInput
  */
 export const zFluxControlLoraDepthInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
+  control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  control_lora_image_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   image_size: z
     .union([
       zImageSize,
@@ -11211,30 +11362,46 @@ export const zFluxControlLoraDepthInput = z.object({
       ]),
     ])
     .optional(),
-  control_lora_strength: z.number().gte(0).lte(2).optional().default(1),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   preprocess_depth: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   loras: z.array(zLoraWeight).optional().default([]),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   prompt: z.string(),
-  control_lora_image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * DifferentialDiffusionInput
  */
 export const zFluxGeneralDifferentialDiffusionInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_images: z.int().gte(1).lte(10).optional().default(1),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
+  use_beta_schedule: z.boolean().optional().default(false),
+  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.string(),
   change_map_image_url: z.string(),
-  nag_alpha: z.number().lte(1).optional().default(0.25),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
   base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  nag_tau: z.number().optional().default(2.5),
+  easycontrols: z.array(zEasyControlWeight).optional().default([]),
+  control_loras: z.array(zControlLoraWeight).optional().default([]),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  nag_end: z.number().lte(1).optional().default(0.25),
+  use_cfg_zero: z.boolean().optional().default(false),
+  nag_scale: z.number().lte(10).optional().default(3),
+  reference_start: z.number().gte(0).lte(1).optional().default(0),
+  reference_end: z.number().gte(0).lte(1).optional().default(1),
+  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
+  num_images: z.int().gte(1).lte(10).optional().default(1),
+  nag_alpha: z.number().lte(1).optional().default(0.25),
+  prompt: z.string(),
+  ip_adapters: z.array(zIpAdapter).optional().default([]),
+  loras: z.array(zLoraWeight).optional().default([]),
+  controlnets: z.array(zControlNet).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -11248,46 +11415,46 @@ export const zFluxGeneralDifferentialDiffusionInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  prompt: z.string(),
-  image_url: z.string(),
-  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
-  negative_prompt: z.string().optional().default(''),
-  use_cfg_zero: z.boolean().optional().default(false),
-  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
-  reference_image_url: z.string().optional(),
-  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
-  easycontrols: z.array(zEasyControlWeight).optional().default([]),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  nag_scale: z.number().lte(10).optional().default(3),
-  use_beta_schedule: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
-  nag_tau: z.number().optional().default(2.5),
-  reference_start: z.number().gte(0).lte(1).optional().default(0),
-  control_loras: z.array(zControlLoraWeight).optional().default([]),
-  nag_end: z.number().lte(1).optional().default(0.25),
-  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
-  use_real_cfg: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   reference_strength: z.number().gte(-3).lte(3).optional().default(0.65),
-  ip_adapters: z.array(zIpAdapter).optional().default([]),
-  reference_end: z.number().gte(0).lte(1).optional().default(1),
-  controlnets: z.array(zControlNet).optional().default([]),
+  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
+  sync_mode: z.boolean().optional().default(false),
+  use_real_cfg: z.boolean().optional().default(false),
+  reference_image_url: z.string().optional(),
+  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
 })
 
 /**
  * ImageToImageInput
  */
 export const zFluxGeneralImageToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_images: z.int().gte(1).lte(10).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
+  use_beta_schedule: z.boolean().optional().default(false),
+  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.string(),
   strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  nag_alpha: z.number().lte(1).optional().default(0.25),
   base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  nag_tau: z.number().optional().default(2.5),
+  easycontrols: z.array(zEasyControlWeight).optional().default([]),
+  control_loras: z.array(zControlLoraWeight).optional().default([]),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  nag_end: z.number().lte(1).optional().default(0.25),
+  use_cfg_zero: z.boolean().optional().default(false),
+  nag_scale: z.number().lte(10).optional().default(3),
+  reference_start: z.number().gte(0).lte(1).optional().default(0),
+  reference_end: z.number().gte(0).lte(1).optional().default(1),
+  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
+  num_images: z.int().gte(1).lte(10).optional().default(1),
+  nag_alpha: z.number().lte(1).optional().default(0.25),
+  prompt: z.string(),
+  ip_adapters: z.array(zIpAdapter).optional().default([]),
+  loras: z.array(zLoraWeight).optional().default([]),
+  controlnets: z.array(zControlNet).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -11301,46 +11468,47 @@ export const zFluxGeneralImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  prompt: z.string(),
-  image_url: z.string(),
-  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
-  negative_prompt: z.string().optional().default(''),
-  use_cfg_zero: z.boolean().optional().default(false),
-  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
-  reference_image_url: z.string().optional(),
-  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
-  easycontrols: z.array(zEasyControlWeight).optional().default([]),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  nag_scale: z.number().lte(10).optional().default(3),
-  use_beta_schedule: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
-  nag_tau: z.number().optional().default(2.5),
-  reference_start: z.number().gte(0).lte(1).optional().default(0),
-  control_loras: z.array(zControlLoraWeight).optional().default([]),
-  nag_end: z.number().lte(1).optional().default(0.25),
-  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
-  use_real_cfg: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   reference_strength: z.number().gte(-3).lte(3).optional().default(0.65),
-  ip_adapters: z.array(zIpAdapter).optional().default([]),
-  reference_end: z.number().gte(0).lte(1).optional().default(1),
-  controlnets: z.array(zControlNet).optional().default([]),
+  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
+  sync_mode: z.boolean().optional().default(false),
+  use_real_cfg: z.boolean().optional().default(false),
+  reference_image_url: z.string().optional(),
+  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
 })
 
 /**
  * InpaintInput
  */
 export const zFluxGeneralInpaintingInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_images: z.int().gte(1).lte(10).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
+  use_beta_schedule: z.boolean().optional().default(false),
+  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.string(),
+  mask_url: z.string(),
   strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  nag_alpha: z.number().lte(1).optional().default(0.25),
   base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  nag_tau: z.number().optional().default(2.5),
+  easycontrols: z.array(zEasyControlWeight).optional().default([]),
+  control_loras: z.array(zControlLoraWeight).optional().default([]),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  nag_end: z.number().lte(1).optional().default(0.25),
+  use_cfg_zero: z.boolean().optional().default(false),
+  nag_scale: z.number().lte(10).optional().default(3),
+  reference_start: z.number().gte(0).lte(1).optional().default(0),
+  reference_end: z.number().gte(0).lte(1).optional().default(1),
+  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
+  num_images: z.int().gte(1).lte(10).optional().default(1),
+  nag_alpha: z.number().lte(1).optional().default(0.25),
+  prompt: z.string(),
+  ip_adapters: z.array(zIpAdapter).optional().default([]),
+  loras: z.array(zLoraWeight).optional().default([]),
+  controlnets: z.array(zControlNet).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -11354,46 +11522,44 @@ export const zFluxGeneralInpaintingInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  easycontrols: z.array(zEasyControlWeight).optional().default([]),
-  image_url: z.string(),
-  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
-  negative_prompt: z.string().optional().default(''),
-  use_cfg_zero: z.boolean().optional().default(false),
-  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
-  reference_image_url: z.string().optional(),
-  prompt: z.string(),
-  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  nag_scale: z.number().lte(10).optional().default(3),
-  use_beta_schedule: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
-  nag_tau: z.number().optional().default(2.5),
-  reference_start: z.number().gte(0).lte(1).optional().default(0),
-  control_loras: z.array(zControlLoraWeight).optional().default([]),
-  nag_end: z.number().lte(1).optional().default(0.25),
-  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
-  use_real_cfg: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   reference_strength: z.number().gte(-3).lte(3).optional().default(0.65),
-  ip_adapters: z.array(zIpAdapter).optional().default([]),
-  reference_end: z.number().gte(0).lte(1).optional().default(1),
-  controlnets: z.array(zControlNet).optional().default([]),
-  mask_url: z.string(),
+  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
+  sync_mode: z.boolean().optional().default(false),
+  use_real_cfg: z.boolean().optional().default(false),
+  reference_image_url: z.string().optional(),
+  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
 })
 
 /**
  * TextToImageInput
  */
 export const zFluxGeneralInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
-  loras: z.array(zLoraWeight).optional().default([]),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
+  use_beta_schedule: z.boolean().optional().default(false),
+  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
+  base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  nag_tau: z.number().optional().default(2.5),
+  easycontrols: z.array(zEasyControlWeight).optional().default([]),
+  control_loras: z.array(zControlLoraWeight).optional().default([]),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  nag_end: z.number().lte(1).optional().default(0.25),
+  use_cfg_zero: z.boolean().optional().default(false),
+  nag_scale: z.number().lte(10).optional().default(3),
+  reference_start: z.number().gte(0).lte(1).optional().default(0),
+  reference_end: z.number().gte(0).lte(1).optional().default(1),
+  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
   num_images: z.int().gte(1).lte(10).optional().default(1),
   nag_alpha: z.number().lte(1).optional().default(0.25),
-  base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  prompt: z.string(),
+  loras: z.array(zLoraWeight).optional().default([]),
+  ip_adapters: z.array(zIpAdapter).optional().default([]),
+  controlnets: z.array(zControlNet).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -11407,50 +11573,60 @@ export const zFluxGeneralInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  prompt: z.string(),
-  easycontrols: z.array(zEasyControlWeight).optional().default([]),
-  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
-  negative_prompt: z.string().optional().default(''),
-  use_cfg_zero: z.boolean().optional().default(false),
-  real_cfg_scale: z.number().gte(0).lte(5).optional().default(3.5),
-  reference_image_url: z.string().optional(),
-  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  nag_scale: z.number().lte(10).optional().default(3),
-  use_beta_schedule: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
-  nag_tau: z.number().optional().default(2.5),
-  reference_start: z.number().gte(0).lte(1).optional().default(0),
-  control_loras: z.array(zControlLoraWeight).optional().default([]),
-  nag_end: z.number().lte(1).optional().default(0.25),
-  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
-  use_real_cfg: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   reference_strength: z.number().gte(-3).lte(3).optional().default(0.65),
-  ip_adapters: z.array(zIpAdapter).optional().default([]),
-  reference_end: z.number().gte(0).lte(1).optional().default(1),
-  controlnets: z.array(zControlNet).optional().default([]),
+  max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
+  sync_mode: z.boolean().optional().default(false),
+  use_real_cfg: z.boolean().optional().default(false),
+  reference_image_url: z.string().optional(),
+  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
 })
 
 /**
  * RFInversionInput
  */
 export const zFluxGeneralRfInversionInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
+  use_beta_schedule: z.boolean().optional().default(false),
+  controller_guidance_reverse: z
+    .number()
+    .gte(0.01)
+    .lte(3)
+    .optional()
+    .default(0.75),
+  image_url: z.string(),
+  base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  nag_tau: z.number().optional().default(2.5),
+  easycontrols: z.array(zEasyControlWeight).optional().default([]),
+  control_loras: z.array(zControlLoraWeight).optional().default([]),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   controller_guidance_forward: z
     .number()
     .gte(0.01)
     .lte(3)
     .optional()
     .default(0.6),
-  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
-  loras: z.array(zLoraWeight).optional().default([]),
+  nag_end: z.number().lte(1).optional().default(0.25),
+  use_cfg_zero: z.boolean().optional().default(false),
+  nag_scale: z.number().lte(10).optional().default(3),
+  reference_start: z.number().gte(0).lte(1).optional().default(0),
+  reference_end: z.number().gte(0).lte(1).optional().default(1),
+  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
   num_images: z.int().gte(1).lte(10).optional().default(1),
+  reverse_guidance_schedule: z
+    .enum(['constant', 'linear_increase', 'linear_decrease'])
+    .optional()
+    .default('constant'),
   nag_alpha: z.number().lte(1).optional().default(0.25),
-  base_shift: z.number().gte(0.01).lte(5).optional().default(0.5),
+  loras: z.array(zLoraWeight).optional().default([]),
+  prompt: z.string(),
+  reverse_guidance_end: z.int().optional().default(8),
+  controlnets: z.array(zControlNet).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -11464,42 +11640,14 @@ export const zFluxGeneralRfInversionInput = z.object({
       ]),
     ])
     .nullish(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  easycontrols: z.array(zEasyControlWeight).optional().default([]),
-  image_url: z.string(),
-  scheduler: z.enum(['euler', 'dpmpp_2m']).optional().default('euler'),
-  negative_prompt: z.string().optional().default(''),
-  use_cfg_zero: z.boolean().optional().default(false),
-  prompt: z.string(),
-  reference_image_url: z.string().optional(),
-  reverse_guidance_schedule: z
-    .enum(['constant', 'linear_increase', 'linear_decrease'])
-    .optional()
-    .default('constant'),
-  fill_image: z.union([zImageFillInput, z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
-  reverse_guidance_end: z.int().optional().default(8),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  nag_scale: z.number().lte(10).optional().default(3),
-  controller_guidance_reverse: z
-    .number()
-    .gte(0.01)
-    .lte(3)
-    .optional()
-    .default(0.75),
   reverse_guidance_start: z.int().optional().default(0),
-  use_beta_schedule: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sigma_schedule: z.union([z.string(), z.unknown()]).optional(),
-  nag_tau: z.number().optional().default(2.5),
-  reference_start: z.number().gte(0).lte(1).optional().default(0),
-  control_loras: z.array(zControlLoraWeight).optional().default([]),
-  nag_end: z.number().lte(1).optional().default(0.25),
+  enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  sync_mode: z.boolean().optional().default(false),
   max_shift: z.number().gte(0.01).lte(5).optional().default(1.15),
   reference_strength: z.number().gte(-3).lte(3).optional().default(0.65),
-  reference_end: z.number().gte(0).lte(1).optional().default(1),
-  controlnets: z.array(zControlNet).optional().default([]),
+  reference_image_url: z.string().optional(),
+  controlnet_unions: z.array(zControlNetUnion).optional().default([]),
 })
 
 /**
@@ -11590,12 +11738,11 @@ export const zFluxKontextLoraTextToImageInput = z.object({
  * ImageToImageInput
  */
 export const zFluxKreaLoraImageToImageInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  image_url: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -11609,24 +11756,24 @@ export const zFluxKreaLoraImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  loras: z.array(zLoraWeight).optional().default([]),
   sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
 })
 
 /**
  * InpaintInput
  */
 export const zFluxKreaLoraInpaintingInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  image_url: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
+  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -11641,24 +11788,23 @@ export const zFluxKreaLoraInpaintingInput = z.object({
     ])
     .optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  mask_url: z.string(),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  loras: z.array(zLoraWeight).optional().default([]),
   sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  mask_url: z.string(),
 })
 
 /**
  * TextToImageInput
  */
 export const zFluxKreaLoraInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  loras: z.array(zLoraWeight).optional().default([]),
   image_size: z
     .union([
       zImageSize,
@@ -11672,22 +11818,22 @@ export const zFluxKreaLoraInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * TextToImageInput
  */
 export const zFluxKreaLoraStreamInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  loras: z.array(zLoraWeight).optional().default([]),
   image_size: z
     .union([
       zImageSize,
@@ -11701,10 +11847,12 @@ export const zFluxKreaLoraStreamInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -11741,8 +11889,16 @@ export const zFluxLoraCannyInput = z.object({
  * DepthInput
  */
 export const zFluxLoraDepthInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  image_url: z.string(),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
   enable_safety_checker: z.boolean().optional().default(true),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -11756,33 +11912,28 @@ export const zFluxLoraDepthInput = z.object({
       ]),
     ])
     .optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   loras: z.array(zLoraWeight).optional().default([]),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  image_url: z.string(),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
 })
 
 /**
  * FillInput
  */
 export const zFluxLoraFillInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
   fill_image: z.union([zImageFillInputType2, z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
-  paste_back: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  resize_to_original: z.boolean().optional().default(false),
   loras: z.array(zLoraWeight).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  paste_back: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   mask_url: z.string(),
+  prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  guidance_scale: z.number().gte(28).lte(35).optional().default(30),
+  resize_to_original: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -11796,9 +11947,6 @@ export const zFluxLoraFillInput = z.object({
       ]),
     ])
     .optional(),
-  guidance_scale: z.number().gte(28).lte(35).optional().default(30),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  prompt: z.string().optional().default(''),
 })
 
 /**
@@ -11926,14 +12074,22 @@ export const zFluxLoraStreamInput = z.object({
  * FooocusImagePromptInput
  */
 export const zFooocusImagePromptInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  mixing_image_prompt_and_vary_upscale: z.boolean().optional().default(false),
+  aspect_ratio: z.string().optional().default('1024x1024'),
+  guidance_scale: z.number().gte(1).lte(30).optional().default(4),
   refiner_model: z
     .enum(['None', 'realisticVisionV60B1_v51VAE.safetensors'])
     .optional()
     .default('None'),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  loras: z
+    .array(zLoraWeight)
+    .optional()
+    .default([
+      {
+        scale: 0.1,
+        path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
+      },
+    ]),
+  inpaint_additional_prompt: z.string().optional().default(''),
   styles: z
     .array(
       z.enum([
@@ -12217,29 +12373,37 @@ export const zFooocusImagePromptInput = z.object({
       ]),
     )
     .optional()
-    .default(['Fooocus Enhance', 'Fooocus V2', 'Fooocus Sharp']),
-  aspect_ratio: z.string().optional().default('1024x1024'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  image_prompt_1: zImagePrompt,
-  inpaint_additional_prompt: z.string().optional().default(''),
-  sharpness: z.number().gte(0).lte(30).optional().default(2),
-  guidance_scale: z.number().gte(1).lte(30).optional().default(4),
+    .default(['Fooocus V2', 'Fooocus Enhance', 'Fooocus Sharp']),
+  mixing_image_prompt_and_vary_upscale: z.boolean().optional().default(false),
+  image_prompt_3: zImagePrompt.optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   performance: z
     .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
     .optional()
     .default('Extreme Speed'),
-  loras: z
-    .array(zLoraWeight)
+  sync_mode: z.boolean().optional().default(false),
+  uov_image_url: z.union([z.string(), z.unknown()]).optional(),
+  inpaint_mode: z
+    .enum([
+      'Inpaint or Outpaint (default)',
+      'Improve Detail (face, hand, eyes, etc.)',
+      'Modify Content (add objects, change background, etc.)',
+    ])
     .optional()
-    .default([
-      {
-        scale: 0.1,
-        path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
-      },
-    ]),
-  mixing_image_prompt_and_inpaint: z.boolean().optional().default(false),
-  inpaint_image_url: z.union([z.string(), z.unknown()]).optional(),
+    .default('Inpaint or Outpaint (default)'),
+  prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).nullish(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
+  mixing_image_prompt_and_inpaint: z.boolean().optional().default(false),
+  outpaint_selections: z
+    .array(z.enum(['Left', 'Right', 'Top', 'Bottom']))
+    .optional()
+    .default([]),
+  sharpness: z.number().gte(0).lte(30).optional().default(2),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  image_prompt_1: zImagePrompt,
+  image_prompt_2: zImagePrompt.optional(),
   uov_method: z
     .enum([
       'Disabled',
@@ -12251,362 +12415,25 @@ export const zFooocusImagePromptInput = z.object({
     ])
     .optional()
     .default('Disabled'),
-  sync_mode: z.boolean().optional().default(false),
-  outpaint_selections: z
-    .array(z.enum(['Left', 'Right', 'Top', 'Bottom']))
-    .optional()
-    .default([]),
-  inpaint_mode: z
-    .enum([
-      'Inpaint or Outpaint (default)',
-      'Improve Detail (face, hand, eyes, etc.)',
-      'Modify Content (add objects, change background, etc.)',
-    ])
-    .optional()
-    .default('Inpaint or Outpaint (default)'),
-  uov_image_url: z.union([z.string(), z.unknown()]).optional(),
-  image_prompt_2: zImagePrompt.optional(),
-  seed: z.union([z.int(), z.unknown()]).nullish(),
-  prompt: z.string().optional().default(''),
-  image_prompt_4: zImagePrompt.optional(),
+  inpaint_image_url: z.union([z.string(), z.unknown()]).optional(),
   mask_image_url: z.union([z.string(), z.unknown()]).optional(),
-  image_prompt_3: zImagePrompt.optional(),
+  image_prompt_4: zImagePrompt.optional(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * FooocusInpaintInput
  */
 export const zFooocusInpaintInput = z.object({
-  refiner_model: z
-    .enum(['None', 'realisticVisionV60B1_v51VAE.safetensors'])
-    .optional()
-    .default('None'),
-  invert_mask: z.boolean().optional().default(false),
-  inpaint_additional_prompt: z.string().optional().default(''),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
-  image_prompt_1: zImagePrompt.optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  sharpness: z.number().gte(0).lte(30).optional().default(2),
-  outpaint_selections: z
-    .array(z.enum(['Left', 'Right', 'Top', 'Bottom']))
-    .optional()
-    .default([]),
-  mixing_image_prompt_and_inpaint: z.boolean().optional().default(false),
-  inpaint_image_url: z.string(),
-  refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
-  inpaint_disable_initial_latent: z.boolean().optional().default(false),
-  inpaint_strength: z.number().lte(1).optional().default(1),
-  override_inpaint_options: z.boolean().optional().default(false),
-  prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).nullish(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_prompt_3: zImagePrompt.optional(),
-  inpaint_erode_or_dilate: z.number().gte(-64).lte(64).optional().default(0),
-  negative_prompt: z.string().optional().default(''),
-  styles: z
-    .array(
-      z.enum([
-        'Fooocus V2',
-        'Fooocus Enhance',
-        'Fooocus Sharp',
-        'Fooocus Semi Realistic',
-        'Fooocus Masterpiece',
-        'Fooocus Photograph',
-        'Fooocus Negative',
-        'Fooocus Cinematic',
-        'SAI 3D Model',
-        'SAI Analog Film',
-        'SAI Anime',
-        'SAI Cinematic',
-        'SAI Comic Book',
-        'SAI Craft Clay',
-        'SAI Digital Art',
-        'SAI Enhance',
-        'SAI Fantasy Art',
-        'SAI Isometric',
-        'SAI Line Art',
-        'SAI Lowpoly',
-        'SAI Neonpunk',
-        'SAI Origami',
-        'SAI Photographic',
-        'SAI Pixel Art',
-        'SAI Texture',
-        'MRE Cinematic Dynamic',
-        'MRE Spontaneous Picture',
-        'MRE Artistic Vision',
-        'MRE Dark Dream',
-        'MRE Gloomy Art',
-        'MRE Bad Dream',
-        'MRE Underground',
-        'MRE Surreal Painting',
-        'MRE Dynamic Illustration',
-        'MRE Undead Art',
-        'MRE Elemental Art',
-        'MRE Space Art',
-        'MRE Ancient Illustration',
-        'MRE Brave Art',
-        'MRE Heroic Fantasy',
-        'MRE Dark Cyberpunk',
-        'MRE Lyrical Geometry',
-        'MRE Sumi E Symbolic',
-        'MRE Sumi E Detailed',
-        'MRE Manga',
-        'MRE Anime',
-        'MRE Comic',
-        'Ads Advertising',
-        'Ads Automotive',
-        'Ads Corporate',
-        'Ads Fashion Editorial',
-        'Ads Food Photography',
-        'Ads Gourmet Food Photography',
-        'Ads Luxury',
-        'Ads Real Estate',
-        'Ads Retail',
-        'Artstyle Abstract',
-        'Artstyle Abstract Expressionism',
-        'Artstyle Art Deco',
-        'Artstyle Art Nouveau',
-        'Artstyle Constructivist',
-        'Artstyle Cubist',
-        'Artstyle Expressionist',
-        'Artstyle Graffiti',
-        'Artstyle Hyperrealism',
-        'Artstyle Impressionist',
-        'Artstyle Pointillism',
-        'Artstyle Pop Art',
-        'Artstyle Psychedelic',
-        'Artstyle Renaissance',
-        'Artstyle Steampunk',
-        'Artstyle Surrealist',
-        'Artstyle Typography',
-        'Artstyle Watercolor',
-        'Futuristic Biomechanical',
-        'Futuristic Biomechanical Cyberpunk',
-        'Futuristic Cybernetic',
-        'Futuristic Cybernetic Robot',
-        'Futuristic Cyberpunk Cityscape',
-        'Futuristic Futuristic',
-        'Futuristic Retro Cyberpunk',
-        'Futuristic Retro Futurism',
-        'Futuristic Sci Fi',
-        'Futuristic Vaporwave',
-        'Game Bubble Bobble',
-        'Game Cyberpunk Game',
-        'Game Fighting Game',
-        'Game Gta',
-        'Game Mario',
-        'Game Minecraft',
-        'Game Pokemon',
-        'Game Retro Arcade',
-        'Game Retro Game',
-        'Game Rpg Fantasy Game',
-        'Game Strategy Game',
-        'Game Streetfighter',
-        'Game Zelda',
-        'Misc Architectural',
-        'Misc Disco',
-        'Misc Dreamscape',
-        'Misc Dystopian',
-        'Misc Fairy Tale',
-        'Misc Gothic',
-        'Misc Grunge',
-        'Misc Horror',
-        'Misc Kawaii',
-        'Misc Lovecraftian',
-        'Misc Macabre',
-        'Misc Manga',
-        'Misc Metropolis',
-        'Misc Minimalist',
-        'Misc Monochrome',
-        'Misc Nautical',
-        'Misc Space',
-        'Misc Stained Glass',
-        'Misc Techwear Fashion',
-        'Misc Tribal',
-        'Misc Zentangle',
-        'Papercraft Collage',
-        'Papercraft Flat Papercut',
-        'Papercraft Kirigami',
-        'Papercraft Paper Mache',
-        'Papercraft Paper Quilling',
-        'Papercraft Papercut Collage',
-        'Papercraft Papercut Shadow Box',
-        'Papercraft Stacked Papercut',
-        'Papercraft Thick Layered Papercut',
-        'Photo Alien',
-        'Photo Film Noir',
-        'Photo Glamour',
-        'Photo Hdr',
-        'Photo Iphone Photographic',
-        'Photo Long Exposure',
-        'Photo Neon Noir',
-        'Photo Silhouette',
-        'Photo Tilt Shift',
-        'Cinematic Diva',
-        'Abstract Expressionism',
-        'Academia',
-        'Action Figure',
-        'Adorable 3D Character',
-        'Adorable Kawaii',
-        'Art Deco',
-        'Art Nouveau',
-        'Astral Aura',
-        'Avant Garde',
-        'Baroque',
-        'Bauhaus Style Poster',
-        'Blueprint Schematic Drawing',
-        'Caricature',
-        'Cel Shaded Art',
-        'Character Design Sheet',
-        'Classicism Art',
-        'Color Field Painting',
-        'Colored Pencil Art',
-        'Conceptual Art',
-        'Constructivism',
-        'Cubism',
-        'Dadaism',
-        'Dark Fantasy',
-        'Dark Moody Atmosphere',
-        'Dmt Art Style',
-        'Doodle Art',
-        'Double Exposure',
-        'Dripping Paint Splatter Art',
-        'Expressionism',
-        'Faded Polaroid Photo',
-        'Fauvism',
-        'Flat 2d Art',
-        'Fortnite Art Style',
-        'Futurism',
-        'Glitchcore',
-        'Glo Fi',
-        'Googie Art Style',
-        'Graffiti Art',
-        'Harlem Renaissance Art',
-        'High Fashion',
-        'Idyllic',
-        'Impressionism',
-        'Infographic Drawing',
-        'Ink Dripping Drawing',
-        'Japanese Ink Drawing',
-        'Knolling Photography',
-        'Light Cheery Atmosphere',
-        'Logo Design',
-        'Luxurious Elegance',
-        'Macro Photography',
-        'Mandola Art',
-        'Marker Drawing',
-        'Medievalism',
-        'Minimalism',
-        'Neo Baroque',
-        'Neo Byzantine',
-        'Neo Futurism',
-        'Neo Impressionism',
-        'Neo Rococo',
-        'Neoclassicism',
-        'Op Art',
-        'Ornate And Intricate',
-        'Pencil Sketch Drawing',
-        'Pop Art 2',
-        'Rococo',
-        'Silhouette Art',
-        'Simple Vector Art',
-        'Sketchup',
-        'Steampunk 2',
-        'Surrealism',
-        'Suprematism',
-        'Terragen',
-        'Tranquil Relaxing Atmosphere',
-        'Sticker Designs',
-        'Vibrant Rim Light',
-        'Volumetric Lighting',
-        'Watercolor 2',
-        'Whimsical And Playful',
-        'Mk Chromolithography',
-        'Mk Cross Processing Print',
-        'Mk Dufaycolor Photograph',
-        'Mk Herbarium',
-        'Mk Punk Collage',
-        'Mk Mosaic',
-        'Mk Van Gogh',
-        'Mk Coloring Book',
-        'Mk Singer Sargent',
-        'Mk Pollock',
-        'Mk Basquiat',
-        'Mk Andy Warhol',
-        'Mk Halftone Print',
-        'Mk Gond Painting',
-        'Mk Albumen Print',
-        'Mk Aquatint Print',
-        'Mk Anthotype Print',
-        'Mk Inuit Carving',
-        'Mk Bromoil Print',
-        'Mk Calotype Print',
-        'Mk Color Sketchnote',
-        'Mk Cibulak Porcelain',
-        'Mk Alcohol Ink Art',
-        'Mk One Line Art',
-        'Mk Blacklight Paint',
-        'Mk Carnival Glass',
-        'Mk Cyanotype Print',
-        'Mk Cross Stitching',
-        'Mk Encaustic Paint',
-        'Mk Embroidery',
-        'Mk Gyotaku',
-        'Mk Luminogram',
-        'Mk Lite Brite Art',
-        'Mk Mokume Gane',
-        'Pebble Art',
-        'Mk Palekh',
-        'Mk Suminagashi',
-        'Mk Scrimshaw',
-        'Mk Shibori',
-        'Mk Vitreous Enamel',
-        'Mk Ukiyo E',
-        'Mk Vintage Airline Poster',
-        'Mk Vintage Travel Poster',
-        'Mk Bauhaus Style',
-        'Mk Afrofuturism',
-        'Mk Atompunk',
-        'Mk Constructivism',
-        'Mk Chicano Art',
-        'Mk De Stijl',
-        'Mk Dayak Art',
-        'Mk Fayum Portrait',
-        'Mk Illuminated Manuscript',
-        'Mk Kalighat Painting',
-        'Mk Madhubani Painting',
-        'Mk Pictorialism',
-        'Mk Pichwai Painting',
-        'Mk Patachitra Painting',
-        'Mk Samoan Art Inspired',
-        'Mk Tlingit Art',
-        'Mk Adnate Style',
-        'Mk Ron English Style',
-        'Mk Shepard Fairey Style',
-      ]),
-    )
-    .optional()
-    .default(['Fooocus Enhance', 'Fooocus V2', 'Fooocus Sharp']),
-  aspect_ratio: z.string().optional().default('1024x1024'),
-  inpaint_engine: z
-    .enum(['None', 'v1', 'v2.5', 'v2.6'])
-    .optional()
-    .default('v2.6'),
   guidance_scale: z.number().gte(1).lte(30).optional().default(4),
+  override_inpaint_options: z.boolean().optional().default(false),
+  invert_mask: z.boolean().optional().default(false),
+  image_prompt_3: zImagePrompt.optional(),
   performance: z
     .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
     .optional()
     .default('Extreme Speed'),
-  loras: z
-    .array(zLoraWeight)
-    .optional()
-    .default([
-      {
-        scale: 0.1,
-        path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
-      },
-    ]),
-  inpaint_respective_field: z.number().gte(0).lte(1).optional().default(0.618),
+  prompt: z.string().optional().default(''),
   inpaint_mode: z
     .enum([
       'Inpaint or Outpaint (default)',
@@ -12615,23 +12442,34 @@ export const zFooocusInpaintInput = z.object({
     ])
     .optional()
     .default('Inpaint or Outpaint (default)'),
-  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).nullish(),
   image_prompt_2: zImagePrompt.optional(),
-  image_prompt_4: zImagePrompt.optional(),
-  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
-})
-
-/**
- * FooocusLegacyInput
- */
-export const zFooocusInput = z.object({
-  control_image_url: z.union([z.string(), z.unknown()]).nullish(),
+  inpaint_erode_or_dilate: z.number().gte(-64).lte(64).optional().default(0),
+  outpaint_selections: z
+    .array(z.enum(['Left', 'Right', 'Top', 'Bottom']))
+    .optional()
+    .default([]),
+  sharpness: z.number().gte(0).lte(30).optional().default(2),
+  inpaint_image_url: z.string(),
+  image_prompt_1: zImagePrompt.optional(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  aspect_ratio: z.string().optional().default('1024x1024'),
+  inpaint_disable_initial_latent: z.boolean().optional().default(false),
   refiner_model: z
     .enum(['None', 'realisticVisionV60B1_v51VAE.safetensors'])
     .optional()
     .default('None'),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  loras: z
+    .array(zLoraWeight)
+    .optional()
+    .default([
+      {
+        scale: 0.1,
+        path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
+      },
+    ]),
+  inpaint_additional_prompt: z.string().optional().default(''),
   styles: z
     .array(
       z.enum([
@@ -12915,15 +12753,31 @@ export const zFooocusInput = z.object({
       ]),
     )
     .optional()
-    .default(['Fooocus Enhance', 'Fooocus V2', 'Fooocus Sharp']),
-  aspect_ratio: z.string().optional().default('1024x1024'),
+    .default(['Fooocus V2', 'Fooocus Enhance', 'Fooocus Sharp']),
+  inpaint_respective_field: z.number().gte(0).lte(1).optional().default(0.618),
+  sync_mode: z.boolean().optional().default(false),
+  inpaint_strength: z.number().lte(1).optional().default(1),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  sharpness: z.number().gte(0).lte(30).optional().default(2),
-  performance: z
-    .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
+  refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
+  mixing_image_prompt_and_inpaint: z.boolean().optional().default(false),
+  inpaint_engine: z
+    .enum(['None', 'v1', 'v2.5', 'v2.6'])
     .optional()
-    .default('Extreme Speed'),
+    .default('v2.6'),
+  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_prompt_4: zImagePrompt.optional(),
+  negative_prompt: z.string().optional().default(''),
+})
+
+/**
+ * FooocusLegacyInput
+ */
+export const zFooocusInput = z.object({
   guidance_scale: z.number().gte(1).lte(30).optional().default(4),
+  refiner_model: z
+    .enum(['None', 'realisticVisionV60B1_v51VAE.safetensors'])
+    .optional()
+    .default('None'),
   loras: z
     .array(zLoraWeight)
     .optional()
@@ -12933,20 +12787,314 @@ export const zFooocusInput = z.object({
         path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
       },
     ]),
-  mixing_image_prompt_and_inpaint: z.boolean().optional().default(false),
-  inpaint_image_url: z.union([z.string(), z.unknown()]).nullish(),
-  refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
-  control_image_stop_at: z.number().gte(0).lte(1).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
   control_image_weight: z.number().gte(0).lte(2).optional().default(1),
+  styles: z
+    .array(
+      z.enum([
+        'Fooocus V2',
+        'Fooocus Enhance',
+        'Fooocus Sharp',
+        'Fooocus Semi Realistic',
+        'Fooocus Masterpiece',
+        'Fooocus Photograph',
+        'Fooocus Negative',
+        'Fooocus Cinematic',
+        'SAI 3D Model',
+        'SAI Analog Film',
+        'SAI Anime',
+        'SAI Cinematic',
+        'SAI Comic Book',
+        'SAI Craft Clay',
+        'SAI Digital Art',
+        'SAI Enhance',
+        'SAI Fantasy Art',
+        'SAI Isometric',
+        'SAI Line Art',
+        'SAI Lowpoly',
+        'SAI Neonpunk',
+        'SAI Origami',
+        'SAI Photographic',
+        'SAI Pixel Art',
+        'SAI Texture',
+        'MRE Cinematic Dynamic',
+        'MRE Spontaneous Picture',
+        'MRE Artistic Vision',
+        'MRE Dark Dream',
+        'MRE Gloomy Art',
+        'MRE Bad Dream',
+        'MRE Underground',
+        'MRE Surreal Painting',
+        'MRE Dynamic Illustration',
+        'MRE Undead Art',
+        'MRE Elemental Art',
+        'MRE Space Art',
+        'MRE Ancient Illustration',
+        'MRE Brave Art',
+        'MRE Heroic Fantasy',
+        'MRE Dark Cyberpunk',
+        'MRE Lyrical Geometry',
+        'MRE Sumi E Symbolic',
+        'MRE Sumi E Detailed',
+        'MRE Manga',
+        'MRE Anime',
+        'MRE Comic',
+        'Ads Advertising',
+        'Ads Automotive',
+        'Ads Corporate',
+        'Ads Fashion Editorial',
+        'Ads Food Photography',
+        'Ads Gourmet Food Photography',
+        'Ads Luxury',
+        'Ads Real Estate',
+        'Ads Retail',
+        'Artstyle Abstract',
+        'Artstyle Abstract Expressionism',
+        'Artstyle Art Deco',
+        'Artstyle Art Nouveau',
+        'Artstyle Constructivist',
+        'Artstyle Cubist',
+        'Artstyle Expressionist',
+        'Artstyle Graffiti',
+        'Artstyle Hyperrealism',
+        'Artstyle Impressionist',
+        'Artstyle Pointillism',
+        'Artstyle Pop Art',
+        'Artstyle Psychedelic',
+        'Artstyle Renaissance',
+        'Artstyle Steampunk',
+        'Artstyle Surrealist',
+        'Artstyle Typography',
+        'Artstyle Watercolor',
+        'Futuristic Biomechanical',
+        'Futuristic Biomechanical Cyberpunk',
+        'Futuristic Cybernetic',
+        'Futuristic Cybernetic Robot',
+        'Futuristic Cyberpunk Cityscape',
+        'Futuristic Futuristic',
+        'Futuristic Retro Cyberpunk',
+        'Futuristic Retro Futurism',
+        'Futuristic Sci Fi',
+        'Futuristic Vaporwave',
+        'Game Bubble Bobble',
+        'Game Cyberpunk Game',
+        'Game Fighting Game',
+        'Game Gta',
+        'Game Mario',
+        'Game Minecraft',
+        'Game Pokemon',
+        'Game Retro Arcade',
+        'Game Retro Game',
+        'Game Rpg Fantasy Game',
+        'Game Strategy Game',
+        'Game Streetfighter',
+        'Game Zelda',
+        'Misc Architectural',
+        'Misc Disco',
+        'Misc Dreamscape',
+        'Misc Dystopian',
+        'Misc Fairy Tale',
+        'Misc Gothic',
+        'Misc Grunge',
+        'Misc Horror',
+        'Misc Kawaii',
+        'Misc Lovecraftian',
+        'Misc Macabre',
+        'Misc Manga',
+        'Misc Metropolis',
+        'Misc Minimalist',
+        'Misc Monochrome',
+        'Misc Nautical',
+        'Misc Space',
+        'Misc Stained Glass',
+        'Misc Techwear Fashion',
+        'Misc Tribal',
+        'Misc Zentangle',
+        'Papercraft Collage',
+        'Papercraft Flat Papercut',
+        'Papercraft Kirigami',
+        'Papercraft Paper Mache',
+        'Papercraft Paper Quilling',
+        'Papercraft Papercut Collage',
+        'Papercraft Papercut Shadow Box',
+        'Papercraft Stacked Papercut',
+        'Papercraft Thick Layered Papercut',
+        'Photo Alien',
+        'Photo Film Noir',
+        'Photo Glamour',
+        'Photo Hdr',
+        'Photo Iphone Photographic',
+        'Photo Long Exposure',
+        'Photo Neon Noir',
+        'Photo Silhouette',
+        'Photo Tilt Shift',
+        'Cinematic Diva',
+        'Abstract Expressionism',
+        'Academia',
+        'Action Figure',
+        'Adorable 3D Character',
+        'Adorable Kawaii',
+        'Art Deco',
+        'Art Nouveau',
+        'Astral Aura',
+        'Avant Garde',
+        'Baroque',
+        'Bauhaus Style Poster',
+        'Blueprint Schematic Drawing',
+        'Caricature',
+        'Cel Shaded Art',
+        'Character Design Sheet',
+        'Classicism Art',
+        'Color Field Painting',
+        'Colored Pencil Art',
+        'Conceptual Art',
+        'Constructivism',
+        'Cubism',
+        'Dadaism',
+        'Dark Fantasy',
+        'Dark Moody Atmosphere',
+        'Dmt Art Style',
+        'Doodle Art',
+        'Double Exposure',
+        'Dripping Paint Splatter Art',
+        'Expressionism',
+        'Faded Polaroid Photo',
+        'Fauvism',
+        'Flat 2d Art',
+        'Fortnite Art Style',
+        'Futurism',
+        'Glitchcore',
+        'Glo Fi',
+        'Googie Art Style',
+        'Graffiti Art',
+        'Harlem Renaissance Art',
+        'High Fashion',
+        'Idyllic',
+        'Impressionism',
+        'Infographic Drawing',
+        'Ink Dripping Drawing',
+        'Japanese Ink Drawing',
+        'Knolling Photography',
+        'Light Cheery Atmosphere',
+        'Logo Design',
+        'Luxurious Elegance',
+        'Macro Photography',
+        'Mandola Art',
+        'Marker Drawing',
+        'Medievalism',
+        'Minimalism',
+        'Neo Baroque',
+        'Neo Byzantine',
+        'Neo Futurism',
+        'Neo Impressionism',
+        'Neo Rococo',
+        'Neoclassicism',
+        'Op Art',
+        'Ornate And Intricate',
+        'Pencil Sketch Drawing',
+        'Pop Art 2',
+        'Rococo',
+        'Silhouette Art',
+        'Simple Vector Art',
+        'Sketchup',
+        'Steampunk 2',
+        'Surrealism',
+        'Suprematism',
+        'Terragen',
+        'Tranquil Relaxing Atmosphere',
+        'Sticker Designs',
+        'Vibrant Rim Light',
+        'Volumetric Lighting',
+        'Watercolor 2',
+        'Whimsical And Playful',
+        'Mk Chromolithography',
+        'Mk Cross Processing Print',
+        'Mk Dufaycolor Photograph',
+        'Mk Herbarium',
+        'Mk Punk Collage',
+        'Mk Mosaic',
+        'Mk Van Gogh',
+        'Mk Coloring Book',
+        'Mk Singer Sargent',
+        'Mk Pollock',
+        'Mk Basquiat',
+        'Mk Andy Warhol',
+        'Mk Halftone Print',
+        'Mk Gond Painting',
+        'Mk Albumen Print',
+        'Mk Aquatint Print',
+        'Mk Anthotype Print',
+        'Mk Inuit Carving',
+        'Mk Bromoil Print',
+        'Mk Calotype Print',
+        'Mk Color Sketchnote',
+        'Mk Cibulak Porcelain',
+        'Mk Alcohol Ink Art',
+        'Mk One Line Art',
+        'Mk Blacklight Paint',
+        'Mk Carnival Glass',
+        'Mk Cyanotype Print',
+        'Mk Cross Stitching',
+        'Mk Encaustic Paint',
+        'Mk Embroidery',
+        'Mk Gyotaku',
+        'Mk Luminogram',
+        'Mk Lite Brite Art',
+        'Mk Mokume Gane',
+        'Pebble Art',
+        'Mk Palekh',
+        'Mk Suminagashi',
+        'Mk Scrimshaw',
+        'Mk Shibori',
+        'Mk Vitreous Enamel',
+        'Mk Ukiyo E',
+        'Mk Vintage Airline Poster',
+        'Mk Vintage Travel Poster',
+        'Mk Bauhaus Style',
+        'Mk Afrofuturism',
+        'Mk Atompunk',
+        'Mk Constructivism',
+        'Mk Chicano Art',
+        'Mk De Stijl',
+        'Mk Dayak Art',
+        'Mk Fayum Portrait',
+        'Mk Illuminated Manuscript',
+        'Mk Kalighat Painting',
+        'Mk Madhubani Painting',
+        'Mk Pictorialism',
+        'Mk Pichwai Painting',
+        'Mk Patachitra Painting',
+        'Mk Samoan Art Inspired',
+        'Mk Tlingit Art',
+        'Mk Adnate Style',
+        'Mk Ron English Style',
+        'Mk Shepard Fairey Style',
+      ]),
+    )
+    .optional()
+    .default(['Fooocus V2', 'Fooocus Enhance', 'Fooocus Sharp']),
+  performance: z
+    .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
+    .optional()
+    .default('Extreme Speed'),
+  prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  control_image_stop_at: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).nullish(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
+  mixing_image_prompt_and_inpaint: z.boolean().optional().default(false),
+  sharpness: z.number().gte(0).lte(30).optional().default(2),
+  inpaint_image_url: z.union([z.string(), z.unknown()]).nullish(),
+  control_image_url: z.union([z.string(), z.unknown()]).nullish(),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
   control_type: z
     .enum(['ImagePrompt', 'PyraCanny', 'CPDS', 'FaceSwap'])
     .optional()
     .default('PyraCanny'),
-  seed: z.union([z.int(), z.unknown()]).nullish(),
-  prompt: z.string().optional().default(''),
-  enable_safety_checker: z.boolean().optional().default(true),
   mask_image_url: z.union([z.string(), z.unknown()]).nullish(),
+  aspect_ratio: z.string().optional().default('1024x1024'),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
@@ -12954,12 +13102,20 @@ export const zFooocusInput = z.object({
  */
 export const zFooocusUpscaleOrVaryInput = z.object({
   mixing_image_prompt_and_vary_upscale: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(30).optional().default(4),
   refiner_model: z
     .enum(['None', 'realisticVisionV60B1_v51VAE.safetensors'])
     .optional()
     .default('None'),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  loras: z
+    .array(zLoraWeight)
+    .optional()
+    .default([
+      {
+        scale: 0.1,
+        path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
+      },
+    ]),
   styles: z
     .array(
       z.enum([
@@ -13243,26 +13399,22 @@ export const zFooocusUpscaleOrVaryInput = z.object({
       ]),
     )
     .optional()
-    .default(['Fooocus Enhance', 'Fooocus V2', 'Fooocus Sharp']),
-  aspect_ratio: z.string().optional().default('1024x1024'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  image_prompt_1: zImagePrompt.optional(),
-  uov_image_url: z.string(),
-  sharpness: z.number().gte(0).lte(30).optional().default(2),
+    .default(['Fooocus V2', 'Fooocus Enhance', 'Fooocus Sharp']),
+  image_prompt_3: zImagePrompt.optional(),
   performance: z
     .enum(['Speed', 'Quality', 'Extreme Speed', 'Lightning'])
     .optional()
     .default('Extreme Speed'),
-  guidance_scale: z.number().gte(1).lte(30).optional().default(4),
-  loras: z
-    .array(zLoraWeight)
-    .optional()
-    .default([
-      {
-        scale: 0.1,
-        path: 'https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0/resolve/main/sd_xl_offset_example-lora_1.0.safetensors',
-      },
-    ]),
+  prompt: z.string().optional().default(''),
+  uov_image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).nullish(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
+  image_prompt_2: zImagePrompt.optional(),
+  sharpness: z.number().gte(0).lte(30).optional().default(2),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('jpeg'),
+  image_prompt_1: zImagePrompt.optional(),
   uov_method: z
     .enum([
       'Disabled',
@@ -13274,24 +13426,29 @@ export const zFooocusUpscaleOrVaryInput = z.object({
     ])
     .optional()
     .default('Vary (Strong)'),
-  refiner_switch: z.number().gte(0).lte(1).optional().default(0.8),
-  sync_mode: z.boolean().optional().default(false),
-  image_prompt_2: zImagePrompt.optional(),
-  seed: z.union([z.int(), z.unknown()]).nullish(),
-  prompt: z.string().optional().default(''),
-  image_prompt_3: zImagePrompt.optional(),
-  image_prompt_4: zImagePrompt.optional(),
   enable_safety_checker: z.boolean().optional().default(true),
+  aspect_ratio: z.string().optional().default('1024x1024'),
+  image_prompt_4: zImagePrompt.optional(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * InpaintInput
  */
 export const zJuggernautFluxLoraInpaintingInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  mask_url: z.string(),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
   image_url: z.string(),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  loras: z.array(zLoraWeight).optional().default([]),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  mask_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -13305,25 +13462,22 @@ export const zJuggernautFluxLoraInpaintingInput = z.object({
       ]),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.85),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * TextToImageInput
  */
 export const zJuggernautFluxLoraInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  loras: z.array(zLoraWeight).optional().default([]),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(35).optional().default(3.5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -13337,21 +13491,15 @@ export const zJuggernautFluxLoraInput = z.object({
       ]),
     ])
     .optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('none'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * LoRAWeight
  */
 export const zLoRaWeight = z.object({
-  path: z.string(),
   transformer: z.enum(['high', 'low', 'both']).optional().default('high'),
   weight_name: z.union([z.string(), z.unknown()]).optional(),
+  path: z.string(),
   scale: z.number().gte(0).lte(4).optional().default(1),
 })
 
@@ -13359,17 +13507,32 @@ export const zLoRaWeight = z.object({
  * LoraWeight
  */
 export const zLoraWeightType2 = z.object({
-  force: z.boolean().optional().default(false),
   path: z.string(),
   scale: z.number().gte(0).lte(1).optional().default(1),
+  force: z.boolean().optional().default(false),
 })
 
 /**
  * DreamshaperTextToImageInput
  */
 export const zDreamshaperInput = z.object({
-  embeddings: z.array(zEmbedding).optional().default([]),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
+  expand_prompt: z.boolean().optional().default(false),
+  request_id: z.string().optional().default(''),
   guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      '(worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art:1.4), (watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name:1.2), (blur, blurry, grainy), morbid, ugly, asymmetrical, mutated malformed, mutilated, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, (airbrushed, cartoon, anime, semi-realistic, cgi, render, blender, digital art, manga, amateur:1.3), (3D ,3D Game, 3D Game Scene, 3D Character:1.1), (bad hands, bad anatomy, bad body, bad face, bad teeth, bad arms, bad legs, deformities:1.3)',
+    ),
   image_size: z
     .union([
       zImageSizeType2,
@@ -13383,23 +13546,8 @@ export const zDreamshaperInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
-  expand_prompt: z.boolean().optional().default(false),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      '(worst quality, low quality, normal quality, lowres, low details, oversaturated, undersaturated, overexposed, underexposed, grayscale, bw, bad photo, bad photography, bad art:1.4), (watermark, signature, text font, username, error, logo, words, letters, digits, autograph, trademark, name:1.2), (blur, blurry, grainy), morbid, ugly, asymmetrical, mutated malformed, mutilated, poorly lit, bad shadow, draft, cropped, out of frame, cut off, censored, jpeg artifacts, out of focus, glitch, duplicate, (airbrushed, cartoon, anime, semi-realistic, cgi, render, blender, digital art, manga, amateur:1.3), (3D ,3D Game, 3D Game Scene, 3D Character:1.1), (bad hands, bad anatomy, bad body, bad face, bad teeth, bad arms, bad legs, deformities:1.3)',
-    ),
+  embeddings: z.array(zEmbedding).optional().default([]),
   safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  request_id: z.string().optional().default(''),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
 })
 
 /**
@@ -13536,10 +13684,22 @@ export const zFastSdxlControlnetCannyInput = z.object({
  * ImageToImageInput
  */
 export const zFastSdxlImageToImageInput = z.object({
-  preserve_aspect_ratio: z.boolean().optional().default(false),
-  embeddings: z.array(zEmbedding).optional().default([]),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  crop_output: z.boolean().optional().default(false),
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
+  expand_prompt: z.boolean().optional().default(false),
+  request_id: z.string().optional().default(''),
+  preserve_aspect_ratio: z.boolean().optional().default(false),
+  negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  embeddings: z.array(zEmbedding).optional().default([]),
   image_url: z.string(),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSizeType2,
@@ -13553,29 +13713,29 @@ export const zFastSdxlImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  crop_output: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
   strength: z.number().gte(0.05).lte(1).optional().default(0.95),
-  expand_prompt: z.boolean().optional().default(false),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  request_id: z.string().optional().default(''),
   enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
 })
 
 /**
  * InpaintingInput
  */
 export const zFastSdxlInpaintingInput = z.object({
-  embeddings: z.array(zEmbedding).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
+  expand_prompt: z.boolean().optional().default(false),
+  request_id: z.string().optional().default(''),
+  negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  mask_url: z.string(),
+  embeddings: z.array(zEmbedding).optional().default([]),
   image_url: z.string(),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSizeType2,
@@ -13589,28 +13749,27 @@ export const zFastSdxlInpaintingInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
   strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  expand_prompt: z.boolean().optional().default(false),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  mask_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  request_id: z.string().optional().default(''),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
 })
 
 /**
  * TextToImageInput
  */
 export const zFastSdxlInput = z.object({
-  embeddings: z.array(zEmbedding).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
+  expand_prompt: z.boolean().optional().default(false),
+  request_id: z.string().optional().default(''),
+  negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  embeddings: z.array(zEmbedding).optional().default([]),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSizeType2,
@@ -13624,18 +13783,7 @@ export const zFastSdxlInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
-  expand_prompt: z.boolean().optional().default(false),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  request_id: z.string().optional().default(''),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -13643,16 +13791,26 @@ export const zFastSdxlInput = z.object({
  */
 export const zLoraWeightType3 = z.object({
   scale: z.number().gte(0).lte(4).optional().default(1),
-  weight_name: z.union([z.string(), z.unknown()]).optional(),
   path: z.string(),
+  weight_name: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * ImageToImageInput
  */
 export const zHidreamI1FullImageToImageInput = z.object({
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
+  loras: z.union([z.array(zLoraWeightType3), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
+  image_url: z.string(),
+  strength: z.number().gte(0).lte(1).optional().default(0.75),
   image_size: z
     .union([
       zImageSize,
@@ -13667,24 +13825,22 @@ export const zHidreamI1FullImageToImageInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  negative_prompt: z.string().optional().default(''),
-  loras: z.union([z.array(zLoraWeightType3), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  strength: z.number().gte(0).lte(1).optional().default(0.75),
-  prompt: z.string(),
 })
 
 /**
  * TextToImageInput
  */
 export const zHidreamI1FullInput = z.object({
+  negative_prompt: z.string().optional().default(''),
+  loras: z.union([z.array(zLoraWeightType3), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -13698,25 +13854,17 @@ export const zHidreamI1FullInput = z.object({
       ]),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  loras: z.union([z.array(zLoraWeightType3), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
 })
 
 /**
  * TextToImageRequest
  */
 export const zLumaPhotonFlashInput = z.object({
+  prompt: z.string().min(3).max(5000),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4', '21:9', '9:21'])
     .optional()
     .default('1:1'),
-  prompt: z.string().min(3).max(5000),
 })
 
 /**
@@ -13724,9 +13872,9 @@ export const zLumaPhotonFlashInput = z.object({
  */
 export const zLumaPhotonFlashModifyInput = z.object({
   image_url: z.string(),
-  strength: z.number().gte(0).lte(1),
-  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
   prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
+  strength: z.number().gte(0).lte(1),
 })
 
 /**
@@ -13747,15 +13895,15 @@ export const zLumaPhotonFlashOutput = z.object({
  * ReframeImageRequest
  */
 export const zLumaPhotonFlashReframeInput = z.object({
+  prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
+  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
+  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
   y_end: z.union([z.int(), z.unknown()]).optional(),
-  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
-  y_start: z.union([z.int(), z.unknown()]).optional(),
-  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
   x_end: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
   x_start: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
+  y_start: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -13769,11 +13917,11 @@ export const zLumaPhotonFlashReframeOutput = z.object({
  * TextToImageRequest
  */
 export const zLumaPhotonInput = z.object({
+  prompt: z.string().min(3).max(5000),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4', '21:9', '9:21'])
     .optional()
     .default('1:1'),
-  prompt: z.string().min(3).max(5000),
 })
 
 /**
@@ -13781,9 +13929,9 @@ export const zLumaPhotonInput = z.object({
  */
 export const zLumaPhotonModifyInput = z.object({
   image_url: z.string(),
-  strength: z.number().gte(0).lte(1),
-  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
   prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
+  strength: z.number().gte(0).lte(1),
 })
 
 /**
@@ -13804,15 +13952,15 @@ export const zLumaPhotonOutput = z.object({
  * ReframeImageRequest
  */
 export const zLumaPhotonReframeInput = z.object({
+  prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
+  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
+  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
   y_end: z.union([z.int(), z.unknown()]).optional(),
-  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
-  y_start: z.union([z.int(), z.unknown()]).optional(),
-  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
   x_end: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
   x_start: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
+  y_start: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -13826,20 +13974,7 @@ export const zLumaPhotonReframeOutput = z.object({
  * TextToImageInput
  */
 export const zLuminaImageV2Input = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  cfg_normalization: z.boolean().optional().default(true),
-  system_prompt: z
-    .string()
-    .optional()
-    .default(
-      'You are an assistant designed to generate superior images with the superior degree of image-text alignment based on textual prompts or user prompts.',
-    ),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -13853,17 +13988,30 @@ export const zLuminaImageV2Input = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
   cfg_trunc_ratio: z.number().gte(0).lte(1).optional().default(1),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  system_prompt: z
+    .string()
+    .optional()
+    .default(
+      'You are an assistant designed to generate superior images with the superior degree of image-text alignment based on textual prompts or user prompts.',
+    ),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  cfg_normalization: z.boolean().optional().default(true),
 })
 
 /**
  * ImageOutput
  */
 export const zLuminaImageV2Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
   images: z.array(zImage),
   timings: z.record(z.string(), z.number()),
@@ -13874,14 +14022,14 @@ export const zLuminaImageV2Output = z.object({
  */
 export const zMaiImage25EditInput = z.object({
   sync_mode: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string().min(3).max(5000),
   aspect_ratio: z
     .enum(['auto', '1:1', '4:3', '3:4', '16:9', '9:16', '3:2', '2:3'])
     .optional()
     .default('auto'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string().min(3).max(5000),
   image_urls: z.tuple([z.string()]),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
@@ -13896,14 +14044,14 @@ export const zMaiImage25EditOutput = z.object({
  * MaiImage25TextToImageInput
  */
 export const zMaiImage25Input = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string().min(3).max(5000),
+  sync_mode: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['auto', '1:1', '4:3', '3:4', '16:9', '9:16', '3:2', '2:3'])
     .optional()
     .default('auto'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string().min(3).max(5000),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
@@ -13923,22 +14071,22 @@ export const zMapImageFile = z.record(z.string(), z.unknown())
  * MapImageFile
  */
 export const zMapImageFileType2 = z.object({
-  height: z.union([z.int(), z.unknown()]).optional(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
+  url: z.string(),
   file_name: z.union([z.string(), z.unknown()]).optional(),
   map_type: z.enum(['basecolor', 'normal', 'roughness', 'metalness', 'height']),
-  url: z.string(),
-  content_type: z.union([z.string(), z.unknown()]).optional(),
-  file_size: z.union([z.int(), z.unknown()]).optional(),
   width: z.union([z.int(), z.unknown()]).optional(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+  height: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * MaskMetadata
  */
 export const zMaskMetadata = z.object({
+  index: z.int(),
   score: z.union([z.number(), z.unknown()]).optional(),
   box: z.union([z.array(z.number()), z.unknown()]).optional(),
-  index: z.int(),
 })
 
 /**
@@ -13946,11 +14094,11 @@ export const zMaskMetadata = z.object({
  */
 export const zMinimaxImage01Input = z.object({
   prompt: z.string().min(1).max(1500),
-  prompt_optimizer: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['1:1', '16:9', '4:3', '3:2', '2:3', '3:4', '9:16', '21:9'])
     .optional()
     .default('1:1'),
+  prompt_optimizer: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(9).optional().default(1),
 })
 
@@ -13966,12 +14114,12 @@ export const zMinimaxImage01Output = z.object({
  */
 export const zMinimaxImage01SubjectReferenceInput = z.object({
   prompt: z.string().min(1).max(1500),
-  prompt_optimizer: z.boolean().optional().default(false),
   image_url: z.string(),
   aspect_ratio: z
     .enum(['1:1', '16:9', '4:3', '3:2', '2:3', '3:4', '9:16', '21:9'])
     .optional()
     .default('1:1'),
+  prompt_optimizer: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(9).optional().default(1),
 })
 
@@ -13983,31 +14131,39 @@ export const zMinimaxImage01SubjectReferenceOutput = z.object({
 })
 
 /**
+ * Moodboard
+ */
+export const zMoodboard = z.object({
+  id: z.string(),
+  strength: z.number().gte(0).lte(1).optional().default(0.23),
+})
+
+/**
  * DetectionInput
  */
 export const zMoondreamNextDetectionInput = z.object({
-  task_type: z.enum(['bbox_detection', 'point_detection', 'gaze_detection']),
+  show_visualization: z.boolean().optional().default(true),
+  image_url: z.string(),
   use_ensemble: z.boolean().optional().default(false),
   detection_prompt: z.string(),
-  image_url: z.string(),
-  show_visualization: z.boolean().optional().default(true),
   combine_points: z.boolean().optional().default(false),
+  task_type: z.enum(['bbox_detection', 'point_detection', 'gaze_detection']),
 })
 
 /**
  * DetectionOutput
  */
 export const zMoondreamNextDetectionOutput = z.object({
-  image: z.union([zImage, z.unknown()]).optional(),
   text_output: z.string(),
+  image: z.union([zImage, z.unknown()]).optional(),
 })
 
 /**
  * NafnetInput
  */
 export const zNafnetDeblurInput = z.object({
-  image_url: z.string(),
   seed: z.int().optional(),
+  image_url: z.string(),
 })
 
 /**
@@ -14021,8 +14177,8 @@ export const zNafnetDeblurOutput = z.object({
  * NafnetInputDenoise
  */
 export const zNafnetDenoiseInput = z.object({
-  image_url: z.string(),
   seed: z.int().optional(),
+  image_url: z.string(),
 })
 
 /**
@@ -14036,18 +14192,10 @@ export const zNafnetDenoiseOutput = z.object({
  * NanoBanana2ImageToImageInput
  */
 export const zNanoBanana2EditInput = z.object({
-  image_urls: z.array(z.string()),
-  system_prompt: z.string().max(50000).optional().default(''),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  resolution: z.enum(['0.5K', '1K', '2K', '4K']).optional().default('1K'),
-  limit_generations: z.boolean().optional().default(true),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('4'),
-  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string().min(3).max(50000),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
   enable_web_search: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
   aspect_ratio: z
     .union([
       z.enum([
@@ -14070,36 +14218,44 @@ export const zNanoBanana2EditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  prompt: z.string().min(3).max(50000),
+  pdf_url: z.union([z.string(), z.unknown()]).optional(),
+  limit_generations: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()).optional(),
+  system_prompt: z.string().max(50000).optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   thinking_level: z
     .union([z.enum(['minimal', 'high']), z.unknown()])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('4'),
+  video_url: z.union([z.string(), z.unknown()]).optional(),
+  resolution: z.enum(['0.5K', '1K', '2K', '4K']).optional().default('1K'),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * NanoBanana2ImageToImageOutput
  */
 export const zNanoBanana2EditOutput = z.object({
-  description: z.string(),
   images: z.array(zImageFile),
+  description: z.string(),
 })
 
 /**
  * NanoBanana2TextToImageInput
  */
 export const zNanoBanana2Input = z.object({
-  system_prompt: z.string().max(50000).optional().default(''),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  resolution: z.enum(['0.5K', '1K', '2K', '4K']).optional().default('1K'),
-  limit_generations: z.boolean().optional().default(true),
-  safety_tolerance: z
-    .enum(['1', '2', '3', '4', '5', '6'])
-    .optional()
-    .default('4'),
-  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string().min(3).max(50000),
   enable_web_search: z.boolean().optional().default(false),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  thinking_level: z
+    .union([z.enum(['minimal', 'high']), z.unknown()])
+    .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  limit_generations: z.boolean().optional().default(true),
   aspect_ratio: z
     .union([
       z.enum([
@@ -14122,27 +14278,29 @@ export const zNanoBanana2Input = z.object({
       z.unknown(),
     ])
     .optional(),
-  prompt: z.string().min(3).max(50000),
-  thinking_level: z
-    .union([z.enum(['minimal', 'high']), z.unknown()])
-    .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5', '6'])
+    .optional()
+    .default('4'),
+  resolution: z.enum(['0.5K', '1K', '2K', '4K']).optional().default('1K'),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  system_prompt: z.string().max(50000).optional().default(''),
 })
 
 /**
  * NanoBanana2TextToImageOutput
  */
 export const zNanoBanana2Output = z.object({
-  description: z.string(),
   images: z.array(zImageFile),
+  description: z.string(),
 })
 
 /**
  * NanoBananaImageToImageInput
  */
 export const zNanoBananaEditInput = z.object({
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string().min(3).max(50000),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -14161,15 +14319,16 @@ export const zNanoBananaEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  sync_mode: z.boolean().optional().default(false),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_urls: z.array(z.string()),
   limit_generations: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  prompt: z.string().min(3).max(50000),
 })
 
 /**
@@ -14184,8 +14343,7 @@ export const zNanoBananaEditOutput = z.object({
  * NanoBananaTextToImageInput
  */
 export const zNanoBananaInput = z.object({
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string().min(3).max(50000),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   aspect_ratio: z
     .enum([
       '21:9',
@@ -14201,14 +14359,15 @@ export const zNanoBananaInput = z.object({
     ])
     .optional()
     .default('1:1'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
   limit_generations: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  prompt: z.string().min(3).max(50000),
 })
 
 /**
@@ -14223,18 +14382,19 @@ export const zNanoBananaOutput = z.object({
  * NanoBananaImageToImageInput
  */
 export const zNanoBananaProEditInput = z.object({
+  prompt: z.string().min(3).max(50000),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_web_search: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
   resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  enable_web_search: z.boolean().optional().default(false),
-  prompt: z.string().min(3).max(50000),
   system_prompt: z.string().max(50000).optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   aspect_ratio: z
     .union([
       z.enum([
@@ -14253,7 +14413,6 @@ export const zNanoBananaProEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
   limit_generations: z.boolean().optional().default(false),
 })
 
@@ -14261,26 +14420,26 @@ export const zNanoBananaProEditInput = z.object({
  * NanoBananaImageToImageOutput
  */
 export const zNanoBananaProEditOutput = z.object({
-  images: z.array(zImageFile),
   description: z.string(),
+  images: z.array(zImageFile),
 })
 
 /**
  * NanoBananaTextToImageInput
  */
 export const zNanoBananaProInput = z.object({
+  prompt: z.string().min(3).max(50000),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_web_search: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
+  system_prompt: z.string().max(50000).optional().default(''),
   resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  enable_web_search: z.boolean().optional().default(false),
-  prompt: z.string().min(3).max(50000),
-  system_prompt: z.string().max(50000).optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .union([
       z.enum([
@@ -14306,38 +14465,38 @@ export const zNanoBananaProInput = z.object({
  * NanoBananaTextToImageOutput
  */
 export const zNanoBananaProOutput = z.object({
-  images: z.array(zImageFile),
   description: z.string(),
+  images: z.array(zImageFile),
 })
 
 /**
  * NucleusImageInput
  */
 export const zNucleusImageInput = z.object({
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(2).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
   guidance_scale: z.number().gte(0).lte(20).optional().default(8),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  negative_prompt: z.string().optional().default(''),
   aspect_ratio: z
     .enum(['1:1', '16:9', '9:16', '4:3', '3:4', '3:2', '2:3'])
     .optional()
     .default('1:1'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  num_images: z.int().gte(1).lte(2).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
 })
 
 /**
  * Output
  */
 export const zNucleusImageOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
-  images: z.array(zImageType2),
   prompt: z.string(),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
+  images: z.array(zImageType2),
 })
 
 /**
@@ -14346,8 +14505,8 @@ export const zNucleusImageOutput = z.object({
 export const zObject = z.object({
   x_max: z.number(),
   y_max: z.number(),
-  x_min: z.number(),
   y_min: z.number(),
+  x_min: z.number(),
 })
 
 /**
@@ -14377,12 +14536,12 @@ export const zObjectDescription = z.object({
  * BboxInput
  */
 export const zObjectRemovalBboxInput = z.object({
+  image_url: z.string(),
   mask_expansion: z.int().gte(0).lte(50).optional().default(15),
   model: z
     .enum(['low_quality', 'medium_quality', 'high_quality', 'best_quality'])
     .optional()
     .default('best_quality'),
-  image_url: z.string(),
   box_prompts: z.array(zBBoxPromptBase).optional().default([]),
 })
 
@@ -14397,26 +14556,26 @@ export const zObjectRemovalBboxOutput = z.object({
  * PromptInput
  */
 export const zObjectRemovalInput = z.object({
-  mask_expansion: z.int().gte(0).lte(50).optional().default(15),
   prompt: z.string(),
+  image_url: z.string(),
+  mask_expansion: z.int().gte(0).lte(50).optional().default(15),
   model: z
     .enum(['low_quality', 'medium_quality', 'high_quality', 'best_quality'])
     .optional()
     .default('best_quality'),
-  image_url: z.string(),
 })
 
 /**
  * MaskInput
  */
 export const zObjectRemovalMaskInput = z.object({
+  image_url: z.string(),
   mask_expansion: z.int().gte(0).lte(50).optional().default(15),
+  mask_url: z.string(),
   model: z
     .enum(['low_quality', 'medium_quality', 'high_quality', 'best_quality'])
     .optional()
     .default('best_quality'),
-  mask_url: z.string(),
-  image_url: z.string(),
 })
 
 /**
@@ -14437,11 +14596,11 @@ export const zObjectRemovalOutput = z.object({
  * OCRBoundingBoxSingle
  */
 export const zOcrBoundingBoxSingle = z.object({
-  w: z.number(),
   y: z.number(),
   h: z.number(),
-  x: z.number(),
+  w: z.number(),
   label: z.string(),
+  x: z.number(),
 })
 
 /**
@@ -14463,8 +14622,13 @@ export const zFlorence2LargeOcrWithRegionOutput = z.object({
  * TextToImageInput
  */
 export const zOmnigenV1Input = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  img_guidance_scale: z.number().gte(0).lte(20).optional().default(1.6),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
@@ -14480,11 +14644,6 @@ export const zOmnigenV1Input = z.object({
     ])
     .optional(),
   input_image_urls: z.array(z.string()).optional().default([]),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  img_guidance_scale: z.number().gte(0).lte(20).optional().default(1.6),
   enable_safety_checker: z.boolean().optional().default(true),
 })
 
@@ -14493,9 +14652,9 @@ export const zOmnigenV1Input = z.object({
  */
 export const zOmnigenV1Output = z.object({
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
-  images: z.array(zImageType2),
   prompt: z.string(),
+  images: z.array(zImageType2),
+  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
 })
 
@@ -14503,25 +14662,19 @@ export const zOmnigenV1Output = z.object({
  * TextToImageInput
  */
 export const zOmnigenV2Input = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  scheduler: z.enum(['euler', 'dpmsolver']).optional().default('euler'),
-  cfg_range_start: z.number().gte(0).lte(1).optional().default(0),
-  input_image_urls: z.array(z.string()).optional().default([]),
-  text_guidance_scale: z.number().gte(1).lte(8).optional().default(5),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  cfg_range_end: z.number().gte(0).lte(1).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(20).lte(50).optional().default(50),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_guidance_scale: z.number().gte(1).lte(3).optional().default(2),
+  scheduler: z.enum(['euler', 'dpmsolver']).optional().default('euler'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  input_image_urls: z.array(z.string()).optional().default([]),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z
     .string()
     .optional()
     .default(
       '(((deformed))), blurry, over saturation, bad anatomy, disfigured, poorly drawn face, mutation, mutated, (extra_limb), (ugly), (poorly drawn hands), fused fingers, messy drawing, broken legs censor, censored, censor_bar',
     ),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_guidance_scale: z.number().gte(1).lte(3).optional().default(2),
   image_size: z
     .union([
       zImageSize,
@@ -14535,37 +14688,43 @@ export const zOmnigenV2Input = z.object({
       ]),
     ])
     .optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  cfg_range_end: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  cfg_range_start: z.number().gte(0).lte(1).optional().default(0),
+  text_guidance_scale: z.number().gte(1).lte(8).optional().default(5),
 })
 
 /**
  * Output
  */
 export const zOmnigenV2Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
+  prompt: z.string(),
   images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * OmniZeroInput
  */
 export const zOmniZeroInput = z.object({
-  image_url: z.string(),
-  style_strength: z.number().optional().default(1),
-  depth_strength: z.number().optional().default(0.5),
-  number_of_images: z.int().optional().default(1),
-  guidance_scale: z.number().optional().default(5),
-  style_image_url: z.string(),
-  negative_prompt: z.string().optional().default(''),
   identity_image_url: z.string(),
-  prompt: z.string(),
+  guidance_scale: z.number().optional().default(5),
   composition_image_url: z.string(),
+  seed: z.int().optional().default(42),
+  face_strength: z.number().optional().default(1),
+  prompt: z.string(),
+  style_image_url: z.string(),
+  number_of_images: z.int().optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  style_strength: z.number().optional().default(1),
+  image_url: z.string(),
+  depth_strength: z.number().optional().default(0.5),
   identity_strength: z.number().optional().default(1),
   composition_strength: z.number().optional().default(1),
-  face_strength: z.number().optional().default(1),
-  seed: z.int().optional().default(42),
   image_strength: z.number().optional().default(0.75),
 })
 
@@ -14580,10 +14739,9 @@ export const zOmniZeroOutput = z.object({
  * TextToImageInput
  */
 export const zOvisImageInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   guidance_scale: z.number().gte(1).lte(20).optional().default(5),
+  negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
@@ -14599,39 +14757,40 @@ export const zOvisImageInput = z.object({
     ])
     .optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  prompt: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * OvisImageOutput
  */
 export const zOvisImageOutput = z.object({
-  images: z.array(zImageType2),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
 })
 
 /**
  * Input
  */
 export const zPasdInput = z.object({
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  scale: z.union([z.int().gte(1).lte(4), z.unknown()]).optional(),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   conditioning_scale: z
     .union([z.number().gte(0.1).lte(1), z.unknown()])
     .optional(),
-  image_url: z.string(),
-  guidance_scale: z.union([z.number().gte(1).lte(20), z.unknown()]).optional(),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   steps: z.union([z.int().gte(10).lte(50), z.unknown()]).optional(),
+  image_url: z.string(),
+  scale: z.union([z.int().gte(1).lte(4), z.unknown()]).optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  guidance_scale: z.union([z.number().gte(1).lte(20), z.unknown()]).optional(),
 })
 
 /**
@@ -14646,41 +14805,44 @@ export const zPasdOutput = z.object({
  * PatinaInput
  */
 export const zPatinaInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   maps: z
     .array(z.enum(['basecolor', 'normal', 'roughness', 'metalness', 'height']))
     .optional()
     .default(['basecolor', 'normal', 'roughness', 'metalness', 'height']),
   image_url: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   enable_safety_checker: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * ExtractTextureInput
  */
 export const zPatinaMaterialExtractInput = z.object({
-  tiling_mode: z
-    .enum(['both', 'horizontal', 'vertical'])
-    .optional()
-    .default('both'),
   enable_safety_checker: z.boolean().optional().default(true),
+  tile_size: z.int().gte(32).lte(256).optional().default(128),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   maps: z
     .array(z.enum(['basecolor', 'normal', 'roughness', 'metalness', 'height']))
     .optional()
     .default(['basecolor', 'normal', 'roughness', 'metalness', 'height']),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  strength: z.number().lte(1).optional().default(0.6),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  tile_stride: z.int().gte(16).lte(128).optional().default(64),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  tile_size: z.int().gte(32).lte(256).optional().default(128),
+  image_url: z.string(),
   upscale_factor: z
     .union([z.literal(0), z.literal(2), z.literal(4)])
     .optional()
     .default(0),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  prompt: z.string(),
+  tile_stride: z.int().gte(16).lte(128).optional().default(64),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
+  tiling_mode: z
+    .enum(['both', 'horizontal', 'vertical'])
+    .optional()
+    .default('both'),
+  strength: z.number().lte(1).optional().default(0.6),
   image_size: z
     .union([
       zImageSize,
@@ -14694,46 +14856,46 @@ export const zPatinaMaterialExtractInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  image_url: z.string(),
-  prompt: z.string(),
 })
 
 /**
  * ExtractTextureOutput
  */
 export const zPatinaMaterialExtractOutput = z.object({
-  prompt: z.string(),
-  timings: z.record(z.string(), z.number()).optional(),
   images: z.array(z.union([zImageFileType2, zMapImageFile])),
   seed: z.int(),
+  prompt: z.string(),
+  timings: z.record(z.string(), z.number()).optional(),
 })
 
 /**
  * MaterialInput
  */
 export const zPatinaMaterialInput = z.object({
-  tiling_mode: z
-    .enum(['both', 'horizontal', 'vertical'])
-    .optional()
-    .default('both'),
-  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  tile_size: z.int().gte(32).lte(256).optional().default(128),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   maps: z
     .array(z.enum(['basecolor', 'normal', 'roughness', 'metalness', 'height']))
     .optional()
     .default(['basecolor', 'normal', 'roughness', 'metalness', 'height']),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  strength: z.number().lte(1).optional().default(0.6),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  tile_stride: z.int().gte(16).lte(128).optional().default(64),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  tile_size: z.int().gte(32).lte(256).optional().default(128),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   upscale_factor: z
     .union([z.literal(0), z.literal(2), z.literal(4)])
     .optional()
     .default(0),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  tile_stride: z.int().gte(16).lte(128).optional().default(64),
+  mask_url: z.union([z.string(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
+  prompt: z.string(),
+  tiling_mode: z
+    .enum(['both', 'horizontal', 'vertical'])
+    .optional()
+    .default('both'),
+  strength: z.number().lte(1).optional().default(0.6),
   image_size: z
     .union([
       zImageSize,
@@ -14747,45 +14909,42 @@ export const zPatinaMaterialInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  mask_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * MaterialOutput
  */
 export const zPatinaMaterialOutput = z.object({
-  prompt: z.string(),
-  timings: z.record(z.string(), z.number()).optional(),
   images: z.array(z.union([zImageFileType2, zMapImageFile])),
   seed: z.int(),
+  prompt: z.string(),
+  timings: z.record(z.string(), z.number()).optional(),
 })
 
 /**
  * PatinaOutput
  */
 export const zPatinaOutput = z.object({
-  timings: z.record(z.string(), z.number()).optional(),
-  images: z.array(zMapImageFileType2),
   seed: z.int(),
+  images: z.array(zMapImageFileType2),
+  timings: z.record(z.string(), z.number()).optional(),
 })
 
 /**
  * PhotaImageEditInput
  */
 export const zPhotaEditInput = z.object({
+  prompt: z.string().max(8000),
   num_images: z.int().gte(1).lte(4).optional().default(1),
   profile_ids: z.array(z.string()).optional(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_urls: z.array(z.string()).min(1),
-  sync_mode: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['auto', '1:1', '16:9', '4:3', '3:4', '9:16'])
     .optional()
     .default('auto'),
-  prompt: z.string().max(8000),
+  image_urls: z.array(z.string()).min(1),
+  sync_mode: z.boolean().optional().default(false),
   resolution: z.enum(['1K', '4K']).optional().default('1K'),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
@@ -14799,10 +14958,10 @@ export const zPhotaEditOutput = z.object({
  * PhotaImageEnhanceInput
  */
 export const zPhotaEnhanceInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   profile_ids: z.array(z.string()).optional(),
-  image_url: z.string(),
   sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_url: z.string(),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
@@ -14817,15 +14976,15 @@ export const zPhotaEnhanceOutput = z.object({
  * PhotaImageGenerateInput
  */
 export const zPhotaInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   aspect_ratio: z
     .enum(['auto', '1:1', '16:9', '4:3', '3:4', '9:16'])
     .optional()
     .default('auto'),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
   resolution: z.enum(['1K', '4K']).optional().default('1K'),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
@@ -14839,10 +14998,10 @@ export const zPhotaOutput = z.object({
  * PhotographicCharacteristics
  */
 export const zPhotographicCharacteristics = z.object({
-  lens_focal_length: z.union([z.string(), z.unknown()]).optional(),
   camera_angle: z.union([z.string(), z.unknown()]).optional(),
-  depth_of_field: z.union([z.string(), z.unknown()]).optional(),
   focus: z.union([z.string(), z.unknown()]).optional(),
+  depth_of_field: z.union([z.string(), z.unknown()]).optional(),
+  lens_focal_length: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -14871,19 +15030,7 @@ export const zPhotographicCharacteristicsType2 = z.object({
  * PhotoMakerInput
  */
 export const zPhotomakerInput = z.object({
-  guidance_scale: z.number().gte(0.1).lte(10).optional().default(5),
-  num_inference_steps: z.int().gte(20).lte(100).optional().default(50),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  style_strength: z.int().gte(15).lte(50).optional().default(20),
-  initial_image_strength: z.number().gte(0).lte(1).optional().default(0.5),
-  image_archive_url: z.string(),
-  initial_image_url: z.union([z.string(), z.unknown()]).optional(),
-  base_pipeline: z
-    .enum(['photomaker', 'photomaker-style'])
-    .optional()
-    .default('photomaker'),
   style: z
     .enum([
       '(No style)',
@@ -14900,7 +15047,19 @@ export const zPhotomakerInput = z.object({
     ])
     .optional()
     .default('Photographic'),
+  negative_prompt: z.string().optional().default(''),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  initial_image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(20).lte(100).optional().default(50),
+  guidance_scale: z.number().gte(0.1).lte(10).optional().default(5),
   prompt: z.string(),
+  initial_image_strength: z.number().gte(0).lte(1).optional().default(0.5),
+  base_pipeline: z
+    .enum(['photomaker', 'photomaker-style'])
+    .optional()
+    .default('photomaker'),
+  image_archive_url: z.string(),
+  style_strength: z.int().gte(15).lte(50).optional().default(20),
 })
 
 /**
@@ -14919,25 +15078,6 @@ export const zPixartSigmaInput = z.object({
     .enum(['DPM-SOLVER', 'SA-SOLVER'])
     .optional()
     .default('DPM-SOLVER'),
-  prompt: z.string(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4.5),
-  num_inference_steps: z.int().gte(5).lte(50).optional().default(35),
-  enable_safety_checker: z.boolean().optional().default(false),
-  image_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
   style: z
     .enum([
       '(No style)',
@@ -14953,34 +15093,49 @@ export const zPixartSigmaInput = z.object({
     ])
     .optional()
     .default('(No style)'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(8).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4.5),
+  enable_safety_checker: z.boolean().optional().default(false),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(5).lte(50).optional().default(35),
   sync_mode: z.boolean().optional().default(false),
+  negative_prompt: z.string().optional().default(''),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
 })
 
 /**
  * PixArtSigmaOutput
  */
 export const zPixartSigmaOutput = z.object({
-  images: z.array(zImage),
   prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImage),
 })
 
 /**
  * ImageToImagePlaygroundv25Input
  */
 export const zPlaygroundV25ImageToImageInput = z.object({
-  image_url: z.string(),
-  embeddings: z.array(zEmbedding).optional().default([]),
-  strength: z.number().gte(0.05).lte(1).optional().default(0.95),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
-  negative_prompt: z.string().optional().default(''),
-  request_id: z.string().optional().default(''),
   prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
-  crop_output: z.boolean().optional().default(false),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  strength: z.number().gte(0.05).lte(1).optional().default(0.95),
+  image_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSizeType2,
@@ -14994,38 +15149,40 @@ export const zPlaygroundV25ImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  preserve_aspect_ratio: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   expand_prompt: z.boolean().optional().default(false),
+  preserve_aspect_ratio: z.boolean().optional().default(false),
   safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  crop_output: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
+  request_id: z.string().optional().default(''),
   enable_safety_checker: z.boolean().optional().default(true),
+  embeddings: z.array(zEmbedding).optional().default([]),
 })
 
 /**
  * Output
  */
 export const zPlaygroundV25ImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  images: z.array(zImageType2),
   prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * InpaintingPlaygroundv25Input
  */
 export const zPlaygroundV25InpaintingInput = z.object({
-  image_url: z.string(),
-  embeddings: z.array(zEmbedding).optional().default([]),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
-  negative_prompt: z.string().optional().default(''),
-  request_id: z.string().optional().default(''),
   prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  image_url: z.string(),
+  mask_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSizeType2,
@@ -15039,33 +15196,44 @@ export const zPlaygroundV25InpaintingInput = z.object({
       ]),
     ])
     .optional(),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_url: z.string(),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   expand_prompt: z.boolean().optional().default(false),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(65).optional().default(25),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
+  request_id: z.string().optional().default(''),
   enable_safety_checker: z.boolean().optional().default(true),
+  embeddings: z.array(zEmbedding).optional().default([]),
 })
 
 /**
  * Output
  */
 export const zPlaygroundV25InpaintingOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  images: z.array(zImageType2),
   prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * TextToImagePlaygroundv25Input
  */
 export const zPlaygroundV25Input = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
-  embeddings: z.array(zEmbedding).optional().default([]),
+  expand_prompt: z.boolean().optional().default(false),
+  prompt: z.string(),
   safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
+  enable_safety_checker: z.boolean().optional().default(true),
+  request_id: z.string().optional().default(''),
+  negative_prompt: z.string().optional().default(''),
+  embeddings: z.array(zEmbedding).optional().default([]),
   image_size: z
     .union([
       zImageSizeType2,
@@ -15079,26 +15247,17 @@ export const zPlaygroundV25Input = z.object({
       ]),
     ])
     .optional(),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(false),
-  request_id: z.string().optional().default(''),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * Output
  */
 export const zPlaygroundV25Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  images: z.array(zImageType2),
   prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -15110,13 +15269,13 @@ export const zPoint = z.record(z.string(), z.unknown())
  * PointPrompt
  */
 export const zPointPrompt = z.object({
-  x: z.union([z.int(), z.unknown()]).optional(),
   y: z.union([z.int(), z.unknown()]).optional(),
+  x: z.union([z.int(), z.unknown()]).optional(),
   frame_index: z.union([z.int(), z.unknown()]).optional(),
-  object_id: z.union([z.int(), z.unknown()]).optional(),
   label: z
     .union([z.union([z.literal(0), z.literal(1)]), z.unknown()])
     .optional(),
+  object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15152,8 +15311,8 @@ export const zBoundingBoxType2 = z.object({
  * Polygon
  */
 export const zPolygon = z.object({
-  points: z.array(z.record(z.string(), z.number())),
   label: z.string(),
+  points: z.array(z.record(z.string(), z.number())),
 })
 
 /**
@@ -15183,10 +15342,7 @@ export const zFlorence2LargeRegionToSegmentationOutput = z.object({
  * Input
  */
 export const zPonyV7Input = z.object({
-  num_images: z.int().gte(1).lte(2).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
-  sync_mode: z.boolean().optional().default(false),
-  noise_source: z.enum(['gpu', 'cpu']).optional().default('gpu'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -15200,22 +15356,25 @@ export const zPonyV7Input = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(20).lte(50).optional().default(40),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  prompt: z.string(),
+  num_images: z.int().gte(1).lte(2).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(20).lte(50).optional().default(40),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  prompt: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  noise_source: z.enum(['gpu', 'cpu']).optional().default('gpu'),
 })
 
 /**
  * ImageOutput
  */
 export const zPonyV7Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
-  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
   images: z.array(zImage),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
@@ -15224,8 +15383,8 @@ export const zPonyV7Output = z.object({
 export const zPostProcessingBlurInput = z.object({
   blur_type: z.enum(['gaussian', 'kuwahara']).optional().default('gaussian'),
   blur_radius: z.int().gte(0).lte(31).optional().default(3),
-  blur_sigma: z.number().gte(0.1).lte(10).optional().default(1),
   image_url: z.string(),
+  blur_sigma: z.number().gte(0.1).lte(10).optional().default(1),
 })
 
 /**
@@ -15239,22 +15398,22 @@ export const zPostProcessingBlurOutput = z.object({
  * ChromaticAberrationInput
  */
 export const zPostProcessingChromaticAberrationInput = z.object({
-  green_shift: z.int().gte(-20).lte(20).optional().default(0),
+  red_shift: z.int().gte(-20).lte(20).optional().default(0),
   blue_direction: z
     .enum(['horizontal', 'vertical'])
     .optional()
     .default('horizontal'),
-  blue_shift: z.int().gte(-20).lte(20).optional().default(0),
   green_direction: z
     .enum(['horizontal', 'vertical'])
     .optional()
     .default('horizontal'),
+  blue_shift: z.int().gte(-20).lte(20).optional().default(0),
+  image_url: z.string(),
   red_direction: z
     .enum(['horizontal', 'vertical'])
     .optional()
     .default('horizontal'),
-  image_url: z.string(),
-  red_shift: z.int().gte(-20).lte(20).optional().default(0),
+  green_shift: z.int().gte(-20).lte(20).optional().default(0),
 })
 
 /**
@@ -15269,11 +15428,11 @@ export const zPostProcessingChromaticAberrationOutput = z.object({
  */
 export const zPostProcessingColorCorrectionInput = z.object({
   contrast: z.number().gte(-100).lte(100).optional().default(0),
-  brightness: z.number().gte(-100).lte(100).optional().default(0),
+  saturation: z.number().gte(-100).lte(100).optional().default(0),
+  gamma: z.number().gte(0.2).lte(2.2).optional().default(1),
   temperature: z.number().gte(-100).lte(100).optional().default(0),
   image_url: z.string(),
-  gamma: z.number().gte(0.2).lte(2.2).optional().default(1),
-  saturation: z.number().gte(-100).lte(100).optional().default(0),
+  brightness: z.number().gte(-100).lte(100).optional().default(0),
 })
 
 /**
@@ -15287,8 +15446,8 @@ export const zPostProcessingColorCorrectionOutput = z.object({
  * ColorTintInput
  */
 export const zPostProcessingColorTintInput = z.object({
-  image_url: z.string(),
   tint_strength: z.number().gte(0.1).lte(1).optional().default(1),
+  image_url: z.string(),
   tint_mode: z
     .enum([
       'sepia',
@@ -15327,6 +15486,7 @@ export const zPostProcessingColorTintOutput = z.object({
  * DesaturateInput
  */
 export const zPostProcessingDesaturateInput = z.object({
+  image_url: z.string(),
   desaturate_factor: z.number().gte(0).lte(1).optional().default(1),
   desaturate_method: z
     .enum([
@@ -15337,7 +15497,6 @@ export const zPostProcessingDesaturateInput = z.object({
     ])
     .optional()
     .default('luminance (Rec.709)'),
-  image_url: z.string(),
 })
 
 /**
@@ -15351,9 +15510,9 @@ export const zPostProcessingDesaturateOutput = z.object({
  * DissolveInput
  */
 export const zPostProcessingDissolveInput = z.object({
+  image_url: z.string(),
   dissolve_factor: z.number().gte(0).lte(1).optional().default(0.5),
   dissolve_image_url: z.string(),
-  image_url: z.string(),
 })
 
 /**
@@ -15367,6 +15526,7 @@ export const zPostProcessingDissolveOutput = z.object({
  * DodgeBurnInput
  */
 export const zPostProcessingDodgeBurnInput = z.object({
+  dodge_burn_intensity: z.number().gte(0).lte(1).optional().default(0.5),
   dodge_burn_mode: z
     .enum([
       'dodge',
@@ -15380,7 +15540,6 @@ export const zPostProcessingDodgeBurnInput = z.object({
     ])
     .optional()
     .default('dodge'),
-  dodge_burn_intensity: z.number().gte(0).lte(1).optional().default(0.5),
   image_url: z.string(),
 })
 
@@ -15396,8 +15555,8 @@ export const zPostProcessingDodgeBurnOutput = z.object({
  */
 export const zPostProcessingGrainInput = z.object({
   grain_intensity: z.number().gte(0).lte(1).optional().default(0.4),
-  grain_scale: z.number().gte(1).lte(100).optional().default(10),
   image_url: z.string(),
+  grain_scale: z.number().gte(1).lte(100).optional().default(10),
   grain_style: z
     .enum(['modern', 'analog', 'kodak', 'fuji', 'cinematic', 'newspaper'])
     .optional()
@@ -15415,6 +15574,19 @@ export const zPostProcessingGrainOutput = z.object({
  * ImageProcessingInput
  */
 export const zPostProcessingInput = z.object({
+  vertex_x: z.number().gte(0).lte(1).optional().default(0.5),
+  parabolize_coeff: z.number().gte(-10).lte(10).optional().default(1),
+  enable_dodge_burn: z.boolean().optional().default(false),
+  enable_parabolize: z.boolean().optional().default(false),
+  enable_blur: z.boolean().optional().default(false),
+  desaturate_factor: z.number().gte(0).lte(1).optional().default(1),
+  vertex_y: z.number().gte(0).lte(1).optional().default(0.5),
+  sharpen_radius: z.int().gte(1).lte(15).optional().default(1),
+  vignette_strength: z.number().gte(0).lte(10).optional().default(0.5),
+  dodge_burn_intensity: z.number().gte(0).lte(1).optional().default(0.5),
+  saturation: z.number().gte(-100).lte(100).optional().default(0),
+  image_url: z.string(),
+  preserve_edges: z.number().gte(0).lte(1).optional().default(0.75),
   desaturate_method: z
     .enum([
       'luminance (Rec.709)',
@@ -15424,32 +15596,63 @@ export const zPostProcessingInput = z.object({
     ])
     .optional()
     .default('luminance (Rec.709)'),
-  vertex_x: z.number().gte(0).lte(1).optional().default(0.5),
-  enable_glow: z.boolean().optional().default(false),
-  blur_sigma: z.number().gte(0.1).lte(10).optional().default(1),
-  enable_parabolize: z.boolean().optional().default(false),
-  image_url: z.string(),
-  sharpen_radius: z.int().gte(1).lte(15).optional().default(1),
-  blue_direction: z
-    .enum(['horizontal', 'vertical'])
-    .optional()
-    .default('horizontal'),
-  sharpen_mode: z.enum(['basic', 'smart', 'cas']).optional().default('basic'),
-  enable_solarize: z.boolean().optional().default(false),
-  enable_vignette: z.boolean().optional().default(false),
-  glow_radius: z.int().gte(1).lte(50).optional().default(5),
-  grain_scale: z.number().gte(1).lte(100).optional().default(10),
+  enable_color_correction: z.boolean().optional().default(false),
+  enable_chromatic: z.boolean().optional().default(false),
+  smart_sharpen_strength: z.number().gte(0).lte(25).optional().default(5),
+  red_shift: z.int().gte(-20).lte(20).optional().default(0),
+  dissolve_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  blur_radius: z.int().gte(0).lte(31).optional().default(3),
   green_direction: z
     .enum(['horizontal', 'vertical'])
     .optional()
     .default('horizontal'),
-  desaturate_factor: z.number().gte(0).lte(1).optional().default(1),
-  brightness: z.number().gte(-100).lte(100).optional().default(0),
-  enable_desaturate: z.boolean().optional().default(false),
-  blur_type: z.enum(['gaussian', 'kuwahara']).optional().default('gaussian'),
-  blue_shift: z.int().gte(-20).lte(20).optional().default(0),
-  vignette_strength: z.number().gte(0).lte(10).optional().default(0.5),
+  tint_strength: z.number().gte(0.1).lte(1).optional().default(1),
   enable_grain: z.boolean().optional().default(false),
+  grain_scale: z.number().gte(1).lte(100).optional().default(10),
+  enable_dissolve: z.boolean().optional().default(false),
+  enable_vignette: z.boolean().optional().default(false),
+  contrast: z.number().gte(-100).lte(100).optional().default(0),
+  enable_sharpen: z.boolean().optional().default(false),
+  dodge_burn_mode: z
+    .enum([
+      'dodge',
+      'burn',
+      'dodge_and_burn',
+      'burn_and_dodge',
+      'color_dodge',
+      'color_burn',
+      'linear_dodge',
+      'linear_burn',
+    ])
+    .optional()
+    .default('dodge'),
+  smart_sharpen_ratio: z.number().gte(0).lte(1).optional().default(0.5),
+  sharpen_alpha: z.number().gte(0.1).lte(5).optional().default(1),
+  blur_type: z.enum(['gaussian', 'kuwahara']).optional().default('gaussian'),
+  grain_style: z
+    .enum(['modern', 'analog', 'kodak', 'fuji', 'cinematic', 'newspaper'])
+    .optional()
+    .default('modern'),
+  dissolve_image_url: z.string().optional().default(''),
+  blue_direction: z
+    .enum(['horizontal', 'vertical'])
+    .optional()
+    .default('horizontal'),
+  enable_tint: z.boolean().optional().default(false),
+  glow_intensity: z.number().gte(0).lte(5).optional().default(1),
+  blue_shift: z.int().gte(-20).lte(20).optional().default(0),
+  red_direction: z
+    .enum(['horizontal', 'vertical'])
+    .optional()
+    .default('horizontal'),
+  glow_radius: z.int().gte(1).lte(50).optional().default(5),
+  solarize_threshold: z.number().gte(0).lte(1).optional().default(0.5),
+  noise_radius: z.int().gte(1).lte(25).optional().default(7),
+  green_shift: z.int().gte(-20).lte(20).optional().default(0),
+  enable_desaturate: z.boolean().optional().default(false),
+  enable_solarize: z.boolean().optional().default(false),
+  grain_intensity: z.number().gte(0).lte(1).optional().default(0.4),
+  brightness: z.number().gte(-100).lte(100).optional().default(0),
   tint_mode: z
     .enum([
       'sepia',
@@ -15475,56 +15678,12 @@ export const zPostProcessingInput = z.object({
     ])
     .optional()
     .default('sepia'),
-  dissolve_factor: z.number().gte(0).lte(1).optional().default(0.5),
-  enable_blur: z.boolean().optional().default(false),
-  contrast: z.number().gte(-100).lte(100).optional().default(0),
-  blur_radius: z.int().gte(0).lte(31).optional().default(3),
-  red_shift: z.int().gte(-20).lte(20).optional().default(0),
-  red_direction: z
-    .enum(['horizontal', 'vertical'])
-    .optional()
-    .default('horizontal'),
-  grain_style: z
-    .enum(['modern', 'analog', 'kodak', 'fuji', 'cinematic', 'newspaper'])
-    .optional()
-    .default('modern'),
-  dodge_burn_mode: z
-    .enum([
-      'dodge',
-      'burn',
-      'dodge_and_burn',
-      'burn_and_dodge',
-      'color_dodge',
-      'color_burn',
-      'linear_dodge',
-      'linear_burn',
-    ])
-    .optional()
-    .default('dodge'),
-  enable_dissolve: z.boolean().optional().default(false),
-  enable_color_correction: z.boolean().optional().default(false),
-  smart_sharpen_strength: z.number().gte(0).lte(25).optional().default(5),
-  dissolve_image_url: z.string().optional().default(''),
-  sharpen_alpha: z.number().gte(0.1).lte(5).optional().default(1),
-  grain_intensity: z.number().gte(0).lte(1).optional().default(0.4),
-  enable_dodge_burn: z.boolean().optional().default(false),
-  enable_tint: z.boolean().optional().default(false),
-  preserve_edges: z.number().gte(0).lte(1).optional().default(0.75),
-  gamma: z.number().gte(0.2).lte(2.2).optional().default(1),
-  parabolize_coeff: z.number().gte(-10).lte(10).optional().default(1),
-  glow_intensity: z.number().gte(0).lte(5).optional().default(1),
-  temperature: z.number().gte(-100).lte(100).optional().default(0),
-  enable_chromatic: z.boolean().optional().default(false),
-  tint_strength: z.number().gte(0.1).lte(1).optional().default(1),
-  enable_sharpen: z.boolean().optional().default(false),
-  green_shift: z.int().gte(-20).lte(20).optional().default(0),
-  smart_sharpen_ratio: z.number().gte(0).lte(1).optional().default(0.5),
-  saturation: z.number().gte(-100).lte(100).optional().default(0),
-  vertex_y: z.number().gte(0).lte(1).optional().default(0.5),
-  dodge_burn_intensity: z.number().gte(0).lte(1).optional().default(0.5),
-  noise_radius: z.int().gte(1).lte(25).optional().default(7),
-  solarize_threshold: z.number().gte(0).lte(1).optional().default(0.5),
   cas_amount: z.number().gte(0).lte(1).optional().default(0.8),
+  enable_glow: z.boolean().optional().default(false),
+  gamma: z.number().gte(0.2).lte(2.2).optional().default(1),
+  temperature: z.number().gte(-100).lte(100).optional().default(0),
+  sharpen_mode: z.enum(['basic', 'smart', 'cas']).optional().default('basic'),
+  blur_sigma: z.number().gte(0.1).lte(10).optional().default(1),
 })
 
 /**
@@ -15538,10 +15697,10 @@ export const zPostProcessingOutput = z.object({
  * ParabolizeInput
  */
 export const zPostProcessingParabolizeInput = z.object({
-  vertex_x: z.number().gte(0).lte(1).optional().default(0.5),
-  vertex_y: z.number().gte(0).lte(1).optional().default(0.5),
-  image_url: z.string(),
   parabolize_coeff: z.number().gte(-10).lte(10).optional().default(1),
+  vertex_x: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
+  vertex_y: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -15555,15 +15714,15 @@ export const zPostProcessingParabolizeOutput = z.object({
  * SharpenInput
  */
 export const zPostProcessingSharpenInput = z.object({
-  preserve_edges: z.number().gte(0).lte(1).optional().default(0.75),
-  smart_sharpen_strength: z.number().gte(0).lte(25).optional().default(5),
-  image_url: z.string(),
-  sharpen_alpha: z.number().gte(0.1).lte(5).optional().default(1),
+  sharpen_mode: z.enum(['basic', 'smart', 'cas']).optional().default('basic'),
   sharpen_radius: z.int().gte(1).lte(15).optional().default(1),
   smart_sharpen_ratio: z.number().gte(0).lte(1).optional().default(0.5),
-  sharpen_mode: z.enum(['basic', 'smart', 'cas']).optional().default('basic'),
-  noise_radius: z.int().gte(1).lte(25).optional().default(7),
+  image_url: z.string(),
+  smart_sharpen_strength: z.number().gte(0).lte(25).optional().default(5),
   cas_amount: z.number().gte(0).lte(1).optional().default(0.8),
+  sharpen_alpha: z.number().gte(0.1).lte(5).optional().default(1),
+  preserve_edges: z.number().gte(0).lte(1).optional().default(0.75),
+  noise_radius: z.int().gte(1).lte(25).optional().default(7),
 })
 
 /**
@@ -15607,21 +15766,21 @@ export const zPostProcessingVignetteOutput = z.object({
  * PromptObject
  */
 export const zPromptObject = z.object({
-  texture: z.union([z.string(), z.unknown()]).optional(),
-  number_of_objects: z.union([z.int(), z.unknown()]).optional(),
-  relationship: z.string(),
-  orientation: z.union([z.string(), z.unknown()]).optional(),
   skin_tone_and_texture: z.union([z.string(), z.unknown()]).optional(),
-  location: z.union([z.string(), z.unknown()]).optional(),
-  relative_size: z.union([z.string(), z.unknown()]).optional(),
-  appearance_details: z.union([z.string(), z.unknown()]).optional(),
-  action: z.union([z.string(), z.unknown()]).optional(),
-  description: z.union([z.string(), z.unknown()]).optional(),
   clothing: z.union([z.string(), z.unknown()]).optional(),
+  number_of_objects: z.union([z.int(), z.unknown()]).optional(),
   gender: z.union([z.string(), z.unknown()]).optional(),
+  relative_size: z.union([z.string(), z.unknown()]).optional(),
   pose: z.union([z.string(), z.unknown()]).optional(),
+  texture: z.union([z.string(), z.unknown()]).optional(),
+  action: z.union([z.string(), z.unknown()]).optional(),
   expression: z.union([z.string(), z.unknown()]).optional(),
   shape_and_color: z.union([z.string(), z.unknown()]).optional(),
+  location: z.union([z.string(), z.unknown()]).optional(),
+  appearance_details: z.union([z.string(), z.unknown()]).optional(),
+  orientation: z.union([z.string(), z.unknown()]).optional(),
+  description: z.union([z.string(), z.unknown()]).optional(),
+  relationship: z.string(),
 })
 
 /**
@@ -15672,9 +15831,12 @@ export const zQueueStatus = z.object({
  * TextToImageInput
  */
 export const zQwenImage2512Input = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -15688,25 +15850,26 @@ export const zQwenImage2512Input = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * LoraInput
  */
 export const zQwenImage2512LoraInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string(),
+  loras: z.array(zLoraWeight).optional().default([]),
   image_size: z
     .union([
       zImageSize,
@@ -15720,39 +15883,35 @@ export const zQwenImage2512LoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  loras: z.array(zLoraWeight).optional().default([]),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * QwenImage2512Output
  */
 export const zQwenImage2512LoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * QwenImage2512Output
  */
 export const zQwenImage2512Output = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -15761,15 +15920,15 @@ export const zQwenImage2512Output = z.object({
  * Input for Qwen Image 2 image editing with reference images
  */
 export const zQwenImage2EditInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string().min(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  num_images: z.int().gte(1).lte(6).optional().default(1),
   enable_prompt_expansion: z.boolean().optional().default(true),
   seed: z.union([z.int(), z.unknown()]).optional(),
   image_urls: z.array(z.string()),
+  num_images: z.int().gte(1).lte(6).optional().default(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().min(1),
+  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -15790,23 +15949,23 @@ export const zQwenImage2EditInput = z.object({
  * QwenImage2EditOutput
  */
 export const zQwenImage2EditOutput = z.object({
-  images: z.array(zFile),
   seed: z.int(),
+  images: z.array(zFile),
 })
 
 /**
  * QwenImage2ProEditInput
  */
 export const zQwenImage2ProEditInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string().min(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  num_images: z.int().gte(1).lte(6).optional().default(1),
   enable_prompt_expansion: z.boolean().optional().default(true),
   seed: z.union([z.int(), z.unknown()]).optional(),
   image_urls: z.array(z.string()),
+  num_images: z.int().gte(1).lte(6).optional().default(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().min(1),
+  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -15827,22 +15986,22 @@ export const zQwenImage2ProEditInput = z.object({
  * QwenImage2ProEditOutput
  */
 export const zQwenImage2ProEditOutput = z.object({
-  images: z.array(zFile),
   seed: z.int(),
+  images: z.array(zFile),
 })
 
 /**
  * QwenImage2ProTextToImageInput
  */
 export const zQwenImage2ProTextToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_prompt_expansion: z.boolean().optional().default(true),
-  prompt: z.string().min(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().min(1),
+  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -15862,22 +16021,22 @@ export const zQwenImage2ProTextToImageInput = z.object({
  * QwenImage2ProTextToImageOutput
  */
 export const zQwenImage2ProTextToImageOutput = z.object({
-  images: z.array(zFile),
   seed: z.int(),
+  images: z.array(zFile),
 })
 
 /**
  * QwenImage2TextToImageInput
  */
 export const zQwenImage2TextToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_prompt_expansion: z.boolean().optional().default(true),
-  prompt: z.string().min(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().min(1),
+  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -15897,23 +16056,16 @@ export const zQwenImage2TextToImageInput = z.object({
  * QwenImage2TextToImageOutput
  */
 export const zQwenImage2TextToImageOutput = z.object({
-  images: z.array(zFile),
   seed: z.int(),
+  images: z.array(zFile),
 })
 
 /**
  * BaseQwenEditImagePlusInput
  */
 export const zQwenImageEdit2509Input = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  image_urls: z.array(z.string()),
-  enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(2).lte(100).optional().default(50),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  sync_mode: z.boolean().optional().default(false),
+  negative_prompt: z.string().optional().default(' '),
   image_size: z
     .union([
       zImageSize,
@@ -15927,8 +16079,15 @@ export const zQwenImageEdit2509Input = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(' '),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
 })
 
 /**
@@ -15937,20 +16096,7 @@ export const zQwenImageEdit2509Input = z.object({
  * Input model for Add Background endpoint - Remove white background and add a realistic scene
  */
 export const zQwenImageEdit2509LoraGalleryAddBackgroundInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Remove white background and add a realistic scene behind the object',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -15965,9 +16111,22 @@ export const zQwenImageEdit2509LoraGalleryAddBackgroundInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Remove white background and add a realistic scene behind the object',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -15984,20 +16143,7 @@ export const zQwenImageEdit2509LoraGalleryAddBackgroundOutput = z.object({
  * Input model for Face to Full Portrait endpoint - Generate full portrait from a cropped face image
  */
 export const zQwenImageEdit2509LoraGalleryFaceToFullPortraitInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Photography. A portrait of the person in professional attire with natural lighting',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -16012,9 +16158,22 @@ export const zQwenImageEdit2509LoraGalleryFaceToFullPortraitInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Photography. A portrait of the person in professional attire with natural lighting',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16031,20 +16190,7 @@ export const zQwenImageEdit2509LoraGalleryFaceToFullPortraitOutput = z.object({
  * Input model for Group Photo endpoint - Create composite group photos with vintage/retro style
  */
 export const zQwenImageEdit2509LoraGalleryGroupPhotoInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Two people standing next to each other outside with a landscape background',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -16059,9 +16205,22 @@ export const zQwenImageEdit2509LoraGalleryGroupPhotoInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Two people standing next to each other outside with a landscape background',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16078,18 +16237,7 @@ export const zQwenImageEdit2509LoraGalleryGroupPhotoOutput = z.object({
  * Input model for Integrate Product endpoint - Blend and integrate products/elements into backgrounds
  */
 export const zQwenImageEdit2509LoraGalleryIntegrateProductInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default('Blend and integrate the product into the background'),
   image_size: z
     .union([
       zImageSize,
@@ -16104,9 +16252,20 @@ export const zQwenImageEdit2509LoraGalleryIntegrateProductInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default('Blend and integrate the product into the background'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16123,13 +16282,7 @@ export const zQwenImageEdit2509LoraGalleryIntegrateProductOutput = z.object({
  * Input model for Lighting Restoration endpoint - Restore natural lighting by removing harsh shadows and light spots
  */
 export const zQwenImageEdit2509LoraGalleryLightingRestorationInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -16144,9 +16297,15 @@ export const zQwenImageEdit2509LoraGalleryLightingRestorationInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16163,11 +16322,7 @@ export const zQwenImageEdit2509LoraGalleryLightingRestorationOutput = z.object({
  * Input model for Multiple Angles endpoint - Camera control with precise adjustments
  */
 export const zQwenImageEdit2509LoraGalleryMultipleAnglesInput = z.object({
-  negative_prompt: z.string().optional().default(' '),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  rotate_right_left: z.number().gte(-90).lte(90).optional().default(0),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -16182,16 +16337,20 @@ export const zQwenImageEdit2509LoraGalleryMultipleAnglesInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  move_forward: z.number().gte(0).lte(10).optional().default(0),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1.25),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  image_urls: z.array(z.string()),
-  vertical_angle: z.number().gte(-1).lte(1).optional().default(0),
+  rotate_right_left: z.number().gte(-90).lte(90).optional().default(0),
   wide_angle_lens: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  vertical_angle: z.number().gte(-1).lte(1).optional().default(0),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1.25),
+  move_forward: z.number().gte(0).lte(10).optional().default(0),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16208,20 +16367,7 @@ export const zQwenImageEdit2509LoraGalleryMultipleAnglesOutput = z.object({
  * Input model for Next Scene endpoint - Create cinematic shot progressions and scene transitions
  */
 export const zQwenImageEdit2509LoraGalleryNextSceneInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Next Scene: The camera moves forward revealing more of the scene',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -16236,9 +16382,22 @@ export const zQwenImageEdit2509LoraGalleryNextSceneInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Next Scene: The camera moves forward revealing more of the scene',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16255,18 +16414,7 @@ export const zQwenImageEdit2509LoraGalleryNextSceneOutput = z.object({
  * Input model for Remove Element endpoint - Remove/delete elements (objects, people, text) from the image
  */
 export const zQwenImageEdit2509LoraGalleryRemoveElementInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default('Remove the specified element from the scene'),
   image_size: z
     .union([
       zImageSize,
@@ -16281,9 +16429,20 @@ export const zQwenImageEdit2509LoraGalleryRemoveElementInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default('Remove the specified element from the scene'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16300,13 +16459,7 @@ export const zQwenImageEdit2509LoraGalleryRemoveElementOutput = z.object({
  * Input model for Remove Lighting endpoint - Remove existing lighting and apply soft even lighting
  */
 export const zQwenImageEdit2509LoraGalleryRemoveLightingInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -16321,9 +16474,15 @@ export const zQwenImageEdit2509LoraGalleryRemoveLightingInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16340,15 +16499,7 @@ export const zQwenImageEdit2509LoraGalleryRemoveLightingOutput = z.object({
  * Input model for Shirt Design endpoint - Put designs/graphics on people's shirts
  */
 export const zQwenImageEdit2509LoraGalleryShirtDesignInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().optional().default('Put this design on their shirt'),
   image_size: z
     .union([
       zImageSize,
@@ -16363,9 +16514,17 @@ export const zQwenImageEdit2509LoraGalleryShirtDesignInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z.string().optional().default('Put this design on their shirt'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16380,8 +16539,12 @@ export const zQwenImageEdit2509LoraGalleryShirtDesignOutput = z.object({
  * BaseQwenEditImagePlusLoRAInput
  */
 export const zQwenImageEdit2509LoraInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(' '),
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  image_urls: z.array(z.string()),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   image_size: z
     .union([
       zImageSize,
@@ -16396,25 +16559,21 @@ export const zQwenImageEdit2509LoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  image_urls: z.array(z.string()),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
   loras: z.array(zLoraWeight).optional().default([]),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(28),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * QwenImageOutput
  */
 export const zQwenImageEdit2509LoraOutput = z.object({
+  seed: z.int(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
 })
@@ -16423,11 +16582,11 @@ export const zQwenImageEdit2509LoraOutput = z.object({
  * QwenImageOutput
  */
 export const zQwenImageEdit2509Output = z.object({
-  images: z.array(zImageType2),
-  seed: z.int(),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
@@ -16517,17 +16676,13 @@ export const zQwenImageEdit2511LoraOutput = z.object({
  * Prompt is built automatically from slider values.
  */
 export const zQwenImageEdit2511MultipleAnglesInput = z.object({
-  vertical_angle: z.number().gte(-30).lte(90).optional().default(0),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  horizontal_angle: z.number().gte(0).lte(360).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(true),
   zoom: z.number().gte(0).lte(10).optional().default(5),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
   output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  vertical_angle: z.number().gte(-30).lte(90).optional().default(0),
   sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -16542,10 +16697,14 @@ export const zQwenImageEdit2511MultipleAnglesInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
-  image_urls: z.array(z.string()).min(1),
   additional_prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_urls: z.array(z.string()).min(1),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(4.5),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  horizontal_angle: z.number().gte(0).lte(360).optional().default(0),
 })
 
 /**
@@ -16554,8 +16713,8 @@ export const zQwenImageEdit2511MultipleAnglesInput = z.object({
  * Output model for Multiple Angles endpoint
  */
 export const zQwenImageEdit2511MultipleAnglesOutput = z.object({
-  images: z.array(zImage),
   prompt: z.string(),
+  images: z.array(zImage),
   seed: z.int(),
 })
 
@@ -16574,15 +16733,14 @@ export const zQwenImageEdit2511Output = z.object({
  * BaseQwenEditImg2ImgInput
  */
 export const zQwenImageEditImageToImageInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  negative_prompt: z.string().optional().default(' '),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
   image_size: z
     .union([
       zImageSize,
@@ -16597,12 +16755,13 @@ export const zQwenImageEditImageToImageInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   strength: z.number().gte(0.01).lte(1).optional().default(0.94),
-  image_url: z.string(),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  negative_prompt: z.string().optional().default(' '),
 })
 
 /**
@@ -16610,25 +16769,31 @@ export const zQwenImageEditImageToImageInput = z.object({
  */
 export const zQwenImageEditImageToImageOutput = z.object({
   seed: z.int(),
+  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   images: z.array(zImageType2),
-  prompt: z.string(),
 })
 
 /**
  * BaseQwenEditInpaintImageInput
  */
 export const zQwenImageEditInpaintInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  negative_prompt: z.string().optional().default(' '),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  mask_url: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.93),
+  prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
   image_size: z
     .union([
       zImageSize,
@@ -16643,13 +16808,7 @@ export const zQwenImageEditInpaintInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.93),
-  image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  mask_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
+  negative_prompt: z.string().optional().default(' '),
 })
 
 /**
@@ -16657,25 +16816,24 @@ export const zQwenImageEditInpaintInput = z.object({
  */
 export const zQwenImageEditInpaintOutput = z.object({
   seed: z.int(),
+  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   images: z.array(zImageType2),
-  prompt: z.string(),
 })
 
 /**
  * BaseQwenEditImageInput
  */
 export const zQwenImageEditInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  negative_prompt: z.string().optional().default(' '),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
   image_size: z
     .union([
       zImageSize,
@@ -16690,20 +16848,29 @@ export const zQwenImageEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  prompt: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  negative_prompt: z.string().optional().default(' '),
 })
 
 /**
  * BaseQwenEditImageLoRAInput
  */
 export const zQwenImageEditLoraInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  image_url: z.string(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  enable_safety_checker: z.boolean().optional().default(true),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
   negative_prompt: z.string().optional().default(' '),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -16718,14 +16885,6 @@ export const zQwenImageEditLoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  image_url: z.string(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  prompt: z.string(),
   loras: z.array(zLoraWeight).optional().default([]),
 })
 
@@ -16733,11 +16892,11 @@ export const zQwenImageEditLoraInput = z.object({
  * QwenImageOutput
  */
 export const zQwenImageEditLoraOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  images: z.array(zImageType2),
   prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  images: z.array(zImageType2),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -16745,25 +16904,18 @@ export const zQwenImageEditLoraOutput = z.object({
  */
 export const zQwenImageEditOutput = z.object({
   seed: z.int(),
+  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   images: z.array(zImageType2),
-  prompt: z.string(),
 })
 
 /**
  * BaseQwenEditImagePlusInput
  */
 export const zQwenImageEditPlusInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  image_urls: z.array(z.string()),
-  enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(2).lte(100).optional().default(50),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  sync_mode: z.boolean().optional().default(false),
+  negative_prompt: z.string().optional().default(' '),
   image_size: z
     .union([
       zImageSize,
@@ -16777,8 +16929,15 @@ export const zQwenImageEditPlusInput = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(' '),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
 })
 
 /**
@@ -16787,20 +16946,7 @@ export const zQwenImageEditPlusInput = z.object({
  * Input model for Add Background endpoint - Remove white background and add a realistic scene
  */
 export const zQwenImageEditPlusLoraGalleryAddBackgroundInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Remove white background and add a realistic scene behind the object',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -16815,9 +16961,22 @@ export const zQwenImageEditPlusLoraGalleryAddBackgroundInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Remove white background and add a realistic scene behind the object',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16834,20 +16993,7 @@ export const zQwenImageEditPlusLoraGalleryAddBackgroundOutput = z.object({
  * Input model for Face to Full Portrait endpoint - Generate full portrait from a cropped face image
  */
 export const zQwenImageEditPlusLoraGalleryFaceToFullPortraitInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Photography. A portrait of the person in professional attire with natural lighting',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -16862,9 +17008,22 @@ export const zQwenImageEditPlusLoraGalleryFaceToFullPortraitInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Photography. A portrait of the person in professional attire with natural lighting',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16881,20 +17040,7 @@ export const zQwenImageEditPlusLoraGalleryFaceToFullPortraitOutput = z.object({
  * Input model for Group Photo endpoint - Create composite group photos with vintage/retro style
  */
 export const zQwenImageEditPlusLoraGalleryGroupPhotoInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Two people standing next to each other outside with a landscape background',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -16909,9 +17055,22 @@ export const zQwenImageEditPlusLoraGalleryGroupPhotoInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Two people standing next to each other outside with a landscape background',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16928,18 +17087,7 @@ export const zQwenImageEditPlusLoraGalleryGroupPhotoOutput = z.object({
  * Input model for Integrate Product endpoint - Blend and integrate products/elements into backgrounds
  */
 export const zQwenImageEditPlusLoraGalleryIntegrateProductInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default('Blend and integrate the product into the background'),
   image_size: z
     .union([
       zImageSize,
@@ -16954,9 +17102,20 @@ export const zQwenImageEditPlusLoraGalleryIntegrateProductInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default('Blend and integrate the product into the background'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -16973,13 +17132,7 @@ export const zQwenImageEditPlusLoraGalleryIntegrateProductOutput = z.object({
  * Input model for Lighting Restoration endpoint - Restore natural lighting by removing harsh shadows and light spots
  */
 export const zQwenImageEditPlusLoraGalleryLightingRestorationInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -16994,9 +17147,15 @@ export const zQwenImageEditPlusLoraGalleryLightingRestorationInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -17013,11 +17172,7 @@ export const zQwenImageEditPlusLoraGalleryLightingRestorationOutput = z.object({
  * Input model for Multiple Angles endpoint - Camera control with precise adjustments
  */
 export const zQwenImageEditPlusLoraGalleryMultipleAnglesInput = z.object({
-  negative_prompt: z.string().optional().default(' '),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  rotate_right_left: z.number().gte(-90).lte(90).optional().default(0),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -17032,16 +17187,20 @@ export const zQwenImageEditPlusLoraGalleryMultipleAnglesInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  move_forward: z.number().gte(0).lte(10).optional().default(0),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1.25),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  image_urls: z.array(z.string()),
-  vertical_angle: z.number().gte(-1).lte(1).optional().default(0),
+  rotate_right_left: z.number().gte(-90).lte(90).optional().default(0),
   wide_angle_lens: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  vertical_angle: z.number().gte(-1).lte(1).optional().default(0),
   enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1.25),
+  move_forward: z.number().gte(0).lte(10).optional().default(0),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -17058,20 +17217,7 @@ export const zQwenImageEditPlusLoraGalleryMultipleAnglesOutput = z.object({
  * Input model for Next Scene endpoint - Create cinematic shot progressions and scene transitions
  */
 export const zQwenImageEditPlusLoraGalleryNextSceneInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'Next Scene: The camera moves forward revealing more of the scene',
-    ),
   image_size: z
     .union([
       zImageSize,
@@ -17086,9 +17232,22 @@ export const zQwenImageEditPlusLoraGalleryNextSceneInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'Next Scene: The camera moves forward revealing more of the scene',
+    ),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -17105,18 +17264,7 @@ export const zQwenImageEditPlusLoraGalleryNextSceneOutput = z.object({
  * Input model for Remove Element endpoint - Remove/delete elements (objects, people, text) from the image
  */
 export const zQwenImageEditPlusLoraGalleryRemoveElementInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z
-    .string()
-    .optional()
-    .default('Remove the specified element from the scene'),
   image_size: z
     .union([
       zImageSize,
@@ -17131,9 +17279,20 @@ export const zQwenImageEditPlusLoraGalleryRemoveElementInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z
+    .string()
+    .optional()
+    .default('Remove the specified element from the scene'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -17150,13 +17309,7 @@ export const zQwenImageEditPlusLoraGalleryRemoveElementOutput = z.object({
  * Input model for Remove Lighting endpoint - Remove existing lighting and apply soft even lighting
  */
 export const zQwenImageEditPlusLoraGalleryRemoveLightingInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -17171,9 +17324,15 @@ export const zQwenImageEditPlusLoraGalleryRemoveLightingInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -17190,15 +17349,7 @@ export const zQwenImageEditPlusLoraGalleryRemoveLightingOutput = z.object({
  * Input model for Shirt Design endpoint - Put designs/graphics on people's shirts
  */
 export const zQwenImageEditPlusLoraGalleryShirtDesignInput = z.object({
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  lora_scale: z.number().gte(0).lte(4).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
-  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().optional().default('Put this design on their shirt'),
   image_size: z
     .union([
       zImageSize,
@@ -17213,9 +17364,17 @@ export const zQwenImageEditPlusLoraGalleryShirtDesignInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(6),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  prompt: z.string().optional().default('Put this design on their shirt'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  lora_scale: z.number().gte(0).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()),
 })
 
 /**
@@ -17230,8 +17389,12 @@ export const zQwenImageEditPlusLoraGalleryShirtDesignOutput = z.object({
  * BaseQwenEditImagePlusLoRAInput
  */
 export const zQwenImageEditPlusLoraInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(' '),
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
+  image_urls: z.array(z.string()),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
   image_size: z
     .union([
       zImageSize,
@@ -17246,25 +17409,21 @@ export const zQwenImageEditPlusLoraInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  sync_mode: z.boolean().optional().default(false),
-  image_urls: z.array(z.string()),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(' '),
   loras: z.array(zLoraWeight).optional().default([]),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(28),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * QwenImageOutput
  */
 export const zQwenImageEditPlusLoraOutput = z.object({
+  seed: z.int(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
 })
@@ -17273,24 +17432,25 @@ export const zQwenImageEditPlusLoraOutput = z.object({
  * QwenImageOutput
  */
 export const zQwenImageEditPlusOutput = z.object({
-  images: z.array(zImageType2),
-  seed: z.int(),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
  * QwenImageI2IInput
  */
 export const zQwenImageImageToImageInput = z.object({
-  image_url: z.string(),
-  use_turbo: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
+  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(2).lte(250).optional().default(30),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
+  use_turbo: z.boolean().optional().default(false),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  strength: z.number().gte(0).lte(1).optional().default(0.6),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   image_size: z
     .union([
       zImageSize,
@@ -17305,39 +17465,34 @@ export const zQwenImageImageToImageInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   loras: z.array(zLoraWeight).optional().default([]),
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  negative_prompt: z.string().optional().default(' '),
   prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  image_url: z.string(),
+  strength: z.number().gte(0).lte(1).optional().default(0.6),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * QwenImageI2IOutput
  */
 export const zQwenImageImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
-  prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * BaseQwenImageInput
  */
 export const zQwenImageInput = z.object({
-  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
-  loras: z.array(zLoraWeight).optional().default([]),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(' '),
-  num_inference_steps: z.int().gte(2).lte(250).optional().default(30),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  use_turbo: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular', 'high']).optional().default('none'),
+  use_turbo: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
   image_size: z
     .union([
       zImageSize,
@@ -17351,8 +17506,12 @@ export const zQwenImageInput = z.object({
       ]),
     ])
     .optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  loras: z.array(zLoraWeight).optional().default([]),
+  negative_prompt: z.string().optional().default(' '),
+  num_inference_steps: z.int().gte(2).lte(250).optional().default(30),
   enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(2.5),
+  prompt: z.string(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
@@ -17360,63 +17519,63 @@ export const zQwenImageInput = z.object({
  * TextToImageInput
  */
 export const zQwenImageLayeredInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
+  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  output_format: z.enum(['png', 'webp']).optional().default('png'),
+  num_layers: z.int().gte(1).lte(10).optional().default(4),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  sync_mode: z.boolean().optional().default(false),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['png', 'webp']).optional().default('png'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
-  num_layers: z.int().gte(1).lte(10).optional().default(4),
 })
 
 /**
  * TextToImageLoRAInput
  */
 export const zQwenImageLayeredLoraInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
+  negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  loras: z.array(zLoRaInput).optional().default([]),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  num_layers: z.int().gte(1).lte(10).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['png', 'webp']).optional().default('png'),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  image_url: z.string(),
-  loras: z.array(zLoRaInput).optional().default([]),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  output_format: z.enum(['png', 'webp']).optional().default('png'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(5),
-  num_layers: z.int().gte(1).lte(10).optional().default(4),
 })
 
 /**
  * QwenImageLayeredOutput
  */
 export const zQwenImageLayeredLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
   timings: z.record(z.string(), z.number()),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
  * QwenImageLayeredOutput
  */
 export const zQwenImageLayeredOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
-  seed: z.int(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
   timings: z.record(z.string(), z.number()),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   images: z.array(zImageFile),
+  seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
 })
 
 /**
@@ -17425,7 +17584,8 @@ export const zQwenImageLayeredOutput = z.object({
  * Input for Qwen Image Max image editing with reference images
  */
 export const zQwenImageMaxEditInput = z.object({
-  num_images: z.int().gte(1).lte(6).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -17440,29 +17600,29 @@ export const zQwenImageMaxEditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_urls: z.array(z.string()),
-  sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompt: z.string().min(1).max(800),
   negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
+  prompt: z.string().min(1).max(800),
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(6).optional().default(1),
 })
 
 /**
  * QwenImageMaxEditOutput
  */
 export const zQwenImageMaxEditOutput = z.object({
-  images: z.array(zFile),
   seed: z.int(),
+  images: z.array(zFile),
 })
 
 /**
  * QwenImageMaxTextToImageInput
  */
 export const zQwenImageMaxTextToImageInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
   image_size: z
     .union([
       zImageSize,
@@ -17476,59 +17636,60 @@ export const zQwenImageMaxTextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
   enable_prompt_expansion: z.boolean().optional().default(true),
   enable_safety_checker: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   prompt: z.string().min(1).max(800),
-  negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * QwenImageMaxTextToImageOutput
  */
 export const zQwenImageMaxTextToImageOutput = z.object({
-  images: z.array(zFile),
   seed: z.int(),
+  images: z.array(zFile),
 })
 
 /**
  * QwenImageOutput
  */
 export const zQwenImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
-  prompt: z.string(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * RawImage
  */
 export const zRawImage = z.object({
-  content: z.string(),
   content_type: z.string().optional().default('image/jpeg'),
-  width: z.int(),
   height: z.int(),
+  content: z.string(),
+  width: z.int(),
 })
 
 /**
  * RealtimeEditOutput
  */
 export const zFlux2KleinRealtimeOutput = z.object({
-  seed: z.int(),
   images: z.array(zRawImage),
+  seed: z.int(),
 })
 
 /**
  * RealisticVisionTextToImageInput
  */
 export const zRealisticVisionInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  request_id: z.string().optional().default(''),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
   negative_prompt: z
     .string()
     .optional()
@@ -17548,27 +17709,25 @@ export const zRealisticVisionInput = z.object({
       ]),
     ])
     .optional(),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  expand_prompt: z.boolean().optional().default(false),
   embeddings: z.array(zEmbedding).optional().default([]),
-  request_id: z.string().optional().default(''),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
+  expand_prompt: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  prompt: z.string(),
   safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  enable_safety_checker: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * Output
  */
 export const zRealisticVisionOutput = z.object({
-  seed: z.int(),
-  timings: z.record(z.string(), z.number()),
+  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
+  timings: z.record(z.string(), z.number()),
+  seed: z.int(),
 })
 
 /**
@@ -17754,9 +17913,9 @@ export const zPulidInput = z.object({
  */
 export const zRegion = z.object({
   x2: z.int().gte(0).lte(999),
-  x1: z.int().gte(0).lte(999),
-  y1: z.int().gte(0).lte(999),
   y2: z.int().gte(0).lte(999),
+  y1: z.int().gte(0).lte(999),
+  x1: z.int().gte(0).lte(999),
 })
 
 /**
@@ -17771,20 +17930,20 @@ export const zFlorence2LargeRegionToSegmentationInput = z.object({
  * Image
  */
 export const zRegistryImageFastSdxlModelsImage = z.object({
-  width: z.int(),
+  height: z.int(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
   url: z.string(),
-  height: z.int(),
+  width: z.int(),
 })
 
 /**
  * Output
  */
 export const zFluxProKontextMaxMultiOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17792,10 +17951,10 @@ export const zFluxProKontextMaxMultiOutput = z.object({
  * Output
  */
 export const zFluxProKontextMaxTextToImageOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17803,10 +17962,10 @@ export const zFluxProKontextMaxTextToImageOutput = z.object({
  * Output
  */
 export const zFluxProKontextMultiOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17814,10 +17973,10 @@ export const zFluxProKontextMultiOutput = z.object({
  * Output
  */
 export const zFluxProKontextTextToImageOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17825,10 +17984,10 @@ export const zFluxProKontextTextToImageOutput = z.object({
  * Output
  */
 export const zFluxProV11Output = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17836,10 +17995,10 @@ export const zFluxProV11Output = z.object({
  * Output
  */
 export const zFluxProV11ReduxOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17847,10 +18006,10 @@ export const zFluxProV11ReduxOutput = z.object({
  * Output
  */
 export const zFluxProV11UltraFinetunedOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17858,10 +18017,10 @@ export const zFluxProV11UltraFinetunedOutput = z.object({
  * Output
  */
 export const zFluxProV11UltraOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17869,10 +18028,10 @@ export const zFluxProV11UltraOutput = z.object({
  * Output
  */
 export const zFluxProV11UltraReduxOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17880,10 +18039,10 @@ export const zFluxProV11UltraReduxOutput = z.object({
  * Output
  */
 export const zFluxProV1EraseOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17891,10 +18050,10 @@ export const zFluxProV1EraseOutput = z.object({
  * Output
  */
 export const zFluxProV1FillFinetunedOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17902,10 +18061,10 @@ export const zFluxProV1FillFinetunedOutput = z.object({
  * Output
  */
 export const zFluxProV1FillOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
 
@@ -17913,43 +18072,12 @@ export const zFluxProV1FillOutput = z.object({
  * Output
  */
 export const zFluxProV1VtoOutput = z.object({
-  images: z.array(zRegistryImageFastSdxlModelsImage),
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
+  images: z.array(zRegistryImageFastSdxlModelsImage),
   timings: z.record(z.string(), z.number()),
 })
-
-/**
- * InputModel
- */
-export const zReimagine32Input = z.object({
-  aspect_ratio: z
-    .enum(['1:1', '2:3', '3:2', '3:4', '4:3', '4:5', '5:4', '9:16', '16:9'])
-    .optional()
-    .default('1:1'),
-  depth_scale: z.number().gte(0).lte(1).optional().default(0.5),
-  seed: z.int().optional().default(5555),
-  canny_preprocess: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'Logo,Watermark,Ugly,Morbid,Extra fingers,Poorly drawn hands,Mutation,Blurry,Extra limbs,Gross proportions,Missing arms,Mutated hands,Long neck,Duplicate,Mutilated,Mutilated hands,Poorly drawn face,Deformed,Bad anatomy,Cloned face,Malformed limbs,Missing legs,Too many fingers',
-    ),
-  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  depth_preprocess: z.boolean().optional().default(true),
-  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
-  canny_scale: z.number().gte(0).lte(1).optional().default(0.5),
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(20).lte(50).optional().default(30),
-  prompt_enhancer: z.boolean().optional().default(true),
-  truncate_prompt: z.boolean().optional().default(true),
-})
-
-export const zReimagine32Output = z.unknown()
 
 /**
  * ImageInput
@@ -17969,12 +18097,12 @@ export const zRembgEnhanceOutput = z.object({
  * ReplaceBackgroundInputModel
  */
 export const zReplaceBackgroundInput = z.object({
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   image_url: z.union([z.string(), z.unknown()]).optional(),
   steps_num: z.int().optional().default(30),
   seed: z.int().optional().default(4925634),
-  sync_mode: z.boolean().optional().default(false),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 export const zReplaceBackgroundOutput = z.unknown()
@@ -17983,24 +18111,24 @@ export const zReplaceBackgroundOutput = z.unknown()
  * RetoucherInput
  */
 export const zRetoucherInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * RetoucherOutput
  */
 export const zRetoucherOutput = z.object({
-  image: zImage,
   seed: z.int(),
+  image: zImage,
 })
 
 /**
  * RGBColor
  */
 export const zRgbColor = z.object({
-  r: z.int().gte(0).lte(255).optional().default(0),
   g: z.int().gte(0).lte(255).optional().default(0),
+  r: z.int().gte(0).lte(255).optional().default(0),
   b: z.int().gte(0).lte(255).optional().default(0),
 })
 
@@ -18008,8 +18136,8 @@ export const zRgbColor = z.object({
  * ColorPaletteMember
  */
 export const zColorPaletteMember = z.object({
-  color_weight: z.union([z.number().gte(0.05).lte(1), z.unknown()]).optional(),
   rgb: zRgbColor,
+  color_weight: z.union([z.number().gte(0.05).lte(1), z.unknown()]).optional(),
 })
 
 /**
@@ -18038,36 +18166,43 @@ export const zColorPalette = z.object({
  * CharacterEditInputV3
  */
 export const zIdeogramCharacterEditInput = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
+  color_palette: z.union([zColorPalette, z.unknown()]).optional(),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(true),
+  reference_mask_urls: z.array(z.string()).optional(),
+  mask_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  image_url: z.string(),
   prompt: z.string(),
   reference_image_urls: z.array(z.string()),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(true),
-  mask_url: z.string(),
-  reference_mask_urls: z.array(z.string()).optional(),
-  color_palette: z.union([zColorPalette, z.unknown()]).optional(),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * BaseCharacterInputV3
  */
 export const zIdeogramCharacterInput = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
-  prompt: z.string(),
   color_palette: z.union([zColorPalette, z.unknown()]).optional(),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(true),
+  reference_mask_urls: z.array(z.string()).optional(),
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  style: z.enum(['AUTO', 'REALISTIC', 'FICTION']).optional().default('AUTO'),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  prompt: z.string(),
   reference_image_urls: z.array(z.string()),
   image_size: z
     .union([
@@ -18083,32 +18218,23 @@ export const zIdeogramCharacterInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(true),
-  reference_mask_urls: z.array(z.string()).optional(),
-  negative_prompt: z.string().optional().default(''),
-  style: z.enum(['AUTO', 'REALISTIC', 'FICTION']).optional().default('AUTO'),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * CharacterRemixInputV3
  */
 export const zIdeogramCharacterRemixInput = z.object({
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  image_url: z.string(),
-  negative_prompt: z.string().optional().default(''),
-  color_palette: z.union([zColorPalette, z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  sync_mode: z.boolean().optional().default(false),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  prompt: z.string(),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  negative_prompt: z.string().optional().default(''),
+  reference_mask_urls: z.array(z.string()).optional(),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  prompt: z.string(),
   reference_image_urls: z.array(z.string()),
   image_size: z
     .union([
@@ -18124,28 +18250,18 @@ export const zIdeogramCharacterRemixInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  color_palette: z.union([zColorPalette, z.unknown()]).optional(),
   expand_prompt: z.boolean().optional().default(true),
-  reference_mask_urls: z.array(z.string()).optional(),
   style: z.enum(['AUTO', 'REALISTIC', 'FICTION']).optional().default('AUTO'),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * EditImageInputV3
  */
 export const zIdeogramV3EditInput = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
-  rendering_speed: z
-    .enum(['TURBO', 'BALANCED', 'QUALITY'])
-    .optional()
-    .default('BALANCED'),
-  prompt: z.string(),
-  color_palette: z.union([zColorPalette, z.unknown()]).optional(),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(true),
-  mask_url: z.string(),
   style_preset: z
     .union([
       z.enum([
@@ -18215,20 +18331,26 @@ export const zIdeogramV3EditInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  rendering_speed: z
+    .enum(['TURBO', 'BALANCED', 'QUALITY'])
+    .optional()
+    .default('BALANCED'),
+  color_palette: z.union([zColorPalette, z.unknown()]).optional(),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(true),
   sync_mode: z.boolean().optional().default(false),
+  mask_url: z.string(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  image_url: z.string(),
+  prompt: z.string(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * BaseTextToImageInputV3
  */
 export const zIdeogramV3Input = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
-  rendering_speed: z
-    .enum(['TURBO', 'BALANCED', 'QUALITY'])
-    .optional()
-    .default('BALANCED'),
   style_preset: z
     .union([
       z.enum([
@@ -18298,8 +18420,22 @@ export const zIdeogramV3Input = z.object({
       z.unknown(),
     ])
     .optional(),
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  rendering_speed: z
+    .enum(['TURBO', 'BALANCED', 'QUALITY'])
+    .optional()
+    .default('BALANCED'),
   color_palette: z.union([zColorPalette, z.unknown()]).optional(),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  sync_mode: z.boolean().optional().default(false),
+  style: z
+    .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
+    .optional(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  prompt: z.string(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -18314,26 +18450,12 @@ export const zIdeogramV3Input = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
-  style: z
-    .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
-    .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * ReframeImageInputV3
  */
 export const zIdeogramV3ReframeInput = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
-  rendering_speed: z
-    .enum(['TURBO', 'BALANCED', 'QUALITY'])
-    .optional()
-    .default('BALANCED'),
   style_preset: z
     .union([
       z.enum([
@@ -18403,8 +18525,20 @@ export const zIdeogramV3ReframeInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  rendering_speed: z
+    .enum(['TURBO', 'BALANCED', 'QUALITY'])
+    .optional()
+    .default('BALANCED'),
   color_palette: z.union([zColorPalette, z.unknown()]).optional(),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  style: z
+    .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
+    .optional(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
   image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   image_size: z.union([
     zImageSize,
     z.enum([
@@ -18416,28 +18550,30 @@ export const zIdeogramV3ReframeInput = z.object({
       'landscape_16_9',
     ]),
   ]),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  style: z
-    .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
-    .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * RemixImageInputV3
  */
 export const zIdeogramV3RemixInput = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
-  prompt: z.string(),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
-  image_url: z.string(),
   color_palette: z.union([zColorPalette, z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  expand_prompt: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.8),
+  style: z
+    .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
+    .optional(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  image_url: z.string(),
+  prompt: z.string(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -18452,26 +18588,12 @@ export const zIdeogramV3RemixInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
-  style: z
-    .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
-    .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
 })
 
 /**
  * ReplaceBackgroundInputV3
  */
 export const zIdeogramV3ReplaceBackgroundInput = z.object({
-  num_images: z.int().gte(1).lte(8).optional().default(1),
-  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
-  rendering_speed: z
-    .enum(['TURBO', 'BALANCED', 'QUALITY'])
-    .optional()
-    .default('BALANCED'),
   style_preset: z
     .union([
       z.enum([
@@ -18541,37 +18663,31 @@ export const zIdeogramV3ReplaceBackgroundInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  prompt: z.string(),
-  image_url: z.string(),
+  rendering_speed: z
+    .enum(['TURBO', 'BALANCED', 'QUALITY'])
+    .optional()
+    .default('BALANCED'),
   color_palette: z.union([zColorPalette, z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  style_codes: z.union([z.array(z.string()), z.unknown()]).optional(),
   expand_prompt: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
   style: z
     .union([z.enum(['AUTO', 'GENERAL', 'REALISTIC', 'DESIGN']), z.unknown()])
     .optional(),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
+  image_url: z.string(),
+  prompt: z.string(),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * Recraft20BTextToImageInput
  */
 export const zRecraft20bInput = z.object({
+  prompt: z.string().min(1).max(1000),
   enable_safety_checker: z.boolean().optional().default(false),
-  image_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
-  style_id: z.union([z.string(), z.unknown()]).optional(),
+  colors: z.array(zRgbColor).optional().default([]),
   style: z
     .enum([
       'any',
@@ -18614,8 +18730,20 @@ export const zRecraft20bInput = z.object({
     ])
     .optional()
     .default('realistic_image'),
-  colors: z.array(zRgbColor).optional().default([]),
-  prompt: z.string().min(1).max(1000),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  style_id: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -19068,23 +19196,23 @@ export const zRecraftV4TextToVectorInput = z.object({
  * RIFEImageInput
  */
 export const zRifeInput = z.object({
-  end_image_url: z.string(),
-  output_type: z.enum(['images', 'video']).optional().default('images'),
-  output_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
-  start_image_url: z.string(),
-  num_frames: z.int().gte(1).lte(64).optional().default(1),
-  include_end: z.boolean().optional().default(false),
   fps: z.int().gte(1).lte(60).optional().default(8),
-  include_start: z.boolean().optional().default(false),
+  include_end: z.boolean().optional().default(false),
+  num_frames: z.int().gte(1).lte(64).optional().default(1),
+  start_image_url: z.string(),
+  output_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
   sync_mode: z.boolean().optional().default(false),
+  include_start: z.boolean().optional().default(false),
+  output_type: z.enum(['images', 'video']).optional().default('images'),
+  end_image_url: z.string(),
 })
 
 /**
  * RIFEImageOutput
  */
 export const zRifeOutput = z.object({
-  images: z.array(zImage).optional().default([]),
   video: z.union([zFile, z.unknown()]).optional(),
+  images: z.array(zImage).optional().default([]),
 })
 
 /**
@@ -19131,33 +19259,33 @@ export const zRundiffusionPhotoFluxOutput = z.object({
  * SAM2AutomaticSegmentationInput
  */
 export const zSam2AutoSegmentInput = z.object({
-  points_per_side: z.int().optional().default(32),
-  image_url: z.string(),
-  pred_iou_thresh: z.number().optional().default(0.88),
-  stability_score_thresh: z.number().optional().default(0.95),
-  min_mask_region_area: z.int().optional().default(100),
   output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  points_per_side: z.int().optional().default(32),
+  min_mask_region_area: z.int().optional().default(100),
   sync_mode: z.boolean().optional().default(false),
+  stability_score_thresh: z.number().optional().default(0.95),
+  pred_iou_thresh: z.number().optional().default(0.88),
+  image_url: z.string(),
 })
 
 /**
  * SAM2AutomaticSegmentationOutput
  */
 export const zSam2AutoSegmentOutput = z.object({
-  individual_masks: z.array(zImage),
   combined_mask: zImage,
+  individual_masks: z.array(zImage),
 })
 
 /**
  * SAM2ImageInput
  */
 export const zSam2ImageInput = z.object({
-  image_url: z.string(),
-  box_prompts: z.array(zBoxPromptType2).optional().default([]),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  prompts: z.array(zPointPromptType2).optional().default([]),
   apply_mask: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
+  box_prompts: z.array(zBoxPromptType2).optional().default([]),
+  prompts: z.array(zPointPromptType2).optional().default([]),
+  image_url: z.string(),
 })
 
 /**
@@ -19171,17 +19299,17 @@ export const zSam2ImageOutput = z.object({
  * SAM31ImageInput
  */
 export const zSam31ImageInput = z.object({
-  prompt: z.string().optional().default('wheel'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  return_multiple_masks: z.boolean().optional().default(false),
-  apply_mask: z.boolean().optional().default(true),
-  include_boxes: z.boolean().optional().default(false),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  max_masks: z.int().gte(1).lte(32).optional().default(3),
-  point_prompts: z.array(zPointPrompt).optional().default([]),
   box_prompts: z.array(zBoxPrompt).optional().default([]),
   include_scores: z.boolean().optional().default(false),
+  max_masks: z.int().gte(1).lte(32).optional().default(3),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  apply_mask: z.boolean().optional().default(true),
+  point_prompts: z.array(zPointPrompt).optional().default([]),
+  prompt: z.string().optional().default('wheel'),
+  return_multiple_masks: z.boolean().optional().default(false),
+  include_boxes: z.boolean().optional().default(false),
+  image_url: z.string(),
 })
 
 /**
@@ -19195,58 +19323,58 @@ export const zSam31ImageOutput = z.object({
     .union([z.array(z.union([z.array(z.number()), z.unknown()])), z.unknown()])
     .optional(),
   image: z.union([zImage, z.unknown()]).optional(),
-  masks: z.array(zImage),
   metadata: z.union([z.array(zMaskMetadata), z.unknown()]).optional(),
+  masks: z.array(zImage),
 })
 
 /**
  * SAM31ImageInput
  */
 export const zSam31ImageRleInput = z.object({
-  prompt: z.string().optional().default('wheel'),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  return_multiple_masks: z.boolean().optional().default(false),
-  apply_mask: z.boolean().optional().default(true),
-  include_boxes: z.boolean().optional().default(false),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  max_masks: z.int().gte(1).lte(32).optional().default(3),
-  point_prompts: z.array(zPointPrompt).optional().default([]),
   box_prompts: z.array(zBoxPrompt).optional().default([]),
   include_scores: z.boolean().optional().default(false),
+  max_masks: z.int().gte(1).lte(32).optional().default(3),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  apply_mask: z.boolean().optional().default(true),
+  point_prompts: z.array(zPointPrompt).optional().default([]),
+  prompt: z.string().optional().default('wheel'),
+  return_multiple_masks: z.boolean().optional().default(false),
+  include_boxes: z.boolean().optional().default(false),
+  image_url: z.string(),
 })
 
 /**
  * SAM31RLEOutput
  */
 export const zSam31ImageRleOutput = z.object({
-  boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
-  metadata: z.union([z.array(zMaskMetadata), z.unknown()]).optional(),
   scores: z
     .union([z.array(z.union([z.number(), z.unknown()])), z.unknown()])
     .optional(),
+  boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
+  rle: z.union([z.string(), z.array(z.string())]),
+  metadata: z.union([z.array(zMaskMetadata), z.unknown()]).optional(),
   boxes: z
     .union([z.array(z.union([z.array(z.number()), z.unknown()])), z.unknown()])
     .optional(),
-  rle: z.union([z.string(), z.array(z.string())]),
 })
 
 /**
  * SAM3ImageInput
  */
 export const zSam3ImageInput = z.object({
-  box_prompts: z.array(zBoxPrompt).optional().default([]),
-  include_scores: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  return_multiple_masks: z.boolean().optional().default(false),
+  apply_mask: z.boolean().optional().default(true),
+  max_masks: z.int().gte(1).lte(32).optional().default(3),
   image_url: z.string(),
   include_boxes: z.boolean().optional().default(false),
-  max_masks: z.int().gte(1).lte(32).optional().default(3),
-  point_prompts: z.array(zPointPrompt).optional().default([]),
-  apply_mask: z.boolean().optional().default(true),
-  prompt: z.string().optional().default('wheel'),
-  text_prompt: z.union([z.string(), z.unknown()]).optional(),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  return_multiple_masks: z.boolean().optional().default(false),
+  sync_mode: z.boolean().optional().default(false),
+  text_prompt: z.union([z.string(), z.unknown()]).optional(),
+  include_scores: z.boolean().optional().default(false),
+  point_prompts: z.array(zPointPrompt).optional().default([]),
+  box_prompts: z.array(zBoxPrompt).optional().default([]),
+  prompt: z.string().optional().default('wheel'),
 })
 
 /**
@@ -19256,72 +19384,52 @@ export const zSam3ImageOutput = z.object({
   scores: z
     .union([z.array(z.union([z.number(), z.unknown()])), z.unknown()])
     .optional(),
-  image: z.union([zImage, z.unknown()]).optional(),
   metadata: z.union([z.array(zMaskMetadata), z.unknown()]).optional(),
+  masks: z.array(zImage),
+  image: z.union([zImage, z.unknown()]).optional(),
   boxes: z
     .union([z.array(z.union([z.array(z.number()), z.unknown()])), z.unknown()])
     .optional(),
-  masks: z.array(zImage),
 })
 
 /**
  * SAM3ImageInput
  */
 export const zSam3ImageRleInput = z.object({
-  box_prompts: z.array(zBoxPrompt).optional().default([]),
-  include_scores: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  return_multiple_masks: z.boolean().optional().default(false),
+  apply_mask: z.boolean().optional().default(true),
+  max_masks: z.int().gte(1).lte(32).optional().default(3),
   image_url: z.string(),
   include_boxes: z.boolean().optional().default(false),
-  max_masks: z.int().gte(1).lte(32).optional().default(3),
-  point_prompts: z.array(zPointPrompt).optional().default([]),
-  apply_mask: z.boolean().optional().default(true),
-  prompt: z.string().optional().default('wheel'),
-  text_prompt: z.union([z.string(), z.unknown()]).optional(),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  return_multiple_masks: z.boolean().optional().default(false),
+  sync_mode: z.boolean().optional().default(false),
+  text_prompt: z.union([z.string(), z.unknown()]).optional(),
+  include_scores: z.boolean().optional().default(false),
+  point_prompts: z.array(zPointPrompt).optional().default([]),
+  box_prompts: z.array(zBoxPrompt).optional().default([]),
+  prompt: z.string().optional().default('wheel'),
 })
 
 /**
  * SAM3RLEOutput
  */
 export const zSam3ImageRleOutput = z.object({
-  scores: z
-    .union([z.array(z.union([z.number(), z.unknown()])), z.unknown()])
-    .optional(),
   boxes: z
     .union([z.array(z.union([z.array(z.number()), z.unknown()])), z.unknown()])
     .optional(),
-  metadata: z.union([z.array(zMaskMetadata), z.unknown()]).optional(),
-  rle: z.union([z.string(), z.array(z.string())]),
   boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
+  metadata: z.union([z.array(zMaskMetadata), z.unknown()]).optional(),
+  scores: z
+    .union([z.array(z.union([z.number(), z.unknown()])), z.unknown()])
+    .optional(),
+  rle: z.union([z.string(), z.array(z.string())]),
 })
 
 /**
  * TextToImageInput
  */
 export const zSanaInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
   enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(18),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   prompt: z.string(),
   style_name: z
     .enum([
@@ -19338,44 +19446,44 @@ export const zSanaInput = z.object({
     ])
     .optional()
     .default('(No style)'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(18),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * Output
  */
 export const zSanaOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * SprintInput
  */
 export const zSanaSprintInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
   enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(20).optional().default(2),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   prompt: z.string(),
   style_name: z
     .enum([
@@ -19392,44 +19500,44 @@ export const zSanaSprintInput = z.object({
     ])
     .optional()
     .default('(No style)'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_inference_steps: z.int().gte(1).lte(20).optional().default(2),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * Output
  */
 export const zSanaSprintOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * TextToImageInput
  */
 export const zSanaV1516bInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
   enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(18),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   prompt: z.string(),
   style_name: z
     .enum([
@@ -19446,44 +19554,44 @@ export const zSanaV1516bInput = z.object({
     ])
     .optional()
     .default('(No style)'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(18),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * Output
  */
 export const zSanaV1516bOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * TextToImageInput
  */
 export const zSanaV1548bInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  image_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
   enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(18),
-  sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   prompt: z.string(),
   style_name: z
     .enum([
@@ -19500,39 +19608,71 @@ export const zSanaV1548bInput = z.object({
     ])
     .optional()
     .default('(No style)'),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(18),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
 })
 
 /**
  * Output
  */
 export const zSanaV1548bOutput = z.object({
-  seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
   prompt: z.string(),
   images: z.array(zImageType2),
+  has_nsfw_concepts: z.array(z.boolean()),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * ImageToImageControlNetUnionInput
  */
 export const zSdxlControlnetUnionImageToImageInput = z.object({
-  embeddings: z.array(zEmbedding).optional().default([]),
-  negative_prompt: z.string().optional().default(''),
-  expand_prompt: z.boolean().optional().default(false),
-  canny_preprocess: z.boolean().optional().default(true),
-  normal_image_url: z.union([z.string(), z.unknown()]).optional(),
+  request_id: z.string().optional().default(''),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  normal_preprocess: z.boolean().optional().default(true),
-  strength: z.number().gte(0.05).lte(1).optional().default(0.95),
-  enable_safety_checker: z.boolean().optional().default(true),
-  depth_preprocess: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  normal_image_url: z.union([z.string(), z.unknown()]).optional(),
   teed_preprocess: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  segmentation_image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
+  image_url: z.string(),
+  embeddings: z.array(zEmbedding).optional().default([]),
+  strength: z.number().gte(0.05).lte(1).optional().default(0.95),
+  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
+  crop_output: z.boolean().optional().default(false),
+  controlnet_conditioning_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  openpose_preprocess: z.boolean().optional().default(true),
   openpose_image_url: z.union([z.string(), z.unknown()]).optional(),
-  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
-  loras: z.array(zLoraWeightType2).optional().default([]),
+  normal_preprocess: z.boolean().optional().default(true),
+  canny_preprocess: z.boolean().optional().default(true),
+  segmentation_preprocess: z.boolean().optional().default(true),
+  preserve_aspect_ratio: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   image_size: z
     .union([
       zImageSizeType2,
@@ -19547,35 +19687,23 @@ export const zSdxlControlnetUnionImageToImageInput = z.object({
       z.unknown(),
     ])
     .nullish(),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  crop_output: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
-  controlnet_conditioning_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  request_id: z.string().optional().default(''),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  teed_image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
-  preserve_aspect_ratio: z.boolean().optional().default(false),
-  segmentation_preprocess: z.boolean().optional().default(true),
-  openpose_preprocess: z.boolean().optional().default(true),
-  segmentation_image_url: z.union([z.string(), z.unknown()]).optional(),
+  depth_preprocess: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
+  loras: z.array(zLoraWeightType2).optional().default([]),
   prompt: z.string(),
+  teed_image_url: z.union([z.string(), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
  * Output
  */
 export const zSdxlControlnetUnionImageToImageOutput = z.object({
+  seed: z.int(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
 })
@@ -19584,22 +19712,33 @@ export const zSdxlControlnetUnionImageToImageOutput = z.object({
  * InpaintingControlNetUnionInput
  */
 export const zSdxlControlnetUnionInpaintingInput = z.object({
-  embeddings: z.array(zEmbedding).optional().default([]),
-  negative_prompt: z.string().optional().default(''),
-  expand_prompt: z.boolean().optional().default(false),
-  canny_preprocess: z.boolean().optional().default(true),
-  normal_image_url: z.union([z.string(), z.unknown()]).optional(),
+  request_id: z.string().optional().default(''),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
   format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  normal_preprocess: z.boolean().optional().default(true),
-  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
-  enable_safety_checker: z.boolean().optional().default(true),
-  depth_preprocess: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(8).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  normal_image_url: z.union([z.string(), z.unknown()]).optional(),
   teed_preprocess: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  segmentation_image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
+  image_url: z.string(),
+  embeddings: z.array(zEmbedding).optional().default([]),
+  strength: z.number().gte(0.01).lte(1).optional().default(0.95),
+  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
+  controlnet_conditioning_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  mask_url: z.string(),
+  openpose_preprocess: z.boolean().optional().default(true),
   openpose_image_url: z.union([z.string(), z.unknown()]).optional(),
-  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
-  loras: z.array(zLoraWeightType2).optional().default([]),
+  normal_preprocess: z.boolean().optional().default(true),
+  canny_preprocess: z.boolean().optional().default(true),
+  segmentation_preprocess: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   image_size: z
     .union([
       zImageSizeType2,
@@ -19614,34 +19753,23 @@ export const zSdxlControlnetUnionInpaintingInput = z.object({
       z.unknown(),
     ])
     .nullish(),
-  sync_mode: z.boolean().optional().default(false),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
-  controlnet_conditioning_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  request_id: z.string().optional().default(''),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  depth_preprocess: z.boolean().optional().default(true),
+  negative_prompt: z.string().optional().default(''),
+  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
+  loras: z.array(zLoraWeightType2).optional().default([]),
   teed_image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
-  segmentation_preprocess: z.boolean().optional().default(true),
-  openpose_preprocess: z.boolean().optional().default(true),
-  mask_url: z.string(),
-  segmentation_image_url: z.union([z.string(), z.unknown()]).optional(),
   prompt: z.string(),
+  expand_prompt: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(8).optional().default(1),
 })
 
 /**
  * Output
  */
 export const zSdxlControlnetUnionInpaintingOutput = z.object({
+  seed: z.int(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
 })
@@ -19650,8 +19778,24 @@ export const zSdxlControlnetUnionInpaintingOutput = z.object({
  * TextToImageControlNetUnionInput
  */
 export const zSdxlControlnetUnionInput = z.object({
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  negative_prompt: z.string().optional().default(''),
+  request_id: z.string().optional().default(''),
+  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
+  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
+  prompt: z.string(),
+  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
+  openpose_preprocess: z.boolean().optional().default(true),
+  openpose_image_url: z.union([z.string(), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(false),
+  sync_mode: z.boolean().optional().default(false),
+  normal_image_url: z.union([z.string(), z.unknown()]).optional(),
+  canny_preprocess: z.boolean().optional().default(true),
+  normal_preprocess: z.boolean().optional().default(true),
+  teed_preprocess: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(true),
+  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  segmentation_preprocess: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSizeType2,
@@ -19666,45 +19810,29 @@ export const zSdxlControlnetUnionInput = z.object({
       z.unknown(),
     ])
     .nullish(),
-  canny_preprocess: z.boolean().optional().default(true),
-  expand_prompt: z.boolean().optional().default(false),
-  format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  sync_mode: z.boolean().optional().default(false),
-  prompt: z.string(),
-  normal_preprocess: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  depth_preprocess: z.boolean().optional().default(true),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  negative_prompt: z.string().optional().default(''),
   segmentation_image_url: z.union([z.string(), z.unknown()]).optional(),
-  embeddings: z.array(zEmbedding).optional().default([]),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  depth_image_url: z.union([z.string(), z.unknown()]).optional(),
-  safety_checker_version: z.enum(['v1', 'v2']).optional().default('v1'),
-  request_id: z.string().optional().default(''),
   teed_image_url: z.union([z.string(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(1).lte(70).optional().default(35),
   controlnet_conditioning_scale: z
     .number()
     .gte(0)
     .lte(1)
     .optional()
     .default(0.5),
-  depth_preprocess: z.boolean().optional().default(true),
+  embeddings: z.array(zEmbedding).optional().default([]),
   num_images: z.int().gte(1).lte(8).optional().default(1),
-  segmentation_preprocess: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
-  teed_preprocess: z.boolean().optional().default(true),
-  openpose_image_url: z.union([z.string(), z.unknown()]).optional(),
-  openpose_preprocess: z.boolean().optional().default(true),
-  normal_image_url: z.union([z.string(), z.unknown()]).optional(),
-  canny_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * Output
  */
 export const zSdxlControlnetUnionOutput = z.object({
+  seed: z.int(),
   images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
 })
@@ -19713,17 +19841,17 @@ export const zSdxlControlnetUnionOutput = z.object({
  * SeedVRImageInput
  */
 export const zSeedvrUpscaleImageInput = z.object({
+  upscale_mode: z.enum(['target', 'factor']).optional().default('factor'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  noise_scale: z.number().gte(0).lte(1).optional().default(0.1),
   image_url: z.string(),
+  upscale_factor: z.number().gte(1).lte(10).optional().default(2),
   target_resolution: z
     .enum(['720p', '1080p', '1440p', '2160p'])
     .optional()
     .default('1080p'),
   sync_mode: z.boolean().optional().default(false),
-  upscale_factor: z.number().gte(1).lte(10).optional().default(2),
   output_format: z.enum(['png', 'jpg', 'webp']).optional().default('jpg'),
-  upscale_mode: z.enum(['target', 'factor']).optional().default('factor'),
-  noise_scale: z.number().gte(0).lte(1).optional().default(0.1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -19740,18 +19868,18 @@ export const zSeedvrUpscaleImageOutput = z.object({
  * Input for seamless tileable image upscaling.
  */
 export const zSeedvrUpscaleImageSeamlessInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  upscale_mode: z.enum(['target', 'factor']).optional().default('factor'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  noise_scale: z.number().gte(0).lte(1).optional().default(0.1),
   image_url: z.string(),
+  upscale_factor: z.number().gte(1).lte(10).optional().default(2),
   target_resolution: z
     .enum(['720p', '1080p', '1440p', '2160p'])
     .optional()
     .default('1080p'),
   sync_mode: z.boolean().optional().default(false),
-  upscale_factor: z.number().gte(1).lte(10).optional().default(2),
   output_format: z.enum(['png', 'jpeg', 'webp']).optional().default('png'),
-  upscale_mode: z.enum(['target', 'factor']).optional().default('factor'),
-  noise_scale: z.number().gte(0).lte(1).optional().default(0.1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -19766,22 +19894,22 @@ export const zSeedvrUpscaleImageSeamlessOutput = z.object({
  * SegmentSamplingSettings
  */
 export const zSegmentSamplingSettings = z.object({
-  temperature: z.number().gte(0).lte(1).optional().default(1),
-  top_p: z.number().gte(0).lte(1).optional().default(1),
   max_tokens: z.union([z.int().gte(1), z.unknown()]).optional(),
+  top_p: z.number().gte(0).lte(1).optional().default(1),
+  temperature: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * MoondreamSegementationInput
  */
 export const zMoondream3PreviewSegmentInput = z.object({
-  preview: z.boolean().optional().default(false),
-  settings: z.union([zSegmentSamplingSettings, z.unknown()]).optional(),
-  object: z.string(),
   image_url: z.string(),
   spatial_references: z
     .union([z.array(z.union([zPoint, z.array(z.number())])), z.unknown()])
     .optional(),
+  settings: z.union([zSegmentSamplingSettings, z.unknown()]).optional(),
+  preview: z.boolean().optional().default(false),
+  object: z.string(),
 })
 
 /**
@@ -19796,18 +19924,18 @@ export const zSigmasInput = z.object({
  * SmartResizeInput
  */
 export const zSmartResizeInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
-  prompt: z.string().max(5000).optional().default(''),
   num_images_per_size: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  target_sizes: z.array(z.string()).min(1).max(10),
   sync_mode: z.boolean().optional().default(false),
-  resolution: z.enum(['1K', '2K', '4K']).optional().default('1K'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  target_sizes: z.array(z.string()).min(1).max(10),
+  prompt: z.string().max(5000).optional().default(''),
 })
 
 /**
@@ -19818,30 +19946,31 @@ export const zSmartResizeInput = z.object({
  */
 export const zSmartResizeResult = z.object({
   resolution: z.string(),
-  aspect_ratio: z.string(),
-  description: z.string(),
-  height: z.int(),
-  images: z.array(zImageFile),
   width: z.int(),
+  height: z.int(),
+  aspect_ratio: z.string(),
+  images: z.array(zImageFile),
+  description: z.string(),
 })
 
 /**
  * SmartResizeOutput
  */
 export const zSmartResizeOutput = z.object({
-  description: z.string(),
-  results: z.array(zSmartResizeResult),
   images: z.array(zImageFile),
+  results: z.array(zSmartResizeResult),
+  description: z.string(),
 })
 
 /**
  * StableCascadeInput
  */
 export const zStableCascadeInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  first_stage_steps: z.int().gte(4).lte(40).optional().default(20),
-  negative_prompt: z.string().optional().default(''),
+  second_stage_steps: z.int().gte(4).lte(24).optional().default(10),
+  second_stage_guidance_scale: z.number().gte(0).lte(20).optional().default(0),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
   image_size: z
     .union([
       zImageSize,
@@ -19855,12 +19984,11 @@ export const zStableCascadeInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(4),
-  sync_mode: z.boolean().optional().default(false),
-  second_stage_steps: z.int().gte(4).lte(24).optional().default(10),
+  negative_prompt: z.string().optional().default(''),
+  first_stage_steps: z.int().gte(4).lte(40).optional().default(20),
   prompt: z.string(),
-  second_stage_guidance_scale: z.number().gte(0).lte(20).optional().default(0),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -19868,20 +19996,21 @@ export const zStableCascadeInput = z.object({
  */
 export const zStableCascadeOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * SoteDiffusionInput
  */
 export const zStableCascadeSoteDiffusionInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  first_stage_steps: z.int().gte(4).lte(50).optional().default(25),
-  negative_prompt: z.string().optional().default(''),
+  second_stage_steps: z.int().gte(4).lte(24).optional().default(10),
+  second_stage_guidance_scale: z.number().gte(0).lte(20).optional().default(2),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(8),
   image_size: z
     .union([
       zImageSize,
@@ -19895,12 +20024,11 @@ export const zStableCascadeSoteDiffusionInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(8),
-  sync_mode: z.boolean().optional().default(false),
-  second_stage_steps: z.int().gte(4).lte(24).optional().default(10),
+  negative_prompt: z.string().optional().default(''),
+  first_stage_steps: z.int().gte(4).lte(50).optional().default(25),
   prompt: z.string(),
-  second_stage_guidance_scale: z.number().gte(0).lte(20).optional().default(2),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
@@ -19908,10 +20036,10 @@ export const zStableCascadeSoteDiffusionInput = z.object({
  */
 export const zStableCascadeSoteDiffusionOutput = z.object({
   seed: z.int(),
-  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageType2),
-  prompt: z.string(),
   timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
@@ -19962,11 +20090,10 @@ export const zStableDiffusionV15Output = z.object({
  * TextToImageInput
  */
 export const zStableDiffusionV35LargeInput = z.object({
-  loras: z.array(zLoraWeight).optional().default([]),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   sync_mode: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   ip_adapter: z.union([zIpAdapter, z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(3.5),
   image_size: z
     .union([
       zImageSize,
@@ -19981,24 +20108,25 @@ export const zStableDiffusionV35LargeInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  loras: z.array(zLoraWeight).optional().default([]),
+  negative_prompt: z.string().optional().default(''),
   controlnet: zControlNetType3.optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
 })
 
 /**
  * Output
  */
 export const zStableDiffusionV35LargeOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
-  timings: z.record(z.string(), z.number()),
-  prompt: z.string(),
   images: z.array(zImageType2),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
@@ -20044,15 +20172,17 @@ export const zStableDiffusionV35MediumOutput = z.object({
  * ImageToImageInput
  */
 export const zStableDiffusionV3MediumImageToImageInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   negative_prompt: z.string().optional().default(''),
   prompt_expansion: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   strength: z.number().gte(0.01).lte(1).optional().default(0.9),
-  sync_mode: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -20067,19 +20197,17 @@ export const zStableDiffusionV3MediumImageToImageInput = z.object({
       z.unknown(),
     ])
     .nullish(),
-  image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * SD3Output
  */
 export const zStableDiffusionV3MediumImageToImageOutput = z.object({
-  images: z.array(zImageType2),
   num_images: z.int(),
-  prompt: z.string(),
+  images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
+  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
 })
 
@@ -20087,15 +20215,15 @@ export const zStableDiffusionV3MediumImageToImageOutput = z.object({
  * TextToImageInput
  */
 export const zStableDiffusionV3MediumInput = z.object({
-  prompt_expansion: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(5),
   negative_prompt: z.string().optional().default(''),
+  prompt_expansion: z.boolean().optional().default(false),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -20115,11 +20243,11 @@ export const zStableDiffusionV3MediumInput = z.object({
  * SD3Output
  */
 export const zStableDiffusionV3MediumOutput = z.object({
-  images: z.array(zImageType2),
   num_images: z.int(),
-  prompt: z.string(),
+  images: z.array(zImageType2),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
+  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
 })
 
@@ -20127,32 +20255,32 @@ export const zStableDiffusionV3MediumOutput = z.object({
  * ImageToImageInput
  */
 export const zStepxEdit2Input = z.object({
+  prompt: z.string(),
+  enable_reflection_mode: z.boolean().optional().default(true),
+  image_url: z.string(),
   enable_safety_checker: z.boolean().optional().default(true),
   negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(6),
-  sync_mode: z.boolean().optional().default(false),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  enable_reflection_mode: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
-  prompt: z.string(),
   enable_thinking_mode: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(6),
+  num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * ImageOutput
  */
 export const zStepxEdit2Output = z.object({
+  prompt: z.string(),
   images: z.array(zImageType2),
-  has_nsfw_concepts: z.array(z.boolean()),
-  timings: z.record(z.string(), z.number()),
+  reformat_prompt: z.union([z.string(), z.unknown()]).optional(),
+  think_info: z.union([z.array(z.string()), z.unknown()]).optional(),
   best_info: z
     .union([z.array(z.record(z.string(), z.unknown())), z.unknown()])
     .optional(),
-  think_info: z.union([z.array(z.string()), z.unknown()]).optional(),
-  reformat_prompt: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.string(),
+  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
   seed: z.int(),
 })
 
@@ -20160,17 +20288,17 @@ export const zStepxEdit2Output = z.object({
  * StructuredInstruction
  */
 export const zStructuredInstruction = z.object({
-  edit_instruction: z.union([z.string(), z.unknown()]).optional(),
+  aesthetics: z.union([zAesthetics, z.unknown()]).optional(),
   text_render: z.union([z.array(z.unknown()), z.unknown()]).optional(),
-  objects: z.union([z.array(zPromptObject), z.unknown()]).optional(),
-  artistic_style: z.union([z.string(), z.unknown()]).optional(),
   style_medium: z.union([z.string(), z.unknown()]).optional(),
+  objects: z.union([z.array(zPromptObject), z.unknown()]).optional(),
+  edit_instruction: z.union([z.string(), z.unknown()]).optional(),
+  artistic_style: z.union([z.string(), z.unknown()]).optional(),
+  short_description: z.union([z.string(), z.unknown()]).optional(),
   background_setting: z.union([z.string(), z.unknown()]).optional(),
   photographic_characteristics: z
     .union([zPhotographicCharacteristics, z.unknown()])
     .optional(),
-  aesthetics: z.union([zAesthetics, z.unknown()]).optional(),
-  short_description: z.union([z.string(), z.unknown()]).optional(),
   context: z.union([z.string(), z.unknown()]).optional(),
   lighting: z.union([zLighting, z.unknown()]).optional(),
 })
@@ -20179,19 +20307,19 @@ export const zStructuredInstruction = z.object({
  * FiboEditInputModel
  */
 export const zFiboEditEditInput = z.object({
-  guidance_scale: z.union([z.number(), z.int()]).optional(),
+  seed: z.int().optional().default(5555),
+  negative_prompt: z.string().optional().default(''),
+  mask_url: z.union([z.string(), z.unknown()]).optional(),
+  new_vgl: z.union([zStructuredInstruction, z.unknown()]).optional(),
+  original_vgl: z.union([zStructuredInstruction, z.unknown()]).optional(),
   sync_mode: z.boolean().optional().default(false),
+  instruction: z.union([z.string(), z.unknown()]).optional(),
+  steps_num: z.int().gte(20).lte(50).optional().default(30),
+  guidance_scale: z.union([z.number(), z.int()]).optional(),
   structured_instruction: z
     .union([zStructuredInstruction, z.unknown()])
     .optional(),
-  steps_num: z.int().gte(20).lte(50).optional().default(30),
-  instruction: z.union([z.string(), z.unknown()]).optional(),
-  original_vgl: z.union([zStructuredInstruction, z.unknown()]).optional(),
-  new_vgl: z.union([zStructuredInstruction, z.unknown()]).optional(),
-  mask_url: z.union([z.string(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
   image_url: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.int().optional().default(5555),
 })
 
 /**
@@ -20272,6 +20400,14 @@ export const zFiboBbqPreviewGenerateInput = z.object({
       z.unknown(),
     ])
     .optional(),
+})
+
+/**
+ * Style
+ */
+export const zStyle = z.object({
+  id: z.string(),
+  strength: z.number().gte(-2).lte(2).optional().default(1),
 })
 
 /**
@@ -20556,20 +20692,15 @@ export const zLoraInput = z.object({
  * ImageUpscaleRequest
  */
 export const zTopazUpscaleImageInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  autoprompt: z.union([z.boolean(), z.unknown()]).optional(),
-  crop_to_fill: z.boolean().optional().default(false),
-  face_enhancement_creativity: z.number().gte(0).lte(1).optional().default(0),
-  subject_detection: z
-    .enum(['All', 'Foreground', 'Background'])
-    .optional()
-    .default('All'),
-  denoise: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  strength: z.union([z.number().gte(0.01).lte(1), z.unknown()]).optional(),
+  enhancement_strength: z
+    .union([z.enum(['low', 'medium', 'high']), z.unknown()])
+    .optional(),
   texture: z.union([z.int().gte(1).lte(5), z.unknown()]).optional(),
-  sharpen: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  prompt: z.union([z.string().max(1024), z.unknown()]).optional(),
-  face_enhancement: z.boolean().optional().default(true),
+  denoise: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   detail: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  face_enhancement_creativity: z.number().gte(0).lte(1).optional().default(0),
+  crop_to_fill: z.boolean().optional().default(false),
   model: z
     .enum([
       'Low Resolution V2',
@@ -20582,15 +20713,24 @@ export const zTopazUpscaleImageInput = z.object({
       'Recovery V2',
       'Standard MAX',
       'Wonder',
+      'Wonder 3',
     ])
     .optional()
     .default('Standard V2'),
   image_url: z.string().min(1),
-  strength: z.union([z.number().gte(0.01).lte(1), z.unknown()]).optional(),
+  autoprompt: z.union([z.boolean(), z.unknown()]).optional(),
+  face_enhancement_strength: z.number().gte(0).lte(1).optional().default(0.8),
   fix_compression: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   creativity: z.union([z.int().gte(1).lte(6), z.unknown()]).optional(),
+  sharpen: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  prompt: z.union([z.string().max(1024), z.unknown()]).optional(),
+  face_enhancement: z.boolean().optional().default(true),
+  subject_detection: z
+    .enum(['All', 'Foreground', 'Background'])
+    .optional()
+    .default('All'),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
   upscale_factor: z.number().gte(1).lte(4).optional().default(2),
-  face_enhancement_strength: z.number().gte(0).lte(1).optional().default(0.8),
 })
 
 /**
@@ -20604,14 +20744,7 @@ export const zTopazUpscaleImageOutput = z.object({
  * UNOInput
  */
 export const zUnoInput = z.object({
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  input_image_urls: z.array(z.string()),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -20626,18 +20759,25 @@ export const zUnoInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(3.5),
+  prompt: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  input_image_urls: z.array(z.string()),
 })
 
 /**
  * UNOOutput
  */
 export const zUnoOutput = z.object({
+  seed: z.int(),
   has_nsfw_concepts: z.array(z.boolean()),
   prompt: z.string(),
-  timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   images: z.array(zImage),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
@@ -20666,21 +20806,21 @@ export const zUpscaleCreativeOutput = z.object({
  * UsageInfo
  */
 export const zUsageInfo = z.object({
+  prefill_time_ms: z.number(),
   output_tokens: z.int(),
   ttft_ms: z.number(),
   decode_time_ms: z.number(),
   input_tokens: z.int(),
-  prefill_time_ms: z.number(),
 })
 
 /**
  * MoondreamSegementationOutput
  */
 export const zMoondream3PreviewSegmentOutput = z.object({
-  image: z.union([zImageFile, z.unknown()]).optional(),
   bbox: z.union([zObject, z.unknown()]).optional(),
-  finish_reason: z.string(),
   usage_info: zUsageInfo,
+  image: z.union([zImageFile, z.unknown()]).optional(),
+  finish_reason: z.string(),
   path: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -20688,9 +20828,8 @@ export const zMoondream3PreviewSegmentOutput = z.object({
  * USOInputImage
  */
 export const zUsoInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
-  sync_mode: z.boolean().optional().default(false),
+  input_image_urls: z.array(z.string()),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -20704,25 +20843,26 @@ export const zUsoInput = z.object({
       ]),
     ])
     .optional(),
-  input_image_urls: z.array(z.string()),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  keep_size: z.boolean().optional().default(false),
-  prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  keep_size: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png']).optional().default('png'),
+  prompt: z.string().optional().default(''),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * USOOutputImage
  */
 export const zUsoOutput = z.object({
-  timings: z.record(z.string(), z.unknown()),
-  seed: z.int(),
   images: z.array(zImage),
-  prompt: z.string(),
   has_nsfw_concepts: z.array(z.boolean()),
+  timings: z.record(z.string(), z.unknown()),
+  prompt: z.string(),
+  seed: z.int(),
 })
 
 /**
@@ -20731,6 +20871,11 @@ export const zUsoOutput = z.object({
  * Input for Wan 2.6 image editing with reference images (enable_interleave=false)
  */
 export const zV26ImageToImageInput = z.object({
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
   image_size: z
     .union([
       zImageSize,
@@ -20744,13 +20889,8 @@ export const zV26ImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string().min(1),
-  image_urls: z.array(z.string()),
-  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -20759,8 +20899,8 @@ export const zV26ImageToImageInput = z.object({
  * Output for Wan 2.6 image editing
  */
 export const zV26ImageToImageOutput = z.object({
-  seed: z.int(),
   images: z.array(zFile),
+  seed: z.int(),
 })
 
 /**
@@ -20769,9 +20909,10 @@ export const zV26ImageToImageOutput = z.object({
  * Input for Wan 2.6 text-to-image or mixed text-and-image generation (enable_interleave=true)
  */
 export const zV26TextToImageInput = z.object({
-  image_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   max_images: z.int().gte(1).lte(5).optional().default(1),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -20787,8 +20928,7 @@ export const zV26TextToImageInput = z.object({
     ])
     .optional(),
   prompt: z.string().min(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -20797,9 +20937,9 @@ export const zV26TextToImageInput = z.object({
  * Output for Wan 2.6 text-to-image (can include generated text in mixed mode)
  */
 export const zV26TextToImageOutput = z.object({
-  seed: z.int(),
   images: z.array(zFile),
   generated_text: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.int(),
 })
 
 /**
@@ -20808,29 +20948,31 @@ export const zV26TextToImageOutput = z.object({
  * Input for Krea-2 Large image generation.
  */
 export const zV2LargeTextToImageInput = z.object({
-  creativity: z
-    .enum(['raw', 'low', 'medium', 'high'])
+  moodboards: z.array(zMoodboard).max(1).optional().default([]),
+  aspect_ratio: z
+    .enum(['1:1', '4:3', '3:2', '16:9', '2.35:1', '4:5', '2:3', '9:16'])
     .optional()
-    .default('medium'),
-  prompt: z.string().min(1).max(5000),
+    .default('1:1'),
   image_style_references: z
     .array(zImageStyleReference)
     .max(10)
     .optional()
     .default([]),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['1:1', '4:3', '3:2', '16:9', '2.35:1', '4:5', '2:3', '9:16'])
+  prompt: z.string().min(1).max(5000),
+  creativity: z
+    .enum(['raw', 'low', 'medium', 'high'])
     .optional()
-    .default('1:1'),
+    .default('medium'),
+  styles: z.array(zStyle).max(10).optional().default([]),
 })
 
 /**
  * Krea2Output
  */
 export const zV2LargeTextToImageOutput = z.object({
-  images: z.array(zImage),
   seed: z.int(),
+  images: z.array(zImage),
 })
 
 /**
@@ -20839,29 +20981,31 @@ export const zV2LargeTextToImageOutput = z.object({
  * Input for Krea-2 Medium image generation.
  */
 export const zV2MediumTextToImageInput = z.object({
-  creativity: z
-    .enum(['raw', 'low', 'medium', 'high'])
+  moodboards: z.array(zMoodboard).max(1).optional().default([]),
+  aspect_ratio: z
+    .enum(['1:1', '4:3', '3:2', '16:9', '2.35:1', '4:5', '2:3', '9:16'])
     .optional()
-    .default('medium'),
-  prompt: z.string().min(1).max(5000),
+    .default('1:1'),
   image_style_references: z
     .array(zImageStyleReference)
     .max(10)
     .optional()
     .default([]),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['1:1', '4:3', '3:2', '16:9', '2.35:1', '4:5', '2:3', '9:16'])
+  prompt: z.string().min(1).max(5000),
+  creativity: z
+    .enum(['raw', 'low', 'medium', 'high'])
     .optional()
-    .default('1:1'),
+    .default('medium'),
+  styles: z.array(zStyle).max(10).optional().default([]),
 })
 
 /**
  * Krea2Output
  */
 export const zV2MediumTextToImageOutput = z.object({
-  images: z.array(zImage),
   seed: z.int(),
+  images: z.array(zImage),
 })
 
 /**
@@ -20876,37 +21020,50 @@ export const zV2MediumTextToImageOutput = z.object({
  * Krea's turbo default can pass ``creativity="low"`` explicitly.
  */
 export const zV2MediumTurboTextToImageInput = z.object({
-  creativity: z
-    .enum(['raw', 'low', 'medium', 'high'])
+  moodboards: z.array(zMoodboard).max(1).optional().default([]),
+  aspect_ratio: z
+    .enum(['1:1', '4:3', '3:2', '16:9', '2.35:1', '4:5', '2:3', '9:16'])
     .optional()
-    .default('medium'),
-  prompt: z.string().min(1).max(5000),
+    .default('1:1'),
   image_style_references: z
     .array(zImageStyleReference)
     .max(10)
     .optional()
     .default([]),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['1:1', '4:3', '3:2', '16:9', '2.35:1', '4:5', '2:3', '9:16'])
+  prompt: z.string().min(1).max(5000),
+  creativity: z
+    .enum(['raw', 'low', 'medium', 'high'])
     .optional()
-    .default('1:1'),
+    .default('medium'),
+  styles: z.array(zStyle).max(10).optional().default([]),
 })
 
 /**
  * Krea2Output
  */
 export const zV2MediumTurboTextToImageOutput = z.object({
-  images: z.array(zImage),
   seed: z.int(),
+  images: z.array(zImage),
 })
 
 /**
  * TextToImageInput
  */
 export const zV4Input = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(true),
+  expansion_model: z.enum(['Medium', 'Large']).optional().default('Medium'),
+  acceleration: z
+    .enum(['none', 'low', 'regular', 'high'])
+    .optional()
+    .default('none'),
   sync_mode: z.boolean().optional().default(false),
+  rendering_speed: z
+    .enum(['TURBO', 'BALANCED', 'QUALITY'])
+    .optional()
+    .default('BALANCED'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   image_size: z
     .union([
       zImageSize,
@@ -20920,114 +21077,149 @@ export const zV4Input = z.object({
       ]),
     ])
     .optional(),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+})
+
+/**
+ * TextToImageLoraInput
+ */
+export const zV4LoraInput = z.object({
+  expansion_model: z.enum(['Medium', 'Large']).optional().default('Medium'),
   acceleration: z
     .enum(['none', 'low', 'regular', 'high'])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
   rendering_speed: z
     .enum(['TURBO', 'BALANCED', 'QUALITY'])
     .optional()
     .default('BALANCED'),
+  loras: z.array(zLoRaInputType2).max(3).optional().default([]),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  image_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  prompt: z.string(),
+  output_format: z.enum(['jpeg', 'png']).optional().default('jpeg'),
+})
+
+/**
+ * IdeogramV4Output
+ */
+export const zV4LoraOutput = z.object({
+  timings: z.record(z.string(), z.number()),
+  seed: z.int(),
+  images: z.array(zImageFile),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * IdeogramV4Output
  */
 export const zV4Output = z.object({
-  prompt: z.string(),
-  has_nsfw_concepts: z.array(z.boolean()),
+  timings: z.record(z.string(), z.number()),
   seed: z.int(),
   images: z.array(zImageFile),
-  timings: z.record(z.string(), z.number()),
+  has_nsfw_concepts: z.array(z.boolean()),
+  prompt: z.string(),
 })
 
 /**
  * ImageToSVGInput
  */
 export const zVecglypherImageToSvgInput = z.object({
-  fill_color: z.string().optional().default('black'),
-  top_p: z.number().gte(0).lte(1).optional().default(0.95),
-  stroke_color: z.union([z.string(), z.unknown()]).optional(),
-  temperature: z.number().gte(0).lte(2).optional().default(0.1),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  output_size: z.int().gte(64).lte(4096).optional().default(512),
-  max_tokens: z.int().gte(256).lte(16384).optional().default(8192),
+  stroke_color: z.union([z.string(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   top_k: z.int().gte(-1).lte(100).optional().default(5),
   reference_image_urls: z.array(z.string()).min(1).max(8),
-  stroke_width: z.number().gte(0.1).lte(50).optional().default(1),
-  prompt: z.string(),
   repetition_penalty: z.number().gte(0).lte(2).optional().default(1),
-  enable_safety_checker: z.boolean().optional().default(true),
+  max_tokens: z.int().gte(256).lte(16384).optional().default(8192),
+  fill_color: z.string().optional().default('black'),
+  output_size: z.int().gte(64).lte(4096).optional().default(512),
+  prompt: z.string(),
+  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  stroke_width: z.number().gte(0.1).lte(50).optional().default(1),
+  temperature: z.number().gte(0).lte(2).optional().default(0.1),
 })
 
 /**
  * VecGlypherOutput
  */
 export const zVecglypherImageToSvgOutput = z.object({
-  timings: z.record(z.string(), z.number()),
-  svg_content: z.string(),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
   image: zFile,
+  svg_content: z.string(),
 })
 
 /**
  * TextToSVGInput
  */
 export const zVecglypherInput = z.object({
-  fill_color: z.string().optional().default('black'),
-  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   stroke_color: z.union([z.string(), z.unknown()]).optional(),
-  temperature: z.number().gte(0).lte(2).optional().default(0.1),
-  output_size: z.int().gte(64).lte(4096).optional().default(512),
+  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  top_k: z.int().gte(-1).lte(100).optional().default(5),
+  max_tokens: z.int().gte(256).lte(16384).optional().default(8192),
+  repetition_penalty: z.number().gte(0).lte(2).optional().default(1),
   style_description: z
     .string()
     .optional()
     .default('italic style, 400 weight, serif, text, elegant'),
-  max_tokens: z.int().gte(256).lte(16384).optional().default(8192),
-  top_k: z.int().gte(-1).lte(100).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  stroke_width: z.number().gte(0.1).lte(50).optional().default(1),
+  fill_color: z.string().optional().default('black'),
+  output_size: z.int().gte(64).lte(4096).optional().default(512),
   prompt: z.string(),
-  repetition_penalty: z.number().gte(0).lte(2).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  stroke_width: z.number().gte(0.1).lte(50).optional().default(1),
+  temperature: z.number().gte(0).lte(2).optional().default(0.1),
 })
 
 /**
  * VecGlypherOutput
  */
 export const zVecglypherOutput = z.object({
-  timings: z.record(z.string(), z.number()),
-  svg_content: z.string(),
   seed: z.int(),
+  timings: z.record(z.string(), z.number()),
   image: zFile,
+  svg_content: z.string(),
 })
 
 /**
  * VideoFile
  */
 export const zVideoFile = z.object({
-  file_name: z.union([z.string(), z.unknown()]).optional(),
-  num_frames: z.union([z.int(), z.unknown()]).optional(),
-  file_size: z.union([z.int(), z.unknown()]).optional(),
-  duration: z.union([z.number(), z.unknown()]).optional(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
-  width: z.union([z.int(), z.unknown()]).optional(),
-  height: z.union([z.int(), z.unknown()]).optional(),
-  url: z.string(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
   fps: z.union([z.number(), z.unknown()]).optional(),
+  url: z.string(),
+  duration: z.union([z.number(), z.unknown()]).optional(),
+  height: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.union([z.int(), z.unknown()]).optional(),
+  width: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * FILMImageOutput
  */
 export const zFilmOutput = z.object({
-  images: z.array(zImageFile).optional().default([]),
   video: z.union([zVideoFile, z.unknown()]).optional(),
+  images: z.array(zImageFile).optional().default([]),
 })
 
 /**
@@ -21086,10 +21278,8 @@ export const zViduReferenceToImageOutput = z.object({
  * Input for image editing
  */
 export const zWan25PreviewImageToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  image_urls: z.array(z.string()),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -21104,6 +21294,8 @@ export const zWan25PreviewImageToImageInput = z.object({
     ])
     .optional(),
   prompt: z.string().min(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -21114,8 +21306,8 @@ export const zWan25PreviewImageToImageInput = z.object({
  */
 export const zWan25PreviewImageToImageOutput = z.object({
   seeds: z.array(z.int()),
-  images: z.array(zImageFile),
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+  images: z.array(zImageFile),
 })
 
 /**
@@ -21124,7 +21316,7 @@ export const zWan25PreviewImageToImageOutput = z.object({
  * Input for text-to-image generation
  */
 export const zWan25PreviewTextToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   image_size: z
     .union([
@@ -21139,10 +21331,10 @@ export const zWan25PreviewTextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  enable_prompt_expansion: z.boolean().optional().default(true),
   prompt: z.string().min(1),
+  enable_safety_checker: z.boolean().optional().default(true),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
@@ -21152,23 +21344,15 @@ export const zWan25PreviewTextToImageInput = z.object({
  */
 export const zWan25PreviewTextToImageOutput = z.object({
   seeds: z.array(z.int()),
-  images: z.array(zImageFile),
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+  images: z.array(zImageFile),
 })
 
 /**
  * WanSmallT2IRequest
  */
 export const zWanV225bTextToImageInput = z.object({
-  prompt: z.string(),
-  image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(2),
-  negative_prompt: z.string().optional().default(''),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
   image_size: z
     .union([
       zImageSize,
@@ -21182,6 +21366,14 @@ export const zWanV225bTextToImageInput = z.object({
       ]),
     ])
     .optional(),
+  negative_prompt: z.string().optional().default(''),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  shift: z.number().gte(1).lte(10).optional().default(2),
+  image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  prompt: z.string(),
   enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
@@ -21189,31 +21381,15 @@ export const zWanV225bTextToImageInput = z.object({
  * WanSmallT2IResponse
  */
 export const zWanV225bTextToImageOutput = z.object({
-  image: zFile,
   seed: z.int(),
+  image: zFile,
 })
 
 /**
  * WanI2IRequest
  */
 export const zWanV22A14bImageToImageInput = z.object({
-  prompt: z.string(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('auto'),
-  image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
-  image_url: z.string(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   strength: z.number().gte(0).lte(1).optional().default(0.5),
-  enable_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(2),
   image_size: z
     .union([
       zImageSize,
@@ -21228,28 +21404,39 @@ export const zWanV22A14bImageToImageInput = z.object({
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
+  image_url: z.string(),
+  shift: z.number().gte(1).lte(10).optional().default(2),
+  negative_prompt: z.string().optional().default(''),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(false),
+  prompt: z.string(),
   enable_prompt_expansion: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('auto'),
 })
 
 /**
  * WanI2IResponse
  */
 export const zWanV22A14bImageToImageOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   image: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanT2IRequest
  */
 export const zWanV22A14bTextToImageInput = z.object({
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
-  enable_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(10).optional().default(2),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
   image_size: z
     .union([
       zImageSize,
@@ -21263,30 +21450,23 @@ export const zWanV22A14bTextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   negative_prompt: z.string().optional().default(''),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   enable_output_safety_checker: z.boolean().optional().default(false),
+  shift: z.number().gte(1).lte(10).optional().default(2),
+  enable_safety_checker: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
 })
 
 /**
  * WanLoRAT2IRequest
  */
 export const zWanV22A14bTextToImageLoraInput = z.object({
-  prompt: z.string(),
-  image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  reverse_video: z.boolean().optional().default(false),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
-  loras: z.array(zLoRaWeight).optional().default([]),
-  enable_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(2),
   image_size: z
     .union([
       zImageSize,
@@ -21300,33 +21480,48 @@ export const zWanV22A14bTextToImageLoraInput = z.object({
       ]),
     ])
     .optional(),
+  loras: z.array(zLoRaWeight).optional().default([]),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
+  shift: z.number().gte(1).lte(10).optional().default(2),
+  negative_prompt: z.string().optional().default(''),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  image_format: z.enum(['png', 'jpeg']).optional().default('jpeg'),
+  enable_safety_checker: z.boolean().optional().default(false),
+  prompt: z.string(),
   enable_prompt_expansion: z.boolean().optional().default(false),
+  reverse_video: z.boolean().optional().default(false),
 })
 
 /**
  * WanT2IResponse
  */
 export const zWanV22A14bTextToImageLoraOutput = z.object({
-  image: zFile,
   seed: z.int(),
+  image: zFile,
 })
 
 /**
  * WanT2IResponse
  */
 export const zWanV22A14bTextToImageOutput = z.object({
-  image: zFile,
   seed: z.int(),
+  image: zFile,
 })
 
 /**
  * Wan27ImageEditInput
  */
 export const zWanV27EditInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()),
   negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string().min(1).max(2000),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
   image_size: z
     .union([
       zImageSize,
@@ -21340,28 +21535,28 @@ export const zWanV27EditInput = z.object({
       ]),
     ])
     .optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_urls: z.array(z.string()),
   enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string().min(1).max(2000),
 })
 
 /**
  * Wan27ImageEditOutput
  */
 export const zWanV27EditOutput = z.object({
-  seed: z.int(),
   images: z.array(zFile),
+  seed: z.int(),
 })
 
 /**
  * Wan27ImageEditInput
  */
 export const zWanV27ProEditInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()),
   negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  prompt: z.string().min(1).max(2000),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
   image_size: z
     .union([
       zImageSize,
@@ -21375,29 +21570,25 @@ export const zWanV27ProEditInput = z.object({
       ]),
     ])
     .optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_urls: z.array(z.string()),
   enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string().min(1).max(2000),
 })
 
 /**
  * Wan27ImageEditOutput
  */
 export const zWanV27ProEditOutput = z.object({
-  seed: z.int(),
   images: z.array(zFile),
+  seed: z.int(),
 })
 
 /**
  * Wan27TextToImageInput
  */
 export const zWanV27ProTextToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(5).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string().min(1).max(2000),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
   negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -21411,27 +21602,27 @@ export const zWanV27ProTextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string().min(1).max(2000),
+  num_images: z.int().gte(1).lte(5).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * Wan27TextToImageOutput
  */
 export const zWanV27ProTextToImageOutput = z.object({
-  generated_text: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.int(),
   images: z.array(zFile),
+  seed: z.int(),
+  generated_text: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * Wan27TextToImageInput
  */
 export const zWanV27TextToImageInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  num_images: z.int().gte(1).lte(5).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string().min(1).max(2000),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('jpeg'),
   negative_prompt: z.union([z.string().max(500), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -21445,16 +21636,17 @@ export const zWanV27TextToImageInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string().min(1).max(2000),
+  num_images: z.int().gte(1).lte(5).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * Wan27TextToImageOutput
  */
 export const zWanV27TextToImageOutput = z.object({
-  generated_text: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.int(),
   images: z.array(zFile),
+  seed: z.int(),
+  generated_text: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -21463,14 +21655,14 @@ export const zWanV27TextToImageOutput = z.object({
  * Input model for extracting every Nth frame from a video
  */
 export const zWorkflowUtilitiesExtractNthFrameInput = z.object({
-  video_url: z.string(),
-  frame_interval: z.int().gte(1).lte(300).optional().default(12),
-  max_frames: z.int().gte(1).lte(500).optional().default(100),
   output_format: z
     .enum(['png', 'jpg', 'jpeg', 'webp'])
     .optional()
     .default('png'),
+  max_frames: z.int().gte(1).lte(500).optional().default(100),
+  frame_interval: z.int().gte(1).lte(300).optional().default(12),
   quality: z.int().gte(1).lte(100).optional().default(95),
+  video_url: z.string(),
 })
 
 /**
@@ -21487,9 +21679,11 @@ export const zWorkflowUtilitiesExtractNthFrameOutput = z.object({
  * ZImageBaseTextToImageInput
  */
 export const zZImageBaseInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  negative_prompt: z.string().optional().default(''),
   image_size: z
     .union([
       zImageSize,
@@ -21504,24 +21698,26 @@ export const zZImageBaseInput = z.object({
     ])
     .optional(),
   enable_safety_checker: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4),
+  sync_mode: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * ZImageBaseTextToImageLoRAInput
  */
 export const zZImageBaseLoraInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   num_images: z.int().gte(1).lte(4).optional().default(1),
-  negative_prompt: z.string().optional().default(''),
+  loras: z.array(zLoRaInput).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_size: z
     .union([
       zImageSize,
@@ -21535,54 +21731,50 @@ export const zZImageBaseLoraInput = z.object({
       ]),
     ])
     .optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(20).optional().default(4),
-  loras: z.array(zLoRaInput).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * ZImageBaseOutput
  */
 export const zZImageBaseLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageBaseOutput
  */
 export const zZImageBaseOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboControlNetInput
  */
 export const zZImageTurboControlnetInput = z.object({
-  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   control_end: z.number().gte(0).lte(1).optional().default(0.8),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
+  control_start: z.number().gte(0).lte(1).optional().default(0),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -21597,32 +21789,31 @@ export const zZImageTurboControlnetInput = z.object({
       ]),
     ])
     .optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   preprocess: z
     .union([z.enum(['none', 'canny', 'depth', 'pose']), z.unknown()])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  control_start: z.number().gte(0).lte(1).optional().default(0),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ZImageTurboControlNetLoRAInput
  */
 export const zZImageTurboControlnetLoraInput = z.object({
-  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
   control_end: z.number().gte(0).lte(1).optional().default(0.8),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
+  control_start: z.number().gte(0).lte(1).optional().default(0),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  loras: z.array(zLoRaInput).optional().default([]),
-  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -21637,46 +21828,55 @@ export const zZImageTurboControlnetLoraInput = z.object({
       ]),
     ])
     .optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   preprocess: z
     .union([z.enum(['none', 'canny', 'depth', 'pose']), z.unknown()])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  control_start: z.number().gte(0).lte(1).optional().default(0),
-  sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
   output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  loras: z.array(zLoRaInput).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ZImageTurboControlNetOutput
  */
 export const zZImageTurboControlnetLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboControlNetOutput
  */
 export const zZImageTurboControlnetOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboImageToImageInput
  */
 export const zZImageTurboImageToImageInput = z.object({
+  strength: z.number().lte(1).optional().default(0.6),
   image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -21691,26 +21891,26 @@ export const zZImageTurboImageToImageInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  strength: z.number().lte(1).optional().default(0.6),
   num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ZImageTurboImageToImageLoRAInput
  */
 export const zZImageTurboImageToImageLoraInput = z.object({
+  strength: z.number().lte(1).optional().default(0.6),
   image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -21725,57 +21925,50 @@ export const zZImageTurboImageToImageLoraInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  strength: z.number().lte(1).optional().default(0.6),
   num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
   loras: z.array(zLoRaInput).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ZImageTurboImageToImageOutput
  */
 export const zZImageTurboImageToImageLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboImageToImageOutput
  */
 export const zZImageTurboImageToImageOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboInpaintInput
  */
 export const zZImageTurboInpaintInput = z.object({
-  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  control_end: z.number().gte(0).lte(1).optional().default(0.8),
   strength: z.number().lte(1).optional().default(1),
+  control_end: z.number().gte(0).lte(1).optional().default(0.8),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  control_start: z.number().gte(0).lte(1).optional().default(0),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -21790,31 +21983,30 @@ export const zZImageTurboInpaintInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  control_start: z.number().gte(0).lte(1).optional().default(0),
+  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
+  prompt: z.string(),
+  image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
   mask_image_url: z.string(),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * ZImageTurboInpaintLoRAInput
  */
 export const zZImageTurboInpaintLoraInput = z.object({
-  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  control_end: z.number().gte(0).lte(1).optional().default(0.8),
   strength: z.number().lte(1).optional().default(1),
+  control_end: z.number().gte(0).lte(1).optional().default(0.8),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  control_start: z.number().gte(0).lte(1).optional().default(0),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  loras: z.array(zLoRaInput).optional().default([]),
-  image_url: z.string(),
   image_size: z
     .union([
       zImageSize,
@@ -21829,43 +22021,50 @@ export const zZImageTurboInpaintLoraInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  control_start: z.number().gte(0).lte(1).optional().default(0),
+  control_scale: z.number().gte(0).lte(1).optional().default(0.75),
+  prompt: z.string(),
+  image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  loras: z.array(zLoRaInput).optional().default([]),
   sync_mode: z.boolean().optional().default(false),
   mask_image_url: z.string(),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * ZImageTurboInpaintOutput
  */
 export const zZImageTurboInpaintLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboInpaintOutput
  */
 export const zZImageTurboInpaintOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboTextToImageInput
  */
 export const zZImageTurboInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -21879,24 +22078,24 @@ export const zZImageTurboInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ZImageTurboTextToImageLoRAInput
  */
 export const zZImageTurboLoraInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   image_size: z
     .union([
       zImageSize,
@@ -21910,60 +22109,48 @@ export const zZImageTurboLoraInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
   loras: z.array(zLoRaInput).optional().default([]),
+  sync_mode: z.boolean().optional().default(false),
   prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * ZImageTurboOutput
  */
 export const zZImageTurboLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboOutput
  */
 export const zZImageTurboOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboTilingInput
  */
 export const zZImageTurboTilingInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  tiling_mode: z
-    .enum(['both', 'horizontal', 'vertical'])
-    .optional()
-    .default('both'),
   strength: z.number().lte(1).optional().default(0.6),
-  tile_size: z.int().gte(32).lte(256).optional().default(128),
-  tile_stride: z.int().gte(16).lte(128).optional().default(64),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -21978,34 +22165,33 @@ export const zZImageTurboTilingInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  tiling_mode: z
+    .enum(['both', 'horizontal', 'vertical'])
+    .optional()
+    .default('both'),
+  prompt: z.string(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
+  tile_stride: z.int().gte(16).lte(128).optional().default(64),
+  tile_size: z.int().gte(32).lte(256).optional().default(128),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
   sync_mode: z.boolean().optional().default(false),
   mask_image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * ZImageTurboTilingLoRAInput
  */
 export const zZImageTurboTilingLoraInput = z.object({
-  num_images: z.int().gte(1).lte(4).optional().default(1),
-  tiling_mode: z
-    .enum(['both', 'horizontal', 'vertical'])
-    .optional()
-    .default('both'),
   strength: z.number().lte(1).optional().default(0.6),
-  tile_size: z.int().gte(32).lte(256).optional().default(128),
-  tile_stride: z.int().gte(16).lte(128).optional().default(64),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_images: z.int().gte(1).lte(4).optional().default(1),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  loras: z.array(zLoRaInput).optional().default([]),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
   image_size: z
     .union([
       zImageSize,
@@ -22020,35 +22206,41 @@ export const zZImageTurboTilingLoraInput = z.object({
       ]),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  tiling_mode: z
+    .enum(['both', 'horizontal', 'vertical'])
+    .optional()
+    .default('both'),
+  prompt: z.string(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
+  tile_stride: z.int().gte(16).lte(128).optional().default(64),
+  tile_size: z.int().gte(32).lte(256).optional().default(128),
+  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
+  loras: z.array(zLoRaInput).optional().default([]),
   sync_mode: z.boolean().optional().default(false),
   mask_image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(1).lte(8).optional().default(8),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string(),
-  output_format: z.enum(['jpeg', 'png', 'webp']).optional().default('png'),
 })
 
 /**
  * ZImageTurboTilingOutput
  */
 export const zZImageTurboTilingLoraOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 /**
  * ZImageTurboTilingOutput
  */
 export const zZImageTurboTilingOutput = z.object({
-  has_nsfw_concepts: z.array(z.boolean()),
   timings: z.record(z.string(), z.number()),
   seed: z.int(),
-  prompt: z.string(),
+  has_nsfw_concepts: z.array(z.boolean()),
   images: z.array(zImageFile),
+  prompt: z.string(),
 })
 
 export const zPostBriaEmbedProductBody = zEmbedProductInput
@@ -22758,45 +22950,45 @@ export const zGetBriaFiboGenerateRequestsByRequestIdStatusQuery = z.object({
 export const zGetBriaFiboGenerateRequestsByRequestIdStatusResponse =
   zQueueStatus
 
-export const zPostBriaReimagine32Body = zReimagine32Input
+export const zPostBriaGenfillV2Body = zGenfillV2Input
 
 /**
  * The request status.
  */
-export const zPostBriaReimagine32Response = zQueueStatus
+export const zPostBriaGenfillV2Response = zQueueStatus
 
-export const zGetBriaReimagine32RequestsByRequestIdPath = z.object({
+export const zGetBriaGenfillV2RequestsByRequestIdPath = z.object({
   request_id: z.string(),
 })
 
 /**
  * Result of the request.
  */
-export const zGetBriaReimagine32RequestsByRequestIdResponse = zReimagine32Output
+export const zGetBriaGenfillV2RequestsByRequestIdResponse = zGenfillV2Output
 
-export const zPutBriaReimagine32RequestsByRequestIdCancelPath = z.object({
+export const zPutBriaGenfillV2RequestsByRequestIdCancelPath = z.object({
   request_id: z.string(),
 })
 
 /**
  * The request was cancelled.
  */
-export const zPutBriaReimagine32RequestsByRequestIdCancelResponse = z.object({
+export const zPutBriaGenfillV2RequestsByRequestIdCancelResponse = z.object({
   success: z.boolean().optional(),
 })
 
-export const zGetBriaReimagine32RequestsByRequestIdStatusPath = z.object({
+export const zGetBriaGenfillV2RequestsByRequestIdStatusPath = z.object({
   request_id: z.string(),
 })
 
-export const zGetBriaReimagine32RequestsByRequestIdStatusQuery = z.object({
+export const zGetBriaGenfillV2RequestsByRequestIdStatusQuery = z.object({
   logs: z.number().optional(),
 })
 
 /**
  * The request status.
  */
-export const zGetBriaReimagine32RequestsByRequestIdStatusResponse = zQueueStatus
+export const zGetBriaGenfillV2RequestsByRequestIdStatusResponse = zQueueStatus
 
 export const zPostBriaReplaceBackgroundBody = zReplaceBackgroundInput
 
@@ -23131,6 +23323,54 @@ export const zGetFalAiBenV2ImageRequestsByRequestIdStatusQuery = z.object({
  * The request status.
  */
 export const zGetFalAiBenV2ImageRequestsByRequestIdStatusResponse = zQueueStatus
+
+export const zPostFalAiBerniniREditImageBody = zBerniniREditImageInput
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBerniniREditImageResponse = zQueueStatus
+
+export const zGetFalAiBerniniREditImageRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBerniniREditImageRequestsByRequestIdResponse =
+  zBerniniREditImageOutput
+
+export const zPutFalAiBerniniREditImageRequestsByRequestIdCancelPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBerniniREditImageRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetFalAiBerniniREditImageRequestsByRequestIdStatusPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+export const zGetFalAiBerniniREditImageRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBerniniREditImageRequestsByRequestIdStatusResponse =
+  zQueueStatus
 
 export const zPostFalAiBirefnetBody = zBirefnetInput
 
@@ -45330,6 +45570,46 @@ export const zPostIdeogramV4Body = zV4Input
  */
 export const zPostIdeogramV4Response = zQueueStatus
 
+export const zPostIdeogramV4LoraBody = zV4LoraInput
+
+/**
+ * The request status.
+ */
+export const zPostIdeogramV4LoraResponse = zQueueStatus
+
+export const zGetIdeogramV4LoraRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetIdeogramV4LoraRequestsByRequestIdResponse = zV4LoraOutput
+
+export const zPutIdeogramV4LoraRequestsByRequestIdCancelPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutIdeogramV4LoraRequestsByRequestIdCancelResponse = z.object({
+  success: z.boolean().optional(),
+})
+
+export const zGetIdeogramV4LoraRequestsByRequestIdStatusPath = z.object({
+  request_id: z.string(),
+})
+
+export const zGetIdeogramV4LoraRequestsByRequestIdStatusQuery = z.object({
+  logs: z.number().optional(),
+})
+
+/**
+ * The request status.
+ */
+export const zGetIdeogramV4LoraRequestsByRequestIdStatusResponse = zQueueStatus
+
 export const zGetIdeogramV4RequestsByRequestIdPath = z.object({
   request_id: z.string(),
 })
@@ -45700,6 +45980,187 @@ export const zGetKreaV2MediumTurboTextToImageRequestsByRequestIdStatusQuery =
  * The request status.
  */
 export const zGetKreaV2MediumTurboTextToImageRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostLumaAgentUni1V1EditBody = zAgentUni1V1EditInput
+
+/**
+ * The request status.
+ */
+export const zPostLumaAgentUni1V1EditResponse = zQueueStatus
+
+export const zGetLumaAgentUni1V1EditRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetLumaAgentUni1V1EditRequestsByRequestIdResponse =
+  zAgentUni1V1EditOutput
+
+export const zPutLumaAgentUni1V1EditRequestsByRequestIdCancelPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutLumaAgentUni1V1EditRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetLumaAgentUni1V1EditRequestsByRequestIdStatusPath = z.object({
+  request_id: z.string(),
+})
+
+export const zGetLumaAgentUni1V1EditRequestsByRequestIdStatusQuery = z.object({
+  logs: z.number().optional(),
+})
+
+/**
+ * The request status.
+ */
+export const zGetLumaAgentUni1V1EditRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostLumaAgentUni1V1MaxBody = zAgentUni1V1MaxInput
+
+/**
+ * The request status.
+ */
+export const zPostLumaAgentUni1V1MaxResponse = zQueueStatus
+
+export const zPostLumaAgentUni1V1MaxEditBody = zAgentUni1V1MaxEditInput
+
+/**
+ * The request status.
+ */
+export const zPostLumaAgentUni1V1MaxEditResponse = zQueueStatus
+
+export const zGetLumaAgentUni1V1MaxEditRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetLumaAgentUni1V1MaxEditRequestsByRequestIdResponse =
+  zAgentUni1V1MaxEditOutput
+
+export const zPutLumaAgentUni1V1MaxEditRequestsByRequestIdCancelPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutLumaAgentUni1V1MaxEditRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetLumaAgentUni1V1MaxEditRequestsByRequestIdStatusPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+export const zGetLumaAgentUni1V1MaxEditRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetLumaAgentUni1V1MaxEditRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zGetLumaAgentUni1V1MaxRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetLumaAgentUni1V1MaxRequestsByRequestIdResponse =
+  zAgentUni1V1MaxOutput
+
+export const zPutLumaAgentUni1V1MaxRequestsByRequestIdCancelPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * The request was cancelled.
+ */
+export const zPutLumaAgentUni1V1MaxRequestsByRequestIdCancelResponse = z.object(
+  {
+    success: z.boolean().optional(),
+  },
+)
+
+export const zGetLumaAgentUni1V1MaxRequestsByRequestIdStatusPath = z.object({
+  request_id: z.string(),
+})
+
+export const zGetLumaAgentUni1V1MaxRequestsByRequestIdStatusQuery = z.object({
+  logs: z.number().optional(),
+})
+
+/**
+ * The request status.
+ */
+export const zGetLumaAgentUni1V1MaxRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostLumaAgentUni1V1TextToImageBody = zAgentUni1V1TextToImageInput
+
+/**
+ * The request status.
+ */
+export const zPostLumaAgentUni1V1TextToImageResponse = zQueueStatus
+
+export const zGetLumaAgentUni1V1TextToImageRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetLumaAgentUni1V1TextToImageRequestsByRequestIdResponse =
+  zAgentUni1V1TextToImageOutput
+
+export const zPutLumaAgentUni1V1TextToImageRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutLumaAgentUni1V1TextToImageRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetLumaAgentUni1V1TextToImageRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetLumaAgentUni1V1TextToImageRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetLumaAgentUni1V1TextToImageRequestsByRequestIdStatusResponse =
   zQueueStatus
 
 export const zPostMicrosoftMaiImage25Body = zMaiImage25Input

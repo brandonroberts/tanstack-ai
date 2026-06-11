@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.774Z",
+  "generated_at": "2026-06-11T02:20:29.653Z",
   "total_models": 6,
   "category": "3d-to-3d",
   "models": [
@@ -1677,158 +1677,88 @@
               "required": ["status", "request_id"]
             },
             "Hunyuan3dV31SmartTopologyInput": {
-              "type": "object",
-              "properties": {
-                "polygon_type": {
-                  "default": "triangle",
-                  "description": "Output polygon type. triangle: triangular faces only. quadrilateral: mixed quad and triangle faces.",
-                  "title": "Polygon Type",
-                  "type": "string",
-                  "enum": ["triangle", "quadrilateral"]
-                },
-                "face_level": {
-                  "default": "medium",
-                  "description": "Target polygon density. high: more detail/polygons, medium: balanced, low: fewer polygons.",
-                  "title": "Face Level",
-                  "type": "string",
-                  "enum": ["high", "medium", "low"]
-                },
-                "input_file_type": {
-                  "default": "glb",
-                  "description": "Input 3D file format.",
-                  "title": "Input File Type",
-                  "type": "string",
-                  "enum": ["glb", "obj"]
-                },
-                "input_file_url": {
-                  "default": "https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb",
-                  "title": "Input File Url",
-                  "description": "URL of GLB or OBJ file to optimize topology. Max size: 200MB.",
-                  "examples": [
-                    "https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb"
-                  ],
-                  "type": "string"
-                }
-              },
-              "title": "SmartTopologyInput",
               "x-fal-order-properties": [
                 "input_file_url",
                 "input_file_type",
                 "polygon_type",
                 "face_level"
-              ]
+              ],
+              "properties": {
+                "face_level": {
+                  "default": "medium",
+                  "enum": ["high", "medium", "low"],
+                  "description": "Target polygon density. high: more detail/polygons, medium: balanced, low: fewer polygons.",
+                  "title": "Face Level",
+                  "type": "string"
+                },
+                "input_file_url": {
+                  "default": "https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb",
+                  "title": "Input File Url",
+                  "examples": [
+                    "https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb"
+                  ],
+                  "description": "URL of GLB or OBJ file to optimize topology. Max size: 200MB.",
+                  "type": "string"
+                },
+                "polygon_type": {
+                  "default": "triangle",
+                  "enum": ["triangle", "quadrilateral"],
+                  "description": "Output polygon type. triangle: triangular faces only. quadrilateral: mixed quad and triangle faces.",
+                  "title": "Polygon Type",
+                  "type": "string"
+                },
+                "input_file_type": {
+                  "default": "glb",
+                  "enum": ["glb", "obj"],
+                  "description": "Input 3D file format.",
+                  "title": "Input File Type",
+                  "type": "string"
+                }
+              },
+              "title": "SmartTopologyInput",
+              "type": "object"
             },
             "Hunyuan3dV31SmartTopologyOutput": {
-              "type": "object",
+              "required": ["model_glb", "model_urls"],
+              "x-fal-order-properties": ["model_glb", "model_urls"],
               "properties": {
                 "model_urls": {
                   "$ref": "#/components/schemas/ModelUrls",
-                  "description": "URLs for different 3D model formats",
                   "examples": [
                     {
-                      "obj": {
-                        "url": "https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj",
-                        "content_type": "model/obj",
-                        "file_name": "model.obj",
-                        "file_size": 394409
-                      },
                       "glb": {
-                        "url": "https://v3b.fal.media/files/b/0a8c0ab4/eX-_x0Wv8fZL05l9CGp6Y_model.glb",
-                        "content_type": "model/gltf-binary",
+                        "file_size": 206004,
                         "file_name": "model.glb",
-                        "file_size": 206004
+                        "url": "https://v3b.fal.media/files/b/0a8c0ab4/eX-_x0Wv8fZL05l9CGp6Y_model.glb",
+                        "content_type": "model/gltf-binary"
+                      },
+                      "obj": {
+                        "file_size": 394409,
+                        "file_name": "model.obj",
+                        "url": "https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj",
+                        "content_type": "model/obj"
                       }
                     }
-                  ]
+                  ],
+                  "description": "URLs for different 3D model formats"
                 },
                 "model_glb": {
                   "$ref": "#/components/schemas/File",
-                  "description": "Processed 3D model with optimized topology (primary file).",
                   "examples": [
                     {
-                      "url": "https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj",
-                      "content_type": "model/obj",
+                      "file_size": 394409,
                       "file_name": "model.obj",
-                      "file_size": 394409
+                      "url": "https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj",
+                      "content_type": "model/obj"
                     }
-                  ]
+                  ],
+                  "description": "Processed 3D model with optimized topology (primary file)."
                 }
               },
               "title": "SmartTopologyOutput",
-              "x-fal-order-properties": ["model_glb", "model_urls"],
-              "required": ["model_glb", "model_urls"]
+              "type": "object"
             },
             "ModelUrls": {
-              "type": "object",
-              "properties": {
-                "texture": {
-                  "description": "Texture image for the 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "usdz": {
-                  "description": "USDZ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "obj": {
-                  "description": "OBJ format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "glb": {
-                  "description": "GLB format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "mtl": {
-                  "description": "MTL material file for OBJ model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "fbx": {
-                  "description": "FBX format 3D model",
-                  "anyOf": [
-                    {
-                      "$ref": "#/components/schemas/File"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                }
-              },
-              "title": "ModelUrls",
               "x-fal-order-properties": [
                 "glb",
                 "fbx",
@@ -1836,45 +1766,89 @@
                 "mtl",
                 "texture",
                 "usdz"
-              ]
+              ],
+              "properties": {
+                "glb": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "GLB format 3D model"
+                },
+                "fbx": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "FBX format 3D model"
+                },
+                "obj": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "OBJ format 3D model"
+                },
+                "mtl": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "MTL material file for OBJ model"
+                },
+                "texture": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Texture image for the 3D model"
+                },
+                "usdz": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "USDZ format 3D model"
+                }
+              },
+              "title": "ModelUrls",
+              "type": "object"
             },
             "File": {
-              "type": "object",
+              "required": ["url"],
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
               "properties": {
-                "url": {
-                  "type": "string",
-                  "description": "The URL where the file can be downloaded from.",
-                  "title": "Url"
-                },
-                "content_type": {
-                  "description": "The mime type of the file.",
-                  "title": "Content Type",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["image/png"]
-                },
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
                 "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
+                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -1883,17 +1857,43 @@
                       "type": "null"
                     }
                   ],
-                  "examples": [4404019]
+                  "title": "File Size",
+                  "description": "The size of the file in bytes."
+                },
+                "file_name": {
+                  "examples": ["z9RV14K95DvU.png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "description": "The name of the file. It will be auto-generated if not provided."
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "title": "Url",
+                  "type": "string"
+                },
+                "content_type": {
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "description": "The mime type of the file."
                 }
               },
               "title": "File",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ],
-              "required": ["url"]
+              "type": "object"
             }
           }
         },
@@ -2121,84 +2121,58 @@
               "required": ["status", "request_id"]
             },
             "Hunyuan3dV31PartInput": {
-              "type": "object",
+              "required": ["input_file_url"],
+              "x-fal-order-properties": ["input_file_url"],
               "properties": {
                 "input_file_url": {
-                  "type": "string",
-                  "description": "URL of FBX file to split into parts. ONLY FBX format supported. Max size: 100MB, face count ≤30,000. Recommended: AIGC-generated models.",
-                  "title": "Input File Url",
                   "examples": [
                     "https://v3b.fal.media/files/b/0a8bf92a/XECcItG5QHt0LViFTRCON_converted.fbx"
-                  ]
+                  ],
+                  "description": "URL of FBX file to split into parts. ONLY FBX format supported. Max size: 100MB, face count ≤30,000. Recommended: AIGC-generated models.",
+                  "title": "Input File Url",
+                  "type": "string"
                 }
               },
               "title": "PartInput",
-              "x-fal-order-properties": ["input_file_url"],
-              "required": ["input_file_url"]
+              "type": "object"
             },
             "Hunyuan3dV31PartOutput": {
-              "type": "object",
+              "required": ["result_files"],
+              "x-fal-order-properties": ["result_files"],
               "properties": {
                 "result_files": {
                   "items": {
                     "$ref": "#/components/schemas/File"
                   },
-                  "description": "List of generated part files in FBX format",
-                  "title": "Result Files",
-                  "type": "array",
                   "examples": [
                     [
                       {
-                        "url": "https://v3b.fal.media/files/b/0a8bf94b/zOP--lT23slziGKp99dJm_part_0.fbx",
-                        "content_type": "application/octet-stream",
+                        "file_size": 2048000,
                         "file_name": "part_0.fbx",
-                        "file_size": 2048000
+                        "url": "https://v3b.fal.media/files/b/0a8bf94b/zOP--lT23slziGKp99dJm_part_0.fbx",
+                        "content_type": "application/octet-stream"
                       }
                     ]
-                  ]
+                  ],
+                  "description": "List of generated part files in FBX format",
+                  "title": "Result Files",
+                  "type": "array"
                 }
               },
               "title": "PartOutput",
-              "x-fal-order-properties": ["result_files"],
-              "required": ["result_files"]
+              "type": "object"
             },
             "File": {
-              "type": "object",
+              "required": ["url"],
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
               "properties": {
-                "url": {
-                  "type": "string",
-                  "description": "The URL where the file can be downloaded from.",
-                  "title": "Url"
-                },
-                "content_type": {
-                  "description": "The mime type of the file.",
-                  "title": "Content Type",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["image/png"]
-                },
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
                 "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
+                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -2207,17 +2181,43 @@
                       "type": "null"
                     }
                   ],
-                  "examples": [4404019]
+                  "title": "File Size",
+                  "description": "The size of the file in bytes."
+                },
+                "file_name": {
+                  "examples": ["z9RV14K95DvU.png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "description": "The name of the file. It will be auto-generated if not provided."
+                },
+                "url": {
+                  "description": "The URL where the file can be downloaded from.",
+                  "title": "Url",
+                  "type": "string"
+                },
+                "content_type": {
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "description": "The mime type of the file."
                 }
               },
               "title": "File",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ],
-              "required": ["url"]
+              "type": "object"
             }
           }
         },
@@ -2445,55 +2445,6 @@
               "required": ["status", "request_id"]
             },
             "Sam33dAlignInput": {
-              "type": "object",
-              "properties": {
-                "body_mask_url": {
-                  "title": "Body Mask Url",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "URL of the human mask image. If not provided, uses full image."
-                },
-                "image_url": {
-                  "type": "string",
-                  "title": "Image Url",
-                  "description": "URL of the original image used for MoGe depth estimation"
-                },
-                "body_mesh_url": {
-                  "type": "string",
-                  "title": "Body Mesh Url",
-                  "description": "URL of the SAM-3D Body mesh file (.ply or .glb) to align"
-                },
-                "focal_length": {
-                  "title": "Focal Length",
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe."
-                },
-                "object_mesh_url": {
-                  "title": "Object Mesh Url",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "description": "Optional URL of SAM-3D Object mesh (.glb) to create combined scene"
-                }
-              },
               "title": "SAM3DAlignmentInput",
               "x-fal-order-properties": [
                 "image_url",
@@ -2502,39 +2453,58 @@
                 "object_mesh_url",
                 "focal_length"
               ],
-              "required": ["image_url", "body_mesh_url"]
-            },
-            "Sam33dAlignOutput": {
-              "type": "object",
               "properties": {
-                "metadata": {
-                  "$ref": "#/components/schemas/SAM3DBodyAlignmentInfo",
-                  "description": "Alignment info (scale, translation, etc.)"
+                "body_mesh_url": {
+                  "title": "Body Mesh Url",
+                  "description": "URL of the SAM-3D Body mesh file (.ply or .glb) to align",
+                  "type": "string"
                 },
-                "visualization": {
-                  "$ref": "#/components/schemas/File",
-                  "description": "Visualization of aligned mesh overlaid on input image"
-                },
-                "body_mesh_ply": {
-                  "$ref": "#/components/schemas/File",
-                  "description": "Aligned body mesh in PLY format"
-                },
-                "scene_glb": {
+                "object_mesh_url": {
+                  "title": "Object Mesh Url",
+                  "description": "Optional URL of SAM-3D Object mesh (.glb) to create combined scene",
                   "anyOf": [
                     {
-                      "$ref": "#/components/schemas/File"
+                      "type": "string"
                     },
                     {
                       "type": "null"
                     }
-                  ],
-                  "description": "Combined scene with body + object meshes in GLB format (only when object_mesh_url provided)"
+                  ]
                 },
-                "model_glb": {
-                  "$ref": "#/components/schemas/File",
-                  "description": "Aligned body mesh in GLB format (for 3D preview)"
+                "image_url": {
+                  "title": "Image Url",
+                  "description": "URL of the original image used for MoGe depth estimation",
+                  "type": "string"
+                },
+                "body_mask_url": {
+                  "title": "Body Mask Url",
+                  "description": "URL of the human mask image. If not provided, uses full image.",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "focal_length": {
+                  "title": "Focal Length",
+                  "description": "Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe.",
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
+              "required": ["image_url", "body_mesh_url"],
+              "type": "object"
+            },
+            "Sam33dAlignOutput": {
               "title": "SAM3DAlignmentOutput",
               "x-fal-order-properties": [
                 "body_mesh_ply",
@@ -2543,117 +2513,44 @@
                 "metadata",
                 "scene_glb"
               ],
+              "properties": {
+                "scene_glb": {
+                  "description": "Combined scene with body + object meshes in GLB format (only when object_mesh_url provided)",
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/File"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "body_mesh_ply": {
+                  "description": "Aligned body mesh in PLY format",
+                  "$ref": "#/components/schemas/File"
+                },
+                "metadata": {
+                  "description": "Alignment info (scale, translation, etc.)",
+                  "$ref": "#/components/schemas/SAM3DBodyAlignmentInfo"
+                },
+                "model_glb": {
+                  "description": "Aligned body mesh in GLB format (for 3D preview)",
+                  "$ref": "#/components/schemas/File"
+                },
+                "visualization": {
+                  "description": "Visualization of aligned mesh overlaid on input image",
+                  "$ref": "#/components/schemas/File"
+                }
+              },
               "required": [
                 "body_mesh_ply",
                 "model_glb",
                 "visualization",
                 "metadata"
-              ]
-            },
-            "SAM3DBodyAlignmentInfo": {
-              "description": "Per-person alignment metadata.",
-              "title": "SAM3DBodyAlignmentInfo",
-              "type": "object",
-              "properties": {
-                "scale_factor": {
-                  "type": "number",
-                  "title": "Scale Factor",
-                  "description": "Scale factor applied for alignment"
-                },
-                "cropped_vertices_count": {
-                  "type": "integer",
-                  "title": "Cropped Vertices Count",
-                  "description": "Number of cropped vertices"
-                },
-                "translation": {
-                  "type": "array",
-                  "title": "Translation",
-                  "items": {
-                    "type": "number"
-                  },
-                  "description": "Translation [tx, ty, tz]"
-                },
-                "person_id": {
-                  "type": "integer",
-                  "title": "Person Id",
-                  "description": "Index of the person"
-                },
-                "focal_length": {
-                  "type": "number",
-                  "title": "Focal Length",
-                  "description": "Focal length used"
-                },
-                "target_points_count": {
-                  "type": "integer",
-                  "title": "Target Points Count",
-                  "description": "Number of target points for alignment"
-                }
-              },
-              "x-fal-order-properties": [
-                "person_id",
-                "scale_factor",
-                "translation",
-                "focal_length",
-                "target_points_count",
-                "cropped_vertices_count"
               ],
-              "required": [
-                "person_id",
-                "scale_factor",
-                "translation",
-                "focal_length",
-                "target_points_count",
-                "cropped_vertices_count"
-              ]
+              "type": "object"
             },
             "File": {
-              "type": "object",
-              "properties": {
-                "file_name": {
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "title": "File Name",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["z9RV14K95DvU.png"]
-                },
-                "file_size": {
-                  "description": "The size of the file in bytes.",
-                  "title": "File Size",
-                  "anyOf": [
-                    {
-                      "type": "integer"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": [4404019]
-                },
-                "content_type": {
-                  "description": "The mime type of the file.",
-                  "title": "Content Type",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "examples": ["image/png"]
-                },
-                "url": {
-                  "type": "string",
-                  "title": "Url",
-                  "description": "The URL where the file can be downloaded from."
-                }
-              },
               "title": "File",
               "x-fal-order-properties": [
                 "url",
@@ -2661,7 +2558,110 @@
                 "file_name",
                 "file_size"
               ],
-              "required": ["url"]
+              "properties": {
+                "content_type": {
+                  "title": "Content Type",
+                  "description": "The mime type of the file.",
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "url": {
+                  "title": "Url",
+                  "description": "The URL where the file can be downloaded from.",
+                  "type": "string"
+                },
+                "file_size": {
+                  "title": "File Size",
+                  "description": "The size of the file in bytes.",
+                  "examples": [4404019],
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "file_name": {
+                  "title": "File Name",
+                  "description": "The name of the file. It will be auto-generated if not provided.",
+                  "examples": ["z9RV14K95DvU.png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": ["url"],
+              "type": "object"
+            },
+            "SAM3DBodyAlignmentInfo": {
+              "title": "SAM3DBodyAlignmentInfo",
+              "x-fal-order-properties": [
+                "person_id",
+                "scale_factor",
+                "translation",
+                "focal_length",
+                "target_points_count",
+                "cropped_vertices_count"
+              ],
+              "properties": {
+                "target_points_count": {
+                  "title": "Target Points Count",
+                  "description": "Number of target points for alignment",
+                  "type": "integer"
+                },
+                "scale_factor": {
+                  "title": "Scale Factor",
+                  "description": "Scale factor applied for alignment",
+                  "type": "number"
+                },
+                "cropped_vertices_count": {
+                  "title": "Cropped Vertices Count",
+                  "description": "Number of cropped vertices",
+                  "type": "integer"
+                },
+                "translation": {
+                  "title": "Translation",
+                  "items": {
+                    "type": "number"
+                  },
+                  "description": "Translation [tx, ty, tz]",
+                  "type": "array"
+                },
+                "person_id": {
+                  "title": "Person Id",
+                  "description": "Index of the person",
+                  "type": "integer"
+                },
+                "focal_length": {
+                  "title": "Focal Length",
+                  "description": "Focal length used",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "person_id",
+                "scale_factor",
+                "translation",
+                "focal_length",
+                "target_points_count",
+                "cropped_vertices_count"
+              ],
+              "type": "object",
+              "description": "Per-person alignment metadata."
             }
           }
         },

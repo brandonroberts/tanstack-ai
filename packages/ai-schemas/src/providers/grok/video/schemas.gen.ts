@@ -22,6 +22,16 @@ export const EditVideoRequestSchema = {
       ],
     },
     prompt: { type: 'string', description: 'Prompt for video editing.' },
+    storage_options: {
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/StorageOptions',
+          description:
+            'Optional output storage configuration. When present, the generated\nvideo is stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL.',
+        },
+      ],
+    },
     user: {
       type: ['string', 'null'],
       description: 'A unique identifier representing your end-user.',
@@ -32,6 +42,62 @@ export const EditVideoRequestSchema = {
     },
   },
   $defs: {
+    PublicUrlInput: {
+      oneOf: [
+        {
+          type: 'boolean',
+          description:
+            '`true` = create public URL with default options (no independent expiry).\n`false` = no public URL (equivalent to omitting the field).',
+        },
+        {
+          $ref: '#/$defs/PublicUrlOptions',
+          description: 'Full configuration object.',
+        },
+      ],
+      description:
+        'Accepts either `true` (create public URL with defaults) or a configuration\nobject with explicit options.\n\n**Variant order matters for `#[serde(untagged)]`:** `Flag` must come before\n`Options` so that JSON `true`/`false` match `Flag` rather than falling\nthrough to the object variant.\n\n**Serialization note:** Proto→REST readback always constructs\n`Options(...)`, never `Flag`, so responses always emit the object form.\n`Flag` only appears on the deserialization (request) path.',
+    },
+    PublicUrlOptions: {
+      type: 'object',
+      description:
+        'Configuration for creating a public URL alongside file storage.',
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`.",
+        },
+      },
+    },
+    StorageOptions: {
+      type: 'object',
+      description:
+        'Configuration for storing generation output in the Files API.\nWhen provided in a generation request, the output is stored as a\npermanent file and a `file_output` reference is included in the response.',
+      required: ['filename'],
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            'Seconds from now until the file auto-expires. Maximum 2592000 (30 days).\nIf omitted, the file does not expire.',
+        },
+        filename: {
+          type: 'string',
+          description: 'Filename for the stored file.',
+        },
+        public_url: {
+          oneOf: [
+            { type: 'null' },
+            {
+              $ref: '#/$defs/PublicUrlInput',
+              description:
+                '`true` = create public URL with default options (no independent expiry).\nObject = create public URL with explicit configuration.\nOmit = no public URL (file stored privately).',
+            },
+          ],
+        },
+      },
+    },
     VideoOutput: {
       type: 'object',
       description: 'Output destination for generated video.',
@@ -93,6 +159,16 @@ export const ExtendVideoRequestSchema = {
       type: 'string',
       description: 'Prompt describing what should happen next in the video.',
     },
+    storage_options: {
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/StorageOptions',
+          description:
+            'Optional output storage configuration. When present, the generated\nvideo is stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL.',
+        },
+      ],
+    },
     video: {
       $ref: '#/$defs/VideoUrl',
       description:
@@ -100,6 +176,62 @@ export const ExtendVideoRequestSchema = {
     },
   },
   $defs: {
+    PublicUrlInput: {
+      oneOf: [
+        {
+          type: 'boolean',
+          description:
+            '`true` = create public URL with default options (no independent expiry).\n`false` = no public URL (equivalent to omitting the field).',
+        },
+        {
+          $ref: '#/$defs/PublicUrlOptions',
+          description: 'Full configuration object.',
+        },
+      ],
+      description:
+        'Accepts either `true` (create public URL with defaults) or a configuration\nobject with explicit options.\n\n**Variant order matters for `#[serde(untagged)]`:** `Flag` must come before\n`Options` so that JSON `true`/`false` match `Flag` rather than falling\nthrough to the object variant.\n\n**Serialization note:** Proto→REST readback always constructs\n`Options(...)`, never `Flag`, so responses always emit the object form.\n`Flag` only appears on the deserialization (request) path.',
+    },
+    PublicUrlOptions: {
+      type: 'object',
+      description:
+        'Configuration for creating a public URL alongside file storage.',
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`.",
+        },
+      },
+    },
+    StorageOptions: {
+      type: 'object',
+      description:
+        'Configuration for storing generation output in the Files API.\nWhen provided in a generation request, the output is stored as a\npermanent file and a `file_output` reference is included in the response.',
+      required: ['filename'],
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            'Seconds from now until the file auto-expires. Maximum 2592000 (30 days).\nIf omitted, the file does not expire.',
+        },
+        filename: {
+          type: 'string',
+          description: 'Filename for the stored file.',
+        },
+        public_url: {
+          oneOf: [
+            { type: 'null' },
+            {
+              $ref: '#/$defs/PublicUrlInput',
+              description:
+                '`true` = create public URL with default options (no independent expiry).\nObject = create public URL with explicit configuration.\nOmit = no public URL (file stored privately).',
+            },
+          ],
+        },
+      },
+    },
     VideoOutput: {
       type: 'object',
       description: 'Output destination for generated video.',
@@ -198,6 +330,16 @@ export const GenerateVideoRequestSchema = {
         },
       ],
     },
+    storage_options: {
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/StorageOptions',
+          description:
+            'Optional output storage configuration. When present, the generated\nvideo is stored in the Files API and a `file_output` reference is\nreturned in the response alongside the ephemeral URL.',
+        },
+      ],
+    },
     user: {
       type: ['string', 'null'],
       description: 'A unique identifier representing your end-user.',
@@ -218,6 +360,62 @@ export const GenerateVideoRequestSchema = {
           type: 'string',
           description:
             'Public URL or base64-encoded data URL of the image (JPEG, PNG, or WebP).\nAlso accepts `image_url` for compatibility.\nRequired when `file_id` is not set.',
+        },
+      },
+    },
+    PublicUrlInput: {
+      oneOf: [
+        {
+          type: 'boolean',
+          description:
+            '`true` = create public URL with default options (no independent expiry).\n`false` = no public URL (equivalent to omitting the field).',
+        },
+        {
+          $ref: '#/$defs/PublicUrlOptions',
+          description: 'Full configuration object.',
+        },
+      ],
+      description:
+        'Accepts either `true` (create public URL with defaults) or a configuration\nobject with explicit options.\n\n**Variant order matters for `#[serde(untagged)]`:** `Flag` must come before\n`Options` so that JSON `true`/`false` match `Flag` rather than falling\nthrough to the object variant.\n\n**Serialization note:** Proto→REST readback always constructs\n`Options(...)`, never `Flag`, so responses always emit the object form.\n`Flag` only appears on the deserialization (request) path.',
+    },
+    PublicUrlOptions: {
+      type: 'object',
+      description:
+        'Configuration for creating a public URL alongside file storage.',
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`.",
+        },
+      },
+    },
+    StorageOptions: {
+      type: 'object',
+      description:
+        'Configuration for storing generation output in the Files API.\nWhen provided in a generation request, the output is stored as a\npermanent file and a `file_output` reference is included in the response.',
+      required: ['filename'],
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            'Seconds from now until the file auto-expires. Maximum 2592000 (30 days).\nIf omitted, the file does not expire.',
+        },
+        filename: {
+          type: 'string',
+          description: 'Filename for the stored file.',
+        },
+        public_url: {
+          oneOf: [
+            { type: 'null' },
+            {
+              $ref: '#/$defs/PublicUrlInput',
+              description:
+                '`true` = create public URL with default options (no independent expiry).\nObject = create public URL with explicit configuration.\nOmit = no public URL (file stored privately).',
+            },
+          ],
         },
       },
     },
@@ -263,6 +461,51 @@ export const ImageUrlSchema = {
   },
 } as const
 
+export const PublicUrlInputSchema = {
+  oneOf: [
+    {
+      type: 'boolean',
+      description:
+        '`true` = create public URL with default options (no independent expiry).\n`false` = no public URL (equivalent to omitting the field).',
+    },
+    {
+      $ref: '#/$defs/PublicUrlOptions',
+      description: 'Full configuration object.',
+    },
+  ],
+  description:
+    'Accepts either `true` (create public URL with defaults) or a configuration\nobject with explicit options.\n\n**Variant order matters for `#[serde(untagged)]`:** `Flag` must come before\n`Options` so that JSON `true`/`false` match `Flag` rather than falling\nthrough to the object variant.\n\n**Serialization note:** Proto→REST readback always constructs\n`Options(...)`, never `Flag`, so responses always emit the object form.\n`Flag` only appears on the deserialization (request) path.',
+  $defs: {
+    PublicUrlOptions: {
+      type: 'object',
+      description:
+        'Configuration for creating a public URL alongside file storage.',
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`.",
+        },
+      },
+    },
+  },
+} as const
+
+export const PublicUrlOptionsSchema = {
+  type: 'object',
+  description:
+    'Configuration for creating a public URL alongside file storage.',
+  properties: {
+    expires_after: {
+      type: ['integer', 'null'],
+      format: 'int64',
+      description:
+        "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`.",
+    },
+  },
+} as const
+
 export const StartDeferredResponseSchema = {
   type: 'object',
   description: 'Response for starting a deferred operation.',
@@ -271,6 +514,62 @@ export const StartDeferredResponseSchema = {
     request_id: {
       type: 'string',
       description: 'A unique request ID to poll for the result.',
+    },
+  },
+} as const
+
+export const StorageOptionsSchema = {
+  type: 'object',
+  description:
+    'Configuration for storing generation output in the Files API.\nWhen provided in a generation request, the output is stored as a\npermanent file and a `file_output` reference is included in the response.',
+  required: ['filename'],
+  properties: {
+    expires_after: {
+      type: ['integer', 'null'],
+      format: 'int64',
+      description:
+        'Seconds from now until the file auto-expires. Maximum 2592000 (30 days).\nIf omitted, the file does not expire.',
+    },
+    filename: { type: 'string', description: 'Filename for the stored file.' },
+    public_url: {
+      oneOf: [
+        { type: 'null' },
+        {
+          $ref: '#/$defs/PublicUrlInput',
+          description:
+            '`true` = create public URL with default options (no independent expiry).\nObject = create public URL with explicit configuration.\nOmit = no public URL (file stored privately).',
+        },
+      ],
+    },
+  },
+  $defs: {
+    PublicUrlInput: {
+      oneOf: [
+        {
+          type: 'boolean',
+          description:
+            '`true` = create public URL with default options (no independent expiry).\n`false` = no public URL (equivalent to omitting the field).',
+        },
+        {
+          $ref: '#/$defs/PublicUrlOptions',
+          description: 'Full configuration object.',
+        },
+      ],
+      description:
+        'Accepts either `true` (create public URL with defaults) or a configuration\nobject with explicit options.\n\n**Variant order matters for `#[serde(untagged)]`:** `Flag` must come before\n`Options` so that JSON `true`/`false` match `Flag` rather than falling\nthrough to the object variant.\n\n**Serialization note:** Proto→REST readback always constructs\n`Options(...)`, never `Flag`, so responses always emit the object form.\n`Flag` only appears on the deserialization (request) path.',
+    },
+    PublicUrlOptions: {
+      type: 'object',
+      description:
+        'Configuration for creating a public URL alongside file storage.',
+      properties: {
+        expires_after: {
+          type: ['integer', 'null'],
+          format: 'int64',
+          description:
+            "Seconds from now until the public URL expires. Must be between\n3600 (1 hour) and 2592000 (30 days).\n\nIf omitted and the file has a TTL (`expires_after` on the file),\nthe public URL inherits the file's expiry. If omitted and the file\nhas no TTL, the public URL remains valid indefinitely until the\nfile is deleted or the URL is explicitly revoked via\n`POST /v1/files/{file_id}/public-url/revoke`.",
+        },
+      },
     },
   },
 } as const

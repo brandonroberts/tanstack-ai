@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.775Z",
+  "generated_at": "2026-06-11T02:20:29.653Z",
   "total_models": 2,
   "category": "unknown",
   "models": [
@@ -505,26 +505,13 @@
               "required": ["status", "request_id"]
             },
             "WorkflowUtilitiesInterleaveVideoInput": {
+              "description": "Input model for interleaving multiple videos",
+              "type": "object",
               "properties": {
-                "frames_per_second": {
-                  "anyOf": [
-                    {
-                      "type": "number",
-                      "maximum": 120,
-                      "minimum": 1
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Frames Per Second",
-                  "examples": [24],
-                  "description": "Frame rate of the interleaved output video. When set, all interleaved frames are emitted at this rate, so lower values produce a longer output while higher values produce a shorter, faster one. Leave unset to preserve the legacy behavior, which derives the output rate from the input videos (this can yield non-standard rates such as 384.0098)."
-                },
                 "video_urls": {
-                  "max_file_size": 100000000,
-                  "type": "array",
                   "title": "Video Urls",
+                  "description": "List of video URLs to interleave in order",
+                  "type": "array",
                   "examples": [
                     [
                       "https://storage.googleapis.com/falserverless/example_outputs/wan-25-i2v-output.mp4",
@@ -535,43 +522,65 @@
                       "https://storage.googleapis.com/falserverless/example_inputs/seedance_pro_i2v.mp4"
                     ]
                   ],
-                  "description": "List of video URLs to interleave in order",
+                  "max_file_size": 100000000,
                   "items": {
-                    "type": "string",
-                    "_fal_ui_field": "video"
+                    "_fal_ui_field": "video",
+                    "type": "string"
                   }
+                },
+                "frames_per_second": {
+                  "description": "Frame rate of the interleaved output video. When set, all interleaved frames are emitted at this rate, so lower values produce a longer output while higher values produce a shorter, faster one. Leave unset to preserve the legacy behavior, which derives the output rate from the input videos (this can yield non-standard rates such as 384.0098).",
+                  "examples": [24],
+                  "anyOf": [
+                    {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 120
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Frames Per Second"
                 }
               },
-              "type": "object",
-              "x-fal-order-properties": ["video_urls", "frames_per_second"],
-              "title": "InterleaveVideoInput",
               "required": ["video_urls"],
-              "description": "Input model for interleaving multiple videos"
+              "x-fal-order-properties": ["video_urls", "frames_per_second"],
+              "title": "InterleaveVideoInput"
             },
             "WorkflowUtilitiesInterleaveVideoOutput": {
+              "description": "Output model for interleaved video",
+              "type": "object",
               "properties": {
                 "video": {
-                  "$ref": "#/components/schemas/File",
+                  "description": "The interleaved video output",
                   "examples": [
                     {
                       "file_size": 3886177,
-                      "file_name": "output.mp4",
                       "content_type": "application/octet-stream",
-                      "url": "https://v3b.fal.media/files/b/monkey/xVp56BqDLgb39NONPs1Gb_output.mp4"
+                      "url": "https://v3b.fal.media/files/b/monkey/xVp56BqDLgb39NONPs1Gb_output.mp4",
+                      "file_name": "output.mp4"
                     }
                   ],
-                  "description": "The interleaved video output"
+                  "$ref": "#/components/schemas/File"
                 }
               },
-              "type": "object",
-              "x-fal-order-properties": ["video"],
-              "title": "InterleaveVideoOutput",
               "required": ["video"],
-              "description": "Output model for interleaved video"
+              "x-fal-order-properties": ["video"],
+              "title": "InterleaveVideoOutput"
             },
             "File": {
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
+              "type": "object",
               "properties": {
                 "file_size": {
+                  "description": "The size of the file in bytes.",
+                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -580,24 +589,11 @@
                       "type": "null"
                     }
                   ],
-                  "title": "File Size",
-                  "examples": [4404019],
-                  "description": "The size of the file in bytes."
-                },
-                "file_name": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "File Name",
-                  "examples": ["z9RV14K95DvU.png"],
-                  "description": "The name of the file. It will be auto-generated if not provided."
+                  "title": "File Size"
                 },
                 "content_type": {
+                  "description": "The mime type of the file.",
+                  "examples": ["image/png"],
                   "anyOf": [
                     {
                       "type": "string"
@@ -606,25 +602,29 @@
                       "type": "null"
                     }
                   ],
-                  "title": "Content Type",
-                  "examples": ["image/png"],
-                  "description": "The mime type of the file."
+                  "title": "Content Type"
                 },
                 "url": {
+                  "description": "The URL where the file can be downloaded from.",
                   "type": "string",
-                  "title": "Url",
-                  "description": "The URL where the file can be downloaded from."
+                  "title": "Url"
+                },
+                "file_name": {
+                  "description": "The name of the file. It will be auto-generated if not provided.",
+                  "examples": ["z9RV14K95DvU.png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name"
                 }
               },
-              "type": "object",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ],
-              "title": "File",
-              "required": ["url"]
+              "required": ["url"],
+              "title": "File"
             }
           }
         },

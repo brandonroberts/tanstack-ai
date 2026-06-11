@@ -24,18 +24,18 @@ export const zEventSegment = z.object({
  * EventSegment
  */
 export const zEventSegmentType2 = z.object({
-  start: z.number(),
   end: z.number(),
+  start: z.number(),
 })
 
 /**
  * File
  */
 export const zFile = z.object({
-  content_type: z.union([z.string(), z.unknown()]).optional(),
   file_size: z.union([z.int(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
   url: z.string(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -131,23 +131,23 @@ export const zGotOcrV2Output = z.object({
  */
 export const zImage = z.object({
   content_type: z.union([z.string(), z.unknown()]).optional(),
+  url: z.string(),
   file_size: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
   width: z.union([z.int(), z.unknown()]).optional(),
   height: z.union([z.int(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
-  url: z.string(),
 })
 
 /**
  * ImageFile
  */
 export const zImageFile = z.object({
-  height: z.union([z.int(), z.unknown()]).optional(),
-  content_type: z.union([z.string(), z.unknown()]).optional(),
   file_name: z.union([z.string(), z.unknown()]).optional(),
   file_size: z.union([z.int(), z.unknown()]).optional(),
-  width: z.union([z.int(), z.unknown()]).optional(),
+  height: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
+  content_type: z.union([z.string(), z.unknown()]).optional(),
+  width: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -200,11 +200,11 @@ export const zIsaac01Output = z.object({
  * LLavaInput
  */
 export const zLlavaNextInput = z.object({
-  image_url: z.string(),
-  top_p: z.number().gte(0).lte(1).optional().default(1),
-  max_tokens: z.int().optional().default(64),
-  temperature: z.number().lte(1).optional().default(0.2),
   prompt: z.string(),
+  top_p: z.number().gte(0).lte(1).optional().default(1),
+  image_url: z.string(),
+  temperature: z.number().lte(1).optional().default(0.2),
+  max_tokens: z.int().optional().default(64),
 })
 
 /**
@@ -275,8 +275,8 @@ export const zMoondream2ObjectDetectionInput = z.object({
  * MoondreamObjectOutput
  */
 export const zMoondream2ObjectDetectionOutput = z.object({
-  image: zImage,
   objects: z.array(z.record(z.string(), z.unknown())),
+  image: zImage,
 })
 
 /**
@@ -298,16 +298,16 @@ export const zMoondream2PointObjectDetectionInput = z.object({
  * MoondreamObjectOutput
  */
 export const zMoondream2PointObjectDetectionOutput = z.object({
-  image: zImage,
   objects: z.array(z.record(z.string(), z.unknown())),
+  image: zImage,
 })
 
 /**
  * MoondreamQueryInput
  */
 export const zMoondream2VisualQueryInput = z.object({
-  image_url: z.string(),
   prompt: z.string(),
+  image_url: z.string(),
 })
 
 /**
@@ -321,39 +321,39 @@ export const zMoondream2VisualQueryOutput = z.object({
  * MoondreamCaptionInput
  */
 export const zMoondream3PreviewCaptionInput = z.object({
-  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  length: z.enum(['short', 'normal', 'long']).optional().default('normal'),
-  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   image_url: z.string(),
+  length: z.enum(['short', 'normal', 'long']).optional().default('normal'),
+  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
 })
 
 /**
  * MoondreamDetectInput
  */
 export const zMoondream3PreviewDetectInput = z.object({
-  preview: z.boolean().optional().default(false),
   image_url: z.string(),
   prompt: z.string().min(1),
+  preview: z.boolean().optional().default(false),
 })
 
 /**
  * MoondreamPointInput
  */
 export const zMoondream3PreviewPointInput = z.object({
-  preview: z.boolean().optional().default(false),
   image_url: z.string(),
   prompt: z.string().min(1),
+  preview: z.boolean().optional().default(false),
 })
 
 /**
  * MoondreamQueryInput
  */
 export const zMoondream3PreviewQueryInput = z.object({
-  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   image_url: z.string(),
   prompt: z.string().min(1),
+  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   reasoning: z.boolean().optional().default(true),
+  top_p: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
 })
 
 /**
@@ -402,18 +402,18 @@ export const zMoondreamNextBatchInput = z.object({
  * BatchMoonDreamOutput
  */
 export const zMoondreamNextBatchOutput = z.object({
-  captions_file: zFile,
   outputs: z.array(z.string()),
+  captions_file: zFile,
 })
 
 /**
  * QueryInput
  */
 export const zMoondreamNextInput = z.object({
-  task_type: z.enum(['caption', 'query']).optional().default('caption'),
   image_url: z.string(),
   prompt: z.string(),
   max_tokens: z.int().gte(1).lte(512).optional().default(64),
+  task_type: z.enum(['caption', 'query']).optional().default('caption'),
 })
 
 /**
@@ -427,35 +427,35 @@ export const zMoondreamNextOutput = z.object({
  * NemotronDiffusionVLMInput
  */
 export const zNemotronDiffusionVlmInput = z.object({
+  prompt: z.string(),
   image_url: z.string(),
   threshold: z.number().gte(0).lte(1).optional().default(0.9),
-  block_length: z.int().gte(8).lte(128).optional().default(32),
-  max_tokens: z.int().gte(1).lte(8192).optional().default(512),
-  prompt: z.string(),
   num_inference_steps: z
     .union([z.int().gte(1).lte(1024), z.unknown()])
     .optional(),
+  block_length: z.int().gte(8).lte(128).optional().default(32),
+  max_tokens: z.int().gte(1).lte(8192).optional().default(512),
 })
 
 /**
  * NemotronDiffusionVLMTimings
  */
 export const zNemotronDiffusionVlmTimings = z.object({
-  total_time: z.number(),
-  preprocessing_time: z.number(),
   gpu_transfer_time: z.number(),
-  image_validation_time: z.number(),
   decode_time: z.number(),
+  total_time: z.number(),
   generation_time: z.number(),
+  preprocessing_time: z.number(),
+  image_validation_time: z.number(),
 })
 
 /**
  * NemotronDiffusionVLMUsage
  */
 export const zNemotronDiffusionVlmUsage = z.object({
-  num_function_evals: z.int(),
-  completion_tokens: z.int(),
   prompt_tokens: z.int(),
+  completion_tokens: z.int(),
+  num_function_evals: z.int(),
 })
 
 /**
@@ -473,16 +473,16 @@ export const zNemotronDiffusionVlmOutput = z.object({
 export const zObject = z.object({
   x_max: z.number(),
   y_max: z.number(),
-  x_min: z.number(),
   y_min: z.number(),
+  x_min: z.number(),
 })
 
 /**
  * Point
  */
 export const zPoint = z.object({
-  x: z.number(),
   y: z.number(),
+  x: z.number(),
 })
 
 /**
@@ -509,9 +509,9 @@ export const zQueueStatus = z.object({
  */
 export const zRegion = z.object({
   x2: z.int().gte(0).lte(999),
-  x1: z.int().gte(0).lte(999),
-  y1: z.int().gte(0).lte(999),
   y2: z.int().gte(0).lte(999),
+  y1: z.int().gte(0).lte(999),
+  x1: z.int().gte(0).lte(999),
 })
 
 /**
@@ -547,70 +547,70 @@ export const zRouterVisionInput = z.object({
  * ImageInput
  */
 export const zSa2Va4bImageInput = z.object({
-  prompt: z.string(),
   image_url: z.string(),
+  prompt: z.string(),
 })
 
 /**
  * ImageChatOutput
  */
 export const zSa2Va4bImageOutput = z.object({
-  output: z.string(),
   masks: z.array(zImage),
+  output: z.string(),
 })
 
 /**
  * VideoInput
  */
 export const zSa2Va4bVideoInput = z.object({
-  video_url: z.string(),
-  prompt: z.string(),
   num_frames_to_sample: z
     .union([z.int().gte(5).lte(100), z.unknown()])
     .optional(),
+  prompt: z.string(),
+  video_url: z.string(),
 })
 
 /**
  * VideoChatOutput
  */
 export const zSa2Va4bVideoOutput = z.object({
-  output: z.string(),
   masks: z.array(zFile),
+  output: z.string(),
 })
 
 /**
  * ImageInput
  */
 export const zSa2Va8bImageInput = z.object({
-  prompt: z.string(),
   image_url: z.string(),
+  prompt: z.string(),
 })
 
 /**
  * ImageChatOutput
  */
 export const zSa2Va8bImageOutput = z.object({
-  output: z.string(),
   masks: z.array(zImage),
+  output: z.string(),
 })
 
 /**
  * VideoInput
  */
 export const zSa2Va8bVideoInput = z.object({
-  video_url: z.string(),
-  prompt: z.string(),
   num_frames_to_sample: z
     .union([z.int().gte(5).lte(100), z.unknown()])
     .optional(),
+  prompt: z.string(),
+  video_url: z.string(),
 })
 
 /**
  * VideoChatOutput
  */
 export const zSa2Va8bVideoOutput = z.object({
-  output: z.string(),
   masks: z.array(zFile),
+  output: z.string(),
 })
 
 /**
@@ -632,59 +632,59 @@ export const zSam3ImageEmbedOutput = z.object({
  */
 export const zSceneFinderInput = z.object({
   video_url: z.string(),
-  prompt: z.string().max(1000),
+  frames_per_second: z.int().gte(1).lte(8).optional().default(2),
   frame_selection: z
     .enum(['mid', 'start', 'end', 'all'])
     .optional()
     .default('mid'),
-  frames_per_second: z.int().gte(1).lte(8).optional().default(2),
+  prompt: z.string().max(1000),
 })
 
 /**
  * LocateOutput
  */
 export const zSceneFinderOutput = z.object({
-  segments: z.array(zEventSegmentType2),
   images: z.array(zImage),
+  segments: z.array(zEventSegmentType2),
 })
 
 /**
  * UsageInfo
  */
 export const zUsageInfo = z.object({
+  prefill_time_ms: z.number(),
   output_tokens: z.int(),
   ttft_ms: z.number(),
   decode_time_ms: z.number(),
   input_tokens: z.int(),
-  prefill_time_ms: z.number(),
 })
 
 /**
  * MoondreamCaptionOutput
  */
 export const zMoondream3PreviewCaptionOutput = z.object({
-  finish_reason: z.string(),
   usage_info: zUsageInfo,
   output: z.string(),
+  finish_reason: z.string(),
 })
 
 /**
  * MoondreamDetectOutput
  */
 export const zMoondream3PreviewDetectOutput = z.object({
-  image: z.union([zImageFile, z.unknown()]).optional(),
-  objects: z.array(zObject),
-  finish_reason: z.string(),
   usage_info: zUsageInfo,
+  image: z.union([zImageFile, z.unknown()]).optional(),
+  finish_reason: z.string(),
+  objects: z.array(zObject),
 })
 
 /**
  * MoondreamPointOutput
  */
 export const zMoondream3PreviewPointOutput = z.object({
+  usage_info: zUsageInfo,
   image: z.union([zImageFile, z.unknown()]).optional(),
   finish_reason: z.string(),
-  usage_info: zUsageInfo,
   points: z.array(zPoint),
 })
 
@@ -692,10 +692,10 @@ export const zMoondream3PreviewPointOutput = z.object({
  * MoondreamQueryOutput
  */
 export const zMoondream3PreviewQueryOutput = z.object({
-  finish_reason: z.string(),
-  usage_info: zUsageInfo,
   reasoning: z.union([z.string(), z.unknown()]).optional(),
+  usage_info: zUsageInfo,
   output: z.string(),
+  finish_reason: z.string(),
 })
 
 /**
@@ -723,9 +723,9 @@ export const zRouterVisionOutput = z.object({
  * VideoUnderstandingInput
  */
 export const zVideoUnderstandingInput = z.object({
+  prompt: z.string().min(1).max(5000),
   video_url: z.string(),
   detailed_analysis: z.boolean().optional().default(false),
-  prompt: z.string().min(1).max(5000),
 })
 
 /**

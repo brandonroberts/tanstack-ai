@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.775Z",
+  "generated_at": "2026-06-11T02:20:29.654Z",
   "total_models": 4,
   "category": "text-to-json",
   "models": [
@@ -1602,69 +1602,69 @@
               "required": ["status", "request_id"]
             },
             "FiboEditEditStructured_instructionInput": {
+              "title": "StructuredInstructionInputModel",
+              "type": "object",
+              "properties": {
+                "seed": {
+                  "title": "Seed",
+                  "default": 5555,
+                  "type": "integer",
+                  "description": "Random seed for reproducibility."
+                },
+                "image_url": {
+                  "title": "Image Url",
+                  "examples": [
+                    "https://v3b.fal.media/files/b/0a8b07e8/GYKVk2EVivg_MC3jRRZi3_png%20-%202026-01-13T094835.850%20(3).png"
+                  ],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Reference image (file or URL)."
+                },
+                "mask_url": {
+                  "title": "Mask Url",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Reference image mask (file or URL). Optional."
+                },
+                "sync_mode": {
+                  "title": "Sync Mode",
+                  "default": false,
+                  "type": "boolean",
+                  "description": "If true, returns the image directly in the response (increases latency)."
+                },
+                "instruction": {
+                  "title": "Instruction",
+                  "examples": ["change lighting to starlight nighttime"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Instruction for image editing."
+                }
+              },
               "x-fal-order-properties": [
                 "image_url",
                 "mask_url",
                 "instruction",
                 "seed",
                 "sync_mode"
-              ],
-              "type": "object",
-              "properties": {
-                "mask_url": {
-                  "description": "Reference image mask (file or URL). Optional.",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Mask Url"
-                },
-                "sync_mode": {
-                  "description": "If true, returns the image directly in the response (increases latency).",
-                  "type": "boolean",
-                  "default": false,
-                  "title": "Sync Mode"
-                },
-                "image_url": {
-                  "examples": [
-                    "https://v3b.fal.media/files/b/0a8b07e8/GYKVk2EVivg_MC3jRRZi3_png%20-%202026-01-13T094835.850%20(3).png"
-                  ],
-                  "description": "Reference image (file or URL).",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Image Url"
-                },
-                "instruction": {
-                  "examples": ["change lighting to starlight nighttime"],
-                  "description": "Instruction for image editing.",
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
-                  "title": "Instruction"
-                },
-                "seed": {
-                  "description": "Random seed for reproducibility.",
-                  "type": "integer",
-                  "default": 5555,
-                  "title": "Seed"
-                }
-              },
-              "title": "StructuredInstructionInputModel"
+              ]
             },
             "FiboEditEditStructured_instructionOutput": {}
           }

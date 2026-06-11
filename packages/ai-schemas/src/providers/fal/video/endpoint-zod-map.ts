@@ -2,6 +2,10 @@
 // Generated via scripts/generate-endpoint-maps.ts
 
 import {
+  zAgentRayV32ImageToVideoInput,
+  zAgentRayV32ImageToVideoOutput,
+  zAgentRayV32TextToVideoInput,
+  zAgentRayV32TextToVideoOutput,
   zAiAvatarMultiInput,
   zAiAvatarMultiOutput,
   zAiAvatarMultiTextInput,
@@ -24,6 +28,14 @@ import {
   zAvatarsTextToVideoOutputType2,
   zBenV2VideoInput,
   zBenV2VideoOutput,
+  zBerniniREditVideoInput,
+  zBerniniREditVideoOutput,
+  zBerniniRReferenceEditVideoInput,
+  zBerniniRReferenceEditVideoOutput,
+  zBerniniRReferenceToVideoInput,
+  zBerniniRReferenceToVideoOutput,
+  zBerniniRTextToVideoInput,
+  zBerniniRTextToVideoOutput,
   zBirefnetV2VideoInput,
   zBirefnetV2VideoOutput,
   zBriaVideoEraserEraseKeypointsInput,
@@ -828,6 +840,10 @@ import {
   zVideoBackgroundRemovalInputType2,
   zVideoBackgroundRemovalOutput,
   zVideoBackgroundRemovalOutputType2,
+  zVideoBackgroundRemovalRealtimeInput,
+  zVideoBackgroundRemovalRealtimeOutput,
+  zVideoBackgroundRemovalV3Input,
+  zVideoBackgroundRemovalV3Output,
   zVideoEraseKeypointsInput,
   zVideoEraseKeypointsOutput,
   zVideoEraseMaskInput,
@@ -1018,6 +1034,14 @@ export const falVideoEndpointZodMap: {
     readonly input: typeof zVideoBackgroundRemovalInput
     readonly output: typeof zVideoBackgroundRemovalOutput
   }
+  readonly 'bria/video/background-removal/realtime': {
+    readonly input: typeof zVideoBackgroundRemovalRealtimeInput
+    readonly output: typeof zVideoBackgroundRemovalRealtimeOutput
+  }
+  readonly 'bria/video/background-removal/v3': {
+    readonly input: typeof zVideoBackgroundRemovalV3Input
+    readonly output: typeof zVideoBackgroundRemovalV3Output
+  }
   readonly 'bria/video/erase/keypoints': {
     readonly input: typeof zVideoEraseKeypointsInput
     readonly output: typeof zVideoEraseKeypointsOutput
@@ -1109,6 +1133,22 @@ export const falVideoEndpointZodMap: {
   readonly 'fal-ai/ben/v2/video': {
     readonly input: typeof zBenV2VideoInput
     readonly output: typeof zBenV2VideoOutput
+  }
+  readonly 'fal-ai/bernini-r/edit-video': {
+    readonly input: typeof zBerniniREditVideoInput
+    readonly output: typeof zBerniniREditVideoOutput
+  }
+  readonly 'fal-ai/bernini-r/reference-edit-video': {
+    readonly input: typeof zBerniniRReferenceEditVideoInput
+    readonly output: typeof zBerniniRReferenceEditVideoOutput
+  }
+  readonly 'fal-ai/bernini-r/reference-to-video': {
+    readonly input: typeof zBerniniRReferenceToVideoInput
+    readonly output: typeof zBerniniRReferenceToVideoOutput
+  }
+  readonly 'fal-ai/bernini-r/text-to-video': {
+    readonly input: typeof zBerniniRTextToVideoInput
+    readonly output: typeof zBerniniRTextToVideoOutput
   }
   readonly 'fal-ai/birefnet/v2/video': {
     readonly input: typeof zBirefnetV2VideoInput
@@ -2798,6 +2838,14 @@ export const falVideoEndpointZodMap: {
     readonly input: typeof zWorkflowUtilitiesTrimVideoInput
     readonly output: typeof zWorkflowUtilitiesTrimVideoOutput
   }
+  readonly 'luma/agent/ray/v3.2/image-to-video': {
+    readonly input: typeof zAgentRayV32ImageToVideoInput
+    readonly output: typeof zAgentRayV32ImageToVideoOutput
+  }
+  readonly 'luma/agent/ray/v3.2/text-to-video': {
+    readonly input: typeof zAgentRayV32TextToVideoInput
+    readonly output: typeof zAgentRayV32TextToVideoOutput
+  }
   readonly 'mirelo-ai/sfx-v1.5/video-to-video': {
     readonly input: typeof zSfxV15VideoToVideoInput
     readonly output: typeof zSfxV15VideoToVideoOutput
@@ -2955,6 +3003,14 @@ export const falVideoEndpointZodMap: {
     input: zVideoBackgroundRemovalInput,
     output: zVideoBackgroundRemovalOutput,
   },
+  'bria/video/background-removal/realtime': {
+    input: zVideoBackgroundRemovalRealtimeInput,
+    output: zVideoBackgroundRemovalRealtimeOutput,
+  },
+  'bria/video/background-removal/v3': {
+    input: zVideoBackgroundRemovalV3Input,
+    output: zVideoBackgroundRemovalV3Output,
+  },
   'bria/video/erase/keypoints': {
     input: zVideoEraseKeypointsInput,
     output: zVideoEraseKeypointsOutput,
@@ -3041,6 +3097,22 @@ export const falVideoEndpointZodMap: {
     output: zAutoCaptionOutput,
   },
   'fal-ai/ben/v2/video': { input: zBenV2VideoInput, output: zBenV2VideoOutput },
+  'fal-ai/bernini-r/edit-video': {
+    input: zBerniniREditVideoInput,
+    output: zBerniniREditVideoOutput,
+  },
+  'fal-ai/bernini-r/reference-edit-video': {
+    input: zBerniniRReferenceEditVideoInput,
+    output: zBerniniRReferenceEditVideoOutput,
+  },
+  'fal-ai/bernini-r/reference-to-video': {
+    input: zBerniniRReferenceToVideoInput,
+    output: zBerniniRReferenceToVideoOutput,
+  },
+  'fal-ai/bernini-r/text-to-video': {
+    input: zBerniniRTextToVideoInput,
+    output: zBerniniRTextToVideoOutput,
+  },
   'fal-ai/birefnet/v2/video': {
     input: zBirefnetV2VideoInput,
     output: zBirefnetV2VideoOutput,
@@ -4632,6 +4704,14 @@ export const falVideoEndpointZodMap: {
   'fal-ai/workflow-utilities/trim-video': {
     input: zWorkflowUtilitiesTrimVideoInput,
     output: zWorkflowUtilitiesTrimVideoOutput,
+  },
+  'luma/agent/ray/v3.2/image-to-video': {
+    input: zAgentRayV32ImageToVideoInput,
+    output: zAgentRayV32ImageToVideoOutput,
+  },
+  'luma/agent/ray/v3.2/text-to-video': {
+    input: zAgentRayV32TextToVideoInput,
+    output: zAgentRayV32TextToVideoOutput,
   },
   'mirelo-ai/sfx-v1.5/video-to-video': {
     input: zSfxV15VideoToVideoInput,

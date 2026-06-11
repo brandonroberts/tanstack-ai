@@ -61,6 +61,8 @@ export const AnthropicBetaSchema = {
         'managed-agents-2026-04-01',
         'cache-diagnosis-2026-04-07',
         'thinking-token-count-2026-05-13',
+        'server-side-fallback-2026-06-01',
+        'fallback-credit-2026-06-01',
       ],
       'x-stainless-nominal': false,
     },
@@ -315,9 +317,27 @@ export const BetaAdvisorMessageIterationUsageSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -329,6 +349,9 @@ export const BetaAdvisorMessageIterationUsageSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -377,11 +400,17 @@ export const BetaAdvisorMessageIterationUsageSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -436,6 +465,7 @@ export const BetaAdvisorToolResultErrorCodeSchema = {
     'overloaded',
     'unavailable',
     'execution_time_exceeded',
+    'model_not_found',
   ],
   title: 'AdvisorToolResultErrorCode',
   type: 'string',
@@ -487,6 +517,12 @@ export const BetaAdvisorTool_20260301Schema = {
         'If true, tool will not be included in initial system prompt. Only loaded when returned via tool_reference from tool search.',
       title: 'Defer Loading',
       type: 'boolean',
+    },
+    max_tokens: {
+      anyOf: [{ minimum: 1024, type: 'integer' }, { type: 'null' }],
+      description:
+        "Bounds the advisor's total output (thinking + text) per call. When the advisor hits this cap, the returned advisor_result or advisor_redacted_result block carries stop_reason='max_tokens', and a truncation note is appended to the advice text the worker model sees (inside the encrypted blob in redacted mode). When set, the server also emits a remaining-tokens budget block in the advisor's prompt so the advisor self-shapes toward the cap. When omitted, the advisor model's default output cap applies and no budget block is emitted.",
+      title: 'Max Tokens',
     },
     max_uses: {
       anyOf: [{ exclusiveMinimum: 0, type: 'integer' }, { type: 'null' }],
@@ -542,9 +578,27 @@ export const BetaAdvisorTool_20260301Schema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -556,6 +610,9 @@ export const BetaAdvisorTool_20260301Schema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -604,11 +661,17 @@ export const BetaAdvisorTool_20260301Schema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -2038,6 +2101,7 @@ export const BetaContentBlockSchema = {
         '#/components/schemas/BetaResponseCodeExecutionToolResultBlock',
       compaction: '#/components/schemas/BetaResponseCompactionBlock',
       container_upload: '#/components/schemas/BetaResponseContainerUploadBlock',
+      fallback: '#/components/schemas/BetaResponseFallbackBlock',
       mcp_tool_result: '#/components/schemas/BetaResponseMCPToolResultBlock',
       mcp_tool_use: '#/components/schemas/BetaResponseMCPToolUseBlock',
       redacted_thinking:
@@ -2074,6 +2138,7 @@ export const BetaContentBlockSchema = {
     { $ref: '#/$defs/BetaResponseMCPToolResultBlock' },
     { $ref: '#/$defs/BetaResponseContainerUploadBlock' },
     { $ref: '#/$defs/BetaResponseCompactionBlock' },
+    { $ref: '#/$defs/BetaResponseFallbackBlock' },
   ],
   $defs: {
     BetaAdvisorToolResultErrorCode: {
@@ -2084,6 +2149,7 @@ export const BetaContentBlockSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -2155,6 +2221,12 @@ export const BetaContentBlockSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`).",
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           default: 'advisor_redacted_result',
@@ -2162,12 +2234,18 @@ export const BetaContentBlockSchema = {
           type: 'string',
         },
       },
-      required: ['encrypted_content', 'type'],
+      required: ['encrypted_content', 'stop_reason', 'type'],
       title: 'ResponseAdvisorRedactedResultBlock',
       type: 'object',
     },
     BetaResponseAdvisorResultBlock: {
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`). `max_tokens` indicates the advisor's output was truncated at the tool's `max_tokens` value or the advisor model's policy cap.",
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: {
           const: 'advisor_result',
@@ -2176,7 +2254,7 @@ export const BetaContentBlockSchema = {
           type: 'string',
         },
       },
-      required: ['text', 'type'],
+      required: ['stop_reason', 'text', 'type'],
       title: 'ResponseAdvisorResultBlock',
       type: 'object',
     },
@@ -2581,6 +2659,38 @@ export const BetaContentBlockSchema = {
         'type',
       ],
       title: 'ResponseEncryptedCodeExecutionResultBlock',
+      type: 'object',
+    },
+    BetaResponseFallbackBlock: {
+      description:
+        "Marks the point in `content` where one model's output gives way to the next.\n\nOne block appears per hop where a preceding model actually ran this turn and\ndeclined. A turn routed directly by the sticky decision has no such boundary\nand carries no block — the signal for whether a fallback model served the\nresponse is the presence of a `fallback_message` entry in\n`usage.iterations`, not this block.\n\nThe block is treated like a server-tool content block for streaming: it\narrives via the standard `content_block_start` / `content_block_stop`\npair and carries no deltas.",
+      properties: {
+        from: {
+          $ref: '#/$defs/BetaResponseFallbackHopInfo',
+          description:
+            "The model whose output ends at this point — the model that declined at this hop. When the declining hop is the requested model, its `model` echoes the top-level `model` string the caller sent (alias or canonical); when the declining hop is a fallback model, its `model` is that model's canonical id.",
+        },
+        to: {
+          $ref: '#/$defs/BetaResponseFallbackHopInfo',
+          description:
+            'The fallback model producing the content that follows this block. Its `model` is always the canonical id.',
+        },
+        type: {
+          const: 'fallback',
+          default: 'fallback',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: ['from', 'to', 'type'],
+      title: 'ResponseFallbackBlock',
+      type: 'object',
+    },
+    BetaResponseFallbackHopInfo: {
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'ResponseFallbackHopInfo',
       type: 'object',
     },
     BetaResponseMCPToolResultBlock: {
@@ -3374,6 +3484,7 @@ export const BetaContentBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -3394,6 +3505,146 @@ export const BetaContentBlockSchema = {
       ],
       title: 'WebSearchToolResultErrorCode',
       type: 'string',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
     },
   },
 } as const
@@ -4102,7 +4353,7 @@ export const BetaCountMessageTokensParamsSchema = {
     tool_choice: { $ref: '#/$defs/BetaToolChoice' },
     tools: {
       description:
-        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview\\#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
+        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
       examples: [
         {
           description: 'Get the current weather in a given location',
@@ -4167,6 +4418,7 @@ export const BetaCountMessageTokensParamsSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -4218,6 +4470,12 @@ export const BetaCountMessageTokensParamsSchema = {
             'If true, tool will not be included in initial system prompt. Only loaded when returned via tool_reference from tool search.',
           title: 'Defer Loading',
           type: 'boolean',
+        },
+        max_tokens: {
+          anyOf: [{ minimum: 1024, type: 'integer' }, { type: 'null' }],
+          description:
+            "Bounds the advisor's total output (thinking + text) per call. When the advisor hits this cap, the returned advisor_result or advisor_redacted_result block carries stop_reason='max_tokens', and a truncation note is appended to the advice text the worker model sees (inside the encrypted blob in redacted mode). When set, the server also emits a remaining-tokens budget block in the advisor's prompt so the advisor self-shapes toward the cap. When omitted, the advisor model's default output cap applies and no budget block is emitted.",
+          title: 'Max Tokens',
         },
         max_uses: {
           anyOf: [{ exclusiveMinimum: 0, type: 'integer' }, { type: 'null' }],
@@ -5078,9 +5336,11 @@ export const BetaCountMessageTokensParamsSchema = {
           container_upload:
             '#/components/schemas/BetaRequestContainerUploadBlock',
           document: '#/components/schemas/BetaRequestDocumentBlock',
+          fallback: '#/components/schemas/BetaRequestFallbackBlock',
           image: '#/components/schemas/BetaRequestImageBlock',
           mcp_tool_result: '#/components/schemas/BetaRequestMCPToolResultBlock',
           mcp_tool_use: '#/components/schemas/BetaRequestMCPToolUseBlock',
+          mid_conv_system: '#/components/schemas/BetaRequestMidConvSystemBlock',
           redacted_thinking:
             '#/components/schemas/BetaRequestRedactedThinkingBlock',
           search_result: '#/components/schemas/BetaRequestSearchResultBlock',
@@ -5150,6 +5410,8 @@ export const BetaCountMessageTokensParamsSchema = {
         { $ref: '#/$defs/BetaRequestMCPToolResultBlock' },
         { $ref: '#/$defs/BetaRequestContainerUploadBlock' },
         { $ref: '#/$defs/BetaRequestCompactionBlock' },
+        { $ref: '#/$defs/BetaRequestMidConvSystemBlock' },
+        { $ref: '#/$defs/BetaRequestFallbackBlock' },
       ],
       'x-stainless-go-variant-constructor': {
         naming: 'new_beta_{variant}_block',
@@ -5169,7 +5431,11 @@ export const BetaCountMessageTokensParamsSchema = {
           ],
           title: 'Content',
         },
-        role: { enum: ['user', 'assistant'], title: 'Role', type: 'string' },
+        role: {
+          enum: ['user', 'assistant', 'system'],
+          title: 'Role',
+          type: 'string',
+        },
       },
       required: ['content', 'role'],
       title: 'InputMessage',
@@ -5411,6 +5677,10 @@ export const BetaCountMessageTokensParamsSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           title: 'Type',
@@ -5424,6 +5694,10 @@ export const BetaCountMessageTokensParamsSchema = {
     BetaRequestAdvisorResultBlock: {
       additionalProperties: false,
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: { const: 'advisor_result', title: 'Type', type: 'string' },
       },
@@ -5921,6 +6195,27 @@ export const BetaCountMessageTokensParamsSchema = {
       title: 'RequestEncryptedCodeExecutionResultBlock',
       type: 'object',
     },
+    BetaRequestFallbackBlock: {
+      additionalProperties: false,
+      description:
+        "A `fallback` block echoed back from a prior response.\n\nAccepted in `messages[].content` and never rendered into the prompt,\nnot validated against the request's `fallbacks` chain or top-level\n`model`, and stripped before the sticky-routing cache key is computed.\n\nCallers should echo the assistant turn verbatim — block included. The\nblock's position is load-bearing for thinking verification: the thinking\nruns on either side of a fallback hop carry independently-rooted\nverification hash chains, and this block is the only record of where one\nchain ends and the next begins. When thinking runs flank the boundary,\nomitting the block merges the runs into one contiguous span whose hashes\ncannot verify (the request is rejected), and moving it into the middle of\na single run splits that run's chain and is likewise rejected; between\nnon-thinking blocks the block's placement has no verification effect.",
+      properties: {
+        from: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        to: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        type: { const: 'fallback', title: 'Type', type: 'string' },
+      },
+      required: ['from', 'to', 'type'],
+      title: 'RequestFallbackBlock',
+      type: 'object',
+    },
+    BetaRequestFallbackHopInfo: {
+      additionalProperties: false,
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'RequestFallbackHopInfo',
+      type: 'object',
+    },
     BetaRequestImageBlock: {
       additionalProperties: false,
       properties: {
@@ -6080,6 +6375,46 @@ export const BetaCountMessageTokensParamsSchema = {
       },
       required: ['id', 'input', 'name', 'server_name', 'type'],
       title: 'RequestMCPToolUseBlock',
+      type: 'object',
+    },
+    BetaRequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/BetaCacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/BetaCacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/BetaRequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/BetaRequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
       type: 'object',
     },
     BetaRequestPageLocationCitation: {
@@ -6652,6 +6987,10 @@ export const BetaCountMessageTokensParamsSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/BetaToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -7730,6 +8069,7 @@ export const BetaCountMessageTokensParamsSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -8178,9 +8518,27 @@ export const BetaCountMessageTokensParamsSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -8192,6 +8550,9 @@ export const BetaCountMessageTokensParamsSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -8240,11 +8601,17 @@ export const BetaCountMessageTokensParamsSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -8385,6 +8752,29 @@ export const BetaCreateMessageParamsSchema = {
       description:
         'Request-level diagnostics. Supply `previous_message_id` to have the response include `diagnostics.cache_miss_reason` explaining any prompt-cache divergence from that prior request.',
     },
+    fallback_credit_token: {
+      anyOf: [
+        { maxLength: 2048, minLength: 1, type: 'string' },
+        { type: 'null' },
+      ],
+      description:
+        "The `fallback_credit_token` from a prior refusal's `stop_details`.\n\nWhen a preceding request was refused and returned a `fallback_credit_token`,\npass that code here on the retry to have the retry's cache-creation tokens\nfor the prefix that was warm on the refused model billed at the cache-read\nrate. Must be redeemed by the same organization and workspace, with the same\nrequest body (optionally extended by one appended `assistant` message whose\ncontent is the partial text — with any trailing whitespace stripped from\nthe final text block — and paired server-tool blocks streamed before the\nrefusal; the appended-assistant form is not available for requests with\n`output_format` set or forced `tool_choice`), on an eligible fallback\nmodel, on the same platform,\nand within 5 minutes of the refusal; a mismatch is a 400. A token minted\nmid-server-tool-loop whose partial content was continuable may only be\nredeemed with the appended-assistant form — if an exact-body retry is\nrejected with a 400 saying the token must be redeemed by continuing the\npartial response, retry with the appended-assistant form instead.\n\nWhen the appended-assistant form is used on a model that otherwise disallows\nassistant-turn prefill, this token also authorizes that one prefill.",
+      title: 'Fallback Credit Token',
+    },
+    fallbacks: {
+      anyOf: [
+        {
+          items: { $ref: '#/$defs/BetaFallbackConfigV2' },
+          maxItems: 3,
+          minItems: 1,
+          type: 'array',
+        },
+        { type: 'null' },
+      ],
+      description:
+        'Opt-in server-side retry on one or more substitute models when the requested model declines for policy reasons. Tried in order: if the first entry also declines, the second is tried, and so on.',
+      title: 'Fallbacks',
+    },
     inference_geo: {
       anyOf: [{ type: 'string' }, { type: 'null' }],
       description:
@@ -8475,7 +8865,7 @@ export const BetaCreateMessageParamsSchema = {
     tool_choice: { $ref: '#/$defs/BetaToolChoice' },
     tools: {
       description:
-        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview\\#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
+        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
       examples: [
         {
           description: 'Get the current weather in a given location',
@@ -8569,6 +8959,7 @@ export const BetaCreateMessageParamsSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -8620,6 +9011,12 @@ export const BetaCreateMessageParamsSchema = {
             'If true, tool will not be included in initial system prompt. Only loaded when returned via tool_reference from tool search.',
           title: 'Defer Loading',
           type: 'boolean',
+        },
+        max_tokens: {
+          anyOf: [{ minimum: 1024, type: 'integer' }, { type: 'null' }],
+          description:
+            "Bounds the advisor's total output (thinking + text) per call. When the advisor hits this cap, the returned advisor_result or advisor_redacted_result block carries stop_reason='max_tokens', and a truncation note is appended to the advice text the worker model sees (inside the encrypted blob in redacted mode). When set, the server also emits a remaining-tokens budget block in the advisor's prompt so the advisor self-shapes toward the cap. When omitted, the advisor model's default output cap applies and no budget block is emitted.",
+          title: 'Max Tokens',
         },
         max_uses: {
           anyOf: [{ exclusiveMinimum: 0, type: 'integer' }, { type: 'null' }],
@@ -9487,6 +9884,46 @@ export const BetaCreateMessageParamsSchema = {
       title: 'EffortLevel',
       type: 'string',
     },
+    BetaFallbackConfigV2: {
+      additionalProperties: true,
+      description:
+        'One entry in the `fallbacks` chain on a `/v1/messages` request.\n\n`model` is required. The four override fields (`max_tokens`, `thinking`,\n`output_config`, and `speed`) replace the corresponding top-level field\nfor this attempt only and are validated as if the request were made to\n`model`. Any other key is rejected at parse time.',
+      properties: {
+        max_tokens: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Max Tokens',
+        },
+        model: { $ref: '#/$defs/Model' },
+        output_config: {
+          anyOf: [{ $ref: '#/$defs/BetaOutputConfig' }, { type: 'null' }],
+        },
+        speed: { anyOf: [{ $ref: '#/$defs/BetaSpeed' }, { type: 'null' }] },
+        thinking: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  adaptive: '#/components/schemas/BetaThinkingConfigAdaptive',
+                  disabled: '#/components/schemas/BetaThinkingConfigDisabled',
+                  enabled: '#/components/schemas/BetaThinkingConfigEnabled',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [
+                { $ref: '#/$defs/BetaThinkingConfigEnabled' },
+                { $ref: '#/$defs/BetaThinkingConfigDisabled' },
+                { $ref: '#/$defs/BetaThinkingConfigAdaptive' },
+              ],
+            },
+            { type: 'null' },
+          ],
+          title: 'Thinking',
+        },
+      },
+      required: ['model'],
+      title: 'FallbackConfigV2',
+      type: 'object',
+    },
     BetaFileDocumentSource: {
       additionalProperties: false,
       properties: {
@@ -9520,9 +9957,11 @@ export const BetaCreateMessageParamsSchema = {
           container_upload:
             '#/components/schemas/BetaRequestContainerUploadBlock',
           document: '#/components/schemas/BetaRequestDocumentBlock',
+          fallback: '#/components/schemas/BetaRequestFallbackBlock',
           image: '#/components/schemas/BetaRequestImageBlock',
           mcp_tool_result: '#/components/schemas/BetaRequestMCPToolResultBlock',
           mcp_tool_use: '#/components/schemas/BetaRequestMCPToolUseBlock',
+          mid_conv_system: '#/components/schemas/BetaRequestMidConvSystemBlock',
           redacted_thinking:
             '#/components/schemas/BetaRequestRedactedThinkingBlock',
           search_result: '#/components/schemas/BetaRequestSearchResultBlock',
@@ -9592,6 +10031,8 @@ export const BetaCreateMessageParamsSchema = {
         { $ref: '#/$defs/BetaRequestMCPToolResultBlock' },
         { $ref: '#/$defs/BetaRequestContainerUploadBlock' },
         { $ref: '#/$defs/BetaRequestCompactionBlock' },
+        { $ref: '#/$defs/BetaRequestMidConvSystemBlock' },
+        { $ref: '#/$defs/BetaRequestFallbackBlock' },
       ],
       'x-stainless-go-variant-constructor': {
         naming: 'new_beta_{variant}_block',
@@ -9611,7 +10052,11 @@ export const BetaCreateMessageParamsSchema = {
           ],
           title: 'Content',
         },
-        role: { enum: ['user', 'assistant'], title: 'Role', type: 'string' },
+        role: {
+          enum: ['user', 'assistant', 'system'],
+          title: 'Role',
+          type: 'string',
+        },
       },
       required: ['content', 'role'],
       title: 'InputMessage',
@@ -9867,6 +10312,10 @@ export const BetaCreateMessageParamsSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           title: 'Type',
@@ -9880,6 +10329,10 @@ export const BetaCreateMessageParamsSchema = {
     BetaRequestAdvisorResultBlock: {
       additionalProperties: false,
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: { const: 'advisor_result', title: 'Type', type: 'string' },
       },
@@ -10377,6 +10830,27 @@ export const BetaCreateMessageParamsSchema = {
       title: 'RequestEncryptedCodeExecutionResultBlock',
       type: 'object',
     },
+    BetaRequestFallbackBlock: {
+      additionalProperties: false,
+      description:
+        "A `fallback` block echoed back from a prior response.\n\nAccepted in `messages[].content` and never rendered into the prompt,\nnot validated against the request's `fallbacks` chain or top-level\n`model`, and stripped before the sticky-routing cache key is computed.\n\nCallers should echo the assistant turn verbatim — block included. The\nblock's position is load-bearing for thinking verification: the thinking\nruns on either side of a fallback hop carry independently-rooted\nverification hash chains, and this block is the only record of where one\nchain ends and the next begins. When thinking runs flank the boundary,\nomitting the block merges the runs into one contiguous span whose hashes\ncannot verify (the request is rejected), and moving it into the middle of\na single run splits that run's chain and is likewise rejected; between\nnon-thinking blocks the block's placement has no verification effect.",
+      properties: {
+        from: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        to: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        type: { const: 'fallback', title: 'Type', type: 'string' },
+      },
+      required: ['from', 'to', 'type'],
+      title: 'RequestFallbackBlock',
+      type: 'object',
+    },
+    BetaRequestFallbackHopInfo: {
+      additionalProperties: false,
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'RequestFallbackHopInfo',
+      type: 'object',
+    },
     BetaRequestImageBlock: {
       additionalProperties: false,
       properties: {
@@ -10536,6 +11010,46 @@ export const BetaCreateMessageParamsSchema = {
       },
       required: ['id', 'input', 'name', 'server_name', 'type'],
       title: 'RequestMCPToolUseBlock',
+      type: 'object',
+    },
+    BetaRequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/BetaCacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/BetaCacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/BetaRequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/BetaRequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
       type: 'object',
     },
     BetaRequestPageLocationCitation: {
@@ -11108,6 +11622,10 @@ export const BetaCreateMessageParamsSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/BetaToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -12220,6 +12738,7 @@ export const BetaCreateMessageParamsSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -12668,9 +13187,27 @@ export const BetaCreateMessageParamsSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -12682,6 +13219,9 @@ export const BetaCreateMessageParamsSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -12730,11 +13270,17 @@ export const BetaCreateMessageParamsSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -13147,6 +13693,539 @@ export const BetaErrorResponseSchema = {
   },
 } as const
 
+export const BetaFallbackConfigV2Schema = {
+  additionalProperties: true,
+  description:
+    'One entry in the `fallbacks` chain on a `/v1/messages` request.\n\n`model` is required. The four override fields (`max_tokens`, `thinking`,\n`output_config`, and `speed`) replace the corresponding top-level field\nfor this attempt only and are validated as if the request were made to\n`model`. Any other key is rejected at parse time.',
+  properties: {
+    max_tokens: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Max Tokens',
+    },
+    model: { $ref: '#/$defs/Model' },
+    output_config: {
+      anyOf: [{ $ref: '#/$defs/BetaOutputConfig' }, { type: 'null' }],
+    },
+    speed: { anyOf: [{ $ref: '#/$defs/BetaSpeed' }, { type: 'null' }] },
+    thinking: {
+      anyOf: [
+        {
+          discriminator: {
+            mapping: {
+              adaptive: '#/components/schemas/BetaThinkingConfigAdaptive',
+              disabled: '#/components/schemas/BetaThinkingConfigDisabled',
+              enabled: '#/components/schemas/BetaThinkingConfigEnabled',
+            },
+            propertyName: 'type',
+          },
+          oneOf: [
+            { $ref: '#/$defs/BetaThinkingConfigEnabled' },
+            { $ref: '#/$defs/BetaThinkingConfigDisabled' },
+            { $ref: '#/$defs/BetaThinkingConfigAdaptive' },
+          ],
+        },
+        { type: 'null' },
+      ],
+      title: 'Thinking',
+    },
+  },
+  required: ['model'],
+  title: 'FallbackConfigV2',
+  type: 'object',
+  $defs: {
+    BetaEffortLevel: {
+      description: 'All possible effort levels.',
+      enum: ['low', 'medium', 'high', 'xhigh', 'max'],
+      title: 'EffortLevel',
+      type: 'string',
+    },
+    BetaJsonOutputFormat: {
+      additionalProperties: false,
+      properties: {
+        schema: {
+          additionalProperties: true,
+          description: 'The JSON schema of the format',
+          title: 'Schema',
+          type: 'object',
+        },
+        type: { const: 'json_schema', title: 'Type', type: 'string' },
+      },
+      required: ['schema', 'type'],
+      title: 'JsonOutputFormat',
+      type: 'object',
+    },
+    BetaOutputConfig: {
+      additionalProperties: false,
+      properties: {
+        effort: {
+          anyOf: [{ $ref: '#/$defs/BetaEffortLevel' }, { type: 'null' }],
+          description:
+            'How much effort the model should put into its response. Higher effort levels may result in more thorough analysis but take longer.\n\nValid values are `low`, `medium`, `high`, `xhigh`, or `max`.',
+        },
+        format: {
+          anyOf: [{ $ref: '#/$defs/BetaJsonOutputFormat' }, { type: 'null' }],
+          description:
+            "A schema to specify Claude's output format in responses. See [structured outputs](https://platform.claude.com/docs/en/build-with-claude/structured-outputs)",
+        },
+        task_budget: {
+          anyOf: [{ $ref: '#/$defs/BetaTokenTaskBudget' }, { type: 'null' }],
+          description:
+            'Configuration for token budget tracking across contexts.',
+        },
+      },
+      title: 'OutputConfig',
+      type: 'object',
+    },
+    BetaSpeed: { enum: ['standard', 'fast'], title: 'Speed', type: 'string' },
+    BetaThinkingConfigAdaptive: {
+      additionalProperties: false,
+      properties: {
+        display: {
+          anyOf: [
+            { $ref: '#/$defs/BetaThinkingDisplayMode' },
+            { type: 'null' },
+          ],
+          description:
+            'Controls how thinking content appears in the response. When set to `summarized`, thinking is returned normally. When set to `omitted`, thinking content is redacted but a signature is returned for multi-turn continuity. Defaults to `summarized`.',
+        },
+        type: { const: 'adaptive', title: 'Type', type: 'string' },
+      },
+      required: ['type'],
+      title: 'ThinkingConfigAdaptive',
+      type: 'object',
+    },
+    BetaThinkingConfigDisabled: {
+      additionalProperties: false,
+      properties: {
+        type: { const: 'disabled', title: 'Type', type: 'string' },
+      },
+      required: ['type'],
+      title: 'ThinkingConfigDisabled',
+      type: 'object',
+      'x-stainless-go-constant-constructor': true,
+    },
+    BetaThinkingConfigEnabled: {
+      additionalProperties: false,
+      properties: {
+        budget_tokens: {
+          description:
+            'Determines how many tokens Claude can use for its internal reasoning process. Larger budgets can enable more thorough analysis for complex problems, improving response quality.\n\nMust be ≥1024 and less than `max_tokens`.\n\nSee [extended thinking](https://docs.claude.com/en/docs/build-with-claude/extended-thinking) for details.',
+          minimum: 1024,
+          title: 'Budget Tokens',
+          type: 'integer',
+        },
+        display: {
+          anyOf: [
+            { $ref: '#/$defs/BetaThinkingDisplayMode' },
+            { type: 'null' },
+          ],
+          description:
+            'Controls how thinking content appears in the response. When set to `summarized`, thinking is returned normally. When set to `omitted`, thinking content is redacted but a signature is returned for multi-turn continuity. Defaults to `summarized`.',
+        },
+        type: { const: 'enabled', title: 'Type', type: 'string' },
+      },
+      required: ['budget_tokens', 'type'],
+      title: 'ThinkingConfigEnabled',
+      type: 'object',
+    },
+    BetaThinkingDisplayMode: {
+      enum: ['summarized', 'omitted'],
+      title: 'ThinkingDisplayMode',
+      type: 'string',
+    },
+    BetaTokenTaskBudget: {
+      additionalProperties: false,
+      description: 'User-configurable total token budget across contexts.',
+      properties: {
+        remaining: {
+          anyOf: [{ minimum: 0, type: 'integer' }, { type: 'null' }],
+          description:
+            'Remaining tokens in the budget. Use this to track usage across contexts when implementing compaction client-side. Defaults to total if not provided.',
+          minimum: 0,
+          title: 'Remaining',
+        },
+        total: {
+          description: 'Total token budget across all contexts in the session.',
+          minimum: 1024,
+          title: 'Total',
+          type: 'integer',
+        },
+        type: {
+          const: 'tokens',
+          description: "The budget type. Currently only 'tokens' is supported.",
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: ['total', 'type'],
+      title: 'TokenTaskBudget',
+      type: 'object',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
+    },
+  },
+} as const
+
+export const BetaFallbackMessageIterationUsageSchema = {
+  description:
+    'Token usage for the fallback-model attempt of a server-side fallback request.\n\nProduced in place of a `message` entry for whichever hop served the\nresponse. A declined hop produces the existing `message` entry. Whether\na fallback model served the response is signalled by the presence of this\nentry in `usage.iterations`.',
+  properties: {
+    cache_creation: {
+      anyOf: [{ $ref: '#/$defs/BetaCacheCreation' }, { type: 'null' }],
+      description: 'Breakdown of cached tokens by TTL',
+    },
+    cache_creation_input_tokens: {
+      default: 0,
+      description: 'The number of input tokens used to create the cache entry.',
+      minimum: 0,
+      title: 'Cache Creation Input Tokens',
+      type: 'integer',
+    },
+    cache_read_input_tokens: {
+      default: 0,
+      description: 'The number of input tokens read from the cache.',
+      minimum: 0,
+      title: 'Cache Read Input Tokens',
+      type: 'integer',
+    },
+    input_tokens: {
+      description: 'The number of input tokens which were used.',
+      minimum: 0,
+      title: 'Input Tokens',
+      type: 'integer',
+    },
+    model: { $ref: '#/$defs/Model' },
+    output_tokens: {
+      description: 'The number of output tokens which were used.',
+      minimum: 0,
+      title: 'Output Tokens',
+      type: 'integer',
+    },
+    type: {
+      const: 'fallback_message',
+      default: 'fallback_message',
+      description:
+        'Usage for the fallback-model attempt that served the response',
+      title: 'Type',
+      type: 'string',
+    },
+  },
+  required: [
+    'cache_creation',
+    'cache_creation_input_tokens',
+    'cache_read_input_tokens',
+    'input_tokens',
+    'model',
+    'output_tokens',
+    'type',
+  ],
+  title: 'FallbackMessageIterationUsage',
+  type: 'object',
+  $defs: {
+    BetaCacheCreation: {
+      properties: {
+        ephemeral_1h_input_tokens: {
+          default: 0,
+          description:
+            'The number of input tokens used to create the 1 hour cache entry.',
+          minimum: 0,
+          title: 'Ephemeral 1H Input Tokens',
+          type: 'integer',
+        },
+        ephemeral_5m_input_tokens: {
+          default: 0,
+          description:
+            'The number of input tokens used to create the 5 minute cache entry.',
+          minimum: 0,
+          title: 'Ephemeral 5M Input Tokens',
+          type: 'integer',
+        },
+      },
+      required: ['ephemeral_1h_input_tokens', 'ephemeral_5m_input_tokens'],
+      title: 'CacheCreation',
+      type: 'object',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
+    },
+  },
+} as const
+
 export const BetaFileDocumentSourceSchema = {
   additionalProperties: false,
   properties: {
@@ -13196,9 +14275,11 @@ export const BetaInputContentBlockSchema = {
       compaction: '#/components/schemas/BetaRequestCompactionBlock',
       container_upload: '#/components/schemas/BetaRequestContainerUploadBlock',
       document: '#/components/schemas/BetaRequestDocumentBlock',
+      fallback: '#/components/schemas/BetaRequestFallbackBlock',
       image: '#/components/schemas/BetaRequestImageBlock',
       mcp_tool_result: '#/components/schemas/BetaRequestMCPToolResultBlock',
       mcp_tool_use: '#/components/schemas/BetaRequestMCPToolUseBlock',
+      mid_conv_system: '#/components/schemas/BetaRequestMidConvSystemBlock',
       redacted_thinking:
         '#/components/schemas/BetaRequestRedactedThinkingBlock',
       search_result: '#/components/schemas/BetaRequestSearchResultBlock',
@@ -13267,6 +14348,8 @@ export const BetaInputContentBlockSchema = {
     { $ref: '#/$defs/BetaRequestMCPToolResultBlock' },
     { $ref: '#/$defs/BetaRequestContainerUploadBlock' },
     { $ref: '#/$defs/BetaRequestCompactionBlock' },
+    { $ref: '#/$defs/BetaRequestMidConvSystemBlock' },
+    { $ref: '#/$defs/BetaRequestFallbackBlock' },
   ],
   'x-stainless-go-variant-constructor': { naming: 'new_beta_{variant}_block' },
   $defs: {
@@ -13278,6 +14361,7 @@ export const BetaInputContentBlockSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -13436,6 +14520,10 @@ export const BetaInputContentBlockSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           title: 'Type',
@@ -13449,6 +14537,10 @@ export const BetaInputContentBlockSchema = {
     BetaRequestAdvisorResultBlock: {
       additionalProperties: false,
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: { const: 'advisor_result', title: 'Type', type: 'string' },
       },
@@ -13946,6 +15038,27 @@ export const BetaInputContentBlockSchema = {
       title: 'RequestEncryptedCodeExecutionResultBlock',
       type: 'object',
     },
+    BetaRequestFallbackBlock: {
+      additionalProperties: false,
+      description:
+        "A `fallback` block echoed back from a prior response.\n\nAccepted in `messages[].content` and never rendered into the prompt,\nnot validated against the request's `fallbacks` chain or top-level\n`model`, and stripped before the sticky-routing cache key is computed.\n\nCallers should echo the assistant turn verbatim — block included. The\nblock's position is load-bearing for thinking verification: the thinking\nruns on either side of a fallback hop carry independently-rooted\nverification hash chains, and this block is the only record of where one\nchain ends and the next begins. When thinking runs flank the boundary,\nomitting the block merges the runs into one contiguous span whose hashes\ncannot verify (the request is rejected), and moving it into the middle of\na single run splits that run's chain and is likewise rejected; between\nnon-thinking blocks the block's placement has no verification effect.",
+      properties: {
+        from: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        to: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        type: { const: 'fallback', title: 'Type', type: 'string' },
+      },
+      required: ['from', 'to', 'type'],
+      title: 'RequestFallbackBlock',
+      type: 'object',
+    },
+    BetaRequestFallbackHopInfo: {
+      additionalProperties: false,
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'RequestFallbackHopInfo',
+      type: 'object',
+    },
     BetaRequestImageBlock: {
       additionalProperties: false,
       properties: {
@@ -14066,6 +15179,46 @@ export const BetaInputContentBlockSchema = {
       },
       required: ['id', 'input', 'name', 'server_name', 'type'],
       title: 'RequestMCPToolUseBlock',
+      type: 'object',
+    },
+    BetaRequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/BetaCacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/BetaCacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/BetaRequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/BetaRequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
       type: 'object',
     },
     BetaRequestPageLocationCitation: {
@@ -14638,6 +15791,10 @@ export const BetaInputContentBlockSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/BetaToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -15008,6 +16165,7 @@ export const BetaInputContentBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -15029,6 +16187,146 @@ export const BetaInputContentBlockSchema = {
       title: 'WebSearchToolResultErrorCode',
       type: 'string',
     },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
+    },
   },
 } as const
 
@@ -15046,7 +16344,11 @@ export const BetaInputMessageSchema = {
       ],
       title: 'Content',
     },
-    role: { enum: ['user', 'assistant'], title: 'Role', type: 'string' },
+    role: {
+      enum: ['user', 'assistant', 'system'],
+      title: 'Role',
+      type: 'string',
+    },
   },
   required: ['content', 'role'],
   title: 'InputMessage',
@@ -15061,6 +16363,7 @@ export const BetaInputMessageSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -15208,9 +16511,11 @@ export const BetaInputMessageSchema = {
           container_upload:
             '#/components/schemas/BetaRequestContainerUploadBlock',
           document: '#/components/schemas/BetaRequestDocumentBlock',
+          fallback: '#/components/schemas/BetaRequestFallbackBlock',
           image: '#/components/schemas/BetaRequestImageBlock',
           mcp_tool_result: '#/components/schemas/BetaRequestMCPToolResultBlock',
           mcp_tool_use: '#/components/schemas/BetaRequestMCPToolUseBlock',
+          mid_conv_system: '#/components/schemas/BetaRequestMidConvSystemBlock',
           redacted_thinking:
             '#/components/schemas/BetaRequestRedactedThinkingBlock',
           search_result: '#/components/schemas/BetaRequestSearchResultBlock',
@@ -15280,6 +16585,8 @@ export const BetaInputMessageSchema = {
         { $ref: '#/$defs/BetaRequestMCPToolResultBlock' },
         { $ref: '#/$defs/BetaRequestContainerUploadBlock' },
         { $ref: '#/$defs/BetaRequestCompactionBlock' },
+        { $ref: '#/$defs/BetaRequestMidConvSystemBlock' },
+        { $ref: '#/$defs/BetaRequestFallbackBlock' },
       ],
       'x-stainless-go-variant-constructor': {
         naming: 'new_beta_{variant}_block',
@@ -15309,6 +16616,10 @@ export const BetaInputMessageSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           title: 'Type',
@@ -15322,6 +16633,10 @@ export const BetaInputMessageSchema = {
     BetaRequestAdvisorResultBlock: {
       additionalProperties: false,
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: { const: 'advisor_result', title: 'Type', type: 'string' },
       },
@@ -15819,6 +17134,27 @@ export const BetaInputMessageSchema = {
       title: 'RequestEncryptedCodeExecutionResultBlock',
       type: 'object',
     },
+    BetaRequestFallbackBlock: {
+      additionalProperties: false,
+      description:
+        "A `fallback` block echoed back from a prior response.\n\nAccepted in `messages[].content` and never rendered into the prompt,\nnot validated against the request's `fallbacks` chain or top-level\n`model`, and stripped before the sticky-routing cache key is computed.\n\nCallers should echo the assistant turn verbatim — block included. The\nblock's position is load-bearing for thinking verification: the thinking\nruns on either side of a fallback hop carry independently-rooted\nverification hash chains, and this block is the only record of where one\nchain ends and the next begins. When thinking runs flank the boundary,\nomitting the block merges the runs into one contiguous span whose hashes\ncannot verify (the request is rejected), and moving it into the middle of\na single run splits that run's chain and is likewise rejected; between\nnon-thinking blocks the block's placement has no verification effect.",
+      properties: {
+        from: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        to: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+        type: { const: 'fallback', title: 'Type', type: 'string' },
+      },
+      required: ['from', 'to', 'type'],
+      title: 'RequestFallbackBlock',
+      type: 'object',
+    },
+    BetaRequestFallbackHopInfo: {
+      additionalProperties: false,
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'RequestFallbackHopInfo',
+      type: 'object',
+    },
     BetaRequestImageBlock: {
       additionalProperties: false,
       properties: {
@@ -15939,6 +17275,46 @@ export const BetaInputMessageSchema = {
       },
       required: ['id', 'input', 'name', 'server_name', 'type'],
       title: 'RequestMCPToolUseBlock',
+      type: 'object',
+    },
+    BetaRequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/BetaCacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/BetaCacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/BetaRequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/BetaRequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
       type: 'object',
     },
     BetaRequestPageLocationCitation: {
@@ -16511,6 +17887,10 @@ export const BetaInputMessageSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/BetaToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -16881,6 +18261,7 @@ export const BetaInputMessageSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -16901,6 +18282,146 @@ export const BetaInputMessageSchema = {
       ],
       title: 'WebSearchToolResultErrorCode',
       type: 'string',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
     },
   },
 } as const
@@ -16969,6 +18490,8 @@ export const BetaIterationsUsageSchema = {
             advisor_message:
               '#/components/schemas/BetaAdvisorMessageIterationUsage',
             compaction: '#/components/schemas/BetaCompactionIterationUsage',
+            fallback_message:
+              '#/components/schemas/BetaFallbackMessageIterationUsage',
             message: '#/components/schemas/BetaMessageIterationUsage',
           },
           propertyName: 'type',
@@ -16977,6 +18500,7 @@ export const BetaIterationsUsageSchema = {
           { $ref: '#/$defs/BetaMessageIterationUsage' },
           { $ref: '#/$defs/BetaCompactionIterationUsage' },
           { $ref: '#/$defs/BetaAdvisorMessageIterationUsage' },
+          { $ref: '#/$defs/BetaFallbackMessageIterationUsage' },
         ],
         'x-stainless-naming': {
           java: { type_name: 'BetaIterationsUsageItems' },
@@ -17122,6 +18646,63 @@ export const BetaIterationsUsageSchema = {
       title: 'CompactionIterationUsage',
       type: 'object',
     },
+    BetaFallbackMessageIterationUsage: {
+      description:
+        'Token usage for the fallback-model attempt of a server-side fallback request.\n\nProduced in place of a `message` entry for whichever hop served the\nresponse. A declined hop produces the existing `message` entry. Whether\na fallback model served the response is signalled by the presence of this\nentry in `usage.iterations`.',
+      properties: {
+        cache_creation: {
+          anyOf: [{ $ref: '#/$defs/BetaCacheCreation' }, { type: 'null' }],
+          description: 'Breakdown of cached tokens by TTL',
+        },
+        cache_creation_input_tokens: {
+          default: 0,
+          description:
+            'The number of input tokens used to create the cache entry.',
+          minimum: 0,
+          title: 'Cache Creation Input Tokens',
+          type: 'integer',
+        },
+        cache_read_input_tokens: {
+          default: 0,
+          description: 'The number of input tokens read from the cache.',
+          minimum: 0,
+          title: 'Cache Read Input Tokens',
+          type: 'integer',
+        },
+        input_tokens: {
+          description: 'The number of input tokens which were used.',
+          minimum: 0,
+          title: 'Input Tokens',
+          type: 'integer',
+        },
+        model: { $ref: '#/$defs/Model' },
+        output_tokens: {
+          description: 'The number of output tokens which were used.',
+          minimum: 0,
+          title: 'Output Tokens',
+          type: 'integer',
+        },
+        type: {
+          const: 'fallback_message',
+          default: 'fallback_message',
+          description:
+            'Usage for the fallback-model attempt that served the response',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cache_creation',
+        'cache_creation_input_tokens',
+        'cache_read_input_tokens',
+        'input_tokens',
+        'model',
+        'output_tokens',
+        'type',
+      ],
+      title: 'FallbackMessageIterationUsage',
+      type: 'object',
+    },
     BetaMessageIterationUsage: {
       description: 'Token usage for a sampling iteration.',
       properties: {
@@ -17150,6 +18731,7 @@ export const BetaIterationsUsageSchema = {
           title: 'Input Tokens',
           type: 'integer',
         },
+        model: { $ref: '#/$defs/Model' },
         output_tokens: {
           description: 'The number of output tokens which were used.',
           minimum: 0,
@@ -17169,6 +18751,7 @@ export const BetaIterationsUsageSchema = {
         'cache_creation_input_tokens',
         'cache_read_input_tokens',
         'input_tokens',
+        'model',
         'output_tokens',
         'type',
       ],
@@ -17178,9 +18761,27 @@ export const BetaIterationsUsageSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -17192,6 +18793,9 @@ export const BetaIterationsUsageSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -17240,11 +18844,17 @@ export const BetaIterationsUsageSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -17684,6 +19294,7 @@ export const BetaMessageSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -17942,6 +19553,7 @@ export const BetaMessageSchema = {
           compaction: '#/components/schemas/BetaResponseCompactionBlock',
           container_upload:
             '#/components/schemas/BetaResponseContainerUploadBlock',
+          fallback: '#/components/schemas/BetaResponseFallbackBlock',
           mcp_tool_result:
             '#/components/schemas/BetaResponseMCPToolResultBlock',
           mcp_tool_use: '#/components/schemas/BetaResponseMCPToolUseBlock',
@@ -17980,6 +19592,7 @@ export const BetaMessageSchema = {
         { $ref: '#/$defs/BetaResponseMCPToolResultBlock' },
         { $ref: '#/$defs/BetaResponseContainerUploadBlock' },
         { $ref: '#/$defs/BetaResponseCompactionBlock' },
+        { $ref: '#/$defs/BetaResponseFallbackBlock' },
       ],
     },
     BetaDiagnostics: {
@@ -18033,6 +19646,63 @@ export const BetaMessageSchema = {
       title: 'DirectCaller',
       type: 'object',
     },
+    BetaFallbackMessageIterationUsage: {
+      description:
+        'Token usage for the fallback-model attempt of a server-side fallback request.\n\nProduced in place of a `message` entry for whichever hop served the\nresponse. A declined hop produces the existing `message` entry. Whether\na fallback model served the response is signalled by the presence of this\nentry in `usage.iterations`.',
+      properties: {
+        cache_creation: {
+          anyOf: [{ $ref: '#/$defs/BetaCacheCreation' }, { type: 'null' }],
+          description: 'Breakdown of cached tokens by TTL',
+        },
+        cache_creation_input_tokens: {
+          default: 0,
+          description:
+            'The number of input tokens used to create the cache entry.',
+          minimum: 0,
+          title: 'Cache Creation Input Tokens',
+          type: 'integer',
+        },
+        cache_read_input_tokens: {
+          default: 0,
+          description: 'The number of input tokens read from the cache.',
+          minimum: 0,
+          title: 'Cache Read Input Tokens',
+          type: 'integer',
+        },
+        input_tokens: {
+          description: 'The number of input tokens which were used.',
+          minimum: 0,
+          title: 'Input Tokens',
+          type: 'integer',
+        },
+        model: { $ref: '#/$defs/Model' },
+        output_tokens: {
+          description: 'The number of output tokens which were used.',
+          minimum: 0,
+          title: 'Output Tokens',
+          type: 'integer',
+        },
+        type: {
+          const: 'fallback_message',
+          default: 'fallback_message',
+          description:
+            'Usage for the fallback-model attempt that served the response',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cache_creation',
+        'cache_creation_input_tokens',
+        'cache_read_input_tokens',
+        'input_tokens',
+        'model',
+        'output_tokens',
+        'type',
+      ],
+      title: 'FallbackMessageIterationUsage',
+      type: 'object',
+    },
     BetaIterationsUsage: {
       anyOf: [
         {
@@ -18042,6 +19712,8 @@ export const BetaMessageSchema = {
                 advisor_message:
                   '#/components/schemas/BetaAdvisorMessageIterationUsage',
                 compaction: '#/components/schemas/BetaCompactionIterationUsage',
+                fallback_message:
+                  '#/components/schemas/BetaFallbackMessageIterationUsage',
                 message: '#/components/schemas/BetaMessageIterationUsage',
               },
               propertyName: 'type',
@@ -18050,6 +19722,7 @@ export const BetaMessageSchema = {
               { $ref: '#/$defs/BetaMessageIterationUsage' },
               { $ref: '#/$defs/BetaCompactionIterationUsage' },
               { $ref: '#/$defs/BetaAdvisorMessageIterationUsage' },
+              { $ref: '#/$defs/BetaFallbackMessageIterationUsage' },
             ],
             'x-stainless-naming': {
               java: { type_name: 'BetaIterationsUsageItems' },
@@ -18092,6 +19765,7 @@ export const BetaMessageSchema = {
           title: 'Input Tokens',
           type: 'integer',
         },
+        model: { $ref: '#/$defs/Model' },
         output_tokens: {
           description: 'The number of output tokens which were used.',
           minimum: 0,
@@ -18111,10 +19785,26 @@ export const BetaMessageSchema = {
         'cache_creation_input_tokens',
         'cache_read_input_tokens',
         'input_tokens',
+        'model',
         'output_tokens',
         'type',
       ],
       title: 'MessageIterationUsage',
+      type: 'object',
+    },
+    BetaOutputTokensDetails: {
+      properties: {
+        thinking_tokens: {
+          default: 0,
+          description:
+            "Number of output tokens the model generated as internal reasoning, including\nthe thinking-block delimiter tokens.\n\nReflects the raw reasoning the model produced, not the (possibly shorter)\nsummarized thinking text returned in the response body. Computed by\nre-tokenizing the raw reasoning text, so it may differ from the model's exact\ngeneration count by a small number of tokens. Always ≤ `output_tokens`;\n`output_tokens - thinking_tokens` approximates the non-reasoning output.",
+          minimum: 0,
+          title: 'Thinking Tokens',
+          type: 'integer',
+        },
+      },
+      required: ['thinking_tokens'],
+      title: 'OutputTokensDetails',
       type: 'object',
     },
     BetaPlainTextSource: {
@@ -18136,7 +19826,13 @@ export const BetaMessageSchema = {
       description: 'Structured information about a refusal.',
       properties: {
         category: {
-          anyOf: [{ enum: ['cyber', 'bio'], type: 'string' }, { type: 'null' }],
+          anyOf: [
+            {
+              enum: ['cyber', 'bio', 'frontier_llm', 'reasoning_extraction'],
+              type: 'string',
+            },
+            { type: 'null' },
+          ],
           description:
             "The policy category that triggered the refusal.\n\n`null` when the refusal doesn't map to a named category.",
           title: 'Category',
@@ -18147,6 +19843,24 @@ export const BetaMessageSchema = {
             'Human-readable explanation of the refusal.\n\nThis text is not guaranteed to be stable. `null` when no explanation is available for the category.',
           title: 'Explanation',
         },
+        fallback_credit_token: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "Opaque code that refunds the cache-miss cost when retrying this refused\nrequest on the fallback model. Pass it as `fallback_credit_token` on the\nretry request. Expires 5 minutes after the refusal.\n\nThe retry is sent either with the same request body (`system`, `messages`,\n`tools`, and other render-shaping fields), or with the same body plus one\nappended `assistant` message whose content is the partial text (with any\ntrailing whitespace stripped from the final text block) and paired\nserver-tool blocks from this refusal — which also authorizes that\nappended turn as an assistant-prefill continuation on models that otherwise\ndisallow prefill. A token minted mid-server-tool-loop whose partial content\nwas continuable may only be redeemed the second way — if a same-body retry\nis rejected with a 400 saying the token must be redeemed by continuing the\npartial response, retry the second way instead. Either way: same workspace,\nsame platform; a mismatch is a 400. Resending a token for an already-warm\nprefix is permitted but yields no additional credit.\n\n`null` when the refused model isn't eligible for a fallback credit.",
+          title: 'Fallback Credit Token',
+        },
+        fallback_has_prefill_claim: {
+          anyOf: [{ type: 'boolean' }, { type: 'null' }],
+          description:
+            "Whether the accompanying `fallback_credit_token` may be redeemed with the\nappended-assistant retry form. Only set when `fallback_credit_token` is\npresent.\n\n`true`: retry by resending the same request body plus one appended\n`assistant` message whose content is this response's `content` with any\ntrailing whitespace stripped from the final text block and unpaired\n`tool_use` blocks omitted (the same appended-turn shape described on\n`fallback_credit_token`), with the token attached. `false`: retry by\nresending the original request body unchanged, with the token attached —\nthe appended-assistant form is not available for this refusal (no\ncontinuable partial content, or the request uses `output_format` or a\n`tool_choice` that forces tool use). One exception: when the request used\n`output_format` or a forced `tool_choice` and the refusal arrived after\nserver tools (including MCP connector tools) had already executed, the\ntoken may not be redeemable by either retry form; if the exact-body retry\nis then rejected with a 400 saying the token must be redeemed by\ncontinuing the partial response, discard the token and retry without it.\n\nAdvisory: if an appended-assistant retry is rejected with a 400 despite\n`true`, fall back to resending the original request body with the token.",
+          title: 'Fallback Has Prefill Claim',
+        },
+        recommended_model: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The server's suggested retry target for this refusal. Populated when a fallback attempt could not be made (the fallback model's rate limit was exhausted, or it was overloaded); names the fallback model the caller can retry directly. Null otherwise.",
+          title: 'Recommended Model',
+        },
         type: {
           const: 'refusal',
           default: 'refusal',
@@ -18154,7 +19868,14 @@ export const BetaMessageSchema = {
           type: 'string',
         },
       },
-      required: ['category', 'explanation', 'type'],
+      required: [
+        'category',
+        'explanation',
+        'fallback_credit_token',
+        'fallback_has_prefill_claim',
+        'recommended_model',
+        'type',
+      ],
       title: 'RefusalStopDetails',
       type: 'object',
     },
@@ -18166,6 +19887,12 @@ export const BetaMessageSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`).",
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           default: 'advisor_redacted_result',
@@ -18173,12 +19900,18 @@ export const BetaMessageSchema = {
           type: 'string',
         },
       },
-      required: ['encrypted_content', 'type'],
+      required: ['encrypted_content', 'stop_reason', 'type'],
       title: 'ResponseAdvisorRedactedResultBlock',
       type: 'object',
     },
     BetaResponseAdvisorResultBlock: {
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`). `max_tokens` indicates the advisor's output was truncated at the tool's `max_tokens` value or the advisor model's policy cap.",
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: {
           const: 'advisor_result',
@@ -18187,7 +19920,7 @@ export const BetaMessageSchema = {
           type: 'string',
         },
       },
-      required: ['text', 'type'],
+      required: ['stop_reason', 'text', 'type'],
       title: 'ResponseAdvisorResultBlock',
       type: 'object',
     },
@@ -18671,6 +20404,38 @@ export const BetaMessageSchema = {
         'type',
       ],
       title: 'ResponseEncryptedCodeExecutionResultBlock',
+      type: 'object',
+    },
+    BetaResponseFallbackBlock: {
+      description:
+        "Marks the point in `content` where one model's output gives way to the next.\n\nOne block appears per hop where a preceding model actually ran this turn and\ndeclined. A turn routed directly by the sticky decision has no such boundary\nand carries no block — the signal for whether a fallback model served the\nresponse is the presence of a `fallback_message` entry in\n`usage.iterations`, not this block.\n\nThe block is treated like a server-tool content block for streaming: it\narrives via the standard `content_block_start` / `content_block_stop`\npair and carries no deltas.",
+      properties: {
+        from: {
+          $ref: '#/$defs/BetaResponseFallbackHopInfo',
+          description:
+            "The model whose output ends at this point — the model that declined at this hop. When the declining hop is the requested model, its `model` echoes the top-level `model` string the caller sent (alias or canonical); when the declining hop is a fallback model, its `model` is that model's canonical id.",
+        },
+        to: {
+          $ref: '#/$defs/BetaResponseFallbackHopInfo',
+          description:
+            'The fallback model producing the content that follows this block. Its `model` is always the canonical id.',
+        },
+        type: {
+          const: 'fallback',
+          default: 'fallback',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: ['from', 'to', 'type'],
+      title: 'ResponseFallbackBlock',
+      type: 'object',
+    },
+    BetaResponseFallbackHopInfo: {
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'ResponseFallbackHopInfo',
       type: 'object',
     },
     BetaResponseMCPToolResultBlock: {
@@ -19568,6 +21333,14 @@ export const BetaMessageSchema = {
           title: 'Output Tokens',
           type: 'integer',
         },
+        output_tokens_details: {
+          anyOf: [
+            { $ref: '#/$defs/BetaOutputTokensDetails' },
+            { type: 'null' },
+          ],
+          description:
+            'Breakdown of output tokens by category.\n\n`output_tokens` remains the inclusive, authoritative total used for billing.\nThis object provides a read-only decomposition for observability — for example,\nhow many of the billed output tokens were spent on internal reasoning that may\nhave been summarized before being returned to you.',
+        },
         server_tool_use: {
           anyOf: [{ $ref: '#/$defs/BetaServerToolUsage' }, { type: 'null' }],
           description: 'The number of server tool requests.',
@@ -19594,6 +21367,7 @@ export const BetaMessageSchema = {
         'input_tokens',
         'iterations',
         'output_tokens',
+        'output_tokens_details',
         'server_tool_use',
         'service_tier',
         'speed',
@@ -19606,6 +21380,7 @@ export const BetaMessageSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -19630,9 +21405,27 @@ export const BetaMessageSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -19644,6 +21437,9 @@ export const BetaMessageSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -19692,11 +21488,17 @@ export const BetaMessageSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -19770,6 +21572,7 @@ export const BetaMessageIterationUsageSchema = {
       title: 'Input Tokens',
       type: 'integer',
     },
+    model: { $ref: '#/$defs/Model' },
     output_tokens: {
       description: 'The number of output tokens which were used.',
       minimum: 0,
@@ -19789,6 +21592,7 @@ export const BetaMessageIterationUsageSchema = {
     'cache_creation_input_tokens',
     'cache_read_input_tokens',
     'input_tokens',
+    'model',
     'output_tokens',
     'type',
   ],
@@ -19817,6 +21621,146 @@ export const BetaMessageIterationUsageSchema = {
       required: ['ephemeral_1h_input_tokens', 'ephemeral_5m_input_tokens'],
       title: 'CacheCreation',
       type: 'object',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
     },
   },
 } as const
@@ -19924,6 +21868,22 @@ export const BetaOutputConfigSchema = {
   },
 } as const
 
+export const BetaOutputTokensDetailsSchema = {
+  properties: {
+    thinking_tokens: {
+      default: 0,
+      description:
+        "Number of output tokens the model generated as internal reasoning, including\nthe thinking-block delimiter tokens.\n\nReflects the raw reasoning the model produced, not the (possibly shorter)\nsummarized thinking text returned in the response body. Computed by\nre-tokenizing the raw reasoning text, so it may differ from the model's exact\ngeneration count by a small number of tokens. Always ≤ `output_tokens`;\n`output_tokens - thinking_tokens` approximates the non-reasoning output.",
+      minimum: 0,
+      title: 'Thinking Tokens',
+      type: 'integer',
+    },
+  },
+  required: ['thinking_tokens'],
+  title: 'OutputTokensDetails',
+  type: 'object',
+} as const
+
 export const BetaOverloadedErrorSchema = {
   properties: {
     message: { default: 'Overloaded', title: 'Message', type: 'string' },
@@ -19985,7 +21945,13 @@ export const BetaRefusalStopDetailsSchema = {
   description: 'Structured information about a refusal.',
   properties: {
     category: {
-      anyOf: [{ enum: ['cyber', 'bio'], type: 'string' }, { type: 'null' }],
+      anyOf: [
+        {
+          enum: ['cyber', 'bio', 'frontier_llm', 'reasoning_extraction'],
+          type: 'string',
+        },
+        { type: 'null' },
+      ],
       description:
         "The policy category that triggered the refusal.\n\n`null` when the refusal doesn't map to a named category.",
       title: 'Category',
@@ -19996,6 +21962,24 @@ export const BetaRefusalStopDetailsSchema = {
         'Human-readable explanation of the refusal.\n\nThis text is not guaranteed to be stable. `null` when no explanation is available for the category.',
       title: 'Explanation',
     },
+    fallback_credit_token: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        "Opaque code that refunds the cache-miss cost when retrying this refused\nrequest on the fallback model. Pass it as `fallback_credit_token` on the\nretry request. Expires 5 minutes after the refusal.\n\nThe retry is sent either with the same request body (`system`, `messages`,\n`tools`, and other render-shaping fields), or with the same body plus one\nappended `assistant` message whose content is the partial text (with any\ntrailing whitespace stripped from the final text block) and paired\nserver-tool blocks from this refusal — which also authorizes that\nappended turn as an assistant-prefill continuation on models that otherwise\ndisallow prefill. A token minted mid-server-tool-loop whose partial content\nwas continuable may only be redeemed the second way — if a same-body retry\nis rejected with a 400 saying the token must be redeemed by continuing the\npartial response, retry the second way instead. Either way: same workspace,\nsame platform; a mismatch is a 400. Resending a token for an already-warm\nprefix is permitted but yields no additional credit.\n\n`null` when the refused model isn't eligible for a fallback credit.",
+      title: 'Fallback Credit Token',
+    },
+    fallback_has_prefill_claim: {
+      anyOf: [{ type: 'boolean' }, { type: 'null' }],
+      description:
+        "Whether the accompanying `fallback_credit_token` may be redeemed with the\nappended-assistant retry form. Only set when `fallback_credit_token` is\npresent.\n\n`true`: retry by resending the same request body plus one appended\n`assistant` message whose content is this response's `content` with any\ntrailing whitespace stripped from the final text block and unpaired\n`tool_use` blocks omitted (the same appended-turn shape described on\n`fallback_credit_token`), with the token attached. `false`: retry by\nresending the original request body unchanged, with the token attached —\nthe appended-assistant form is not available for this refusal (no\ncontinuable partial content, or the request uses `output_format` or a\n`tool_choice` that forces tool use). One exception: when the request used\n`output_format` or a forced `tool_choice` and the refusal arrived after\nserver tools (including MCP connector tools) had already executed, the\ntoken may not be redeemable by either retry form; if the exact-body retry\nis then rejected with a 400 saying the token must be redeemed by\ncontinuing the partial response, discard the token and retry without it.\n\nAdvisory: if an appended-assistant retry is rejected with a 400 despite\n`true`, fall back to resending the original request body with the token.",
+      title: 'Fallback Has Prefill Claim',
+    },
+    recommended_model: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        "The server's suggested retry target for this refusal. Populated when a fallback attempt could not be made (the fallback model's rate limit was exhausted, or it was overloaded); names the fallback model the caller can retry directly. Null otherwise.",
+      title: 'Recommended Model',
+    },
     type: {
       const: 'refusal',
       default: 'refusal',
@@ -20003,7 +21987,14 @@ export const BetaRefusalStopDetailsSchema = {
       type: 'string',
     },
   },
-  required: ['category', 'explanation', 'type'],
+  required: [
+    'category',
+    'explanation',
+    'fallback_credit_token',
+    'fallback_has_prefill_claim',
+    'recommended_model',
+    'type',
+  ],
   title: 'RefusalStopDetails',
   type: 'object',
 } as const
@@ -20017,6 +22008,10 @@ export const BetaRequestAdvisorRedactedResultBlockSchema = {
       title: 'Encrypted Content',
       type: 'string',
     },
+    stop_reason: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Stop Reason',
+    },
     type: { const: 'advisor_redacted_result', title: 'Type', type: 'string' },
   },
   required: ['encrypted_content', 'type'],
@@ -20027,6 +22022,10 @@ export const BetaRequestAdvisorRedactedResultBlockSchema = {
 export const BetaRequestAdvisorResultBlockSchema = {
   additionalProperties: false,
   properties: {
+    stop_reason: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Stop Reason',
+    },
     text: { title: 'Text', type: 'string' },
     type: { const: 'advisor_result', title: 'Type', type: 'string' },
   },
@@ -20081,6 +22080,7 @@ export const BetaRequestAdvisorToolResultBlockSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -20112,6 +22112,10 @@ export const BetaRequestAdvisorToolResultBlockSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           title: 'Type',
@@ -20125,6 +22129,10 @@ export const BetaRequestAdvisorToolResultBlockSchema = {
     BetaRequestAdvisorResultBlock: {
       additionalProperties: false,
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: { const: 'advisor_result', title: 'Type', type: 'string' },
       },
@@ -20167,6 +22175,7 @@ export const BetaRequestAdvisorToolResultErrorSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -21327,6 +23336,321 @@ export const BetaRequestEncryptedCodeExecutionResultBlockSchema = {
   },
 } as const
 
+export const BetaRequestFallbackBlockSchema = {
+  additionalProperties: false,
+  description:
+    "A `fallback` block echoed back from a prior response.\n\nAccepted in `messages[].content` and never rendered into the prompt,\nnot validated against the request's `fallbacks` chain or top-level\n`model`, and stripped before the sticky-routing cache key is computed.\n\nCallers should echo the assistant turn verbatim — block included. The\nblock's position is load-bearing for thinking verification: the thinking\nruns on either side of a fallback hop carry independently-rooted\nverification hash chains, and this block is the only record of where one\nchain ends and the next begins. When thinking runs flank the boundary,\nomitting the block merges the runs into one contiguous span whose hashes\ncannot verify (the request is rejected), and moving it into the middle of\na single run splits that run's chain and is likewise rejected; between\nnon-thinking blocks the block's placement has no verification effect.",
+  properties: {
+    from: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+    to: { $ref: '#/$defs/BetaRequestFallbackHopInfo' },
+    type: { const: 'fallback', title: 'Type', type: 'string' },
+  },
+  required: ['from', 'to', 'type'],
+  title: 'RequestFallbackBlock',
+  type: 'object',
+  $defs: {
+    BetaRequestFallbackHopInfo: {
+      additionalProperties: false,
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'RequestFallbackHopInfo',
+      type: 'object',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
+    },
+  },
+} as const
+
+export const BetaRequestFallbackHopInfoSchema = {
+  additionalProperties: false,
+  description: 'Identifies one hop of a fallback transition.',
+  properties: { model: { $ref: '#/$defs/Model' } },
+  required: ['model'],
+  title: 'RequestFallbackHopInfo',
+  type: 'object',
+  $defs: {
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
+    },
+  },
+} as const
+
 export const BetaRequestImageBlockSchema = {
   additionalProperties: false,
   properties: {
@@ -21856,6 +24180,324 @@ export const BetaRequestMCPToolUseBlockSchema = {
       title: 'CacheControlEphemeral',
       type: 'object',
       'x-stainless-go-constant-constructor': true,
+    },
+  },
+} as const
+
+export const BetaRequestMidConvSystemBlockSchema = {
+  additionalProperties: false,
+  description:
+    'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+  properties: {
+    cache_control: {
+      anyOf: [
+        {
+          discriminator: {
+            mapping: {
+              ephemeral: '#/components/schemas/BetaCacheControlEphemeral',
+            },
+            propertyName: 'type',
+          },
+          oneOf: [{ $ref: '#/$defs/BetaCacheControlEphemeral' }],
+        },
+        { type: 'null' },
+      ],
+      description: 'Create a cache control breakpoint at this content block.',
+      title: 'Cache Control',
+    },
+    content: {
+      description: 'System instruction text blocks.',
+      items: {
+        discriminator: {
+          mapping: { text: '#/components/schemas/BetaRequestTextBlock' },
+          propertyName: 'type',
+        },
+        oneOf: [{ $ref: '#/$defs/BetaRequestTextBlock' }],
+      },
+      title: 'Content',
+      type: 'array',
+    },
+    type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+  },
+  required: ['content', 'type'],
+  title: 'RequestMidConvSystemBlock',
+  type: 'object',
+  $defs: {
+    BetaCacheControlEphemeral: {
+      additionalProperties: false,
+      properties: {
+        ttl: {
+          description:
+            'The time-to-live for the cache control breakpoint.\n\nThis may be one the following values:\n- `5m`: 5 minutes\n- `1h`: 1 hour\n\nDefaults to `5m`.',
+          enum: ['5m', '1h'],
+          title: 'Ttl',
+          type: 'string',
+          'x-stainless-renameMap': { ttl_5m: '5m', ttl_1h: '1h' },
+        },
+        type: { const: 'ephemeral', title: 'Type', type: 'string' },
+      },
+      required: ['type'],
+      title: 'CacheControlEphemeral',
+      type: 'object',
+      'x-stainless-go-constant-constructor': true,
+    },
+    BetaRequestCharLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: { title: 'Cited Text', type: 'string' },
+        document_index: {
+          minimum: 0,
+          title: 'Document Index',
+          type: 'integer',
+        },
+        document_title: {
+          anyOf: [
+            { maxLength: 255, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Document Title',
+        },
+        end_char_index: { title: 'End Char Index', type: 'integer' },
+        start_char_index: {
+          minimum: 0,
+          title: 'Start Char Index',
+          type: 'integer',
+        },
+        type: { const: 'char_location', title: 'Type', type: 'string' },
+      },
+      required: [
+        'cited_text',
+        'document_index',
+        'document_title',
+        'end_char_index',
+        'start_char_index',
+        'type',
+      ],
+      title: 'RequestCharLocationCitation',
+      type: 'object',
+    },
+    BetaRequestContentBlockLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: {
+          description:
+            'The full text of the cited block range, concatenated.\n\nAlways equals the contents of `content[start_block_index:end_block_index]` joined together. The text block is the minimal citable unit; this field is never a substring of a single block. Not counted toward output tokens, and not counted toward input tokens when sent back in subsequent turns.',
+          title: 'Cited Text',
+          type: 'string',
+        },
+        document_index: {
+          minimum: 0,
+          title: 'Document Index',
+          type: 'integer',
+        },
+        document_title: {
+          anyOf: [
+            { maxLength: 255, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Document Title',
+        },
+        end_block_index: {
+          description:
+            "Exclusive 0-based end index of the cited block range in the source's `content` array.\n\nAlways greater than `start_block_index`; a single-block citation has `end_block_index = start_block_index + 1`.",
+          title: 'End Block Index',
+          type: 'integer',
+        },
+        start_block_index: {
+          description:
+            "0-based index of the first cited block in the source's `content` array.",
+          minimum: 0,
+          title: 'Start Block Index',
+          type: 'integer',
+        },
+        type: {
+          const: 'content_block_location',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cited_text',
+        'document_index',
+        'document_title',
+        'end_block_index',
+        'start_block_index',
+        'type',
+      ],
+      title: 'RequestContentBlockLocationCitation',
+      type: 'object',
+    },
+    BetaRequestPageLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: { title: 'Cited Text', type: 'string' },
+        document_index: {
+          minimum: 0,
+          title: 'Document Index',
+          type: 'integer',
+        },
+        document_title: {
+          anyOf: [
+            { maxLength: 255, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Document Title',
+        },
+        end_page_number: { title: 'End Page Number', type: 'integer' },
+        start_page_number: {
+          minimum: 1,
+          title: 'Start Page Number',
+          type: 'integer',
+        },
+        type: { const: 'page_location', title: 'Type', type: 'string' },
+      },
+      required: [
+        'cited_text',
+        'document_index',
+        'document_title',
+        'end_page_number',
+        'start_page_number',
+        'type',
+      ],
+      title: 'RequestPageLocationCitation',
+      type: 'object',
+    },
+    BetaRequestSearchResultLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: {
+          description:
+            'The full text of the cited block range, concatenated.\n\nAlways equals the contents of `content[start_block_index:end_block_index]` joined together. The text block is the minimal citable unit; this field is never a substring of a single block. Not counted toward output tokens, and not counted toward input tokens when sent back in subsequent turns.',
+          title: 'Cited Text',
+          type: 'string',
+        },
+        end_block_index: {
+          description:
+            "Exclusive 0-based end index of the cited block range in the source's `content` array.\n\nAlways greater than `start_block_index`; a single-block citation has `end_block_index = start_block_index + 1`.",
+          title: 'End Block Index',
+          type: 'integer',
+        },
+        search_result_index: {
+          description:
+            '0-based index of the cited search result among all `search_result` content blocks in the request, in the order they appear across messages and tool results.\n\nCounted separately from `document_index`; server-side web search results are not included in this count.',
+          minimum: 0,
+          title: 'Search Result Index',
+          type: 'integer',
+        },
+        source: { title: 'Source', type: 'string' },
+        start_block_index: {
+          description:
+            "0-based index of the first cited block in the source's `content` array.",
+          minimum: 0,
+          title: 'Start Block Index',
+          type: 'integer',
+        },
+        title: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Title',
+        },
+        type: {
+          const: 'search_result_location',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cited_text',
+        'end_block_index',
+        'search_result_index',
+        'source',
+        'start_block_index',
+        'title',
+        'type',
+      ],
+      title: 'RequestSearchResultLocationCitation',
+      type: 'object',
+    },
+    BetaRequestTextBlock: {
+      additionalProperties: false,
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/BetaCacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/BetaCacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        citations: {
+          anyOf: [
+            {
+              items: {
+                discriminator: {
+                  mapping: {
+                    char_location:
+                      '#/components/schemas/BetaRequestCharLocationCitation',
+                    content_block_location:
+                      '#/components/schemas/BetaRequestContentBlockLocationCitation',
+                    page_location:
+                      '#/components/schemas/BetaRequestPageLocationCitation',
+                    search_result_location:
+                      '#/components/schemas/BetaRequestSearchResultLocationCitation',
+                    web_search_result_location:
+                      '#/components/schemas/BetaRequestWebSearchResultLocationCitation',
+                  },
+                  propertyName: 'type',
+                },
+                oneOf: [
+                  { $ref: '#/$defs/BetaRequestCharLocationCitation' },
+                  { $ref: '#/$defs/BetaRequestPageLocationCitation' },
+                  { $ref: '#/$defs/BetaRequestContentBlockLocationCitation' },
+                  {
+                    $ref: '#/$defs/BetaRequestWebSearchResultLocationCitation',
+                  },
+                  { $ref: '#/$defs/BetaRequestSearchResultLocationCitation' },
+                ],
+              },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+          title: 'Citations',
+        },
+        text: { minLength: 1, title: 'Text', type: 'string' },
+        type: { const: 'text', title: 'Type', type: 'string' },
+      },
+      required: ['text', 'type'],
+      title: 'RequestTextBlock',
+      type: 'object',
+    },
+    BetaRequestWebSearchResultLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: { title: 'Cited Text', type: 'string' },
+        encrypted_index: { title: 'Encrypted Index', type: 'string' },
+        title: {
+          anyOf: [
+            { maxLength: 512, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Title',
+        },
+        type: {
+          const: 'web_search_result_location',
+          title: 'Type',
+          type: 'string',
+        },
+        url: { maxLength: 2048, minLength: 1, title: 'Url', type: 'string' },
+      },
+      required: ['cited_text', 'encrypted_index', 'title', 'type', 'url'],
+      title: 'RequestWebSearchResultLocationCitation',
+      type: 'object',
     },
   },
 } as const
@@ -23765,6 +26407,10 @@ export const BetaRequestToolSearchToolResultBlockSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/BetaToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -23810,6 +26456,10 @@ export const BetaRequestToolSearchToolResultErrorSchema = {
   additionalProperties: false,
   properties: {
     error_code: { $ref: '#/$defs/BetaToolSearchToolResultErrorCode' },
+    error_message: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Error Message',
+    },
     type: {
       const: 'tool_search_tool_result_error',
       title: 'Type',
@@ -25185,6 +27835,7 @@ export const BetaRequestWebFetchToolResultBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -25216,6 +27867,7 @@ export const BetaRequestWebFetchToolResultErrorSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -25477,6 +28129,12 @@ export const BetaResponseAdvisorRedactedResultBlockSchema = {
       title: 'Encrypted Content',
       type: 'string',
     },
+    stop_reason: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`).",
+      title: 'Stop Reason',
+    },
     type: {
       const: 'advisor_redacted_result',
       default: 'advisor_redacted_result',
@@ -25484,13 +28142,19 @@ export const BetaResponseAdvisorRedactedResultBlockSchema = {
       type: 'string',
     },
   },
-  required: ['encrypted_content', 'type'],
+  required: ['encrypted_content', 'stop_reason', 'type'],
   title: 'ResponseAdvisorRedactedResultBlock',
   type: 'object',
 } as const
 
 export const BetaResponseAdvisorResultBlockSchema = {
   properties: {
+    stop_reason: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description:
+        "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`). `max_tokens` indicates the advisor's output was truncated at the tool's `max_tokens` value or the advisor model's policy cap.",
+      title: 'Stop Reason',
+    },
     text: { title: 'Text', type: 'string' },
     type: {
       const: 'advisor_result',
@@ -25499,7 +28163,7 @@ export const BetaResponseAdvisorResultBlockSchema = {
       type: 'string',
     },
   },
-  required: ['text', 'type'],
+  required: ['stop_reason', 'text', 'type'],
   title: 'ResponseAdvisorResultBlock',
   type: 'object',
 } as const
@@ -25538,6 +28202,7 @@ export const BetaResponseAdvisorToolResultBlockSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -25550,6 +28215,12 @@ export const BetaResponseAdvisorToolResultBlockSchema = {
           title: 'Encrypted Content',
           type: 'string',
         },
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`).",
+          title: 'Stop Reason',
+        },
         type: {
           const: 'advisor_redacted_result',
           default: 'advisor_redacted_result',
@@ -25557,12 +28228,18 @@ export const BetaResponseAdvisorToolResultBlockSchema = {
           type: 'string',
         },
       },
-      required: ['encrypted_content', 'type'],
+      required: ['encrypted_content', 'stop_reason', 'type'],
       title: 'ResponseAdvisorRedactedResultBlock',
       type: 'object',
     },
     BetaResponseAdvisorResultBlock: {
       properties: {
+        stop_reason: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          description:
+            "The advisor sub-inference's stop reason (same values as the top-level message `stop_reason`). `max_tokens` indicates the advisor's output was truncated at the tool's `max_tokens` value or the advisor model's policy cap.",
+          title: 'Stop Reason',
+        },
         text: { title: 'Text', type: 'string' },
         type: {
           const: 'advisor_result',
@@ -25571,7 +28248,7 @@ export const BetaResponseAdvisorToolResultBlockSchema = {
           type: 'string',
         },
       },
-      required: ['text', 'type'],
+      required: ['stop_reason', 'text', 'type'],
       title: 'ResponseAdvisorResultBlock',
       type: 'object',
     },
@@ -25614,6 +28291,7 @@ export const BetaResponseAdvisorToolResultErrorSchema = {
         'overloaded',
         'unavailable',
         'execution_time_exceeded',
+        'model_not_found',
       ],
       title: 'AdvisorToolResultErrorCode',
       type: 'string',
@@ -26381,6 +29059,331 @@ export const BetaResponseEncryptedCodeExecutionResultBlockSchema = {
       required: ['file_id', 'type'],
       title: 'ResponseCodeExecutionOutputBlock',
       type: 'object',
+    },
+  },
+} as const
+
+export const BetaResponseFallbackBlockSchema = {
+  description:
+    "Marks the point in `content` where one model's output gives way to the next.\n\nOne block appears per hop where a preceding model actually ran this turn and\ndeclined. A turn routed directly by the sticky decision has no such boundary\nand carries no block — the signal for whether a fallback model served the\nresponse is the presence of a `fallback_message` entry in\n`usage.iterations`, not this block.\n\nThe block is treated like a server-tool content block for streaming: it\narrives via the standard `content_block_start` / `content_block_stop`\npair and carries no deltas.",
+  properties: {
+    from: {
+      $ref: '#/$defs/BetaResponseFallbackHopInfo',
+      description:
+        "The model whose output ends at this point — the model that declined at this hop. When the declining hop is the requested model, its `model` echoes the top-level `model` string the caller sent (alias or canonical); when the declining hop is a fallback model, its `model` is that model's canonical id.",
+    },
+    to: {
+      $ref: '#/$defs/BetaResponseFallbackHopInfo',
+      description:
+        'The fallback model producing the content that follows this block. Its `model` is always the canonical id.',
+    },
+    type: {
+      const: 'fallback',
+      default: 'fallback',
+      title: 'Type',
+      type: 'string',
+    },
+  },
+  required: ['from', 'to', 'type'],
+  title: 'ResponseFallbackBlock',
+  type: 'object',
+  $defs: {
+    BetaResponseFallbackHopInfo: {
+      description: 'Identifies one hop of a fallback transition.',
+      properties: { model: { $ref: '#/$defs/Model' } },
+      required: ['model'],
+      title: 'ResponseFallbackHopInfo',
+      type: 'object',
+    },
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
+    },
+  },
+} as const
+
+export const BetaResponseFallbackHopInfoSchema = {
+  description: 'Identifies one hop of a fallback transition.',
+  properties: { model: { $ref: '#/$defs/Model' } },
+  required: ['model'],
+  title: 'ResponseFallbackHopInfo',
+  type: 'object',
+  $defs: {
+    Model: {
+      title: 'Model',
+      description:
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+      anyOf: [
+        { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-7',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-preview',
+          description:
+            'New class of intelligence, strongest in coding and cybersecurity',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-6',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-6',
+          description: 'Best combination of speed and intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-haiku-4-5-20251001',
+          description: 'Fastest model with near-frontier intelligence',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-5-20251101',
+          description:
+            'Premium model combining maximum intelligence with practical performance',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-sonnet-4-5-20250929',
+          description: 'High-performance model for agents and coding',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-1',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-1-20250805',
+          description: 'Exceptional model for specialized complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-0',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-opus-4-20250514',
+          description: 'Powerful model for complex tasks',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-0',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-sonnet-4-20250514',
+          description: 'High-performance model with extended thinking',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 15th, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+        {
+          const: 'claude-3-haiku-20240307',
+          description: 'Fast and cost-effective model',
+          'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on April 20th, 2026. Please migrate to claude-haiku-4-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
+        },
+      ],
     },
   },
 } as const
@@ -28036,6 +31039,7 @@ export const BetaResponseWebFetchToolResultBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -28067,6 +31071,7 @@ export const BetaResponseWebFetchToolResultErrorSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -29534,6 +32539,11 @@ export const BetaUsageSchema = {
       title: 'Output Tokens',
       type: 'integer',
     },
+    output_tokens_details: {
+      anyOf: [{ $ref: '#/$defs/BetaOutputTokensDetails' }, { type: 'null' }],
+      description:
+        'Breakdown of output tokens by category.\n\n`output_tokens` remains the inclusive, authoritative total used for billing.\nThis object provides a read-only decomposition for observability — for example,\nhow many of the billed output tokens were spent on internal reasoning that may\nhave been summarized before being returned to you.',
+    },
     server_tool_use: {
       anyOf: [{ $ref: '#/$defs/BetaServerToolUsage' }, { type: 'null' }],
       description: 'The number of server tool requests.',
@@ -29559,6 +32569,7 @@ export const BetaUsageSchema = {
     'input_tokens',
     'iterations',
     'output_tokens',
+    'output_tokens_details',
     'server_tool_use',
     'service_tier',
     'speed',
@@ -29697,6 +32708,63 @@ export const BetaUsageSchema = {
       title: 'CompactionIterationUsage',
       type: 'object',
     },
+    BetaFallbackMessageIterationUsage: {
+      description:
+        'Token usage for the fallback-model attempt of a server-side fallback request.\n\nProduced in place of a `message` entry for whichever hop served the\nresponse. A declined hop produces the existing `message` entry. Whether\na fallback model served the response is signalled by the presence of this\nentry in `usage.iterations`.',
+      properties: {
+        cache_creation: {
+          anyOf: [{ $ref: '#/$defs/BetaCacheCreation' }, { type: 'null' }],
+          description: 'Breakdown of cached tokens by TTL',
+        },
+        cache_creation_input_tokens: {
+          default: 0,
+          description:
+            'The number of input tokens used to create the cache entry.',
+          minimum: 0,
+          title: 'Cache Creation Input Tokens',
+          type: 'integer',
+        },
+        cache_read_input_tokens: {
+          default: 0,
+          description: 'The number of input tokens read from the cache.',
+          minimum: 0,
+          title: 'Cache Read Input Tokens',
+          type: 'integer',
+        },
+        input_tokens: {
+          description: 'The number of input tokens which were used.',
+          minimum: 0,
+          title: 'Input Tokens',
+          type: 'integer',
+        },
+        model: { $ref: '#/$defs/Model' },
+        output_tokens: {
+          description: 'The number of output tokens which were used.',
+          minimum: 0,
+          title: 'Output Tokens',
+          type: 'integer',
+        },
+        type: {
+          const: 'fallback_message',
+          default: 'fallback_message',
+          description:
+            'Usage for the fallback-model attempt that served the response',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cache_creation',
+        'cache_creation_input_tokens',
+        'cache_read_input_tokens',
+        'input_tokens',
+        'model',
+        'output_tokens',
+        'type',
+      ],
+      title: 'FallbackMessageIterationUsage',
+      type: 'object',
+    },
     BetaIterationsUsage: {
       anyOf: [
         {
@@ -29706,6 +32774,8 @@ export const BetaUsageSchema = {
                 advisor_message:
                   '#/components/schemas/BetaAdvisorMessageIterationUsage',
                 compaction: '#/components/schemas/BetaCompactionIterationUsage',
+                fallback_message:
+                  '#/components/schemas/BetaFallbackMessageIterationUsage',
                 message: '#/components/schemas/BetaMessageIterationUsage',
               },
               propertyName: 'type',
@@ -29714,6 +32784,7 @@ export const BetaUsageSchema = {
               { $ref: '#/$defs/BetaMessageIterationUsage' },
               { $ref: '#/$defs/BetaCompactionIterationUsage' },
               { $ref: '#/$defs/BetaAdvisorMessageIterationUsage' },
+              { $ref: '#/$defs/BetaFallbackMessageIterationUsage' },
             ],
             'x-stainless-naming': {
               java: { type_name: 'BetaIterationsUsageItems' },
@@ -29756,6 +32827,7 @@ export const BetaUsageSchema = {
           title: 'Input Tokens',
           type: 'integer',
         },
+        model: { $ref: '#/$defs/Model' },
         output_tokens: {
           description: 'The number of output tokens which were used.',
           minimum: 0,
@@ -29775,10 +32847,26 @@ export const BetaUsageSchema = {
         'cache_creation_input_tokens',
         'cache_read_input_tokens',
         'input_tokens',
+        'model',
         'output_tokens',
         'type',
       ],
       title: 'MessageIterationUsage',
+      type: 'object',
+    },
+    BetaOutputTokensDetails: {
+      properties: {
+        thinking_tokens: {
+          default: 0,
+          description:
+            "Number of output tokens the model generated as internal reasoning, including\nthe thinking-block delimiter tokens.\n\nReflects the raw reasoning the model produced, not the (possibly shorter)\nsummarized thinking text returned in the response body. Computed by\nre-tokenizing the raw reasoning text, so it may differ from the model's exact\ngeneration count by a small number of tokens. Always ≤ `output_tokens`;\n`output_tokens - thinking_tokens` approximates the non-reasoning output.",
+          minimum: 0,
+          title: 'Thinking Tokens',
+          type: 'integer',
+        },
+      },
+      required: ['thinking_tokens'],
+      title: 'OutputTokensDetails',
       type: 'object',
     },
     BetaServerToolUsage: {
@@ -29808,9 +32896,27 @@ export const BetaUsageSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -29822,6 +32928,9 @@ export const BetaUsageSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -29870,11 +32979,17 @@ export const BetaUsageSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -29971,6 +33086,7 @@ export const BetaWebFetchToolResultErrorCodeSchema = {
     'invalid_tool_input',
     'url_too_long',
     'url_not_allowed',
+    'url_not_in_prior_context',
     'url_not_accessible',
     'unsupported_content_type',
     'too_many_requests',
@@ -31029,9 +34145,27 @@ export const CompletionRequestSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -31043,6 +34177,9 @@ export const CompletionRequestSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -31091,11 +34228,17 @@ export const CompletionRequestSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -31188,9 +34331,27 @@ export const CompletionResponseSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -31202,6 +34363,9 @@ export const CompletionResponseSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -31250,11 +34414,17 @@ export const CompletionResponseSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -32480,6 +35650,7 @@ export const ContentBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -32938,7 +36109,7 @@ export const CountMessageTokensParamsSchema = {
     tool_choice: { $ref: '#/$defs/ToolChoice' },
     tools: {
       description:
-        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview\\#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
+        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
       examples: [
         {
           description: 'Get the current weather in a given location',
@@ -33346,6 +36517,7 @@ export const CountMessageTokensParamsSchema = {
           container_upload: '#/components/schemas/RequestContainerUploadBlock',
           document: '#/components/schemas/RequestDocumentBlock',
           image: '#/components/schemas/RequestImageBlock',
+          mid_conv_system: '#/components/schemas/RequestMidConvSystemBlock',
           redacted_thinking:
             '#/components/schemas/RequestRedactedThinkingBlock',
           search_result: '#/components/schemas/RequestSearchResultBlock',
@@ -33411,6 +36583,7 @@ export const CountMessageTokensParamsSchema = {
         { $ref: '#/$defs/RequestTextEditorCodeExecutionToolResultBlock' },
         { $ref: '#/$defs/RequestToolSearchToolResultBlock' },
         { $ref: '#/$defs/RequestContainerUploadBlock' },
+        { $ref: '#/$defs/RequestMidConvSystemBlock' },
       ],
       'x-stainless-python-extend-union': ['ContentBlock'],
       'x-stainless-python-extend-union-imports': [
@@ -33432,7 +36605,11 @@ export const CountMessageTokensParamsSchema = {
           ],
           title: 'Content',
         },
-        role: { enum: ['user', 'assistant'], title: 'Role', type: 'string' },
+        role: {
+          enum: ['user', 'assistant', 'system'],
+          title: 'Role',
+          type: 'string',
+        },
       },
       required: ['content', 'role'],
       title: 'InputMessage',
@@ -33539,9 +36716,27 @@ export const CountMessageTokensParamsSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -33553,6 +36748,9 @@ export const CountMessageTokensParamsSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -33601,11 +36799,17 @@ export const CountMessageTokensParamsSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -34102,6 +37306,46 @@ export const CountMessageTokensParamsSchema = {
       },
       required: ['source', 'type'],
       title: 'RequestImageBlock',
+      type: 'object',
+    },
+    RequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/CacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/CacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/RequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/RequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
       type: 'object',
     },
     RequestPageLocationCitation: {
@@ -34664,6 +37908,10 @@ export const CountMessageTokensParamsSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/ToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -35616,6 +38864,7 @@ export const CountMessageTokensParamsSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -36181,7 +39430,7 @@ export const CreateMessageParamsSchema = {
     tool_choice: { $ref: '#/$defs/ToolChoice' },
     tools: {
       description:
-        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview\\#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
+        'Definitions of tools that the model may use.\n\nIf you include `tools` in your API request, the model may return `tool_use` content blocks that represent the model\'s use of those tools. You can then run those tools using the tool input generated by the model and then optionally return results back to the model using `tool_result` content blocks.\n\nThere are two types of tools: **client tools** and **server tools**. The behavior described below applies to client tools. For [server tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview#server-tools), see their individual documentation as each has its own behavior (e.g., the [web search tool](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)).\n\nEach tool definition includes:\n\n* `name`: Name of the tool.\n* `description`: Optional, but strongly-recommended description of the tool.\n* `input_schema`: [JSON schema](https://json-schema.org/draft/2020-12) for the tool `input` shape that the model will produce in `tool_use` output content blocks.\n\nFor example, if you defined `tools` as:\n\n```json\n[\n  {\n    "name": "get_stock_price",\n    "description": "Get the current stock price for a given ticker symbol.",\n    "input_schema": {\n      "type": "object",\n      "properties": {\n        "ticker": {\n          "type": "string",\n          "description": "The stock ticker symbol, e.g. AAPL for Apple Inc."\n        }\n      },\n      "required": ["ticker"]\n    }\n  }\n]\n```\n\nAnd then asked the model "What\'s the S&P 500 at today?", the model might produce `tool_use` content blocks in the response like this:\n\n```json\n[\n  {\n    "type": "tool_use",\n    "id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "name": "get_stock_price",\n    "input": { "ticker": "^GSPC" }\n  }\n]\n```\n\nYou might then run your `get_stock_price` tool with `{"ticker": "^GSPC"}` as an input, and return the following back to the model in a subsequent `user` message:\n\n```json\n[\n  {\n    "type": "tool_result",\n    "tool_use_id": "toolu_01D7FLrfh4GYq7yT1ULFeyMV",\n    "content": "259.75 USD"\n  }\n]\n```\n\nTools can be used for workflows that include running client-side tools and functions, or more generally whenever you want the model to produce a particular JSON structure of output.\n\nSee our [guide](https://docs.claude.com/en/docs/tool-use) for more details.',
       examples: [
         {
           description: 'Get the current weather in a given location',
@@ -36612,6 +39861,7 @@ export const CreateMessageParamsSchema = {
           container_upload: '#/components/schemas/RequestContainerUploadBlock',
           document: '#/components/schemas/RequestDocumentBlock',
           image: '#/components/schemas/RequestImageBlock',
+          mid_conv_system: '#/components/schemas/RequestMidConvSystemBlock',
           redacted_thinking:
             '#/components/schemas/RequestRedactedThinkingBlock',
           search_result: '#/components/schemas/RequestSearchResultBlock',
@@ -36677,6 +39927,7 @@ export const CreateMessageParamsSchema = {
         { $ref: '#/$defs/RequestTextEditorCodeExecutionToolResultBlock' },
         { $ref: '#/$defs/RequestToolSearchToolResultBlock' },
         { $ref: '#/$defs/RequestContainerUploadBlock' },
+        { $ref: '#/$defs/RequestMidConvSystemBlock' },
       ],
       'x-stainless-python-extend-union': ['ContentBlock'],
       'x-stainless-python-extend-union-imports': [
@@ -36698,7 +39949,11 @@ export const CreateMessageParamsSchema = {
           ],
           title: 'Content',
         },
-        role: { enum: ['user', 'assistant'], title: 'Role', type: 'string' },
+        role: {
+          enum: ['user', 'assistant', 'system'],
+          title: 'Role',
+          type: 'string',
+        },
       },
       required: ['content', 'role'],
       title: 'InputMessage',
@@ -36819,9 +40074,27 @@ export const CreateMessageParamsSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -36833,6 +40106,9 @@ export const CreateMessageParamsSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -36881,11 +40157,17 @@ export const CreateMessageParamsSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -37382,6 +40664,46 @@ export const CreateMessageParamsSchema = {
       },
       required: ['source', 'type'],
       title: 'RequestImageBlock',
+      type: 'object',
+    },
+    RequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/CacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/CacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/RequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/RequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
       type: 'object',
     },
     RequestPageLocationCitation: {
@@ -37944,6 +41266,10 @@ export const CreateMessageParamsSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/ToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -38896,6 +42222,7 @@ export const CreateMessageParamsSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -39565,6 +42892,7 @@ export const InputContentBlockSchema = {
       container_upload: '#/components/schemas/RequestContainerUploadBlock',
       document: '#/components/schemas/RequestDocumentBlock',
       image: '#/components/schemas/RequestImageBlock',
+      mid_conv_system: '#/components/schemas/RequestMidConvSystemBlock',
       redacted_thinking: '#/components/schemas/RequestRedactedThinkingBlock',
       search_result: '#/components/schemas/RequestSearchResultBlock',
       server_tool_use: '#/components/schemas/RequestServerToolUseBlock',
@@ -39625,6 +42953,7 @@ export const InputContentBlockSchema = {
     { $ref: '#/$defs/RequestTextEditorCodeExecutionToolResultBlock' },
     { $ref: '#/$defs/RequestToolSearchToolResultBlock' },
     { $ref: '#/$defs/RequestContainerUploadBlock' },
+    { $ref: '#/$defs/RequestMidConvSystemBlock' },
   ],
   'x-stainless-python-extend-union': ['ContentBlock'],
   'x-stainless-python-extend-union-imports': [
@@ -40183,6 +43512,46 @@ export const InputContentBlockSchema = {
       title: 'RequestImageBlock',
       type: 'object',
     },
+    RequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/CacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/CacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/RequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/RequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
+      type: 'object',
+    },
     RequestPageLocationCitation: {
       additionalProperties: false,
       properties: {
@@ -40743,6 +44112,10 @@ export const InputContentBlockSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/ToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -41110,6 +44483,7 @@ export const InputContentBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -41148,7 +44522,11 @@ export const InputMessageSchema = {
       ],
       title: 'Content',
     },
-    role: { enum: ['user', 'assistant'], title: 'Role', type: 'string' },
+    role: {
+      enum: ['user', 'assistant', 'system'],
+      title: 'Role',
+      type: 'string',
+    },
   },
   required: ['content', 'role'],
   title: 'InputMessage',
@@ -41278,6 +44656,7 @@ export const InputMessageSchema = {
           container_upload: '#/components/schemas/RequestContainerUploadBlock',
           document: '#/components/schemas/RequestDocumentBlock',
           image: '#/components/schemas/RequestImageBlock',
+          mid_conv_system: '#/components/schemas/RequestMidConvSystemBlock',
           redacted_thinking:
             '#/components/schemas/RequestRedactedThinkingBlock',
           search_result: '#/components/schemas/RequestSearchResultBlock',
@@ -41343,6 +44722,7 @@ export const InputMessageSchema = {
         { $ref: '#/$defs/RequestTextEditorCodeExecutionToolResultBlock' },
         { $ref: '#/$defs/RequestToolSearchToolResultBlock' },
         { $ref: '#/$defs/RequestContainerUploadBlock' },
+        { $ref: '#/$defs/RequestMidConvSystemBlock' },
       ],
       'x-stainless-python-extend-union': ['ContentBlock'],
       'x-stainless-python-extend-union-imports': [
@@ -41788,6 +45168,46 @@ export const InputMessageSchema = {
       title: 'RequestImageBlock',
       type: 'object',
     },
+    RequestMidConvSystemBlock: {
+      additionalProperties: false,
+      description:
+        'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/CacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/CacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        content: {
+          description: 'System instruction text blocks.',
+          items: {
+            discriminator: {
+              mapping: { text: '#/components/schemas/RequestTextBlock' },
+              propertyName: 'type',
+            },
+            oneOf: [{ $ref: '#/$defs/RequestTextBlock' }],
+          },
+          title: 'Content',
+          type: 'array',
+        },
+        type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+      },
+      required: ['content', 'type'],
+      title: 'RequestMidConvSystemBlock',
+      type: 'object',
+    },
     RequestPageLocationCitation: {
       additionalProperties: false,
       properties: {
@@ -42348,6 +45768,10 @@ export const InputMessageSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/ToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -42715,6 +46139,7 @@ export const InputMessageSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -43103,9 +46528,27 @@ export const MessageSchema = {
     Model: {
       title: 'Model',
       description:
-        'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+        'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
       anyOf: [
         { type: 'string' },
+        {
+          const: 'claude-fable-5',
+          description:
+            'Next generation of intelligence for the hardest knowledge work and coding problems',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-mythos-5',
+          description:
+            'Most capable model for cybersecurity and biology research',
+          'x-stainless-nominal': false,
+        },
+        {
+          const: 'claude-opus-4-8',
+          description:
+            'Frontier intelligence for long-running agents and coding',
+          'x-stainless-nominal': false,
+        },
         {
           const: 'claude-opus-4-7',
           description:
@@ -43117,6 +46560,9 @@ export const MessageSchema = {
           description:
             'New class of intelligence, strongest in coding and cybersecurity',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-6',
@@ -43165,11 +46611,17 @@ export const MessageSchema = {
           const: 'claude-opus-4-1',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-1-20250805',
           description: 'Exceptional model for specialized complex tasks',
           'x-stainless-nominal': false,
+          deprecated: true,
+          'x-stainless-deprecation-message':
+            'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
         },
         {
           const: 'claude-opus-4-0',
@@ -43213,6 +46665,21 @@ export const MessageSchema = {
         },
       ],
     },
+    OutputTokensDetails: {
+      properties: {
+        thinking_tokens: {
+          default: 0,
+          description:
+            "Number of output tokens the model generated as internal reasoning, including\nthe thinking-block delimiter tokens.\n\nReflects the raw reasoning the model produced, not the (possibly shorter)\nsummarized thinking text returned in the response body. Computed by\nre-tokenizing the raw reasoning text, so it may differ from the model's exact\ngeneration count by a small number of tokens. Always ≤ `output_tokens`;\n`output_tokens - thinking_tokens` approximates the non-reasoning output.",
+          minimum: 0,
+          title: 'Thinking Tokens',
+          type: 'integer',
+        },
+      },
+      required: ['thinking_tokens'],
+      title: 'OutputTokensDetails',
+      type: 'object',
+    },
     PlainTextSource: {
       additionalProperties: false,
       properties: {
@@ -43232,7 +46699,13 @@ export const MessageSchema = {
       description: 'Structured information about a refusal.',
       properties: {
         category: {
-          anyOf: [{ enum: ['cyber', 'bio'], type: 'string' }, { type: 'null' }],
+          anyOf: [
+            {
+              enum: ['cyber', 'bio', 'frontier_llm', 'reasoning_extraction'],
+              type: 'string',
+            },
+            { type: 'null' },
+          ],
           description:
             "The policy category that triggered the refusal.\n\n`null` when the refusal doesn't map to a named category.",
           title: 'Category',
@@ -44382,6 +47855,11 @@ export const MessageSchema = {
           title: 'Output Tokens',
           type: 'integer',
         },
+        output_tokens_details: {
+          anyOf: [{ $ref: '#/$defs/OutputTokensDetails' }, { type: 'null' }],
+          description:
+            'Breakdown of output tokens by category.\n\n`output_tokens` remains the inclusive, authoritative total used for billing.\nThis object provides a read-only decomposition for observability — for example,\nhow many of the billed output tokens were spent on internal reasoning that may\nhave been summarized before being returned to you.',
+        },
         server_tool_use: {
           anyOf: [{ $ref: '#/$defs/ServerToolUsage' }, { type: 'null' }],
           description: 'The number of server tool requests.',
@@ -44403,6 +47881,7 @@ export const MessageSchema = {
         'inference_geo',
         'input_tokens',
         'output_tokens',
+        'output_tokens_details',
         'server_tool_use',
         'service_tier',
       ],
@@ -44414,6 +47893,7 @@ export const MessageSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -44456,9 +47936,25 @@ export const MetadataSchema = {
 export const ModelSchema = {
   title: 'Model',
   description:
-    'The model that will complete your prompt.\\n\\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
+    'The model that will complete your prompt.\n\nSee [models](https://docs.anthropic.com/en/docs/models-overview) for additional details and options.',
   anyOf: [
     { type: 'string' },
+    {
+      const: 'claude-fable-5',
+      description:
+        'Next generation of intelligence for the hardest knowledge work and coding problems',
+      'x-stainless-nominal': false,
+    },
+    {
+      const: 'claude-mythos-5',
+      description: 'Most capable model for cybersecurity and biology research',
+      'x-stainless-nominal': false,
+    },
+    {
+      const: 'claude-opus-4-8',
+      description: 'Frontier intelligence for long-running agents and coding',
+      'x-stainless-nominal': false,
+    },
     {
       const: 'claude-opus-4-7',
       description: 'Frontier intelligence for long-running agents and coding',
@@ -44469,6 +47965,9 @@ export const ModelSchema = {
       description:
         'New class of intelligence, strongest in coding and cybersecurity',
       'x-stainless-nominal': false,
+      deprecated: true,
+      'x-stainless-deprecation-message':
+        'Will reach end-of-life on June 30, 2026. Please migrate to claude-mythos-5. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
     },
     {
       const: 'claude-opus-4-6',
@@ -44516,11 +48015,17 @@ export const ModelSchema = {
       const: 'claude-opus-4-1',
       description: 'Exceptional model for specialized complex tasks',
       'x-stainless-nominal': false,
+      deprecated: true,
+      'x-stainless-deprecation-message':
+        'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
     },
     {
       const: 'claude-opus-4-1-20250805',
       description: 'Exceptional model for specialized complex tasks',
       'x-stainless-nominal': false,
+      deprecated: true,
+      'x-stainless-deprecation-message':
+        'Will reach end-of-life on August 5, 2026. Please migrate to a newer model. Visit https://docs.anthropic.com/en/docs/resources/model-deprecations for more information.',
     },
     {
       const: 'claude-opus-4-0',
@@ -44621,6 +48126,22 @@ export const OutputConfigSchema = {
   },
 } as const
 
+export const OutputTokensDetailsSchema = {
+  properties: {
+    thinking_tokens: {
+      default: 0,
+      description:
+        "Number of output tokens the model generated as internal reasoning, including\nthe thinking-block delimiter tokens.\n\nReflects the raw reasoning the model produced, not the (possibly shorter)\nsummarized thinking text returned in the response body. Computed by\nre-tokenizing the raw reasoning text, so it may differ from the model's exact\ngeneration count by a small number of tokens. Always ≤ `output_tokens`;\n`output_tokens - thinking_tokens` approximates the non-reasoning output.",
+      minimum: 0,
+      title: 'Thinking Tokens',
+      type: 'integer',
+    },
+  },
+  required: ['thinking_tokens'],
+  title: 'OutputTokensDetails',
+  type: 'object',
+} as const
+
 export const OverloadedErrorSchema = {
   properties: {
     message: { default: 'Overloaded', title: 'Message', type: 'string' },
@@ -44682,7 +48203,13 @@ export const RefusalStopDetailsSchema = {
   description: 'Structured information about a refusal.',
   properties: {
     category: {
-      anyOf: [{ enum: ['cyber', 'bio'], type: 'string' }, { type: 'null' }],
+      anyOf: [
+        {
+          enum: ['cyber', 'bio', 'frontier_llm', 'reasoning_extraction'],
+          type: 'string',
+        },
+        { type: 'null' },
+      ],
       description:
         "The policy category that triggered the refusal.\n\n`null` when the refusal doesn't map to a named category.",
       title: 'Category',
@@ -45848,6 +49375,322 @@ export const RequestImageBlockSchema = {
       },
       required: ['type', 'url'],
       title: 'URLImageSource',
+      type: 'object',
+    },
+  },
+} as const
+
+export const RequestMidConvSystemBlockSchema = {
+  additionalProperties: false,
+  description:
+    'System instructions that appear mid-conversation.\n\nUse this block to provide or update system-level instructions at a specific\npoint in the conversation, rather than only via the top-level `system` parameter.',
+  properties: {
+    cache_control: {
+      anyOf: [
+        {
+          discriminator: {
+            mapping: {
+              ephemeral: '#/components/schemas/CacheControlEphemeral',
+            },
+            propertyName: 'type',
+          },
+          oneOf: [{ $ref: '#/$defs/CacheControlEphemeral' }],
+        },
+        { type: 'null' },
+      ],
+      description: 'Create a cache control breakpoint at this content block.',
+      title: 'Cache Control',
+    },
+    content: {
+      description: 'System instruction text blocks.',
+      items: {
+        discriminator: {
+          mapping: { text: '#/components/schemas/RequestTextBlock' },
+          propertyName: 'type',
+        },
+        oneOf: [{ $ref: '#/$defs/RequestTextBlock' }],
+      },
+      title: 'Content',
+      type: 'array',
+    },
+    type: { const: 'mid_conv_system', title: 'Type', type: 'string' },
+  },
+  required: ['content', 'type'],
+  title: 'RequestMidConvSystemBlock',
+  type: 'object',
+  $defs: {
+    CacheControlEphemeral: {
+      additionalProperties: false,
+      properties: {
+        ttl: {
+          description:
+            'The time-to-live for the cache control breakpoint.\n\nThis may be one the following values:\n- `5m`: 5 minutes\n- `1h`: 1 hour\n\nDefaults to `5m`.',
+          enum: ['5m', '1h'],
+          title: 'Ttl',
+          type: 'string',
+          'x-stainless-renameMap': { ttl_5m: '5m', ttl_1h: '1h' },
+        },
+        type: { const: 'ephemeral', title: 'Type', type: 'string' },
+      },
+      required: ['type'],
+      title: 'CacheControlEphemeral',
+      type: 'object',
+      'x-stainless-go-constant-constructor': true,
+    },
+    RequestCharLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: { title: 'Cited Text', type: 'string' },
+        document_index: {
+          minimum: 0,
+          title: 'Document Index',
+          type: 'integer',
+        },
+        document_title: {
+          anyOf: [
+            { maxLength: 255, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Document Title',
+        },
+        end_char_index: { title: 'End Char Index', type: 'integer' },
+        start_char_index: {
+          minimum: 0,
+          title: 'Start Char Index',
+          type: 'integer',
+        },
+        type: { const: 'char_location', title: 'Type', type: 'string' },
+      },
+      required: [
+        'cited_text',
+        'document_index',
+        'document_title',
+        'end_char_index',
+        'start_char_index',
+        'type',
+      ],
+      title: 'RequestCharLocationCitation',
+      type: 'object',
+    },
+    RequestContentBlockLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: {
+          description:
+            'The full text of the cited block range, concatenated.\n\nAlways equals the contents of `content[start_block_index:end_block_index]` joined together. The text block is the minimal citable unit; this field is never a substring of a single block. Not counted toward output tokens, and not counted toward input tokens when sent back in subsequent turns.',
+          title: 'Cited Text',
+          type: 'string',
+        },
+        document_index: {
+          minimum: 0,
+          title: 'Document Index',
+          type: 'integer',
+        },
+        document_title: {
+          anyOf: [
+            { maxLength: 255, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Document Title',
+        },
+        end_block_index: {
+          description:
+            "Exclusive 0-based end index of the cited block range in the source's `content` array.\n\nAlways greater than `start_block_index`; a single-block citation has `end_block_index = start_block_index + 1`.",
+          title: 'End Block Index',
+          type: 'integer',
+        },
+        start_block_index: {
+          description:
+            "0-based index of the first cited block in the source's `content` array.",
+          minimum: 0,
+          title: 'Start Block Index',
+          type: 'integer',
+        },
+        type: {
+          const: 'content_block_location',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cited_text',
+        'document_index',
+        'document_title',
+        'end_block_index',
+        'start_block_index',
+        'type',
+      ],
+      title: 'RequestContentBlockLocationCitation',
+      type: 'object',
+    },
+    RequestPageLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: { title: 'Cited Text', type: 'string' },
+        document_index: {
+          minimum: 0,
+          title: 'Document Index',
+          type: 'integer',
+        },
+        document_title: {
+          anyOf: [
+            { maxLength: 255, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Document Title',
+        },
+        end_page_number: { title: 'End Page Number', type: 'integer' },
+        start_page_number: {
+          minimum: 1,
+          title: 'Start Page Number',
+          type: 'integer',
+        },
+        type: { const: 'page_location', title: 'Type', type: 'string' },
+      },
+      required: [
+        'cited_text',
+        'document_index',
+        'document_title',
+        'end_page_number',
+        'start_page_number',
+        'type',
+      ],
+      title: 'RequestPageLocationCitation',
+      type: 'object',
+    },
+    RequestSearchResultLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: {
+          description:
+            'The full text of the cited block range, concatenated.\n\nAlways equals the contents of `content[start_block_index:end_block_index]` joined together. The text block is the minimal citable unit; this field is never a substring of a single block. Not counted toward output tokens, and not counted toward input tokens when sent back in subsequent turns.',
+          title: 'Cited Text',
+          type: 'string',
+        },
+        end_block_index: {
+          description:
+            "Exclusive 0-based end index of the cited block range in the source's `content` array.\n\nAlways greater than `start_block_index`; a single-block citation has `end_block_index = start_block_index + 1`.",
+          title: 'End Block Index',
+          type: 'integer',
+        },
+        search_result_index: {
+          description:
+            '0-based index of the cited search result among all `search_result` content blocks in the request, in the order they appear across messages and tool results.\n\nCounted separately from `document_index`; server-side web search results are not included in this count.',
+          minimum: 0,
+          title: 'Search Result Index',
+          type: 'integer',
+        },
+        source: { title: 'Source', type: 'string' },
+        start_block_index: {
+          description:
+            "0-based index of the first cited block in the source's `content` array.",
+          minimum: 0,
+          title: 'Start Block Index',
+          type: 'integer',
+        },
+        title: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Title',
+        },
+        type: {
+          const: 'search_result_location',
+          title: 'Type',
+          type: 'string',
+        },
+      },
+      required: [
+        'cited_text',
+        'end_block_index',
+        'search_result_index',
+        'source',
+        'start_block_index',
+        'title',
+        'type',
+      ],
+      title: 'RequestSearchResultLocationCitation',
+      type: 'object',
+    },
+    RequestTextBlock: {
+      additionalProperties: false,
+      properties: {
+        cache_control: {
+          anyOf: [
+            {
+              discriminator: {
+                mapping: {
+                  ephemeral: '#/components/schemas/CacheControlEphemeral',
+                },
+                propertyName: 'type',
+              },
+              oneOf: [{ $ref: '#/$defs/CacheControlEphemeral' }],
+            },
+            { type: 'null' },
+          ],
+          description:
+            'Create a cache control breakpoint at this content block.',
+          title: 'Cache Control',
+        },
+        citations: {
+          anyOf: [
+            {
+              items: {
+                discriminator: {
+                  mapping: {
+                    char_location:
+                      '#/components/schemas/RequestCharLocationCitation',
+                    content_block_location:
+                      '#/components/schemas/RequestContentBlockLocationCitation',
+                    page_location:
+                      '#/components/schemas/RequestPageLocationCitation',
+                    search_result_location:
+                      '#/components/schemas/RequestSearchResultLocationCitation',
+                    web_search_result_location:
+                      '#/components/schemas/RequestWebSearchResultLocationCitation',
+                  },
+                  propertyName: 'type',
+                },
+                oneOf: [
+                  { $ref: '#/$defs/RequestCharLocationCitation' },
+                  { $ref: '#/$defs/RequestPageLocationCitation' },
+                  { $ref: '#/$defs/RequestContentBlockLocationCitation' },
+                  { $ref: '#/$defs/RequestWebSearchResultLocationCitation' },
+                  { $ref: '#/$defs/RequestSearchResultLocationCitation' },
+                ],
+              },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+          title: 'Citations',
+        },
+        text: { minLength: 1, title: 'Text', type: 'string' },
+        type: { const: 'text', title: 'Type', type: 'string' },
+      },
+      required: ['text', 'type'],
+      title: 'RequestTextBlock',
+      type: 'object',
+    },
+    RequestWebSearchResultLocationCitation: {
+      additionalProperties: false,
+      properties: {
+        cited_text: { title: 'Cited Text', type: 'string' },
+        encrypted_index: { title: 'Encrypted Index', type: 'string' },
+        title: {
+          anyOf: [
+            { maxLength: 512, minLength: 1, type: 'string' },
+            { type: 'null' },
+          ],
+          title: 'Title',
+        },
+        type: {
+          const: 'web_search_result_location',
+          title: 'Type',
+          type: 'string',
+        },
+        url: { maxLength: 2048, minLength: 1, title: 'Url', type: 'string' },
+      },
+      required: ['cited_text', 'encrypted_index', 'title', 'type', 'url'],
+      title: 'RequestWebSearchResultLocationCitation',
       type: 'object',
     },
   },
@@ -47724,6 +51567,10 @@ export const RequestToolSearchToolResultBlockSchema = {
       additionalProperties: false,
       properties: {
         error_code: { $ref: '#/$defs/ToolSearchToolResultErrorCode' },
+        error_message: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Error Message',
+        },
         type: {
           const: 'tool_search_tool_result_error',
           title: 'Type',
@@ -47769,6 +51616,10 @@ export const RequestToolSearchToolResultErrorSchema = {
   additionalProperties: false,
   properties: {
     error_code: { $ref: '#/$defs/ToolSearchToolResultErrorCode' },
+    error_message: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Error Message',
+    },
     type: {
       const: 'tool_search_tool_result_error',
       title: 'Type',
@@ -49092,6 +52943,7 @@ export const RequestWebFetchToolResultBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -49123,6 +52975,7 @@ export const RequestWebFetchToolResultErrorSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -51301,6 +55154,7 @@ export const ResponseWebFetchToolResultBlockSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -51332,6 +55186,7 @@ export const ResponseWebFetchToolResultErrorSchema = {
         'invalid_tool_input',
         'url_too_long',
         'url_not_allowed',
+        'url_not_in_prior_context',
         'url_not_accessible',
         'unsupported_content_type',
         'too_many_requests',
@@ -52569,6 +56424,11 @@ export const UsageSchema = {
       title: 'Output Tokens',
       type: 'integer',
     },
+    output_tokens_details: {
+      anyOf: [{ $ref: '#/$defs/OutputTokensDetails' }, { type: 'null' }],
+      description:
+        'Breakdown of output tokens by category.\n\n`output_tokens` remains the inclusive, authoritative total used for billing.\nThis object provides a read-only decomposition for observability — for example,\nhow many of the billed output tokens were spent on internal reasoning that may\nhave been summarized before being returned to you.',
+    },
     server_tool_use: {
       anyOf: [{ $ref: '#/$defs/ServerToolUsage' }, { type: 'null' }],
       description: 'The number of server tool requests.',
@@ -52589,6 +56449,7 @@ export const UsageSchema = {
     'inference_geo',
     'input_tokens',
     'output_tokens',
+    'output_tokens_details',
     'server_tool_use',
     'service_tier',
   ],
@@ -52616,6 +56477,21 @@ export const UsageSchema = {
       },
       required: ['ephemeral_1h_input_tokens', 'ephemeral_5m_input_tokens'],
       title: 'CacheCreation',
+      type: 'object',
+    },
+    OutputTokensDetails: {
+      properties: {
+        thinking_tokens: {
+          default: 0,
+          description:
+            "Number of output tokens the model generated as internal reasoning, including\nthe thinking-block delimiter tokens.\n\nReflects the raw reasoning the model produced, not the (possibly shorter)\nsummarized thinking text returned in the response body. Computed by\nre-tokenizing the raw reasoning text, so it may differ from the model's exact\ngeneration count by a small number of tokens. Always ≤ `output_tokens`;\n`output_tokens - thinking_tokens` approximates the non-reasoning output.",
+          minimum: 0,
+          title: 'Thinking Tokens',
+          type: 'integer',
+        },
+      },
+      required: ['thinking_tokens'],
+      title: 'OutputTokensDetails',
       type: 'object',
     },
     ServerToolUsage: {
@@ -52694,6 +56570,7 @@ export const WebFetchToolResultErrorCodeSchema = {
     'invalid_tool_input',
     'url_too_long',
     'url_not_allowed',
+    'url_not_in_prior_context',
     'url_not_accessible',
     'unsupported_content_type',
     'too_many_requests',

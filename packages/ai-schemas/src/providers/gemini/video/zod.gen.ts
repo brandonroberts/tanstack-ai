@@ -14,6 +14,7 @@ export const zPredictLongRunningRequest = z.object({
  * The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
  */
 export const zStatus = z.object({
+  message: z.string().optional(),
   code: z
     .int()
     .min(-2147483648, {
@@ -23,7 +24,6 @@ export const zStatus = z.object({
       error: 'Invalid value: Expected int32 to be <= 2147483647',
     })
     .optional(),
-  message: z.string().optional(),
   details: z.array(z.record(z.string(), z.unknown())).optional(),
 })
 
@@ -31,10 +31,10 @@ export const zStatus = z.object({
  * This resource represents a long-running operation that is the result of a network API call.
  */
 export const zOperation = z.object({
-  name: z.string().optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
   done: z.boolean().optional(),
   error: zStatus.optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+  name: z.string().optional(),
   response: z.record(z.string(), z.unknown()).optional(),
 })
 

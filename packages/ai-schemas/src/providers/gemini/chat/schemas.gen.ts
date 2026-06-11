@@ -32,15 +32,15 @@ export const AttributionSourceIdSchema = {
       description:
         'Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.',
       properties: {
-        source: {
-          type: 'string',
-          description:
-            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
-        },
         chunk: {
           type: 'string',
           description:
             'Output only. Name of the `Chunk` containing the attributed text. Example: `corpora/123/documents/abc/chunks/xyz`',
+        },
+        source: {
+          type: 'string',
+          description:
+            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
         },
       },
     },
@@ -105,13 +105,38 @@ export const CandidateSchema = {
   type: 'object',
   description: 'A response candidate generated from the model.',
   properties: {
+    avgLogprobs: {
+      type: 'number',
+      format: 'double',
+      description:
+        'Output only. Average log probability score of the candidate.',
+    },
+    groundingMetadata: { $ref: '#/$defs/GroundingMetadata' },
+    content: { $ref: '#/$defs/Content' },
+    finishMessage: {
+      type: 'string',
+      description:
+        'Optional. Output only. Details the reason why the model stopped generating tokens. This is populated only when `finish_reason` is set.',
+    },
+    safetyRatings: {
+      type: 'array',
+      description:
+        'List of ratings for the safety of a response candidate. There is at most one rating per category.',
+      items: { $ref: '#/$defs/SafetyRating' },
+    },
+    tokenCount: {
+      type: 'integer',
+      format: 'int32',
+      description: 'Output only. Token count for this candidate.',
+    },
+    logprobsResult: { $ref: '#/$defs/LogprobsResult' },
+    urlContextMetadata: { $ref: '#/$defs/UrlContextMetadata' },
     index: {
       type: 'integer',
       format: 'int32',
       description:
         'Output only. Index of the candidate in the list of response candidates.',
     },
-    content: { $ref: '#/$defs/Content' },
     finishReason: {
       type: 'string',
       description:
@@ -137,24 +162,8 @@ export const CandidateSchema = {
         'TOO_MANY_TOOL_CALLS',
         'MISSING_THOUGHT_SIGNATURE',
         'MALFORMED_RESPONSE',
+        'ESCALATION',
       ],
-    },
-    finishMessage: {
-      type: 'string',
-      description:
-        'Optional. Output only. Details the reason why the model stopped generating tokens. This is populated only when `finish_reason` is set.',
-    },
-    safetyRatings: {
-      type: 'array',
-      description:
-        'List of ratings for the safety of a response candidate. There is at most one rating per category.',
-      items: { $ref: '#/$defs/SafetyRating' },
-    },
-    citationMetadata: { $ref: '#/$defs/CitationMetadata' },
-    tokenCount: {
-      type: 'integer',
-      format: 'int32',
-      description: 'Output only. Token count for this candidate.',
     },
     groundingAttributions: {
       type: 'array',
@@ -162,15 +171,7 @@ export const CandidateSchema = {
         'Output only. Attribution information for sources that contributed to a grounded answer. This field is populated for `GenerateAnswer` calls.',
       items: { $ref: '#/$defs/GroundingAttribution' },
     },
-    groundingMetadata: { $ref: '#/$defs/GroundingMetadata' },
-    avgLogprobs: {
-      type: 'number',
-      format: 'double',
-      description:
-        'Output only. Average log probability score of the candidate.',
-    },
-    logprobsResult: { $ref: '#/$defs/LogprobsResult' },
-    urlContextMetadata: { $ref: '#/$defs/UrlContextMetadata' },
+    citationMetadata: { $ref: '#/$defs/CitationMetadata' },
   },
   $defs: {
     AttributionSourceId: {
@@ -216,11 +217,10 @@ export const CandidateSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -232,10 +232,11 @@ export const CandidateSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -244,10 +245,10 @@ export const CandidateSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -259,10 +260,10 @@ export const CandidateSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -271,16 +272,16 @@ export const CandidateSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -289,11 +290,6 @@ export const CandidateSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -302,6 +298,11 @@ export const CandidateSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -353,6 +354,17 @@ export const CandidateSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -372,17 +384,6 @@ export const CandidateSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -414,17 +415,17 @@ export const CandidateSchema = {
       description: 'Grounding support.',
       properties: {
         segment: { $ref: '#/$defs/GoogleAiGenerativelanguageV1betaSegment' },
-        groundingChunkIndices: {
-          type: 'array',
-          description:
-            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
-          items: { type: 'integer', format: 'int32' },
-        },
         confidenceScores: {
           type: 'array',
           description:
             'Optional. Confidence score of the support references. Ranges from 0 to 1. 1 is the most confident. This list must have the same size as the grounding_chunk_indices.',
           items: { type: 'number', format: 'float' },
+        },
+        groundingChunkIndices: {
+          type: 'array',
+          description:
+            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
+          items: { type: 'integer', format: 'int32' },
         },
         renderedParts: {
           type: 'array',
@@ -438,12 +439,6 @@ export const CandidateSchema = {
       type: 'object',
       description: 'Segment of the content.',
       properties: {
-        partIndex: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'The index of a Part object within its parent Content object.',
-        },
         startIndex: {
           type: 'integer',
           format: 'int32',
@@ -455,6 +450,12 @@ export const CandidateSchema = {
           format: 'int32',
           description:
             'End index in the given Part, measured in bytes. Offset from the start of the Part, exclusive, starting at zero.',
+        },
+        partIndex: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'The index of a Part object within its parent Content object.',
         },
         text: {
           type: 'string',
@@ -477,27 +478,27 @@ export const CandidateSchema = {
         "A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.",
       properties: {
         web: { $ref: '#/$defs/Web' },
-        image: { $ref: '#/$defs/Image' },
-        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
         maps: { $ref: '#/$defs/Maps' },
+        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
+        image: { $ref: '#/$defs/Image' },
       },
     },
     GroundingChunkCustomMetadata: {
       type: 'object',
       description: 'User provided metadata about the GroundingFact.',
       properties: {
-        stringValue: {
-          type: 'string',
-          description: 'Optional. The string value of the metadata.',
-        },
-        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         numericValue: {
           type: 'number',
           format: 'float',
           description:
             'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
         },
+        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         key: { type: 'string', description: 'The key of the metadata.' },
+        stringValue: {
+          type: 'string',
+          description: 'Optional. The string value of the metadata.',
+        },
       },
     },
     GroundingChunkStringList: {
@@ -516,12 +517,6 @@ export const CandidateSchema = {
       description: 'Metadata returned to client when grounding is enabled.',
       properties: {
         searchEntryPoint: { $ref: '#/$defs/SearchEntryPoint' },
-        groundingChunks: {
-          type: 'array',
-          description:
-            'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
-          items: { $ref: '#/$defs/GroundingChunk' },
-        },
         groundingSupports: {
           type: 'array',
           description: 'List of grounding support.',
@@ -529,21 +524,27 @@ export const CandidateSchema = {
             $ref: '#/$defs/GoogleAiGenerativelanguageV1betaGroundingSupport',
           },
         },
-        retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
-        webSearchQueries: {
-          type: 'array',
-          description: 'Web search queries for the following-up web search.',
-          items: { type: 'string' },
-        },
         imageSearchQueries: {
           type: 'array',
           description: 'Image search queries used for grounding.',
           items: { type: 'string' },
         },
+        retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
         googleMapsWidgetContextToken: {
           type: 'string',
           description:
             'Optional. Resource name of the Google Maps widget context token that can be used with the PlacesContextElement widget in order to render contextual data. Only populated in the case that grounding with Google Maps is enabled.',
+        },
+        webSearchQueries: {
+          type: 'array',
+          description: 'Web search queries for the following-up web search.',
+          items: { type: 'string' },
+        },
+        groundingChunks: {
+          type: 'array',
+          description:
+            'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
+          items: { $ref: '#/$defs/GroundingChunk' },
         },
       },
     },
@@ -572,15 +573,15 @@ export const CandidateSchema = {
           type: 'string',
           description: 'The web page URI for attribution.',
         },
-        imageUri: { type: 'string', description: 'The image asset URL.' },
-        title: {
-          type: 'string',
-          description: 'The title of the web page that the image is from.',
-        },
         domain: {
           type: 'string',
           description:
             'The root domain of the web page that the image is from, e.g. "example.com".',
+        },
+        imageUri: { type: 'string', description: 'The image asset URL.' },
+        title: {
+          type: 'string',
+          description: 'The title of the web page that the image is from.',
         },
       },
     },
@@ -593,16 +594,16 @@ export const CandidateSchema = {
           format: 'float',
           description: 'Sum of log probabilities for all tokens.',
         },
-        topCandidates: {
-          type: 'array',
-          description: 'Length = total number of decoding steps.',
-          items: { $ref: '#/$defs/TopCandidates' },
-        },
         chosenCandidates: {
           type: 'array',
           description:
             'Length = total number of decoding steps. The chosen candidates may or may not be in top_candidates.',
           items: { $ref: '#/$defs/LogprobsResultCandidate' },
+        },
+        topCandidates: {
+          type: 'array',
+          description: 'Length = total number of decoding steps.',
+          items: { $ref: '#/$defs/TopCandidates' },
         },
       },
     },
@@ -631,18 +632,18 @@ export const CandidateSchema = {
       description:
         'A grounding chunk from Google Maps. A Maps chunk corresponds to a single place.',
       properties: {
-        uri: { type: 'string', description: 'URI reference of the place.' },
-        title: { type: 'string', description: 'Title of the place.' },
-        text: {
-          type: 'string',
-          description: 'Text description of the place answer.',
-        },
         placeId: {
           type: 'string',
           description:
             'The ID of the place, in `places/{place_id}` format. A user can use this ID to look up that place.',
         },
+        uri: { type: 'string', description: 'URI reference of the place.' },
+        text: {
+          type: 'string',
+          description: 'Text description of the place answer.',
+        },
         placeAnswerSources: { $ref: '#/$defs/PlaceAnswerSources' },
+        title: { type: 'string', description: 'Title of the place.' },
       },
     },
     MediaResolution: {
@@ -656,27 +657,17 @@ export const CandidateSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -686,7 +677,17 @@ export const CandidateSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     PlaceAnswerSources: {
@@ -718,20 +719,20 @@ export const CandidateSchema = {
       type: 'object',
       description: 'Chunk from context retrieved by the file search tool.',
       properties: {
-        uri: {
-          type: 'string',
+        pageNumber: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. URI reference of the semantic retrieval document.',
+            'Optional. Page number of the retrieved context, if applicable.',
         },
         title: {
           type: 'string',
           description: 'Optional. Title of the document.',
         },
-        text: { type: 'string', description: 'Optional. Text of the chunk.' },
-        fileSearchStore: {
+        uri: {
           type: 'string',
           description:
-            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
+            'Optional. URI reference of the semantic retrieval document.',
         },
         customMetadata: {
           type: 'array',
@@ -739,17 +740,17 @@ export const CandidateSchema = {
             'Optional. User-provided metadata about the retrieved context.',
           items: { $ref: '#/$defs/GroundingChunkCustomMetadata' },
         },
-        pageNumber: {
-          type: 'integer',
-          format: 'int32',
+        fileSearchStore: {
+          type: 'string',
           description:
-            'Optional. Page number of the retrieved context, if applicable.',
+            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
         },
         mediaId: {
           type: 'string',
           description:
             'Optional. The media blob resource name for multimodal file search results. Format: fileSearchStores/{file_search_store_id}/media/{blob_id}',
         },
+        text: { type: 'string', description: 'Optional. Text of the chunk.' },
       },
     },
     ReviewSnippet: {
@@ -757,16 +758,16 @@ export const CandidateSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
     SafetyRating: {
@@ -774,6 +775,21 @@ export const CandidateSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -791,21 +807,6 @@ export const CandidateSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -831,15 +832,15 @@ export const CandidateSchema = {
       description:
         'Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.',
       properties: {
-        source: {
-          type: 'string',
-          description:
-            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
-        },
         chunk: {
           type: 'string',
           description:
             'Output only. Name of the `Chunk` containing the attributed text. Example: `corpora/123/documents/abc/chunks/xyz`',
+        },
+        source: {
+          type: 'string',
+          description:
+            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
         },
       },
     },
@@ -980,13 +981,13 @@ export const CandidateSchema = {
       type: 'object',
       description: 'Chunk from the web.',
       properties: {
-        uri: {
-          type: 'string',
-          description: 'Output only. URI reference of the chunk.',
-        },
         title: {
           type: 'string',
           description: 'Output only. Title of the chunk.',
+        },
+        uri: {
+          type: 'string',
+          description: 'Output only. URI reference of the chunk.',
         },
       },
     },
@@ -1009,11 +1010,10 @@ export const CitationMetadataSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -1025,10 +1025,11 @@ export const CitationMetadataSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -1039,11 +1040,10 @@ export const CitationSourceSchema = {
   type: 'object',
   description: 'A citation to a source for a portion of a specific response.',
   properties: {
-    startIndex: {
-      type: 'integer',
-      format: 'int32',
+    license: {
+      type: 'string',
       description:
-        'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+        'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
     },
     endIndex: {
       type: 'integer',
@@ -1055,10 +1055,11 @@ export const CitationSourceSchema = {
       description:
         'Optional. URI that is attributed as a source for a portion of the text.',
     },
-    license: {
-      type: 'string',
+    startIndex: {
+      type: 'integer',
+      format: 'int32',
       description:
-        'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+        'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
     },
   },
 } as const
@@ -1075,10 +1076,10 @@ export const CodeExecutionResultSchema = {
   description:
     'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
   properties: {
-    id: {
+    output: {
       type: 'string',
       description:
-        'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+        'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
     },
     outcome: {
       type: 'string',
@@ -1090,10 +1091,10 @@ export const CodeExecutionResultSchema = {
         'OUTCOME_DEADLINE_EXCEEDED',
       ],
     },
-    output: {
+    id: {
       type: 'string',
       description:
-        'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+        'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
     },
   },
 } as const
@@ -1102,16 +1103,16 @@ export const ComputerUseSchema = {
   type: 'object',
   description: 'Computer Use tool type.',
   properties: {
-    environment: {
-      type: 'string',
-      description: 'Required. The environment being operated.',
-      enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
-    },
     excludedPredefinedFunctions: {
       type: 'array',
       description:
         'Optional. By default, predefined functions are included in the final model call. Some of them can be explicitly excluded from being automatically included. This can serve two purposes: 1. Using a more restricted / different action space. 2. Improving the definitions / instructions of predefined functions.',
       items: { type: 'string' },
+    },
+    environment: {
+      type: 'string',
+      description: 'Required. The environment being operated.',
+      enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
     },
   },
 } as const
@@ -1123,11 +1124,6 @@ export const ConditionSchema = {
     stringValue: {
       type: 'string',
       description: 'The string value to filter the metadata on.',
-    },
-    numericValue: {
-      type: 'number',
-      format: 'float',
-      description: 'The numeric value to filter the metadata on.',
     },
     operation: {
       type: 'string',
@@ -1145,6 +1141,11 @@ export const ConditionSchema = {
         'EXCLUDES',
       ],
     },
+    numericValue: {
+      type: 'number',
+      format: 'float',
+      description: 'The numeric value to filter the metadata on.',
+    },
   },
 } as const
 
@@ -1153,16 +1154,16 @@ export const ContentSchema = {
   description:
     'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
   properties: {
+    role: {
+      type: 'string',
+      description:
+        "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+    },
     parts: {
       type: 'array',
       description:
         'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
       items: { $ref: '#/$defs/Part' },
-    },
-    role: {
-      type: 'string',
-      description:
-        "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
     },
   },
   $defs: {
@@ -1188,10 +1189,10 @@ export const ContentSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -1203,10 +1204,10 @@ export const ContentSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -1215,11 +1216,6 @@ export const ContentSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -1228,6 +1224,11 @@ export const ContentSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -1279,6 +1280,17 @@ export const ContentSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -1298,17 +1310,6 @@ export const ContentSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -1346,27 +1347,17 @@ export const ContentSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -1376,7 +1367,17 @@ export const ContentSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -1512,11 +1513,10 @@ export const CountMessageTokensRequestSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -1528,10 +1528,11 @@ export const CountMessageTokensRequestSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -1549,17 +1550,17 @@ export const CountMessageTokensRequestSchema = {
       description:
         'The base unit of structured text. A `Message` includes an `author` and the `content` of the `Message`. The `author` is used to tag messages when they are fed to the model as text.',
       properties: {
-        author: {
-          type: 'string',
-          description:
-            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
-        },
         content: {
           type: 'string',
           description:
             'Required. The text content of the structured `Message`.',
         },
         citationMetadata: { $ref: '#/$defs/CitationMetadata' },
+        author: {
+          type: 'string',
+          description:
+            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
+        },
       },
     },
     MessagePrompt: {
@@ -1567,16 +1568,16 @@ export const CountMessageTokensRequestSchema = {
       description:
         'All of the structured input text passed to the model as a prompt. A `MessagePrompt` contains a structured set of fields that provide context for the conversation, examples of user input/model output message pairs that prime the model to respond in different ways, and the conversation history or list of messages representing the alternating turns of the conversation between the user and the model.',
       properties: {
-        context: {
-          type: 'string',
-          description:
-            'Optional. Text that should be provided to the model first to ground the response. If not empty, this `context` will be given to the model first before the `examples` and `messages`. When using a `context` be sure to provide it with every request to maintain continuity. This field can be a description of your prompt to the model to help provide context and guide the responses. Examples: "Translate the phrase from English to French." or "Given a statement, classify the sentiment as happy, sad or neutral." Anything included in this field will take precedence over message history if the total input size exceeds the model\'s `input_token_limit` and the input request is truncated.',
-        },
         examples: {
           type: 'array',
           description:
             "Optional. Examples of what the model should generate. This includes both user input and the response that the model should emulate. These `examples` are treated identically to conversation messages except that they take precedence over the history in `messages`: If the total input size exceeds the model's `input_token_limit` the input will be truncated. Items will be dropped from `messages` before `examples`.",
           items: { $ref: '#/$defs/Example' },
+        },
+        context: {
+          type: 'string',
+          description:
+            'Optional. Text that should be provided to the model first to ground the response. If not empty, this `context` will be given to the model first before the `examples` and `messages`. When using a `context` be sure to provide it with every request to maintain continuity. This field can be a description of your prompt to the model to help provide context and guide the responses. Examples: "Translate the phrase from English to French." or "Given a statement, classify the sentiment as happy, sad or neutral." Anything included in this field will take precedence over message history if the total input size exceeds the model\'s `input_token_limit` and the input request is truncated.',
         },
         messages: {
           type: 'array',
@@ -1639,13 +1640,13 @@ export const CountTokensRequestSchema = {
   description:
     'Counts the number of tokens in the `prompt` sent to a model. Models may tokenize text differently, so each model may return a different `token_count`.',
   properties: {
+    generateContentRequest: { $ref: '#/$defs/GenerateContentRequest' },
     contents: {
       type: 'array',
       description:
         'Optional. The input given to the model as a prompt. This field is ignored when `generate_content_request` is set.',
       items: { $ref: '#/$defs/Content' },
     },
-    generateContentRequest: { $ref: '#/$defs/GenerateContentRequest' },
   },
   $defs: {
     AudioResponseFormat: {
@@ -1711,10 +1712,10 @@ export const CountTokensRequestSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -1726,10 +1727,10 @@ export const CountTokensRequestSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -1737,16 +1738,16 @@ export const CountTokensRequestSchema = {
       type: 'object',
       description: 'Computer Use tool type.',
       properties: {
-        environment: {
-          type: 'string',
-          description: 'Required. The environment being operated.',
-          enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
-        },
         excludedPredefinedFunctions: {
           type: 'array',
           description:
             'Optional. By default, predefined functions are included in the final model call. Some of them can be explicitly excluded from being automatically included. This can serve two purposes: 1. Using a more restricted / different action space. 2. Improving the definitions / instructions of predefined functions.',
           items: { type: 'string' },
+        },
+        environment: {
+          type: 'string',
+          description: 'Required. The environment being operated.',
+          enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
         },
       },
     },
@@ -1755,16 +1756,16 @@ export const CountTokensRequestSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -1791,11 +1792,6 @@ export const CountTokensRequestSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -1804,6 +1800,11 @@ export const CountTokensRequestSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -1830,16 +1831,16 @@ export const CountTokensRequestSchema = {
             'Required. The names of the file_search_stores to retrieve from. Example: `fileSearchStores/my-file-search-store-123`',
           items: { type: 'string' },
         },
+        metadataFilter: {
+          type: 'string',
+          description:
+            'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
+        },
         topK: {
           type: 'integer',
           format: 'int32',
           description:
             'Optional. The number of semantic retrieval chunks to retrieve.',
-        },
-        metadataFilter: {
-          type: 'string',
-          description:
-            'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
         },
       },
     },
@@ -1892,32 +1893,32 @@ export const CountTokensRequestSchema = {
       description:
         'Structured representation of a function declaration as defined by the [OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included in this declaration are the function name and parameters. This FunctionDeclaration is a representation of a block of code that can be used as a `Tool` by the model and executed by the client.',
       properties: {
-        name: {
-          type: 'string',
-          description:
-            'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
-        },
         description: {
           type: 'string',
           description: 'Required. A brief description of the function.',
         },
         parameters: { $ref: '#/$defs/Schema' },
-        parametersJsonSchema: {
-          type: 'any',
-          description:
-            'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
-        },
-        response: { $ref: '#/$defs/Schema' },
         responseJsonSchema: {
           type: 'any',
           description:
             'Optional. Describes the output from this function in JSON Schema format. The value specified by the schema is the response value of the function. This field is mutually exclusive with `response`.',
         },
+        name: {
+          type: 'string',
+          description:
+            'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
+        },
+        response: { $ref: '#/$defs/Schema' },
         behavior: {
           type: 'string',
           description:
             'Optional. Specifies the function Behavior. Currently only supported by the BidiGenerateContent method.',
           enum: ['UNSPECIFIED', 'BLOCKING', 'NON_BLOCKING'],
+        },
+        parametersJsonSchema: {
+          type: 'any',
+          description:
+            'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
         },
       },
     },
@@ -1930,6 +1931,17 @@ export const CountTokensRequestSchema = {
           type: 'string',
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
+        },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
         },
         name: {
           type: 'string',
@@ -1950,17 +1962,6 @@ export const CountTokensRequestSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -1991,10 +1992,21 @@ export const CountTokensRequestSchema = {
       type: 'object',
       description: 'Request to generate a completion from the model.',
       properties: {
-        model: {
+        tools: {
+          type: 'array',
+          description:
+            'Optional. A list of `Tools` the `Model` may use to generate the next response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the `Model`. Supported `Tool`s are `Function` and `code_execution`. Refer to the [Function calling](https://ai.google.dev/gemini-api/docs/function-calling) and the [Code execution](https://ai.google.dev/gemini-api/docs/code-execution) guides to learn more.',
+          items: { $ref: '#/$defs/Tool' },
+        },
+        cachedContent: {
           type: 'string',
           description:
-            'Required. The name of the `Model` to use for generating the completion. Format: `models/{model}`.',
+            'Optional. The name of the content [cached](https://ai.google.dev/gemini-api/docs/caching) to use as context to serve the prediction. Format: `cachedContents/{cachedContent}`',
+        },
+        store: {
+          type: 'boolean',
+          description:
+            'Optional. Configures the logging behavior for a given request. If set, it takes precedence over the project-level logging config.',
         },
         systemInstruction: { $ref: '#/$defs/Content' },
         contents: {
@@ -2003,13 +2015,12 @@ export const CountTokensRequestSchema = {
             'Required. The content of the current conversation with the model. For single-turn queries, this is a single instance. For multi-turn queries like [chat](https://ai.google.dev/gemini-api/docs/text-generation#chat), this is a repeated field that contains the conversation history and the latest request.',
           items: { $ref: '#/$defs/Content' },
         },
-        tools: {
-          type: 'array',
-          description:
-            'Optional. A list of `Tools` the `Model` may use to generate the next response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the `Model`. Supported `Tool`s are `Function` and `code_execution`. Refer to the [Function calling](https://ai.google.dev/gemini-api/docs/function-calling) and the [Code execution](https://ai.google.dev/gemini-api/docs/code-execution) guides to learn more.',
-          items: { $ref: '#/$defs/Tool' },
-        },
         toolConfig: { $ref: '#/$defs/ToolConfig' },
+        model: {
+          type: 'string',
+          description:
+            'Required. The name of the `Model` to use for generating the completion. Format: `models/{model}`.',
+        },
         safetySettings: {
           type: 'array',
           description:
@@ -2017,20 +2028,10 @@ export const CountTokensRequestSchema = {
           items: { $ref: '#/$defs/SafetySetting' },
         },
         generationConfig: { $ref: '#/$defs/GenerationConfig' },
-        cachedContent: {
-          type: 'string',
-          description:
-            'Optional. The name of the content [cached](https://ai.google.dev/gemini-api/docs/caching) to use as context to serve the prediction. Format: `cachedContents/{cachedContent}`',
-        },
         serviceTier: {
           type: 'string',
           description: 'Optional. The service tier of the request.',
           enum: ['unspecified', 'standard', 'flex', 'priority'],
-        },
-        store: {
-          type: 'boolean',
-          description:
-            'Optional. Configures the logging behavior for a given request. If set, it takes precedence over the project-level logging config.',
         },
       },
     },
@@ -2039,17 +2040,65 @@ export const CountTokensRequestSchema = {
       description:
         'Configuration options for model generation and outputs. Not all parameters are configurable for every model.',
       properties: {
+        topK: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            "Optional. The maximum number of tokens to consider when sampling. Gemini models use Top-p (nucleus) sampling or a combination of Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Models running with nucleus sampling don't allow top_k setting. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
+        },
+        imageConfig: { $ref: '#/$defs/ImageConfig' },
         candidateCount: {
           type: 'integer',
           format: 'int32',
           description:
             "Optional. Number of generated responses to return. If unset, this will default to 1. Please note that this doesn't work for previous generation models (Gemini 1.0 family)",
         },
+        translationConfig: { $ref: '#/$defs/TranslationConfig' },
+        frequencyPenalty: {
+          type: 'number',
+          format: 'float',
+          description:
+            "Optional. Frequency penalty applied to the next token's logprobs, multiplied by the number of times each token has been seen in the respponse so far. A positive penalty will discourage the use of tokens that have already been used, proportional to the number of times the token has been used: The more a token is used, the more difficult it is for the model to use that token again increasing the vocabulary of responses. Caution: A _negative_ penalty will encourage the model to reuse tokens proportional to the number of times the token has been used. Small negative values will reduce the vocabulary of a response. Larger negative values will cause the model to start repeating a common token until it hits the max_output_tokens limit.",
+        },
+        speechConfig: { $ref: '#/$defs/SpeechConfig' },
+        presencePenalty: {
+          type: 'number',
+          format: 'float',
+          description:
+            "Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequency_penalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary. A negative penalty will encourage the use of tokens that have already been used in the response, decreasing the vocabulary.",
+        },
+        _responseJsonSchema: {
+          type: 'any',
+          description:
+            'Optional. Output schema of the generated response. This is an alternative to `response_schema` that accepts [JSON Schema](https://json-schema.org/). If set, `response_schema` must be omitted, but `response_mime_type` is required. While the full JSON Schema may be sent, not all features are supported. Specifically, only the following properties are supported: - `$id` - `$defs` - `$ref` - `$anchor` - `type` - `format` - `title` - `description` - `enum` (for strings and numbers) - `items` - `prefixItems` - `minItems` - `maxItems` - `minimum` - `maximum` - `anyOf` - `oneOf` (interpreted the same as `anyOf`) - `properties` - `additionalProperties` - `required` The non-standard `propertyOrdering` property may also be set. Cyclic references are unrolled to a limited degree and, as such, may only be used within non-required properties. (Nullable properties are not sufficient.) If `$ref` is set on a sub-schema, no other properties, except for than those starting as a `$`, may be set.',
+        },
         stopSequences: {
           type: 'array',
           description:
             'Optional. The set of character sequences (up to 5) that will stop output generation. If specified, the API will stop at the first appearance of a `stop_sequence`. The stop sequence will not be included as part of the response.',
           items: { type: 'string' },
+        },
+        seed: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.',
+        },
+        responseMimeType: {
+          type: 'string',
+          description:
+            'Optional. MIME type of the generated candidate text. Supported MIME types are: `text/plain`: (default) Text output. `application/json`: JSON response in the response candidates. `text/x.enum`: ENUM as a string response in the response candidates. Refer to the [docs](https://ai.google.dev/gemini-api/docs/prompting_with_media#plain_text_formats) for a list of all supported text MIME types.',
+        },
+        mediaResolution: {
+          type: 'string',
+          description:
+            'Optional. If specified, the media resolution specified will be used.',
+          enum: [
+            'MEDIA_RESOLUTION_UNSPECIFIED',
+            'MEDIA_RESOLUTION_LOW',
+            'MEDIA_RESOLUTION_MEDIUM',
+            'MEDIA_RESOLUTION_HIGH',
+          ],
         },
         maxOutputTokens: {
           type: 'integer',
@@ -2069,51 +2118,28 @@ export const CountTokensRequestSchema = {
           description:
             "Optional. The maximum cumulative probability of tokens to consider when sampling. The model uses combined Top-k and Top-p (nucleus) sampling. Tokens are sorted based on their assigned probabilities so that only the most likely tokens are considered. Top-k sampling directly limits the maximum number of tokens to consider, while Nucleus sampling limits the number of tokens based on the cumulative probability. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
         },
-        topK: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            "Optional. The maximum number of tokens to consider when sampling. Gemini models use Top-p (nucleus) sampling or a combination of Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Models running with nucleus sampling don't allow top_k setting. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
-        },
-        seed: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.',
-        },
-        responseMimeType: {
-          type: 'string',
-          description:
-            'Optional. MIME type of the generated candidate text. Supported MIME types are: `text/plain`: (default) Text output. `application/json`: JSON response in the response candidates. `text/x.enum`: ENUM as a string response in the response candidates. Refer to the [docs](https://ai.google.dev/gemini-api/docs/prompting_with_media#plain_text_formats) for a list of all supported text MIME types.',
-        },
-        responseSchema: { $ref: '#/$defs/Schema' },
-        _responseJsonSchema: {
-          type: 'any',
-          description:
-            'Optional. Output schema of the generated response. This is an alternative to `response_schema` that accepts [JSON Schema](https://json-schema.org/). If set, `response_schema` must be omitted, but `response_mime_type` is required. While the full JSON Schema may be sent, not all features are supported. Specifically, only the following properties are supported: - `$id` - `$defs` - `$ref` - `$anchor` - `type` - `format` - `title` - `description` - `enum` (for strings and numbers) - `items` - `prefixItems` - `minItems` - `maxItems` - `minimum` - `maximum` - `anyOf` - `oneOf` (interpreted the same as `anyOf`) - `properties` - `additionalProperties` - `required` The non-standard `propertyOrdering` property may also be set. Cyclic references are unrolled to a limited degree and, as such, may only be used within non-required properties. (Nullable properties are not sufficient.) If `$ref` is set on a sub-schema, no other properties, except for than those starting as a `$`, may be set.',
-        },
         responseJsonSchema: {
           type: 'any',
           description:
             'Optional. An internal detail. Use `responseJsonSchema` rather than this field.',
         },
-        presencePenalty: {
-          type: 'number',
-          format: 'float',
+        responseFormat: { $ref: '#/$defs/ResponseFormatConfig' },
+        responseModalities: {
+          type: 'array',
           description:
-            "Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequency_penalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary. A negative penalty will encourage the use of tokens that have already been used in the response, decreasing the vocabulary.",
-        },
-        frequencyPenalty: {
-          type: 'number',
-          format: 'float',
-          description:
-            "Optional. Frequency penalty applied to the next token's logprobs, multiplied by the number of times each token has been seen in the respponse so far. A positive penalty will discourage the use of tokens that have already been used, proportional to the number of times the token has been used: The more a token is used, the more difficult it is for the model to use that token again increasing the vocabulary of responses. Caution: A _negative_ penalty will encourage the model to reuse tokens proportional to the number of times the token has been used. Small negative values will reduce the vocabulary of a response. Larger negative values will cause the model to start repeating a common token until it hits the max_output_tokens limit.",
+            'Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.',
+          items: {
+            type: 'string',
+            enum: ['MODALITY_UNSPECIFIED', 'TEXT', 'IMAGE', 'AUDIO'],
+          },
         },
         responseLogprobs: {
           type: 'boolean',
           description:
             'Optional. If true, export the logprobs results in response.',
         },
+        thinkingConfig: { $ref: '#/$defs/ThinkingConfig' },
+        responseSchema: { $ref: '#/$defs/Schema' },
         logprobs: {
           type: 'integer',
           format: 'int32',
@@ -2125,30 +2151,6 @@ export const CountTokensRequestSchema = {
           description:
             'Optional. Enables enhanced civic answers. It may not be available for all models.',
         },
-        responseModalities: {
-          type: 'array',
-          description:
-            'Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.',
-          items: {
-            type: 'string',
-            enum: ['MODALITY_UNSPECIFIED', 'TEXT', 'IMAGE', 'AUDIO'],
-          },
-        },
-        speechConfig: { $ref: '#/$defs/SpeechConfig' },
-        thinkingConfig: { $ref: '#/$defs/ThinkingConfig' },
-        imageConfig: { $ref: '#/$defs/ImageConfig' },
-        mediaResolution: {
-          type: 'string',
-          description:
-            'Optional. If specified, the media resolution specified will be used.',
-          enum: [
-            'MEDIA_RESOLUTION_UNSPECIFIED',
-            'MEDIA_RESOLUTION_LOW',
-            'MEDIA_RESOLUTION_MEDIUM',
-            'MEDIA_RESOLUTION_HIGH',
-          ],
-        },
-        responseFormat: { $ref: '#/$defs/ResponseFormatConfig' },
       },
     },
     GoogleMaps: {
@@ -2184,15 +2186,15 @@ export const CountTokensRequestSchema = {
       type: 'object',
       description: 'Config for image generation features.',
       properties: {
-        aspectRatio: {
-          type: 'string',
-          description:
-            'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
-        },
         imageSize: {
           type: 'string',
           description:
             'Optional. Specifies the size of generated images. Supported values are `512`, `1K`, `2K`, `4K`. If not specified, the model will use default value `1K`.',
+        },
+        aspectRatio: {
+          type: 'string',
+          description:
+            'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
         },
       },
     },
@@ -2200,16 +2202,6 @@ export const CountTokensRequestSchema = {
       type: 'object',
       description: 'Configuration for image output format.',
       properties: {
-        mimeType: {
-          type: 'string',
-          description: 'Optional. The MIME type of the image output.',
-          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
-        },
-        delivery: {
-          type: 'string',
-          description: 'Optional. The delivery mode for the image output.',
-          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
-        },
         aspectRatio: {
           type: 'string',
           description: 'Optional. The aspect ratio for the image output.',
@@ -2230,6 +2222,16 @@ export const CountTokensRequestSchema = {
             'ASPECT_RATIO_ONE_BY_FOUR',
             'ASPECT_RATIO_FOUR_BY_ONE',
           ],
+        },
+        mimeType: {
+          type: 'string',
+          description: 'Optional. The MIME type of the image output.',
+          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
+        },
+        delivery: {
+          type: 'string',
+          description: 'Optional. The delivery mode for the image output.',
+          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
         },
         imageSize: {
           type: 'string',
@@ -2254,17 +2256,17 @@ export const CountTokensRequestSchema = {
       description:
         'Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.',
       properties: {
-        startTime: {
-          type: 'string',
-          format: 'google-datetime',
-          description:
-            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
-        },
         endTime: {
           type: 'string',
           format: 'google-datetime',
           description:
             'Optional. Exclusive end of the interval. If specified, a Timestamp matching this interval will have to be before the end.',
+        },
+        startTime: {
+          type: 'string',
+          format: 'google-datetime',
+          description:
+            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
         },
       },
     },
@@ -2273,17 +2275,17 @@ export const CountTokensRequestSchema = {
       description:
         'An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.',
       properties: {
-        latitude: {
-          type: 'number',
-          format: 'double',
-          description:
-            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
-        },
         longitude: {
           type: 'number',
           format: 'double',
           description:
             'The longitude in degrees. It must be in the range [-180.0, +180.0].',
+        },
+        latitude: {
+          type: 'number',
+          format: 'double',
+          description:
+            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
         },
       },
     },
@@ -2318,27 +2320,17 @@ export const CountTokensRequestSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -2348,7 +2340,17 @@ export const CountTokensRequestSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     PrebuiltVoiceConfig: {
@@ -2426,6 +2428,45 @@ export const CountTokensRequestSchema = {
       description:
         'The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).',
       properties: {
+        format: {
+          type: 'string',
+          description:
+            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
+        },
+        maxProperties: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the properties for Type.OBJECT.',
+        },
+        description: {
+          type: 'string',
+          description:
+            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
+        },
+        maxLength: {
+          type: 'string',
+          format: 'int64',
+          description: 'Optional. Maximum length of the Type.STRING',
+        },
+        items: { $ref: '#/$defs/Schema' },
+        maxItems: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the elements for Type.ARRAY.',
+        },
+        anyOf: {
+          type: 'array',
+          description:
+            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
+          items: { $ref: '#/$defs/Schema' },
+        },
+        default: {
+          type: 'any',
+          description:
+            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
+        },
         type: {
           type: 'string',
           description: 'Required. Data type.',
@@ -2440,36 +2481,36 @@ export const CountTokensRequestSchema = {
             'NULL',
           ],
         },
-        format: {
-          type: 'string',
-          description:
-            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
-        },
-        title: {
-          type: 'string',
-          description: 'Optional. The title of the schema.',
-        },
-        description: {
-          type: 'string',
-          description:
-            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
-        },
         nullable: {
           type: 'boolean',
           description: 'Optional. Indicates if the value may be null.',
         },
-        enum: {
+        propertyOrdering: {
           type: 'array',
           description:
-            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
+            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
           items: { type: 'string' },
         },
-        items: { $ref: '#/$defs/Schema' },
-        maxItems: {
+        pattern: {
+          type: 'string',
+          description:
+            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
+        },
+        required: {
+          type: 'array',
+          description: 'Optional. Required properties of Type.OBJECT.',
+          items: { type: 'string' },
+        },
+        minLength: {
           type: 'string',
           format: 'int64',
           description:
-            'Optional. Maximum number of the elements for Type.ARRAY.',
+            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
+        },
+        example: {
+          type: 'any',
+          description:
+            'Optional. Example of the object. Will only populated when the object is the root.',
         },
         minItems: {
           type: 'string',
@@ -2482,10 +2523,15 @@ export const CountTokensRequestSchema = {
           description: 'Optional. Properties of Type.OBJECT.',
           additionalProperties: { $ref: '#/$defs/Schema' },
         },
-        required: {
-          type: 'array',
-          description: 'Optional. Required properties of Type.OBJECT.',
-          items: { type: 'string' },
+        maximum: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional. The title of the schema.',
         },
         minProperties: {
           type: 'string',
@@ -2493,61 +2539,17 @@ export const CountTokensRequestSchema = {
           description:
             'Optional. Minimum number of the properties for Type.OBJECT.',
         },
-        maxProperties: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. Maximum number of the properties for Type.OBJECT.',
-        },
         minimum: {
           type: 'number',
           format: 'double',
           description:
             'Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER Minimum value of the Type.INTEGER and Type.NUMBER',
         },
-        maximum: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
-        },
-        minLength: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
-        },
-        maxLength: {
-          type: 'string',
-          format: 'int64',
-          description: 'Optional. Maximum length of the Type.STRING',
-        },
-        pattern: {
-          type: 'string',
-          description:
-            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
-        },
-        example: {
-          type: 'any',
-          description:
-            'Optional. Example of the object. Will only populated when the object is the root.',
-        },
-        anyOf: {
+        enum: {
           type: 'array',
           description:
-            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
-          items: { $ref: '#/$defs/Schema' },
-        },
-        propertyOrdering: {
-          type: 'array',
-          description:
-            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
+            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
           items: { type: 'string' },
-        },
-        default: {
-          type: 'any',
-          description:
-            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
         },
       },
     },
@@ -2565,25 +2567,25 @@ export const CountTokensRequestSchema = {
       description:
         'The configuration for a single speaker in a multi speaker setup.',
       properties: {
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         speaker: {
           type: 'string',
           description:
             'Required. The name of the speaker to use. Should be the same as in the prompt.',
         },
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     SpeechConfig: {
       type: 'object',
       description: 'Config for speech generation and transcription.',
       properties: {
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         multiSpeakerVoiceConfig: { $ref: '#/$defs/MultiSpeakerVoiceConfig' },
         languageCode: {
           type: 'string',
           description:
             'Optional. The IETF [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language code that the user configured the app to use. Used for speech recognition and synthesis. Valid values are: `de-DE`, `en-AU`, `en-GB`, `en-IN`, `en-US`, `es-US`, `fr-FR`, `hi-IN`, `pt-BR`, `ar-XA`, `es-ES`, `fr-CA`, `id-ID`, `it-IT`, `ja-JP`, `tr-TR`, `vi-VN`, `bn-IN`, `gu-IN`, `kn-IN`, `ml-IN`, `mr-IN`, `ta-IN`, `te-IN`, `nl-NL`, `ko-KR`, `cmn-CN`, `pl-PL`, `ru-RU`, and `th-TH`.',
         },
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     StreamableHttpTransport: {
@@ -2591,21 +2593,11 @@ export const CountTokensRequestSchema = {
       description:
         'A transport that can stream HTTP requests and responses. Next ID: 6',
       properties: {
-        url: {
-          type: 'string',
-          description:
-            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
-        },
         headers: {
           type: 'object',
           description:
             'Optional: Fields for authentication headers, timeouts, etc., if needed.',
           additionalProperties: { type: 'string' },
-        },
-        timeout: {
-          type: 'string',
-          format: 'google-duration',
-          description: 'HTTP timeout for regular operations.',
         },
         sseReadTimeout: {
           type: 'string',
@@ -2616,6 +2608,16 @@ export const CountTokensRequestSchema = {
           type: 'boolean',
           description:
             'Whether to close the client session when the transport closes.',
+        },
+        timeout: {
+          type: 'string',
+          format: 'google-duration',
+          description: 'HTTP timeout for regular operations.',
+        },
+        url: {
+          type: 'string',
+          description:
+            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
         },
       },
     },
@@ -2639,16 +2641,16 @@ export const CountTokensRequestSchema = {
       type: 'object',
       description: 'Config for thinking features.',
       properties: {
-        includeThoughts: {
-          type: 'boolean',
-          description:
-            'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
-        },
         thinkingBudget: {
           type: 'integer',
           format: 'int32',
           description:
             'The number of thoughts tokens that the model should generate.',
+        },
+        includeThoughts: {
+          type: 'boolean',
+          description:
+            'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
         },
         thinkingLevel: {
           type: 'string',
@@ -2669,24 +2671,24 @@ export const CountTokensRequestSchema = {
       description:
         'Tool details that the model may use to generate response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the model. Next ID: 16',
       properties: {
+        googleSearchRetrieval: { $ref: '#/$defs/GoogleSearchRetrieval' },
+        mcpServers: {
+          type: 'array',
+          description: 'Optional. MCP Servers to connect to.',
+          items: { $ref: '#/$defs/McpServer' },
+        },
+        googleSearch: { $ref: '#/$defs/GoogleSearch' },
+        codeExecution: { $ref: '#/$defs/CodeExecution' },
+        computerUse: { $ref: '#/$defs/ComputerUse' },
+        googleMaps: { $ref: '#/$defs/GoogleMaps' },
         functionDeclarations: {
           type: 'array',
           description:
             'Optional. A list of `FunctionDeclarations` available to the model that can be used for function calling. The model or system does not execute the function. Instead the defined function may be returned as a FunctionCall with arguments to the client side for execution. The model may decide to call a subset of these functions by populating FunctionCall in the response. The next conversation turn may contain a FunctionResponse with the Content.role "function" generation context for the next model turn.',
           items: { $ref: '#/$defs/FunctionDeclaration' },
         },
-        googleSearchRetrieval: { $ref: '#/$defs/GoogleSearchRetrieval' },
-        codeExecution: { $ref: '#/$defs/CodeExecution' },
-        googleSearch: { $ref: '#/$defs/GoogleSearch' },
-        computerUse: { $ref: '#/$defs/ComputerUse' },
         urlContext: { $ref: '#/$defs/UrlContext' },
         fileSearch: { $ref: '#/$defs/FileSearch' },
-        mcpServers: {
-          type: 'array',
-          description: 'Optional. MCP Servers to connect to.',
-          items: { $ref: '#/$defs/McpServer' },
-        },
-        googleMaps: { $ref: '#/$defs/GoogleMaps' },
       },
     },
     ToolCall: {
@@ -2727,13 +2729,13 @@ export const CountTokensRequestSchema = {
       description:
         'The Tool configuration containing parameters for specifying `Tool` use in the request.',
       properties: {
-        functionCallingConfig: { $ref: '#/$defs/FunctionCallingConfig' },
-        retrievalConfig: { $ref: '#/$defs/RetrievalConfig' },
         includeServerSideToolInvocations: {
           type: 'boolean',
           description:
             "Optional. If true, the API response will include the server-side tool calls and responses within the `Content` message. This allows clients to observe the server's tool interactions.",
         },
+        functionCallingConfig: { $ref: '#/$defs/FunctionCallingConfig' },
+        retrievalConfig: { $ref: '#/$defs/RetrievalConfig' },
       },
     },
     ToolResponse: {
@@ -2766,6 +2768,22 @@ export const CountTokensRequestSchema = {
             type: 'any',
             description: 'Properties of the object.',
           },
+        },
+      },
+    },
+    TranslationConfig: {
+      type: 'object',
+      description: 'Config for translation features.',
+      properties: {
+        echoTargetLanguage: {
+          type: 'boolean',
+          description:
+            'Optional. If true, the model will generate audio when the target language is spoken, essentially it will parrot the input. If false, we will not produce audio for the target language.',
+        },
+        targetLanguageCode: {
+          type: 'string',
+          description:
+            'Required. The target language for translation. Supported values are BCP-47 language codes (e.g. "en", "es", "fr").',
         },
       },
     },
@@ -2914,11 +2932,10 @@ export const ExampleSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -2930,10 +2947,11 @@ export const ExampleSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -2942,17 +2960,17 @@ export const ExampleSchema = {
       description:
         'The base unit of structured text. A `Message` includes an `author` and the `content` of the `Message`. The `author` is used to tag messages when they are fed to the model as text.',
       properties: {
-        author: {
-          type: 'string',
-          description:
-            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
-        },
         content: {
           type: 'string',
           description:
             'Required. The text content of the structured `Message`.',
         },
         citationMetadata: { $ref: '#/$defs/CitationMetadata' },
+        author: {
+          type: 'string',
+          description:
+            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
+        },
       },
     },
   },
@@ -2963,17 +2981,17 @@ export const ExecutableCodeSchema = {
   description:
     'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
   properties: {
-    id: {
-      type: 'string',
-      description:
-        'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-    },
     language: {
       type: 'string',
       description: 'Required. Programming language of the `code`.',
       enum: ['LANGUAGE_UNSPECIFIED', 'PYTHON'],
     },
     code: { type: 'string', description: 'Required. The code to be executed.' },
+    id: {
+      type: 'string',
+      description:
+        'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
+    },
   },
 } as const
 
@@ -3000,16 +3018,16 @@ export const FileSearchSchema = {
         'Required. The names of the file_search_stores to retrieve from. Example: `fileSearchStores/my-file-search-store-123`',
       items: { type: 'string' },
     },
+    metadataFilter: {
+      type: 'string',
+      description:
+        'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
+    },
     topK: {
       type: 'integer',
       format: 'int32',
       description:
         'Optional. The number of semantic retrieval chunks to retrieve.',
-    },
-    metadataFilter: {
-      type: 'string',
-      description:
-        'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
     },
   },
 } as const
@@ -3065,32 +3083,32 @@ export const FunctionDeclarationSchema = {
   description:
     'Structured representation of a function declaration as defined by the [OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included in this declaration are the function name and parameters. This FunctionDeclaration is a representation of a block of code that can be used as a `Tool` by the model and executed by the client.',
   properties: {
-    name: {
-      type: 'string',
-      description:
-        'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
-    },
     description: {
       type: 'string',
       description: 'Required. A brief description of the function.',
     },
     parameters: { $ref: '#/$defs/Schema' },
-    parametersJsonSchema: {
-      type: 'any',
-      description:
-        'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
-    },
-    response: { $ref: '#/$defs/Schema' },
     responseJsonSchema: {
       type: 'any',
       description:
         'Optional. Describes the output from this function in JSON Schema format. The value specified by the schema is the response value of the function. This field is mutually exclusive with `response`.',
     },
+    name: {
+      type: 'string',
+      description:
+        'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
+    },
+    response: { $ref: '#/$defs/Schema' },
     behavior: {
       type: 'string',
       description:
         'Optional. Specifies the function Behavior. Currently only supported by the BidiGenerateContent method.',
       enum: ['UNSPECIFIED', 'BLOCKING', 'NON_BLOCKING'],
+    },
+    parametersJsonSchema: {
+      type: 'any',
+      description:
+        'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
     },
   },
   $defs: {
@@ -3099,6 +3117,45 @@ export const FunctionDeclarationSchema = {
       description:
         'The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).',
       properties: {
+        format: {
+          type: 'string',
+          description:
+            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
+        },
+        maxProperties: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the properties for Type.OBJECT.',
+        },
+        description: {
+          type: 'string',
+          description:
+            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
+        },
+        maxLength: {
+          type: 'string',
+          format: 'int64',
+          description: 'Optional. Maximum length of the Type.STRING',
+        },
+        items: { $ref: '#/$defs/Schema' },
+        maxItems: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the elements for Type.ARRAY.',
+        },
+        anyOf: {
+          type: 'array',
+          description:
+            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
+          items: { $ref: '#/$defs/Schema' },
+        },
+        default: {
+          type: 'any',
+          description:
+            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
+        },
         type: {
           type: 'string',
           description: 'Required. Data type.',
@@ -3113,36 +3170,36 @@ export const FunctionDeclarationSchema = {
             'NULL',
           ],
         },
-        format: {
-          type: 'string',
-          description:
-            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
-        },
-        title: {
-          type: 'string',
-          description: 'Optional. The title of the schema.',
-        },
-        description: {
-          type: 'string',
-          description:
-            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
-        },
         nullable: {
           type: 'boolean',
           description: 'Optional. Indicates if the value may be null.',
         },
-        enum: {
+        propertyOrdering: {
           type: 'array',
           description:
-            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
+            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
           items: { type: 'string' },
         },
-        items: { $ref: '#/$defs/Schema' },
-        maxItems: {
+        pattern: {
+          type: 'string',
+          description:
+            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
+        },
+        required: {
+          type: 'array',
+          description: 'Optional. Required properties of Type.OBJECT.',
+          items: { type: 'string' },
+        },
+        minLength: {
           type: 'string',
           format: 'int64',
           description:
-            'Optional. Maximum number of the elements for Type.ARRAY.',
+            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
+        },
+        example: {
+          type: 'any',
+          description:
+            'Optional. Example of the object. Will only populated when the object is the root.',
         },
         minItems: {
           type: 'string',
@@ -3155,10 +3212,15 @@ export const FunctionDeclarationSchema = {
           description: 'Optional. Properties of Type.OBJECT.',
           additionalProperties: { $ref: '#/$defs/Schema' },
         },
-        required: {
-          type: 'array',
-          description: 'Optional. Required properties of Type.OBJECT.',
-          items: { type: 'string' },
+        maximum: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional. The title of the schema.',
         },
         minProperties: {
           type: 'string',
@@ -3166,61 +3228,17 @@ export const FunctionDeclarationSchema = {
           description:
             'Optional. Minimum number of the properties for Type.OBJECT.',
         },
-        maxProperties: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. Maximum number of the properties for Type.OBJECT.',
-        },
         minimum: {
           type: 'number',
           format: 'double',
           description:
             'Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER Minimum value of the Type.INTEGER and Type.NUMBER',
         },
-        maximum: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
-        },
-        minLength: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
-        },
-        maxLength: {
-          type: 'string',
-          format: 'int64',
-          description: 'Optional. Maximum length of the Type.STRING',
-        },
-        pattern: {
-          type: 'string',
-          description:
-            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
-        },
-        example: {
-          type: 'any',
-          description:
-            'Optional. Example of the object. Will only populated when the object is the root.',
-        },
-        anyOf: {
+        enum: {
           type: 'array',
           description:
-            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
-          items: { $ref: '#/$defs/Schema' },
-        },
-        propertyOrdering: {
-          type: 'array',
-          description:
-            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
+            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
           items: { type: 'string' },
-        },
-        default: {
-          type: 'any',
-          description:
-            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
         },
       },
     },
@@ -3236,6 +3254,17 @@ export const FunctionResponseSchema = {
       type: 'string',
       description:
         'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
+    },
+    scheduling: {
+      type: 'string',
+      description:
+        'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+      enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+    },
+    willContinue: {
+      type: 'boolean',
+      description:
+        'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
     },
     name: {
       type: 'string',
@@ -3256,17 +3285,6 @@ export const FunctionResponseSchema = {
       description:
         'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
       items: { $ref: '#/$defs/FunctionResponsePart' },
-    },
-    willContinue: {
-      type: 'boolean',
-      description:
-        'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-    },
-    scheduling: {
-      type: 'string',
-      description:
-        'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-      enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
     },
   },
   $defs: {
@@ -3344,24 +3362,6 @@ export const GenerateAnswerRequestSchema = {
   type: 'object',
   description: 'Request to generate a grounded answer from the `Model`.',
   properties: {
-    inlinePassages: { $ref: '#/$defs/GroundingPassages' },
-    semanticRetriever: { $ref: '#/$defs/SemanticRetrieverConfig' },
-    contents: {
-      type: 'array',
-      description:
-        'Required. The content of the current conversation with the `Model`. For single-turn queries, this is a single question to answer. For multi-turn queries, this is a repeated field that contains conversation history and the last `Content` in the list containing the question. Note: `GenerateAnswer` only supports queries in English.',
-      items: { $ref: '#/$defs/Content' },
-    },
-    answerStyle: {
-      type: 'string',
-      description: 'Required. Style in which answers should be returned.',
-      enum: [
-        'ANSWER_STYLE_UNSPECIFIED',
-        'ABSTRACTIVE',
-        'EXTRACTIVE',
-        'VERBOSE',
-      ],
-    },
     safetySettings: {
       type: 'array',
       description:
@@ -3373,6 +3373,24 @@ export const GenerateAnswerRequestSchema = {
       format: 'float',
       description:
         'Optional. Controls the randomness of the output. Values can range from [0.0,1.0], inclusive. A value closer to 1.0 will produce responses that are more varied and creative, while a value closer to 0.0 will typically result in more straightforward responses from the model. A low temperature (~0.2) is usually recommended for Attributed-Question-Answering use cases.',
+    },
+    inlinePassages: { $ref: '#/$defs/GroundingPassages' },
+    contents: {
+      type: 'array',
+      description:
+        'Required. The content of the current conversation with the `Model`. For single-turn queries, this is a single question to answer. For multi-turn queries, this is a repeated field that contains conversation history and the last `Content` in the list containing the question. Note: `GenerateAnswer` only supports queries in English.',
+      items: { $ref: '#/$defs/Content' },
+    },
+    semanticRetriever: { $ref: '#/$defs/SemanticRetrieverConfig' },
+    answerStyle: {
+      type: 'string',
+      description: 'Required. Style in which answers should be returned.',
+      enum: [
+        'ANSWER_STYLE_UNSPECIFIED',
+        'ABSTRACTIVE',
+        'EXTRACTIVE',
+        'VERBOSE',
+      ],
     },
   },
   $defs: {
@@ -3398,10 +3416,10 @@ export const GenerateAnswerRequestSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -3413,10 +3431,10 @@ export const GenerateAnswerRequestSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -3427,11 +3445,6 @@ export const GenerateAnswerRequestSchema = {
         stringValue: {
           type: 'string',
           description: 'The string value to filter the metadata on.',
-        },
-        numericValue: {
-          type: 'number',
-          format: 'float',
-          description: 'The numeric value to filter the metadata on.',
         },
         operation: {
           type: 'string',
@@ -3449,6 +3462,11 @@ export const GenerateAnswerRequestSchema = {
             'EXCLUDES',
           ],
         },
+        numericValue: {
+          type: 'number',
+          format: 'float',
+          description: 'The numeric value to filter the metadata on.',
+        },
       },
     },
     Content: {
@@ -3456,16 +3474,16 @@ export const GenerateAnswerRequestSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -3474,11 +3492,6 @@ export const GenerateAnswerRequestSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -3487,6 +3500,11 @@ export const GenerateAnswerRequestSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -3538,6 +3556,17 @@ export const GenerateAnswerRequestSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -3557,17 +3586,6 @@ export const GenerateAnswerRequestSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -3598,12 +3616,12 @@ export const GenerateAnswerRequestSchema = {
       type: 'object',
       description: 'Passage included inline with a grounding configuration.',
       properties: {
+        content: { $ref: '#/$defs/Content' },
         id: {
           type: 'string',
           description:
             'Identifier for the passage for attributing this passage in grounded answers.',
         },
-        content: { $ref: '#/$defs/Content' },
       },
     },
     GroundingPassages: {
@@ -3645,27 +3663,17 @@ export const GenerateAnswerRequestSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -3675,7 +3683,17 @@ export const GenerateAnswerRequestSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     SafetySetting: {
@@ -3843,6 +3861,7 @@ export const GenerateAnswerResponseSchema = {
   type: 'object',
   description: 'Response from the model for a grounded answer.',
   properties: {
+    inputFeedback: { $ref: '#/$defs/InputFeedback' },
     answer: { $ref: '#/$defs/Candidate' },
     answerableProbability: {
       type: 'number',
@@ -3850,7 +3869,6 @@ export const GenerateAnswerResponseSchema = {
       description:
         'Output only. The model\'s estimate of the probability that its answer is correct and grounded in the input passages. A low `answerable_probability` indicates that the answer might not be grounded in the sources. When `answerable_probability` is low, you may want to: * Display a message to the effect of "We couldn’t answer that question" to the user. * Fall back to a general-purpose LLM that answers the question from world knowledge. The threshold and nature of such fallbacks will depend on individual use cases. `0.5` is a good starting threshold.',
     },
-    inputFeedback: { $ref: '#/$defs/InputFeedback' },
   },
   $defs: {
     AttributionSourceId: {
@@ -3883,13 +3901,38 @@ export const GenerateAnswerResponseSchema = {
       type: 'object',
       description: 'A response candidate generated from the model.',
       properties: {
+        avgLogprobs: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Output only. Average log probability score of the candidate.',
+        },
+        groundingMetadata: { $ref: '#/$defs/GroundingMetadata' },
+        content: { $ref: '#/$defs/Content' },
+        finishMessage: {
+          type: 'string',
+          description:
+            'Optional. Output only. Details the reason why the model stopped generating tokens. This is populated only when `finish_reason` is set.',
+        },
+        safetyRatings: {
+          type: 'array',
+          description:
+            'List of ratings for the safety of a response candidate. There is at most one rating per category.',
+          items: { $ref: '#/$defs/SafetyRating' },
+        },
+        tokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description: 'Output only. Token count for this candidate.',
+        },
+        logprobsResult: { $ref: '#/$defs/LogprobsResult' },
+        urlContextMetadata: { $ref: '#/$defs/UrlContextMetadata' },
         index: {
           type: 'integer',
           format: 'int32',
           description:
             'Output only. Index of the candidate in the list of response candidates.',
         },
-        content: { $ref: '#/$defs/Content' },
         finishReason: {
           type: 'string',
           description:
@@ -3915,24 +3958,8 @@ export const GenerateAnswerResponseSchema = {
             'TOO_MANY_TOOL_CALLS',
             'MISSING_THOUGHT_SIGNATURE',
             'MALFORMED_RESPONSE',
+            'ESCALATION',
           ],
-        },
-        finishMessage: {
-          type: 'string',
-          description:
-            'Optional. Output only. Details the reason why the model stopped generating tokens. This is populated only when `finish_reason` is set.',
-        },
-        safetyRatings: {
-          type: 'array',
-          description:
-            'List of ratings for the safety of a response candidate. There is at most one rating per category.',
-          items: { $ref: '#/$defs/SafetyRating' },
-        },
-        citationMetadata: { $ref: '#/$defs/CitationMetadata' },
-        tokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description: 'Output only. Token count for this candidate.',
         },
         groundingAttributions: {
           type: 'array',
@@ -3940,15 +3967,7 @@ export const GenerateAnswerResponseSchema = {
             'Output only. Attribution information for sources that contributed to a grounded answer. This field is populated for `GenerateAnswer` calls.',
           items: { $ref: '#/$defs/GroundingAttribution' },
         },
-        groundingMetadata: { $ref: '#/$defs/GroundingMetadata' },
-        avgLogprobs: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Output only. Average log probability score of the candidate.',
-        },
-        logprobsResult: { $ref: '#/$defs/LogprobsResult' },
-        urlContextMetadata: { $ref: '#/$defs/UrlContextMetadata' },
+        citationMetadata: { $ref: '#/$defs/CitationMetadata' },
       },
     },
     CitationMetadata: {
@@ -3968,11 +3987,10 @@ export const GenerateAnswerResponseSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -3984,10 +4002,11 @@ export const GenerateAnswerResponseSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -3996,10 +4015,10 @@ export const GenerateAnswerResponseSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -4011,10 +4030,10 @@ export const GenerateAnswerResponseSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -4023,16 +4042,16 @@ export const GenerateAnswerResponseSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -4041,11 +4060,6 @@ export const GenerateAnswerResponseSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -4054,6 +4068,11 @@ export const GenerateAnswerResponseSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -4105,6 +4124,17 @@ export const GenerateAnswerResponseSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -4124,17 +4154,6 @@ export const GenerateAnswerResponseSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -4166,17 +4185,17 @@ export const GenerateAnswerResponseSchema = {
       description: 'Grounding support.',
       properties: {
         segment: { $ref: '#/$defs/GoogleAiGenerativelanguageV1betaSegment' },
-        groundingChunkIndices: {
-          type: 'array',
-          description:
-            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
-          items: { type: 'integer', format: 'int32' },
-        },
         confidenceScores: {
           type: 'array',
           description:
             'Optional. Confidence score of the support references. Ranges from 0 to 1. 1 is the most confident. This list must have the same size as the grounding_chunk_indices.',
           items: { type: 'number', format: 'float' },
+        },
+        groundingChunkIndices: {
+          type: 'array',
+          description:
+            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
+          items: { type: 'integer', format: 'int32' },
         },
         renderedParts: {
           type: 'array',
@@ -4190,12 +4209,6 @@ export const GenerateAnswerResponseSchema = {
       type: 'object',
       description: 'Segment of the content.',
       properties: {
-        partIndex: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'The index of a Part object within its parent Content object.',
-        },
         startIndex: {
           type: 'integer',
           format: 'int32',
@@ -4207,6 +4220,12 @@ export const GenerateAnswerResponseSchema = {
           format: 'int32',
           description:
             'End index in the given Part, measured in bytes. Offset from the start of the Part, exclusive, starting at zero.',
+        },
+        partIndex: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'The index of a Part object within its parent Content object.',
         },
         text: {
           type: 'string',
@@ -4229,27 +4248,27 @@ export const GenerateAnswerResponseSchema = {
         "A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.",
       properties: {
         web: { $ref: '#/$defs/Web' },
-        image: { $ref: '#/$defs/Image' },
-        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
         maps: { $ref: '#/$defs/Maps' },
+        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
+        image: { $ref: '#/$defs/Image' },
       },
     },
     GroundingChunkCustomMetadata: {
       type: 'object',
       description: 'User provided metadata about the GroundingFact.',
       properties: {
-        stringValue: {
-          type: 'string',
-          description: 'Optional. The string value of the metadata.',
-        },
-        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         numericValue: {
           type: 'number',
           format: 'float',
           description:
             'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
         },
+        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         key: { type: 'string', description: 'The key of the metadata.' },
+        stringValue: {
+          type: 'string',
+          description: 'Optional. The string value of the metadata.',
+        },
       },
     },
     GroundingChunkStringList: {
@@ -4268,12 +4287,6 @@ export const GenerateAnswerResponseSchema = {
       description: 'Metadata returned to client when grounding is enabled.',
       properties: {
         searchEntryPoint: { $ref: '#/$defs/SearchEntryPoint' },
-        groundingChunks: {
-          type: 'array',
-          description:
-            'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
-          items: { $ref: '#/$defs/GroundingChunk' },
-        },
         groundingSupports: {
           type: 'array',
           description: 'List of grounding support.',
@@ -4281,21 +4294,27 @@ export const GenerateAnswerResponseSchema = {
             $ref: '#/$defs/GoogleAiGenerativelanguageV1betaGroundingSupport',
           },
         },
-        retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
-        webSearchQueries: {
-          type: 'array',
-          description: 'Web search queries for the following-up web search.',
-          items: { type: 'string' },
-        },
         imageSearchQueries: {
           type: 'array',
           description: 'Image search queries used for grounding.',
           items: { type: 'string' },
         },
+        retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
         googleMapsWidgetContextToken: {
           type: 'string',
           description:
             'Optional. Resource name of the Google Maps widget context token that can be used with the PlacesContextElement widget in order to render contextual data. Only populated in the case that grounding with Google Maps is enabled.',
+        },
+        webSearchQueries: {
+          type: 'array',
+          description: 'Web search queries for the following-up web search.',
+          items: { type: 'string' },
+        },
+        groundingChunks: {
+          type: 'array',
+          description:
+            'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
+          items: { $ref: '#/$defs/GroundingChunk' },
         },
       },
     },
@@ -4324,15 +4343,15 @@ export const GenerateAnswerResponseSchema = {
           type: 'string',
           description: 'The web page URI for attribution.',
         },
-        imageUri: { type: 'string', description: 'The image asset URL.' },
-        title: {
-          type: 'string',
-          description: 'The title of the web page that the image is from.',
-        },
         domain: {
           type: 'string',
           description:
             'The root domain of the web page that the image is from, e.g. "example.com".',
+        },
+        imageUri: { type: 'string', description: 'The image asset URL.' },
+        title: {
+          type: 'string',
+          description: 'The title of the web page that the image is from.',
         },
       },
     },
@@ -4364,16 +4383,16 @@ export const GenerateAnswerResponseSchema = {
           format: 'float',
           description: 'Sum of log probabilities for all tokens.',
         },
-        topCandidates: {
-          type: 'array',
-          description: 'Length = total number of decoding steps.',
-          items: { $ref: '#/$defs/TopCandidates' },
-        },
         chosenCandidates: {
           type: 'array',
           description:
             'Length = total number of decoding steps. The chosen candidates may or may not be in top_candidates.',
           items: { $ref: '#/$defs/LogprobsResultCandidate' },
+        },
+        topCandidates: {
+          type: 'array',
+          description: 'Length = total number of decoding steps.',
+          items: { $ref: '#/$defs/TopCandidates' },
         },
       },
     },
@@ -4402,18 +4421,18 @@ export const GenerateAnswerResponseSchema = {
       description:
         'A grounding chunk from Google Maps. A Maps chunk corresponds to a single place.',
       properties: {
-        uri: { type: 'string', description: 'URI reference of the place.' },
-        title: { type: 'string', description: 'Title of the place.' },
-        text: {
-          type: 'string',
-          description: 'Text description of the place answer.',
-        },
         placeId: {
           type: 'string',
           description:
             'The ID of the place, in `places/{place_id}` format. A user can use this ID to look up that place.',
         },
+        uri: { type: 'string', description: 'URI reference of the place.' },
+        text: {
+          type: 'string',
+          description: 'Text description of the place answer.',
+        },
         placeAnswerSources: { $ref: '#/$defs/PlaceAnswerSources' },
+        title: { type: 'string', description: 'Title of the place.' },
       },
     },
     MediaResolution: {
@@ -4427,27 +4446,17 @@ export const GenerateAnswerResponseSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -4457,7 +4466,17 @@ export const GenerateAnswerResponseSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     PlaceAnswerSources: {
@@ -4489,20 +4508,20 @@ export const GenerateAnswerResponseSchema = {
       type: 'object',
       description: 'Chunk from context retrieved by the file search tool.',
       properties: {
-        uri: {
-          type: 'string',
+        pageNumber: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. URI reference of the semantic retrieval document.',
+            'Optional. Page number of the retrieved context, if applicable.',
         },
         title: {
           type: 'string',
           description: 'Optional. Title of the document.',
         },
-        text: { type: 'string', description: 'Optional. Text of the chunk.' },
-        fileSearchStore: {
+        uri: {
           type: 'string',
           description:
-            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
+            'Optional. URI reference of the semantic retrieval document.',
         },
         customMetadata: {
           type: 'array',
@@ -4510,17 +4529,17 @@ export const GenerateAnswerResponseSchema = {
             'Optional. User-provided metadata about the retrieved context.',
           items: { $ref: '#/$defs/GroundingChunkCustomMetadata' },
         },
-        pageNumber: {
-          type: 'integer',
-          format: 'int32',
+        fileSearchStore: {
+          type: 'string',
           description:
-            'Optional. Page number of the retrieved context, if applicable.',
+            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
         },
         mediaId: {
           type: 'string',
           description:
             'Optional. The media blob resource name for multimodal file search results. Format: fileSearchStores/{file_search_store_id}/media/{blob_id}',
         },
+        text: { type: 'string', description: 'Optional. Text of the chunk.' },
       },
     },
     ReviewSnippet: {
@@ -4528,16 +4547,16 @@ export const GenerateAnswerResponseSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
     SafetyRating: {
@@ -4545,6 +4564,21 @@ export const GenerateAnswerResponseSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -4562,21 +4596,6 @@ export const GenerateAnswerResponseSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -4602,15 +4621,15 @@ export const GenerateAnswerResponseSchema = {
       description:
         'Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.',
       properties: {
-        source: {
-          type: 'string',
-          description:
-            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
-        },
         chunk: {
           type: 'string',
           description:
             'Output only. Name of the `Chunk` containing the attributed text. Example: `corpora/123/documents/abc/chunks/xyz`',
+        },
+        source: {
+          type: 'string',
+          description:
+            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
         },
       },
     },
@@ -4751,13 +4770,13 @@ export const GenerateAnswerResponseSchema = {
       type: 'object',
       description: 'Chunk from the web.',
       properties: {
-        uri: {
-          type: 'string',
-          description: 'Output only. URI reference of the chunk.',
-        },
         title: {
           type: 'string',
           description: 'Output only. Title of the chunk.',
+        },
+        uri: {
+          type: 'string',
+          description: 'Output only. URI reference of the chunk.',
         },
       },
     },
@@ -4768,10 +4787,21 @@ export const GenerateContentRequestSchema = {
   type: 'object',
   description: 'Request to generate a completion from the model.',
   properties: {
-    model: {
+    tools: {
+      type: 'array',
+      description:
+        'Optional. A list of `Tools` the `Model` may use to generate the next response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the `Model`. Supported `Tool`s are `Function` and `code_execution`. Refer to the [Function calling](https://ai.google.dev/gemini-api/docs/function-calling) and the [Code execution](https://ai.google.dev/gemini-api/docs/code-execution) guides to learn more.',
+      items: { $ref: '#/$defs/Tool' },
+    },
+    cachedContent: {
       type: 'string',
       description:
-        'Required. The name of the `Model` to use for generating the completion. Format: `models/{model}`.',
+        'Optional. The name of the content [cached](https://ai.google.dev/gemini-api/docs/caching) to use as context to serve the prediction. Format: `cachedContents/{cachedContent}`',
+    },
+    store: {
+      type: 'boolean',
+      description:
+        'Optional. Configures the logging behavior for a given request. If set, it takes precedence over the project-level logging config.',
     },
     systemInstruction: { $ref: '#/$defs/Content' },
     contents: {
@@ -4780,13 +4810,12 @@ export const GenerateContentRequestSchema = {
         'Required. The content of the current conversation with the model. For single-turn queries, this is a single instance. For multi-turn queries like [chat](https://ai.google.dev/gemini-api/docs/text-generation#chat), this is a repeated field that contains the conversation history and the latest request.',
       items: { $ref: '#/$defs/Content' },
     },
-    tools: {
-      type: 'array',
-      description:
-        'Optional. A list of `Tools` the `Model` may use to generate the next response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the `Model`. Supported `Tool`s are `Function` and `code_execution`. Refer to the [Function calling](https://ai.google.dev/gemini-api/docs/function-calling) and the [Code execution](https://ai.google.dev/gemini-api/docs/code-execution) guides to learn more.',
-      items: { $ref: '#/$defs/Tool' },
-    },
     toolConfig: { $ref: '#/$defs/ToolConfig' },
+    model: {
+      type: 'string',
+      description:
+        'Required. The name of the `Model` to use for generating the completion. Format: `models/{model}`.',
+    },
     safetySettings: {
       type: 'array',
       description:
@@ -4794,20 +4823,10 @@ export const GenerateContentRequestSchema = {
       items: { $ref: '#/$defs/SafetySetting' },
     },
     generationConfig: { $ref: '#/$defs/GenerationConfig' },
-    cachedContent: {
-      type: 'string',
-      description:
-        'Optional. The name of the content [cached](https://ai.google.dev/gemini-api/docs/caching) to use as context to serve the prediction. Format: `cachedContents/{cachedContent}`',
-    },
     serviceTier: {
       type: 'string',
       description: 'Optional. The service tier of the request.',
       enum: ['unspecified', 'standard', 'flex', 'priority'],
-    },
-    store: {
-      type: 'boolean',
-      description:
-        'Optional. Configures the logging behavior for a given request. If set, it takes precedence over the project-level logging config.',
     },
   },
   $defs: {
@@ -4874,10 +4893,10 @@ export const GenerateContentRequestSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -4889,10 +4908,10 @@ export const GenerateContentRequestSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -4900,16 +4919,16 @@ export const GenerateContentRequestSchema = {
       type: 'object',
       description: 'Computer Use tool type.',
       properties: {
-        environment: {
-          type: 'string',
-          description: 'Required. The environment being operated.',
-          enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
-        },
         excludedPredefinedFunctions: {
           type: 'array',
           description:
             'Optional. By default, predefined functions are included in the final model call. Some of them can be explicitly excluded from being automatically included. This can serve two purposes: 1. Using a more restricted / different action space. 2. Improving the definitions / instructions of predefined functions.',
           items: { type: 'string' },
+        },
+        environment: {
+          type: 'string',
+          description: 'Required. The environment being operated.',
+          enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
         },
       },
     },
@@ -4918,16 +4937,16 @@ export const GenerateContentRequestSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -4954,11 +4973,6 @@ export const GenerateContentRequestSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -4967,6 +4981,11 @@ export const GenerateContentRequestSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -4993,16 +5012,16 @@ export const GenerateContentRequestSchema = {
             'Required. The names of the file_search_stores to retrieve from. Example: `fileSearchStores/my-file-search-store-123`',
           items: { type: 'string' },
         },
+        metadataFilter: {
+          type: 'string',
+          description:
+            'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
+        },
         topK: {
           type: 'integer',
           format: 'int32',
           description:
             'Optional. The number of semantic retrieval chunks to retrieve.',
-        },
-        metadataFilter: {
-          type: 'string',
-          description:
-            'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
         },
       },
     },
@@ -5055,32 +5074,32 @@ export const GenerateContentRequestSchema = {
       description:
         'Structured representation of a function declaration as defined by the [OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included in this declaration are the function name and parameters. This FunctionDeclaration is a representation of a block of code that can be used as a `Tool` by the model and executed by the client.',
       properties: {
-        name: {
-          type: 'string',
-          description:
-            'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
-        },
         description: {
           type: 'string',
           description: 'Required. A brief description of the function.',
         },
         parameters: { $ref: '#/$defs/Schema' },
-        parametersJsonSchema: {
-          type: 'any',
-          description:
-            'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
-        },
-        response: { $ref: '#/$defs/Schema' },
         responseJsonSchema: {
           type: 'any',
           description:
             'Optional. Describes the output from this function in JSON Schema format. The value specified by the schema is the response value of the function. This field is mutually exclusive with `response`.',
         },
+        name: {
+          type: 'string',
+          description:
+            'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
+        },
+        response: { $ref: '#/$defs/Schema' },
         behavior: {
           type: 'string',
           description:
             'Optional. Specifies the function Behavior. Currently only supported by the BidiGenerateContent method.',
           enum: ['UNSPECIFIED', 'BLOCKING', 'NON_BLOCKING'],
+        },
+        parametersJsonSchema: {
+          type: 'any',
+          description:
+            'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
         },
       },
     },
@@ -5093,6 +5112,17 @@ export const GenerateContentRequestSchema = {
           type: 'string',
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
+        },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
         },
         name: {
           type: 'string',
@@ -5113,17 +5143,6 @@ export const GenerateContentRequestSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -5155,17 +5174,65 @@ export const GenerateContentRequestSchema = {
       description:
         'Configuration options for model generation and outputs. Not all parameters are configurable for every model.',
       properties: {
+        topK: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            "Optional. The maximum number of tokens to consider when sampling. Gemini models use Top-p (nucleus) sampling or a combination of Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Models running with nucleus sampling don't allow top_k setting. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
+        },
+        imageConfig: { $ref: '#/$defs/ImageConfig' },
         candidateCount: {
           type: 'integer',
           format: 'int32',
           description:
             "Optional. Number of generated responses to return. If unset, this will default to 1. Please note that this doesn't work for previous generation models (Gemini 1.0 family)",
         },
+        translationConfig: { $ref: '#/$defs/TranslationConfig' },
+        frequencyPenalty: {
+          type: 'number',
+          format: 'float',
+          description:
+            "Optional. Frequency penalty applied to the next token's logprobs, multiplied by the number of times each token has been seen in the respponse so far. A positive penalty will discourage the use of tokens that have already been used, proportional to the number of times the token has been used: The more a token is used, the more difficult it is for the model to use that token again increasing the vocabulary of responses. Caution: A _negative_ penalty will encourage the model to reuse tokens proportional to the number of times the token has been used. Small negative values will reduce the vocabulary of a response. Larger negative values will cause the model to start repeating a common token until it hits the max_output_tokens limit.",
+        },
+        speechConfig: { $ref: '#/$defs/SpeechConfig' },
+        presencePenalty: {
+          type: 'number',
+          format: 'float',
+          description:
+            "Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequency_penalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary. A negative penalty will encourage the use of tokens that have already been used in the response, decreasing the vocabulary.",
+        },
+        _responseJsonSchema: {
+          type: 'any',
+          description:
+            'Optional. Output schema of the generated response. This is an alternative to `response_schema` that accepts [JSON Schema](https://json-schema.org/). If set, `response_schema` must be omitted, but `response_mime_type` is required. While the full JSON Schema may be sent, not all features are supported. Specifically, only the following properties are supported: - `$id` - `$defs` - `$ref` - `$anchor` - `type` - `format` - `title` - `description` - `enum` (for strings and numbers) - `items` - `prefixItems` - `minItems` - `maxItems` - `minimum` - `maximum` - `anyOf` - `oneOf` (interpreted the same as `anyOf`) - `properties` - `additionalProperties` - `required` The non-standard `propertyOrdering` property may also be set. Cyclic references are unrolled to a limited degree and, as such, may only be used within non-required properties. (Nullable properties are not sufficient.) If `$ref` is set on a sub-schema, no other properties, except for than those starting as a `$`, may be set.',
+        },
         stopSequences: {
           type: 'array',
           description:
             'Optional. The set of character sequences (up to 5) that will stop output generation. If specified, the API will stop at the first appearance of a `stop_sequence`. The stop sequence will not be included as part of the response.',
           items: { type: 'string' },
+        },
+        seed: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.',
+        },
+        responseMimeType: {
+          type: 'string',
+          description:
+            'Optional. MIME type of the generated candidate text. Supported MIME types are: `text/plain`: (default) Text output. `application/json`: JSON response in the response candidates. `text/x.enum`: ENUM as a string response in the response candidates. Refer to the [docs](https://ai.google.dev/gemini-api/docs/prompting_with_media#plain_text_formats) for a list of all supported text MIME types.',
+        },
+        mediaResolution: {
+          type: 'string',
+          description:
+            'Optional. If specified, the media resolution specified will be used.',
+          enum: [
+            'MEDIA_RESOLUTION_UNSPECIFIED',
+            'MEDIA_RESOLUTION_LOW',
+            'MEDIA_RESOLUTION_MEDIUM',
+            'MEDIA_RESOLUTION_HIGH',
+          ],
         },
         maxOutputTokens: {
           type: 'integer',
@@ -5185,51 +5252,28 @@ export const GenerateContentRequestSchema = {
           description:
             "Optional. The maximum cumulative probability of tokens to consider when sampling. The model uses combined Top-k and Top-p (nucleus) sampling. Tokens are sorted based on their assigned probabilities so that only the most likely tokens are considered. Top-k sampling directly limits the maximum number of tokens to consider, while Nucleus sampling limits the number of tokens based on the cumulative probability. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
         },
-        topK: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            "Optional. The maximum number of tokens to consider when sampling. Gemini models use Top-p (nucleus) sampling or a combination of Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Models running with nucleus sampling don't allow top_k setting. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
-        },
-        seed: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.',
-        },
-        responseMimeType: {
-          type: 'string',
-          description:
-            'Optional. MIME type of the generated candidate text. Supported MIME types are: `text/plain`: (default) Text output. `application/json`: JSON response in the response candidates. `text/x.enum`: ENUM as a string response in the response candidates. Refer to the [docs](https://ai.google.dev/gemini-api/docs/prompting_with_media#plain_text_formats) for a list of all supported text MIME types.',
-        },
-        responseSchema: { $ref: '#/$defs/Schema' },
-        _responseJsonSchema: {
-          type: 'any',
-          description:
-            'Optional. Output schema of the generated response. This is an alternative to `response_schema` that accepts [JSON Schema](https://json-schema.org/). If set, `response_schema` must be omitted, but `response_mime_type` is required. While the full JSON Schema may be sent, not all features are supported. Specifically, only the following properties are supported: - `$id` - `$defs` - `$ref` - `$anchor` - `type` - `format` - `title` - `description` - `enum` (for strings and numbers) - `items` - `prefixItems` - `minItems` - `maxItems` - `minimum` - `maximum` - `anyOf` - `oneOf` (interpreted the same as `anyOf`) - `properties` - `additionalProperties` - `required` The non-standard `propertyOrdering` property may also be set. Cyclic references are unrolled to a limited degree and, as such, may only be used within non-required properties. (Nullable properties are not sufficient.) If `$ref` is set on a sub-schema, no other properties, except for than those starting as a `$`, may be set.',
-        },
         responseJsonSchema: {
           type: 'any',
           description:
             'Optional. An internal detail. Use `responseJsonSchema` rather than this field.',
         },
-        presencePenalty: {
-          type: 'number',
-          format: 'float',
+        responseFormat: { $ref: '#/$defs/ResponseFormatConfig' },
+        responseModalities: {
+          type: 'array',
           description:
-            "Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequency_penalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary. A negative penalty will encourage the use of tokens that have already been used in the response, decreasing the vocabulary.",
-        },
-        frequencyPenalty: {
-          type: 'number',
-          format: 'float',
-          description:
-            "Optional. Frequency penalty applied to the next token's logprobs, multiplied by the number of times each token has been seen in the respponse so far. A positive penalty will discourage the use of tokens that have already been used, proportional to the number of times the token has been used: The more a token is used, the more difficult it is for the model to use that token again increasing the vocabulary of responses. Caution: A _negative_ penalty will encourage the model to reuse tokens proportional to the number of times the token has been used. Small negative values will reduce the vocabulary of a response. Larger negative values will cause the model to start repeating a common token until it hits the max_output_tokens limit.",
+            'Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.',
+          items: {
+            type: 'string',
+            enum: ['MODALITY_UNSPECIFIED', 'TEXT', 'IMAGE', 'AUDIO'],
+          },
         },
         responseLogprobs: {
           type: 'boolean',
           description:
             'Optional. If true, export the logprobs results in response.',
         },
+        thinkingConfig: { $ref: '#/$defs/ThinkingConfig' },
+        responseSchema: { $ref: '#/$defs/Schema' },
         logprobs: {
           type: 'integer',
           format: 'int32',
@@ -5241,30 +5285,6 @@ export const GenerateContentRequestSchema = {
           description:
             'Optional. Enables enhanced civic answers. It may not be available for all models.',
         },
-        responseModalities: {
-          type: 'array',
-          description:
-            'Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.',
-          items: {
-            type: 'string',
-            enum: ['MODALITY_UNSPECIFIED', 'TEXT', 'IMAGE', 'AUDIO'],
-          },
-        },
-        speechConfig: { $ref: '#/$defs/SpeechConfig' },
-        thinkingConfig: { $ref: '#/$defs/ThinkingConfig' },
-        imageConfig: { $ref: '#/$defs/ImageConfig' },
-        mediaResolution: {
-          type: 'string',
-          description:
-            'Optional. If specified, the media resolution specified will be used.',
-          enum: [
-            'MEDIA_RESOLUTION_UNSPECIFIED',
-            'MEDIA_RESOLUTION_LOW',
-            'MEDIA_RESOLUTION_MEDIUM',
-            'MEDIA_RESOLUTION_HIGH',
-          ],
-        },
-        responseFormat: { $ref: '#/$defs/ResponseFormatConfig' },
       },
     },
     GoogleMaps: {
@@ -5300,15 +5320,15 @@ export const GenerateContentRequestSchema = {
       type: 'object',
       description: 'Config for image generation features.',
       properties: {
-        aspectRatio: {
-          type: 'string',
-          description:
-            'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
-        },
         imageSize: {
           type: 'string',
           description:
             'Optional. Specifies the size of generated images. Supported values are `512`, `1K`, `2K`, `4K`. If not specified, the model will use default value `1K`.',
+        },
+        aspectRatio: {
+          type: 'string',
+          description:
+            'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
         },
       },
     },
@@ -5316,16 +5336,6 @@ export const GenerateContentRequestSchema = {
       type: 'object',
       description: 'Configuration for image output format.',
       properties: {
-        mimeType: {
-          type: 'string',
-          description: 'Optional. The MIME type of the image output.',
-          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
-        },
-        delivery: {
-          type: 'string',
-          description: 'Optional. The delivery mode for the image output.',
-          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
-        },
         aspectRatio: {
           type: 'string',
           description: 'Optional. The aspect ratio for the image output.',
@@ -5346,6 +5356,16 @@ export const GenerateContentRequestSchema = {
             'ASPECT_RATIO_ONE_BY_FOUR',
             'ASPECT_RATIO_FOUR_BY_ONE',
           ],
+        },
+        mimeType: {
+          type: 'string',
+          description: 'Optional. The MIME type of the image output.',
+          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
+        },
+        delivery: {
+          type: 'string',
+          description: 'Optional. The delivery mode for the image output.',
+          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
         },
         imageSize: {
           type: 'string',
@@ -5370,17 +5390,17 @@ export const GenerateContentRequestSchema = {
       description:
         'Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.',
       properties: {
-        startTime: {
-          type: 'string',
-          format: 'google-datetime',
-          description:
-            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
-        },
         endTime: {
           type: 'string',
           format: 'google-datetime',
           description:
             'Optional. Exclusive end of the interval. If specified, a Timestamp matching this interval will have to be before the end.',
+        },
+        startTime: {
+          type: 'string',
+          format: 'google-datetime',
+          description:
+            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
         },
       },
     },
@@ -5389,17 +5409,17 @@ export const GenerateContentRequestSchema = {
       description:
         'An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.',
       properties: {
-        latitude: {
-          type: 'number',
-          format: 'double',
-          description:
-            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
-        },
         longitude: {
           type: 'number',
           format: 'double',
           description:
             'The longitude in degrees. It must be in the range [-180.0, +180.0].',
+        },
+        latitude: {
+          type: 'number',
+          format: 'double',
+          description:
+            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
         },
       },
     },
@@ -5434,27 +5454,17 @@ export const GenerateContentRequestSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -5464,7 +5474,17 @@ export const GenerateContentRequestSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     PrebuiltVoiceConfig: {
@@ -5542,6 +5562,45 @@ export const GenerateContentRequestSchema = {
       description:
         'The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).',
       properties: {
+        format: {
+          type: 'string',
+          description:
+            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
+        },
+        maxProperties: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the properties for Type.OBJECT.',
+        },
+        description: {
+          type: 'string',
+          description:
+            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
+        },
+        maxLength: {
+          type: 'string',
+          format: 'int64',
+          description: 'Optional. Maximum length of the Type.STRING',
+        },
+        items: { $ref: '#/$defs/Schema' },
+        maxItems: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the elements for Type.ARRAY.',
+        },
+        anyOf: {
+          type: 'array',
+          description:
+            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
+          items: { $ref: '#/$defs/Schema' },
+        },
+        default: {
+          type: 'any',
+          description:
+            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
+        },
         type: {
           type: 'string',
           description: 'Required. Data type.',
@@ -5556,36 +5615,36 @@ export const GenerateContentRequestSchema = {
             'NULL',
           ],
         },
-        format: {
-          type: 'string',
-          description:
-            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
-        },
-        title: {
-          type: 'string',
-          description: 'Optional. The title of the schema.',
-        },
-        description: {
-          type: 'string',
-          description:
-            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
-        },
         nullable: {
           type: 'boolean',
           description: 'Optional. Indicates if the value may be null.',
         },
-        enum: {
+        propertyOrdering: {
           type: 'array',
           description:
-            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
+            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
           items: { type: 'string' },
         },
-        items: { $ref: '#/$defs/Schema' },
-        maxItems: {
+        pattern: {
+          type: 'string',
+          description:
+            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
+        },
+        required: {
+          type: 'array',
+          description: 'Optional. Required properties of Type.OBJECT.',
+          items: { type: 'string' },
+        },
+        minLength: {
           type: 'string',
           format: 'int64',
           description:
-            'Optional. Maximum number of the elements for Type.ARRAY.',
+            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
+        },
+        example: {
+          type: 'any',
+          description:
+            'Optional. Example of the object. Will only populated when the object is the root.',
         },
         minItems: {
           type: 'string',
@@ -5598,10 +5657,15 @@ export const GenerateContentRequestSchema = {
           description: 'Optional. Properties of Type.OBJECT.',
           additionalProperties: { $ref: '#/$defs/Schema' },
         },
-        required: {
-          type: 'array',
-          description: 'Optional. Required properties of Type.OBJECT.',
-          items: { type: 'string' },
+        maximum: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional. The title of the schema.',
         },
         minProperties: {
           type: 'string',
@@ -5609,61 +5673,17 @@ export const GenerateContentRequestSchema = {
           description:
             'Optional. Minimum number of the properties for Type.OBJECT.',
         },
-        maxProperties: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. Maximum number of the properties for Type.OBJECT.',
-        },
         minimum: {
           type: 'number',
           format: 'double',
           description:
             'Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER Minimum value of the Type.INTEGER and Type.NUMBER',
         },
-        maximum: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
-        },
-        minLength: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
-        },
-        maxLength: {
-          type: 'string',
-          format: 'int64',
-          description: 'Optional. Maximum length of the Type.STRING',
-        },
-        pattern: {
-          type: 'string',
-          description:
-            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
-        },
-        example: {
-          type: 'any',
-          description:
-            'Optional. Example of the object. Will only populated when the object is the root.',
-        },
-        anyOf: {
+        enum: {
           type: 'array',
           description:
-            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
-          items: { $ref: '#/$defs/Schema' },
-        },
-        propertyOrdering: {
-          type: 'array',
-          description:
-            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
+            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
           items: { type: 'string' },
-        },
-        default: {
-          type: 'any',
-          description:
-            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
         },
       },
     },
@@ -5681,25 +5701,25 @@ export const GenerateContentRequestSchema = {
       description:
         'The configuration for a single speaker in a multi speaker setup.',
       properties: {
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         speaker: {
           type: 'string',
           description:
             'Required. The name of the speaker to use. Should be the same as in the prompt.',
         },
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     SpeechConfig: {
       type: 'object',
       description: 'Config for speech generation and transcription.',
       properties: {
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         multiSpeakerVoiceConfig: { $ref: '#/$defs/MultiSpeakerVoiceConfig' },
         languageCode: {
           type: 'string',
           description:
             'Optional. The IETF [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language code that the user configured the app to use. Used for speech recognition and synthesis. Valid values are: `de-DE`, `en-AU`, `en-GB`, `en-IN`, `en-US`, `es-US`, `fr-FR`, `hi-IN`, `pt-BR`, `ar-XA`, `es-ES`, `fr-CA`, `id-ID`, `it-IT`, `ja-JP`, `tr-TR`, `vi-VN`, `bn-IN`, `gu-IN`, `kn-IN`, `ml-IN`, `mr-IN`, `ta-IN`, `te-IN`, `nl-NL`, `ko-KR`, `cmn-CN`, `pl-PL`, `ru-RU`, and `th-TH`.',
         },
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     StreamableHttpTransport: {
@@ -5707,21 +5727,11 @@ export const GenerateContentRequestSchema = {
       description:
         'A transport that can stream HTTP requests and responses. Next ID: 6',
       properties: {
-        url: {
-          type: 'string',
-          description:
-            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
-        },
         headers: {
           type: 'object',
           description:
             'Optional: Fields for authentication headers, timeouts, etc., if needed.',
           additionalProperties: { type: 'string' },
-        },
-        timeout: {
-          type: 'string',
-          format: 'google-duration',
-          description: 'HTTP timeout for regular operations.',
         },
         sseReadTimeout: {
           type: 'string',
@@ -5732,6 +5742,16 @@ export const GenerateContentRequestSchema = {
           type: 'boolean',
           description:
             'Whether to close the client session when the transport closes.',
+        },
+        timeout: {
+          type: 'string',
+          format: 'google-duration',
+          description: 'HTTP timeout for regular operations.',
+        },
+        url: {
+          type: 'string',
+          description:
+            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
         },
       },
     },
@@ -5755,16 +5775,16 @@ export const GenerateContentRequestSchema = {
       type: 'object',
       description: 'Config for thinking features.',
       properties: {
-        includeThoughts: {
-          type: 'boolean',
-          description:
-            'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
-        },
         thinkingBudget: {
           type: 'integer',
           format: 'int32',
           description:
             'The number of thoughts tokens that the model should generate.',
+        },
+        includeThoughts: {
+          type: 'boolean',
+          description:
+            'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
         },
         thinkingLevel: {
           type: 'string',
@@ -5785,24 +5805,24 @@ export const GenerateContentRequestSchema = {
       description:
         'Tool details that the model may use to generate response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the model. Next ID: 16',
       properties: {
+        googleSearchRetrieval: { $ref: '#/$defs/GoogleSearchRetrieval' },
+        mcpServers: {
+          type: 'array',
+          description: 'Optional. MCP Servers to connect to.',
+          items: { $ref: '#/$defs/McpServer' },
+        },
+        googleSearch: { $ref: '#/$defs/GoogleSearch' },
+        codeExecution: { $ref: '#/$defs/CodeExecution' },
+        computerUse: { $ref: '#/$defs/ComputerUse' },
+        googleMaps: { $ref: '#/$defs/GoogleMaps' },
         functionDeclarations: {
           type: 'array',
           description:
             'Optional. A list of `FunctionDeclarations` available to the model that can be used for function calling. The model or system does not execute the function. Instead the defined function may be returned as a FunctionCall with arguments to the client side for execution. The model may decide to call a subset of these functions by populating FunctionCall in the response. The next conversation turn may contain a FunctionResponse with the Content.role "function" generation context for the next model turn.',
           items: { $ref: '#/$defs/FunctionDeclaration' },
         },
-        googleSearchRetrieval: { $ref: '#/$defs/GoogleSearchRetrieval' },
-        codeExecution: { $ref: '#/$defs/CodeExecution' },
-        googleSearch: { $ref: '#/$defs/GoogleSearch' },
-        computerUse: { $ref: '#/$defs/ComputerUse' },
         urlContext: { $ref: '#/$defs/UrlContext' },
         fileSearch: { $ref: '#/$defs/FileSearch' },
-        mcpServers: {
-          type: 'array',
-          description: 'Optional. MCP Servers to connect to.',
-          items: { $ref: '#/$defs/McpServer' },
-        },
-        googleMaps: { $ref: '#/$defs/GoogleMaps' },
       },
     },
     ToolCall: {
@@ -5843,13 +5863,13 @@ export const GenerateContentRequestSchema = {
       description:
         'The Tool configuration containing parameters for specifying `Tool` use in the request.',
       properties: {
-        functionCallingConfig: { $ref: '#/$defs/FunctionCallingConfig' },
-        retrievalConfig: { $ref: '#/$defs/RetrievalConfig' },
         includeServerSideToolInvocations: {
           type: 'boolean',
           description:
             "Optional. If true, the API response will include the server-side tool calls and responses within the `Content` message. This allows clients to observe the server's tool interactions.",
         },
+        functionCallingConfig: { $ref: '#/$defs/FunctionCallingConfig' },
+        retrievalConfig: { $ref: '#/$defs/RetrievalConfig' },
       },
     },
     ToolResponse: {
@@ -5882,6 +5902,22 @@ export const GenerateContentRequestSchema = {
             type: 'any',
             description: 'Properties of the object.',
           },
+        },
+      },
+    },
+    TranslationConfig: {
+      type: 'object',
+      description: 'Config for translation features.',
+      properties: {
+        echoTargetLanguage: {
+          type: 'boolean',
+          description:
+            'Optional. If true, the model will generate audio when the target language is spoken, essentially it will parrot the input. If false, we will not produce audio for the target language.',
+        },
+        targetLanguageCode: {
+          type: 'string',
+          description:
+            'Required. The target language for translation. Supported values are BCP-47 language codes (e.g. "en", "es", "fr").',
         },
       },
     },
@@ -5934,24 +5970,24 @@ export const GenerateContentResponseSchema = {
   description:
     'Response from the model supporting multiple candidate responses. Safety ratings and content filtering are reported for both prompt in `GenerateContentResponse.prompt_feedback` and for each candidate in `finish_reason` and in `safety_ratings`. The API: - Returns either all requested candidates or none of them - Returns no candidates at all only if there was something wrong with the prompt (check `prompt_feedback`) - Reports feedback on each candidate in `finish_reason` and `safety_ratings`.',
   properties: {
-    candidates: {
-      type: 'array',
-      description: 'Candidate responses from the model.',
-      items: { $ref: '#/$defs/Candidate' },
-    },
-    promptFeedback: { $ref: '#/$defs/PromptFeedback' },
     usageMetadata: { $ref: '#/$defs/UsageMetadata' },
-    modelVersion: {
-      type: 'string',
-      description:
-        'Output only. The model version used to generate the response.',
-    },
+    modelStatus: { $ref: '#/$defs/ModelStatus' },
+    promptFeedback: { $ref: '#/$defs/PromptFeedback' },
     responseId: {
       type: 'string',
       description:
         'Output only. response_id is used to identify each response.',
     },
-    modelStatus: { $ref: '#/$defs/ModelStatus' },
+    candidates: {
+      type: 'array',
+      description: 'Candidate responses from the model.',
+      items: { $ref: '#/$defs/Candidate' },
+    },
+    modelVersion: {
+      type: 'string',
+      description:
+        'Output only. The model version used to generate the response.',
+    },
   },
   $defs: {
     AttributionSourceId: {
@@ -5984,13 +6020,38 @@ export const GenerateContentResponseSchema = {
       type: 'object',
       description: 'A response candidate generated from the model.',
       properties: {
+        avgLogprobs: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Output only. Average log probability score of the candidate.',
+        },
+        groundingMetadata: { $ref: '#/$defs/GroundingMetadata' },
+        content: { $ref: '#/$defs/Content' },
+        finishMessage: {
+          type: 'string',
+          description:
+            'Optional. Output only. Details the reason why the model stopped generating tokens. This is populated only when `finish_reason` is set.',
+        },
+        safetyRatings: {
+          type: 'array',
+          description:
+            'List of ratings for the safety of a response candidate. There is at most one rating per category.',
+          items: { $ref: '#/$defs/SafetyRating' },
+        },
+        tokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description: 'Output only. Token count for this candidate.',
+        },
+        logprobsResult: { $ref: '#/$defs/LogprobsResult' },
+        urlContextMetadata: { $ref: '#/$defs/UrlContextMetadata' },
         index: {
           type: 'integer',
           format: 'int32',
           description:
             'Output only. Index of the candidate in the list of response candidates.',
         },
-        content: { $ref: '#/$defs/Content' },
         finishReason: {
           type: 'string',
           description:
@@ -6016,24 +6077,8 @@ export const GenerateContentResponseSchema = {
             'TOO_MANY_TOOL_CALLS',
             'MISSING_THOUGHT_SIGNATURE',
             'MALFORMED_RESPONSE',
+            'ESCALATION',
           ],
-        },
-        finishMessage: {
-          type: 'string',
-          description:
-            'Optional. Output only. Details the reason why the model stopped generating tokens. This is populated only when `finish_reason` is set.',
-        },
-        safetyRatings: {
-          type: 'array',
-          description:
-            'List of ratings for the safety of a response candidate. There is at most one rating per category.',
-          items: { $ref: '#/$defs/SafetyRating' },
-        },
-        citationMetadata: { $ref: '#/$defs/CitationMetadata' },
-        tokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description: 'Output only. Token count for this candidate.',
         },
         groundingAttributions: {
           type: 'array',
@@ -6041,15 +6086,7 @@ export const GenerateContentResponseSchema = {
             'Output only. Attribution information for sources that contributed to a grounded answer. This field is populated for `GenerateAnswer` calls.',
           items: { $ref: '#/$defs/GroundingAttribution' },
         },
-        groundingMetadata: { $ref: '#/$defs/GroundingMetadata' },
-        avgLogprobs: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Output only. Average log probability score of the candidate.',
-        },
-        logprobsResult: { $ref: '#/$defs/LogprobsResult' },
-        urlContextMetadata: { $ref: '#/$defs/UrlContextMetadata' },
+        citationMetadata: { $ref: '#/$defs/CitationMetadata' },
       },
     },
     CitationMetadata: {
@@ -6069,11 +6106,10 @@ export const GenerateContentResponseSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -6085,10 +6121,11 @@ export const GenerateContentResponseSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -6097,10 +6134,10 @@ export const GenerateContentResponseSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -6112,10 +6149,10 @@ export const GenerateContentResponseSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -6124,16 +6161,16 @@ export const GenerateContentResponseSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -6142,11 +6179,6 @@ export const GenerateContentResponseSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -6155,6 +6187,11 @@ export const GenerateContentResponseSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -6206,6 +6243,17 @@ export const GenerateContentResponseSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -6225,17 +6273,6 @@ export const GenerateContentResponseSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -6267,17 +6304,17 @@ export const GenerateContentResponseSchema = {
       description: 'Grounding support.',
       properties: {
         segment: { $ref: '#/$defs/GoogleAiGenerativelanguageV1betaSegment' },
-        groundingChunkIndices: {
-          type: 'array',
-          description:
-            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
-          items: { type: 'integer', format: 'int32' },
-        },
         confidenceScores: {
           type: 'array',
           description:
             'Optional. Confidence score of the support references. Ranges from 0 to 1. 1 is the most confident. This list must have the same size as the grounding_chunk_indices.',
           items: { type: 'number', format: 'float' },
+        },
+        groundingChunkIndices: {
+          type: 'array',
+          description:
+            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
+          items: { type: 'integer', format: 'int32' },
         },
         renderedParts: {
           type: 'array',
@@ -6291,12 +6328,6 @@ export const GenerateContentResponseSchema = {
       type: 'object',
       description: 'Segment of the content.',
       properties: {
-        partIndex: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'The index of a Part object within its parent Content object.',
-        },
         startIndex: {
           type: 'integer',
           format: 'int32',
@@ -6308,6 +6339,12 @@ export const GenerateContentResponseSchema = {
           format: 'int32',
           description:
             'End index in the given Part, measured in bytes. Offset from the start of the Part, exclusive, starting at zero.',
+        },
+        partIndex: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'The index of a Part object within its parent Content object.',
         },
         text: {
           type: 'string',
@@ -6330,27 +6367,27 @@ export const GenerateContentResponseSchema = {
         "A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.",
       properties: {
         web: { $ref: '#/$defs/Web' },
-        image: { $ref: '#/$defs/Image' },
-        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
         maps: { $ref: '#/$defs/Maps' },
+        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
+        image: { $ref: '#/$defs/Image' },
       },
     },
     GroundingChunkCustomMetadata: {
       type: 'object',
       description: 'User provided metadata about the GroundingFact.',
       properties: {
-        stringValue: {
-          type: 'string',
-          description: 'Optional. The string value of the metadata.',
-        },
-        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         numericValue: {
           type: 'number',
           format: 'float',
           description:
             'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
         },
+        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         key: { type: 'string', description: 'The key of the metadata.' },
+        stringValue: {
+          type: 'string',
+          description: 'Optional. The string value of the metadata.',
+        },
       },
     },
     GroundingChunkStringList: {
@@ -6369,12 +6406,6 @@ export const GenerateContentResponseSchema = {
       description: 'Metadata returned to client when grounding is enabled.',
       properties: {
         searchEntryPoint: { $ref: '#/$defs/SearchEntryPoint' },
-        groundingChunks: {
-          type: 'array',
-          description:
-            'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
-          items: { $ref: '#/$defs/GroundingChunk' },
-        },
         groundingSupports: {
           type: 'array',
           description: 'List of grounding support.',
@@ -6382,21 +6413,27 @@ export const GenerateContentResponseSchema = {
             $ref: '#/$defs/GoogleAiGenerativelanguageV1betaGroundingSupport',
           },
         },
-        retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
-        webSearchQueries: {
-          type: 'array',
-          description: 'Web search queries for the following-up web search.',
-          items: { type: 'string' },
-        },
         imageSearchQueries: {
           type: 'array',
           description: 'Image search queries used for grounding.',
           items: { type: 'string' },
         },
+        retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
         googleMapsWidgetContextToken: {
           type: 'string',
           description:
             'Optional. Resource name of the Google Maps widget context token that can be used with the PlacesContextElement widget in order to render contextual data. Only populated in the case that grounding with Google Maps is enabled.',
+        },
+        webSearchQueries: {
+          type: 'array',
+          description: 'Web search queries for the following-up web search.',
+          items: { type: 'string' },
+        },
+        groundingChunks: {
+          type: 'array',
+          description:
+            'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
+          items: { $ref: '#/$defs/GroundingChunk' },
         },
       },
     },
@@ -6425,15 +6462,15 @@ export const GenerateContentResponseSchema = {
           type: 'string',
           description: 'The web page URI for attribution.',
         },
-        imageUri: { type: 'string', description: 'The image asset URL.' },
-        title: {
-          type: 'string',
-          description: 'The title of the web page that the image is from.',
-        },
         domain: {
           type: 'string',
           description:
             'The root domain of the web page that the image is from, e.g. "example.com".',
+        },
+        imageUri: { type: 'string', description: 'The image asset URL.' },
+        title: {
+          type: 'string',
+          description: 'The title of the web page that the image is from.',
         },
       },
     },
@@ -6446,16 +6483,16 @@ export const GenerateContentResponseSchema = {
           format: 'float',
           description: 'Sum of log probabilities for all tokens.',
         },
-        topCandidates: {
-          type: 'array',
-          description: 'Length = total number of decoding steps.',
-          items: { $ref: '#/$defs/TopCandidates' },
-        },
         chosenCandidates: {
           type: 'array',
           description:
             'Length = total number of decoding steps. The chosen candidates may or may not be in top_candidates.',
           items: { $ref: '#/$defs/LogprobsResultCandidate' },
+        },
+        topCandidates: {
+          type: 'array',
+          description: 'Length = total number of decoding steps.',
+          items: { $ref: '#/$defs/TopCandidates' },
         },
       },
     },
@@ -6484,18 +6521,18 @@ export const GenerateContentResponseSchema = {
       description:
         'A grounding chunk from Google Maps. A Maps chunk corresponds to a single place.',
       properties: {
-        uri: { type: 'string', description: 'URI reference of the place.' },
-        title: { type: 'string', description: 'Title of the place.' },
-        text: {
-          type: 'string',
-          description: 'Text description of the place answer.',
-        },
         placeId: {
           type: 'string',
           description:
             'The ID of the place, in `places/{place_id}` format. A user can use this ID to look up that place.',
         },
+        uri: { type: 'string', description: 'URI reference of the place.' },
+        text: {
+          type: 'string',
+          description: 'Text description of the place answer.',
+        },
         placeAnswerSources: { $ref: '#/$defs/PlaceAnswerSources' },
+        title: { type: 'string', description: 'Title of the place.' },
       },
     },
     MediaResolution: {
@@ -6546,14 +6583,14 @@ export const GenerateContentResponseSchema = {
             'RETIRED',
           ],
         },
+        message: {
+          type: 'string',
+          description: 'A message explaining the model status.',
+        },
         retirementTime: {
           type: 'string',
           format: 'google-datetime',
           description: 'The time at which the model will be retired.',
-        },
-        message: {
-          type: 'string',
-          description: 'A message explaining the model status.',
         },
       },
     },
@@ -6562,27 +6599,17 @@ export const GenerateContentResponseSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -6592,7 +6619,17 @@ export const GenerateContentResponseSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     PlaceAnswerSources: {
@@ -6650,20 +6687,20 @@ export const GenerateContentResponseSchema = {
       type: 'object',
       description: 'Chunk from context retrieved by the file search tool.',
       properties: {
-        uri: {
-          type: 'string',
+        pageNumber: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. URI reference of the semantic retrieval document.',
+            'Optional. Page number of the retrieved context, if applicable.',
         },
         title: {
           type: 'string',
           description: 'Optional. Title of the document.',
         },
-        text: { type: 'string', description: 'Optional. Text of the chunk.' },
-        fileSearchStore: {
+        uri: {
           type: 'string',
           description:
-            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
+            'Optional. URI reference of the semantic retrieval document.',
         },
         customMetadata: {
           type: 'array',
@@ -6671,17 +6708,17 @@ export const GenerateContentResponseSchema = {
             'Optional. User-provided metadata about the retrieved context.',
           items: { $ref: '#/$defs/GroundingChunkCustomMetadata' },
         },
-        pageNumber: {
-          type: 'integer',
-          format: 'int32',
+        fileSearchStore: {
+          type: 'string',
           description:
-            'Optional. Page number of the retrieved context, if applicable.',
+            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
         },
         mediaId: {
           type: 'string',
           description:
             'Optional. The media blob resource name for multimodal file search results. Format: fileSearchStores/{file_search_store_id}/media/{blob_id}',
         },
+        text: { type: 'string', description: 'Optional. Text of the chunk.' },
       },
     },
     ReviewSnippet: {
@@ -6689,16 +6726,16 @@ export const GenerateContentResponseSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
     SafetyRating: {
@@ -6706,6 +6743,21 @@ export const GenerateContentResponseSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -6723,21 +6775,6 @@ export const GenerateContentResponseSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -6763,15 +6800,15 @@ export const GenerateContentResponseSchema = {
       description:
         'Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.',
       properties: {
-        source: {
-          type: 'string',
-          description:
-            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
-        },
         chunk: {
           type: 'string',
           description:
             'Output only. Name of the `Chunk` containing the attributed text. Example: `corpora/123/documents/abc/chunks/xyz`',
+        },
+        source: {
+          type: 'string',
+          description:
+            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
         },
       },
     },
@@ -6895,41 +6932,17 @@ export const GenerateContentResponseSchema = {
           description:
             'Number of tokens in the prompt. When `cached_content` is set, this is still the total effective prompt size meaning this includes the number of tokens in the cached content.',
         },
+        toolUsePromptTokensDetails: {
+          type: 'array',
+          description:
+            'Output only. List of modalities that were processed for tool-use request inputs.',
+          items: { $ref: '#/$defs/ModalityTokenCount' },
+        },
         cachedContentTokenCount: {
           type: 'integer',
           format: 'int32',
           description:
             'Number of tokens in the cached part of the prompt (the cached content)',
-        },
-        candidatesTokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'Total number of tokens across all the generated response candidates.',
-        },
-        toolUsePromptTokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'Output only. Number of tokens present in tool-use prompt(s).',
-        },
-        thoughtsTokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'Output only. Number of tokens of thoughts for thinking models.',
-        },
-        totalTokenCount: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'Total token count for the generation request (prompt + thoughts + response candidates).',
-        },
-        promptTokensDetails: {
-          type: 'array',
-          description:
-            'Output only. List of modalities that were processed in the request input.',
-          items: { $ref: '#/$defs/ModalityTokenCount' },
         },
         cacheTokensDetails: {
           type: 'array',
@@ -6943,10 +6956,34 @@ export const GenerateContentResponseSchema = {
             'Output only. List of modalities that were returned in the response.',
           items: { $ref: '#/$defs/ModalityTokenCount' },
         },
-        toolUsePromptTokensDetails: {
+        toolUsePromptTokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Output only. Number of tokens present in tool-use prompt(s).',
+        },
+        totalTokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Total token count for the generation request (prompt + thoughts + response candidates).',
+        },
+        candidatesTokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Total number of tokens across all the generated response candidates.',
+        },
+        thoughtsTokenCount: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'Output only. Number of tokens of thoughts for thinking models.',
+        },
+        promptTokensDetails: {
           type: 'array',
           description:
-            'Output only. List of modalities that were processed for tool-use request inputs.',
+            'Output only. List of modalities that were processed in the request input.',
           items: { $ref: '#/$defs/ModalityTokenCount' },
         },
         serviceTier: {
@@ -6983,13 +7020,13 @@ export const GenerateContentResponseSchema = {
       type: 'object',
       description: 'Chunk from the web.',
       properties: {
-        uri: {
-          type: 'string',
-          description: 'Output only. URI reference of the chunk.',
-        },
         title: {
           type: 'string',
           description: 'Output only. Title of the chunk.',
+        },
+        uri: {
+          type: 'string',
+          description: 'Output only. URI reference of the chunk.',
         },
       },
     },
@@ -7000,18 +7037,11 @@ export const GenerateMessageRequestSchema = {
   type: 'object',
   description: 'Request to generate a message response from the model.',
   properties: {
-    prompt: { $ref: '#/$defs/MessagePrompt' },
     temperature: {
       type: 'number',
       format: 'float',
       description:
         'Optional. Controls the randomness of the output. Values can range over `[0.0,1.0]`, inclusive. A value closer to `1.0` will produce responses that are more varied, while a value closer to `0.0` will typically result in less surprising responses from the model.',
-    },
-    candidateCount: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Optional. The number of generated response messages to return. This value must be between `[1, 8]`, inclusive. If unset, this will default to `1`.',
     },
     topP: {
       type: 'number',
@@ -7019,6 +7049,13 @@ export const GenerateMessageRequestSchema = {
       description:
         'Optional. The maximum cumulative probability of tokens to consider when sampling. The model uses combined Top-k and nucleus sampling. Nucleus sampling considers the smallest set of tokens whose probability sum is at least `top_p`.',
     },
+    candidateCount: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Optional. The number of generated response messages to return. This value must be between `[1, 8]`, inclusive. If unset, this will default to `1`.',
+    },
+    prompt: { $ref: '#/$defs/MessagePrompt' },
     topK: {
       type: 'integer',
       format: 'int32',
@@ -7044,11 +7081,10 @@ export const GenerateMessageRequestSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -7060,10 +7096,11 @@ export const GenerateMessageRequestSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -7081,17 +7118,17 @@ export const GenerateMessageRequestSchema = {
       description:
         'The base unit of structured text. A `Message` includes an `author` and the `content` of the `Message`. The `author` is used to tag messages when they are fed to the model as text.',
       properties: {
-        author: {
-          type: 'string',
-          description:
-            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
-        },
         content: {
           type: 'string',
           description:
             'Required. The text content of the structured `Message`.',
         },
         citationMetadata: { $ref: '#/$defs/CitationMetadata' },
+        author: {
+          type: 'string',
+          description:
+            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
+        },
       },
     },
     MessagePrompt: {
@@ -7099,16 +7136,16 @@ export const GenerateMessageRequestSchema = {
       description:
         'All of the structured input text passed to the model as a prompt. A `MessagePrompt` contains a structured set of fields that provide context for the conversation, examples of user input/model output message pairs that prime the model to respond in different ways, and the conversation history or list of messages representing the alternating turns of the conversation between the user and the model.',
       properties: {
-        context: {
-          type: 'string',
-          description:
-            'Optional. Text that should be provided to the model first to ground the response. If not empty, this `context` will be given to the model first before the `examples` and `messages`. When using a `context` be sure to provide it with every request to maintain continuity. This field can be a description of your prompt to the model to help provide context and guide the responses. Examples: "Translate the phrase from English to French." or "Given a statement, classify the sentiment as happy, sad or neutral." Anything included in this field will take precedence over message history if the total input size exceeds the model\'s `input_token_limit` and the input request is truncated.',
-        },
         examples: {
           type: 'array',
           description:
             "Optional. Examples of what the model should generate. This includes both user input and the response that the model should emulate. These `examples` are treated identically to conversation messages except that they take precedence over the history in `messages`: If the total input size exceeds the model's `input_token_limit` the input will be truncated. Items will be dropped from `messages` before `examples`.",
           items: { $ref: '#/$defs/Example' },
+        },
+        context: {
+          type: 'string',
+          description:
+            'Optional. Text that should be provided to the model first to ground the response. If not empty, this `context` will be given to the model first before the `examples` and `messages`. When using a `context` be sure to provide it with every request to maintain continuity. This field can be a description of your prompt to the model to help provide context and guide the responses. Examples: "Translate the phrase from English to French." or "Given a statement, classify the sentiment as happy, sad or neutral." Anything included in this field will take precedence over message history if the total input size exceeds the model\'s `input_token_limit` and the input request is truncated.',
         },
         messages: {
           type: 'array',
@@ -7131,16 +7168,16 @@ export const GenerateMessageResponseSchema = {
       description: 'Candidate response messages from the model.',
       items: { $ref: '#/$defs/Message' },
     },
-    messages: {
-      type: 'array',
-      description: 'The conversation history used by the model.',
-      items: { $ref: '#/$defs/Message' },
-    },
     filters: {
       type: 'array',
       description:
         'A set of content filtering metadata for the prompt and response text. This indicates which `SafetyCategory`(s) blocked a candidate from this response, the lowest `HarmProbability` that triggered a block, and the HarmThreshold setting for that category.',
       items: { $ref: '#/$defs/ContentFilter' },
+    },
+    messages: {
+      type: 'array',
+      description: 'The conversation history used by the model.',
+      items: { $ref: '#/$defs/Message' },
     },
   },
   $defs: {
@@ -7161,11 +7198,10 @@ export const GenerateMessageResponseSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -7177,10 +7213,11 @@ export const GenerateMessageResponseSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -7207,17 +7244,17 @@ export const GenerateMessageResponseSchema = {
       description:
         'The base unit of structured text. A `Message` includes an `author` and the `content` of the `Message`. The `author` is used to tag messages when they are fed to the model as text.',
       properties: {
-        author: {
-          type: 'string',
-          description:
-            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
-        },
         content: {
           type: 'string',
           description:
             'Required. The text content of the structured `Message`.',
         },
         citationMetadata: { $ref: '#/$defs/CitationMetadata' },
+        author: {
+          type: 'string',
+          description:
+            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
+        },
       },
     },
   },
@@ -7227,18 +7264,11 @@ export const GenerateTextRequestSchema = {
   type: 'object',
   description: 'Request to generate a text completion response from the model.',
   properties: {
-    prompt: { $ref: '#/$defs/TextPrompt' },
     temperature: {
       type: 'number',
       format: 'float',
       description:
         'Optional. Controls the randomness of the output. Note: The default value varies by model, see the `Model.temperature` attribute of the `Model` returned the `getModel` function. Values can range from [0.0,1.0], inclusive. A value closer to 1.0 will produce responses that are more varied and creative, while a value closer to 0.0 will typically result in more straightforward responses from the model.',
-    },
-    candidateCount: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Optional. Number of generated responses to return. This value must be between [1, 8], inclusive. If unset, this will default to 1.',
     },
     maxOutputTokens: {
       type: 'integer',
@@ -7252,23 +7282,30 @@ export const GenerateTextRequestSchema = {
       description:
         'Optional. The maximum cumulative probability of tokens to consider when sampling. The model uses combined Top-k and nucleus sampling. Tokens are sorted based on their assigned probabilities so that only the most likely tokens are considered. Top-k sampling directly limits the maximum number of tokens to consider, while Nucleus sampling limits number of tokens based on the cumulative probability. Note: The default value varies by model, see the `Model.top_p` attribute of the `Model` returned the `getModel` function.',
     },
-    topK: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Optional. The maximum number of tokens to consider when sampling. The model uses combined Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Defaults to 40. Note: The default value varies by model, see the `Model.top_k` attribute of the `Model` returned the `getModel` function.',
-    },
     safetySettings: {
       type: 'array',
       description:
         'Optional. A list of unique `SafetySetting` instances for blocking unsafe content. that will be enforced on the `GenerateTextRequest.prompt` and `GenerateTextResponse.candidates`. There should not be more than one setting for each `SafetyCategory` type. The API will block any prompts and responses that fail to meet the thresholds set by these settings. This list overrides the default settings for each `SafetyCategory` specified in the safety_settings. If there is no `SafetySetting` for a given `SafetyCategory` provided in the list, the API will use the default safety setting for that category. Harm categories HARM_CATEGORY_DEROGATORY, HARM_CATEGORY_TOXICITY, HARM_CATEGORY_VIOLENCE, HARM_CATEGORY_SEXUAL, HARM_CATEGORY_MEDICAL, HARM_CATEGORY_DANGEROUS are supported in text service.',
       items: { $ref: '#/$defs/SafetySetting' },
     },
+    candidateCount: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Optional. Number of generated responses to return. This value must be between [1, 8], inclusive. If unset, this will default to 1.',
+    },
     stopSequences: {
       type: 'array',
       description:
         'The set of character sequences (up to 5) that will stop output generation. If specified, the API will stop at the first appearance of a stop sequence. The stop sequence will not be included as part of the response.',
       items: { type: 'string' },
+    },
+    prompt: { $ref: '#/$defs/TextPrompt' },
+    topK: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Optional. The maximum number of tokens to consider when sampling. The model uses combined Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Defaults to 40. Note: The default value varies by model, see the `Model.top_k` attribute of the `Model` returned the `getModel` function.',
     },
   },
   $defs: {
@@ -7325,6 +7362,11 @@ export const GenerateTextResponseSchema = {
   type: 'object',
   description: 'The response from the model, including candidate completions.',
   properties: {
+    safetyFeedback: {
+      type: 'array',
+      description: 'Returns any safety feedback related to content filtering.',
+      items: { $ref: '#/$defs/SafetyFeedback' },
+    },
     candidates: {
       type: 'array',
       description: 'Candidate responses from the model.',
@@ -7335,11 +7377,6 @@ export const GenerateTextResponseSchema = {
       description:
         'A set of content filtering metadata for the prompt and response text. This indicates which `SafetyCategory`(s) blocked a candidate from this response, the lowest `HarmProbability` that triggered a block, and the HarmThreshold setting for that category. This indicates the smallest change to the `SafetySettings` that would be necessary to unblock at least 1 response. The blocking is configured by the `SafetySettings` in the request (or the default `SafetySettings` of the API).',
       items: { $ref: '#/$defs/ContentFilter' },
-    },
-    safetyFeedback: {
-      type: 'array',
-      description: 'Returns any safety feedback related to content filtering.',
-      items: { $ref: '#/$defs/SafetyFeedback' },
     },
   },
   $defs: {
@@ -7360,11 +7397,10 @@ export const GenerateTextResponseSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -7376,10 +7412,11 @@ export const GenerateTextResponseSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -7415,6 +7452,21 @@ export const GenerateTextResponseSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -7432,21 +7484,6 @@ export const GenerateTextResponseSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -7514,17 +7551,65 @@ export const GenerationConfigSchema = {
   description:
     'Configuration options for model generation and outputs. Not all parameters are configurable for every model.',
   properties: {
+    topK: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        "Optional. The maximum number of tokens to consider when sampling. Gemini models use Top-p (nucleus) sampling or a combination of Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Models running with nucleus sampling don't allow top_k setting. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
+    },
+    imageConfig: { $ref: '#/$defs/ImageConfig' },
     candidateCount: {
       type: 'integer',
       format: 'int32',
       description:
         "Optional. Number of generated responses to return. If unset, this will default to 1. Please note that this doesn't work for previous generation models (Gemini 1.0 family)",
     },
+    translationConfig: { $ref: '#/$defs/TranslationConfig' },
+    frequencyPenalty: {
+      type: 'number',
+      format: 'float',
+      description:
+        "Optional. Frequency penalty applied to the next token's logprobs, multiplied by the number of times each token has been seen in the respponse so far. A positive penalty will discourage the use of tokens that have already been used, proportional to the number of times the token has been used: The more a token is used, the more difficult it is for the model to use that token again increasing the vocabulary of responses. Caution: A _negative_ penalty will encourage the model to reuse tokens proportional to the number of times the token has been used. Small negative values will reduce the vocabulary of a response. Larger negative values will cause the model to start repeating a common token until it hits the max_output_tokens limit.",
+    },
+    speechConfig: { $ref: '#/$defs/SpeechConfig' },
+    presencePenalty: {
+      type: 'number',
+      format: 'float',
+      description:
+        "Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequency_penalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary. A negative penalty will encourage the use of tokens that have already been used in the response, decreasing the vocabulary.",
+    },
+    _responseJsonSchema: {
+      type: 'any',
+      description:
+        'Optional. Output schema of the generated response. This is an alternative to `response_schema` that accepts [JSON Schema](https://json-schema.org/). If set, `response_schema` must be omitted, but `response_mime_type` is required. While the full JSON Schema may be sent, not all features are supported. Specifically, only the following properties are supported: - `$id` - `$defs` - `$ref` - `$anchor` - `type` - `format` - `title` - `description` - `enum` (for strings and numbers) - `items` - `prefixItems` - `minItems` - `maxItems` - `minimum` - `maximum` - `anyOf` - `oneOf` (interpreted the same as `anyOf`) - `properties` - `additionalProperties` - `required` The non-standard `propertyOrdering` property may also be set. Cyclic references are unrolled to a limited degree and, as such, may only be used within non-required properties. (Nullable properties are not sufficient.) If `$ref` is set on a sub-schema, no other properties, except for than those starting as a `$`, may be set.',
+    },
     stopSequences: {
       type: 'array',
       description:
         'Optional. The set of character sequences (up to 5) that will stop output generation. If specified, the API will stop at the first appearance of a `stop_sequence`. The stop sequence will not be included as part of the response.',
       items: { type: 'string' },
+    },
+    seed: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.',
+    },
+    responseMimeType: {
+      type: 'string',
+      description:
+        'Optional. MIME type of the generated candidate text. Supported MIME types are: `text/plain`: (default) Text output. `application/json`: JSON response in the response candidates. `text/x.enum`: ENUM as a string response in the response candidates. Refer to the [docs](https://ai.google.dev/gemini-api/docs/prompting_with_media#plain_text_formats) for a list of all supported text MIME types.',
+    },
+    mediaResolution: {
+      type: 'string',
+      description:
+        'Optional. If specified, the media resolution specified will be used.',
+      enum: [
+        'MEDIA_RESOLUTION_UNSPECIFIED',
+        'MEDIA_RESOLUTION_LOW',
+        'MEDIA_RESOLUTION_MEDIUM',
+        'MEDIA_RESOLUTION_HIGH',
+      ],
     },
     maxOutputTokens: {
       type: 'integer',
@@ -7544,51 +7629,28 @@ export const GenerationConfigSchema = {
       description:
         "Optional. The maximum cumulative probability of tokens to consider when sampling. The model uses combined Top-k and Top-p (nucleus) sampling. Tokens are sorted based on their assigned probabilities so that only the most likely tokens are considered. Top-k sampling directly limits the maximum number of tokens to consider, while Nucleus sampling limits the number of tokens based on the cumulative probability. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
     },
-    topK: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        "Optional. The maximum number of tokens to consider when sampling. Gemini models use Top-p (nucleus) sampling or a combination of Top-k and nucleus sampling. Top-k sampling considers the set of `top_k` most probable tokens. Models running with nucleus sampling don't allow top_k setting. Note: The default value varies by `Model` and is specified by the`Model.top_p` attribute returned from the `getModel` function. An empty `top_k` attribute indicates that the model doesn't apply top-k sampling and doesn't allow setting `top_k` on requests.",
-    },
-    seed: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Optional. Seed used in decoding. If not set, the request uses a randomly generated seed.',
-    },
-    responseMimeType: {
-      type: 'string',
-      description:
-        'Optional. MIME type of the generated candidate text. Supported MIME types are: `text/plain`: (default) Text output. `application/json`: JSON response in the response candidates. `text/x.enum`: ENUM as a string response in the response candidates. Refer to the [docs](https://ai.google.dev/gemini-api/docs/prompting_with_media#plain_text_formats) for a list of all supported text MIME types.',
-    },
-    responseSchema: { $ref: '#/$defs/Schema' },
-    _responseJsonSchema: {
-      type: 'any',
-      description:
-        'Optional. Output schema of the generated response. This is an alternative to `response_schema` that accepts [JSON Schema](https://json-schema.org/). If set, `response_schema` must be omitted, but `response_mime_type` is required. While the full JSON Schema may be sent, not all features are supported. Specifically, only the following properties are supported: - `$id` - `$defs` - `$ref` - `$anchor` - `type` - `format` - `title` - `description` - `enum` (for strings and numbers) - `items` - `prefixItems` - `minItems` - `maxItems` - `minimum` - `maximum` - `anyOf` - `oneOf` (interpreted the same as `anyOf`) - `properties` - `additionalProperties` - `required` The non-standard `propertyOrdering` property may also be set. Cyclic references are unrolled to a limited degree and, as such, may only be used within non-required properties. (Nullable properties are not sufficient.) If `$ref` is set on a sub-schema, no other properties, except for than those starting as a `$`, may be set.',
-    },
     responseJsonSchema: {
       type: 'any',
       description:
         'Optional. An internal detail. Use `responseJsonSchema` rather than this field.',
     },
-    presencePenalty: {
-      type: 'number',
-      format: 'float',
+    responseFormat: { $ref: '#/$defs/ResponseFormatConfig' },
+    responseModalities: {
+      type: 'array',
       description:
-        "Optional. Presence penalty applied to the next token's logprobs if the token has already been seen in the response. This penalty is binary on/off and not dependant on the number of times the token is used (after the first). Use frequency_penalty for a penalty that increases with each use. A positive penalty will discourage the use of tokens that have already been used in the response, increasing the vocabulary. A negative penalty will encourage the use of tokens that have already been used in the response, decreasing the vocabulary.",
-    },
-    frequencyPenalty: {
-      type: 'number',
-      format: 'float',
-      description:
-        "Optional. Frequency penalty applied to the next token's logprobs, multiplied by the number of times each token has been seen in the respponse so far. A positive penalty will discourage the use of tokens that have already been used, proportional to the number of times the token has been used: The more a token is used, the more difficult it is for the model to use that token again increasing the vocabulary of responses. Caution: A _negative_ penalty will encourage the model to reuse tokens proportional to the number of times the token has been used. Small negative values will reduce the vocabulary of a response. Larger negative values will cause the model to start repeating a common token until it hits the max_output_tokens limit.",
+        'Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.',
+      items: {
+        type: 'string',
+        enum: ['MODALITY_UNSPECIFIED', 'TEXT', 'IMAGE', 'AUDIO'],
+      },
     },
     responseLogprobs: {
       type: 'boolean',
       description:
         'Optional. If true, export the logprobs results in response.',
     },
+    thinkingConfig: { $ref: '#/$defs/ThinkingConfig' },
+    responseSchema: { $ref: '#/$defs/Schema' },
     logprobs: {
       type: 'integer',
       format: 'int32',
@@ -7600,30 +7662,6 @@ export const GenerationConfigSchema = {
       description:
         'Optional. Enables enhanced civic answers. It may not be available for all models.',
     },
-    responseModalities: {
-      type: 'array',
-      description:
-        'Optional. The requested modalities of the response. Represents the set of modalities that the model can return, and should be expected in the response. This is an exact match to the modalities of the response. A model may have multiple combinations of supported modalities. If the requested modalities do not match any of the supported combinations, an error will be returned. An empty list is equivalent to requesting only text.',
-      items: {
-        type: 'string',
-        enum: ['MODALITY_UNSPECIFIED', 'TEXT', 'IMAGE', 'AUDIO'],
-      },
-    },
-    speechConfig: { $ref: '#/$defs/SpeechConfig' },
-    thinkingConfig: { $ref: '#/$defs/ThinkingConfig' },
-    imageConfig: { $ref: '#/$defs/ImageConfig' },
-    mediaResolution: {
-      type: 'string',
-      description:
-        'Optional. If specified, the media resolution specified will be used.',
-      enum: [
-        'MEDIA_RESOLUTION_UNSPECIFIED',
-        'MEDIA_RESOLUTION_LOW',
-        'MEDIA_RESOLUTION_MEDIUM',
-        'MEDIA_RESOLUTION_HIGH',
-      ],
-    },
-    responseFormat: { $ref: '#/$defs/ResponseFormatConfig' },
   },
   $defs: {
     AudioResponseFormat: {
@@ -7665,15 +7703,15 @@ export const GenerationConfigSchema = {
       type: 'object',
       description: 'Config for image generation features.',
       properties: {
-        aspectRatio: {
-          type: 'string',
-          description:
-            'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
-        },
         imageSize: {
           type: 'string',
           description:
             'Optional. Specifies the size of generated images. Supported values are `512`, `1K`, `2K`, `4K`. If not specified, the model will use default value `1K`.',
+        },
+        aspectRatio: {
+          type: 'string',
+          description:
+            'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
         },
       },
     },
@@ -7681,16 +7719,6 @@ export const GenerationConfigSchema = {
       type: 'object',
       description: 'Configuration for image output format.',
       properties: {
-        mimeType: {
-          type: 'string',
-          description: 'Optional. The MIME type of the image output.',
-          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
-        },
-        delivery: {
-          type: 'string',
-          description: 'Optional. The delivery mode for the image output.',
-          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
-        },
         aspectRatio: {
           type: 'string',
           description: 'Optional. The aspect ratio for the image output.',
@@ -7711,6 +7739,16 @@ export const GenerationConfigSchema = {
             'ASPECT_RATIO_ONE_BY_FOUR',
             'ASPECT_RATIO_FOUR_BY_ONE',
           ],
+        },
+        mimeType: {
+          type: 'string',
+          description: 'Optional. The MIME type of the image output.',
+          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
+        },
+        delivery: {
+          type: 'string',
+          description: 'Optional. The delivery mode for the image output.',
+          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
         },
         imageSize: {
           type: 'string',
@@ -7761,6 +7799,45 @@ export const GenerationConfigSchema = {
       description:
         'The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).',
       properties: {
+        format: {
+          type: 'string',
+          description:
+            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
+        },
+        maxProperties: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the properties for Type.OBJECT.',
+        },
+        description: {
+          type: 'string',
+          description:
+            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
+        },
+        maxLength: {
+          type: 'string',
+          format: 'int64',
+          description: 'Optional. Maximum length of the Type.STRING',
+        },
+        items: { $ref: '#/$defs/Schema' },
+        maxItems: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the elements for Type.ARRAY.',
+        },
+        anyOf: {
+          type: 'array',
+          description:
+            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
+          items: { $ref: '#/$defs/Schema' },
+        },
+        default: {
+          type: 'any',
+          description:
+            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
+        },
         type: {
           type: 'string',
           description: 'Required. Data type.',
@@ -7775,36 +7852,36 @@ export const GenerationConfigSchema = {
             'NULL',
           ],
         },
-        format: {
-          type: 'string',
-          description:
-            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
-        },
-        title: {
-          type: 'string',
-          description: 'Optional. The title of the schema.',
-        },
-        description: {
-          type: 'string',
-          description:
-            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
-        },
         nullable: {
           type: 'boolean',
           description: 'Optional. Indicates if the value may be null.',
         },
-        enum: {
+        propertyOrdering: {
           type: 'array',
           description:
-            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
+            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
           items: { type: 'string' },
         },
-        items: { $ref: '#/$defs/Schema' },
-        maxItems: {
+        pattern: {
+          type: 'string',
+          description:
+            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
+        },
+        required: {
+          type: 'array',
+          description: 'Optional. Required properties of Type.OBJECT.',
+          items: { type: 'string' },
+        },
+        minLength: {
           type: 'string',
           format: 'int64',
           description:
-            'Optional. Maximum number of the elements for Type.ARRAY.',
+            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
+        },
+        example: {
+          type: 'any',
+          description:
+            'Optional. Example of the object. Will only populated when the object is the root.',
         },
         minItems: {
           type: 'string',
@@ -7817,10 +7894,15 @@ export const GenerationConfigSchema = {
           description: 'Optional. Properties of Type.OBJECT.',
           additionalProperties: { $ref: '#/$defs/Schema' },
         },
-        required: {
-          type: 'array',
-          description: 'Optional. Required properties of Type.OBJECT.',
-          items: { type: 'string' },
+        maximum: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional. The title of the schema.',
         },
         minProperties: {
           type: 'string',
@@ -7828,61 +7910,17 @@ export const GenerationConfigSchema = {
           description:
             'Optional. Minimum number of the properties for Type.OBJECT.',
         },
-        maxProperties: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. Maximum number of the properties for Type.OBJECT.',
-        },
         minimum: {
           type: 'number',
           format: 'double',
           description:
             'Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER Minimum value of the Type.INTEGER and Type.NUMBER',
         },
-        maximum: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
-        },
-        minLength: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
-        },
-        maxLength: {
-          type: 'string',
-          format: 'int64',
-          description: 'Optional. Maximum length of the Type.STRING',
-        },
-        pattern: {
-          type: 'string',
-          description:
-            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
-        },
-        example: {
-          type: 'any',
-          description:
-            'Optional. Example of the object. Will only populated when the object is the root.',
-        },
-        anyOf: {
+        enum: {
           type: 'array',
           description:
-            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
-          items: { $ref: '#/$defs/Schema' },
-        },
-        propertyOrdering: {
-          type: 'array',
-          description:
-            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
+            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
           items: { type: 'string' },
-        },
-        default: {
-          type: 'any',
-          description:
-            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
         },
       },
     },
@@ -7891,25 +7929,25 @@ export const GenerationConfigSchema = {
       description:
         'The configuration for a single speaker in a multi speaker setup.',
       properties: {
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         speaker: {
           type: 'string',
           description:
             'Required. The name of the speaker to use. Should be the same as in the prompt.',
         },
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     SpeechConfig: {
       type: 'object',
       description: 'Config for speech generation and transcription.',
       properties: {
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         multiSpeakerVoiceConfig: { $ref: '#/$defs/MultiSpeakerVoiceConfig' },
         languageCode: {
           type: 'string',
           description:
             'Optional. The IETF [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language code that the user configured the app to use. Used for speech recognition and synthesis. Valid values are: `de-DE`, `en-AU`, `en-GB`, `en-IN`, `en-US`, `es-US`, `fr-FR`, `hi-IN`, `pt-BR`, `ar-XA`, `es-ES`, `fr-CA`, `id-ID`, `it-IT`, `ja-JP`, `tr-TR`, `vi-VN`, `bn-IN`, `gu-IN`, `kn-IN`, `ml-IN`, `mr-IN`, `ta-IN`, `te-IN`, `nl-NL`, `ko-KR`, `cmn-CN`, `pl-PL`, `ru-RU`, and `th-TH`.',
         },
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     TextResponseFormat: {
@@ -7932,16 +7970,16 @@ export const GenerationConfigSchema = {
       type: 'object',
       description: 'Config for thinking features.',
       properties: {
-        includeThoughts: {
-          type: 'boolean',
-          description:
-            'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
-        },
         thinkingBudget: {
           type: 'integer',
           format: 'int32',
           description:
             'The number of thoughts tokens that the model should generate.',
+        },
+        includeThoughts: {
+          type: 'boolean',
+          description:
+            'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
         },
         thinkingLevel: {
           type: 'string',
@@ -7954,6 +7992,22 @@ export const GenerationConfigSchema = {
             'MEDIUM',
             'HIGH',
           ],
+        },
+      },
+    },
+    TranslationConfig: {
+      type: 'object',
+      description: 'Config for translation features.',
+      properties: {
+        echoTargetLanguage: {
+          type: 'boolean',
+          description:
+            'Optional. If true, the model will generate audio when the target language is spoken, essentially it will parrot the input. If false, we will not produce audio for the target language.',
+        },
+        targetLanguageCode: {
+          type: 'string',
+          description:
+            'Required. The target language for translation. Supported values are BCP-47 language codes (e.g. "en", "es", "fr").',
         },
       },
     },
@@ -7972,17 +8026,17 @@ export const GoogleAiGenerativelanguageV1betaGroundingSupportSchema = {
   description: 'Grounding support.',
   properties: {
     segment: { $ref: '#/$defs/GoogleAiGenerativelanguageV1betaSegment' },
-    groundingChunkIndices: {
-      type: 'array',
-      description:
-        "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
-      items: { type: 'integer', format: 'int32' },
-    },
     confidenceScores: {
       type: 'array',
       description:
         'Optional. Confidence score of the support references. Ranges from 0 to 1. 1 is the most confident. This list must have the same size as the grounding_chunk_indices.',
       items: { type: 'number', format: 'float' },
+    },
+    groundingChunkIndices: {
+      type: 'array',
+      description:
+        "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
+      items: { type: 'integer', format: 'int32' },
     },
     renderedParts: {
       type: 'array',
@@ -7996,12 +8050,6 @@ export const GoogleAiGenerativelanguageV1betaGroundingSupportSchema = {
       type: 'object',
       description: 'Segment of the content.',
       properties: {
-        partIndex: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'The index of a Part object within its parent Content object.',
-        },
         startIndex: {
           type: 'integer',
           format: 'int32',
@@ -8013,6 +8061,12 @@ export const GoogleAiGenerativelanguageV1betaGroundingSupportSchema = {
           format: 'int32',
           description:
             'End index in the given Part, measured in bytes. Offset from the start of the Part, exclusive, starting at zero.',
+        },
+        partIndex: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'The index of a Part object within its parent Content object.',
         },
         text: {
           type: 'string',
@@ -8028,12 +8082,6 @@ export const GoogleAiGenerativelanguageV1betaSegmentSchema = {
   type: 'object',
   description: 'Segment of the content.',
   properties: {
-    partIndex: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'The index of a Part object within its parent Content object.',
-    },
     startIndex: {
       type: 'integer',
       format: 'int32',
@@ -8045,6 +8093,12 @@ export const GoogleAiGenerativelanguageV1betaSegmentSchema = {
       format: 'int32',
       description:
         'End index in the given Part, measured in bytes. Offset from the start of the Part, exclusive, starting at zero.',
+    },
+    partIndex: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'The index of a Part object within its parent Content object.',
     },
     text: {
       type: 'string',
@@ -8085,17 +8139,17 @@ export const GoogleSearchSchema = {
       description:
         'Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.',
       properties: {
-        startTime: {
-          type: 'string',
-          format: 'google-datetime',
-          description:
-            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
-        },
         endTime: {
           type: 'string',
           format: 'google-datetime',
           description:
             'Optional. Exclusive end of the interval. If specified, a Timestamp matching this interval will have to be before the end.',
+        },
+        startTime: {
+          type: 'string',
+          format: 'google-datetime',
+          description:
+            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
         },
       },
     },
@@ -8185,10 +8239,10 @@ export const GroundingAttributionSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -8200,10 +8254,10 @@ export const GroundingAttributionSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -8212,16 +8266,16 @@ export const GroundingAttributionSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -8230,11 +8284,6 @@ export const GroundingAttributionSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -8243,6 +8292,11 @@ export const GroundingAttributionSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -8294,6 +8348,17 @@ export const GroundingAttributionSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -8313,17 +8378,6 @@ export const GroundingAttributionSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -8378,27 +8432,17 @@ export const GroundingAttributionSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -8408,7 +8452,17 @@ export const GroundingAttributionSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     SemanticRetrieverChunk: {
@@ -8416,15 +8470,15 @@ export const GroundingAttributionSchema = {
       description:
         'Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.',
       properties: {
-        source: {
-          type: 'string',
-          description:
-            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
-        },
         chunk: {
           type: 'string',
           description:
             'Output only. Name of the `Chunk` containing the attributed text. Example: `corpora/123/documents/abc/chunks/xyz`',
+        },
+        source: {
+          type: 'string',
+          description:
+            "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
         },
       },
     },
@@ -8526,27 +8580,27 @@ export const GroundingChunkSchema = {
     "A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.",
   properties: {
     web: { $ref: '#/$defs/Web' },
-    image: { $ref: '#/$defs/Image' },
-    retrievedContext: { $ref: '#/$defs/RetrievedContext' },
     maps: { $ref: '#/$defs/Maps' },
+    retrievedContext: { $ref: '#/$defs/RetrievedContext' },
+    image: { $ref: '#/$defs/Image' },
   },
   $defs: {
     GroundingChunkCustomMetadata: {
       type: 'object',
       description: 'User provided metadata about the GroundingFact.',
       properties: {
-        stringValue: {
-          type: 'string',
-          description: 'Optional. The string value of the metadata.',
-        },
-        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         numericValue: {
           type: 'number',
           format: 'float',
           description:
             'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
         },
+        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         key: { type: 'string', description: 'The key of the metadata.' },
+        stringValue: {
+          type: 'string',
+          description: 'Optional. The string value of the metadata.',
+        },
       },
     },
     GroundingChunkStringList: {
@@ -8568,15 +8622,15 @@ export const GroundingChunkSchema = {
           type: 'string',
           description: 'The web page URI for attribution.',
         },
-        imageUri: { type: 'string', description: 'The image asset URL.' },
-        title: {
-          type: 'string',
-          description: 'The title of the web page that the image is from.',
-        },
         domain: {
           type: 'string',
           description:
             'The root domain of the web page that the image is from, e.g. "example.com".',
+        },
+        imageUri: { type: 'string', description: 'The image asset URL.' },
+        title: {
+          type: 'string',
+          description: 'The title of the web page that the image is from.',
         },
       },
     },
@@ -8585,18 +8639,18 @@ export const GroundingChunkSchema = {
       description:
         'A grounding chunk from Google Maps. A Maps chunk corresponds to a single place.',
       properties: {
-        uri: { type: 'string', description: 'URI reference of the place.' },
-        title: { type: 'string', description: 'Title of the place.' },
-        text: {
-          type: 'string',
-          description: 'Text description of the place answer.',
-        },
         placeId: {
           type: 'string',
           description:
             'The ID of the place, in `places/{place_id}` format. A user can use this ID to look up that place.',
         },
+        uri: { type: 'string', description: 'URI reference of the place.' },
+        text: {
+          type: 'string',
+          description: 'Text description of the place answer.',
+        },
         placeAnswerSources: { $ref: '#/$defs/PlaceAnswerSources' },
+        title: { type: 'string', description: 'Title of the place.' },
       },
     },
     PlaceAnswerSources: {
@@ -8616,20 +8670,20 @@ export const GroundingChunkSchema = {
       type: 'object',
       description: 'Chunk from context retrieved by the file search tool.',
       properties: {
-        uri: {
-          type: 'string',
+        pageNumber: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. URI reference of the semantic retrieval document.',
+            'Optional. Page number of the retrieved context, if applicable.',
         },
         title: {
           type: 'string',
           description: 'Optional. Title of the document.',
         },
-        text: { type: 'string', description: 'Optional. Text of the chunk.' },
-        fileSearchStore: {
+        uri: {
           type: 'string',
           description:
-            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
+            'Optional. URI reference of the semantic retrieval document.',
         },
         customMetadata: {
           type: 'array',
@@ -8637,17 +8691,17 @@ export const GroundingChunkSchema = {
             'Optional. User-provided metadata about the retrieved context.',
           items: { $ref: '#/$defs/GroundingChunkCustomMetadata' },
         },
-        pageNumber: {
-          type: 'integer',
-          format: 'int32',
+        fileSearchStore: {
+          type: 'string',
           description:
-            'Optional. Page number of the retrieved context, if applicable.',
+            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
         },
         mediaId: {
           type: 'string',
           description:
             'Optional. The media blob resource name for multimodal file search results. Format: fileSearchStores/{file_search_store_id}/media/{blob_id}',
         },
+        text: { type: 'string', description: 'Optional. Text of the chunk.' },
       },
     },
     ReviewSnippet: {
@@ -8655,29 +8709,29 @@ export const GroundingChunkSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
     Web: {
       type: 'object',
       description: 'Chunk from the web.',
       properties: {
-        uri: {
-          type: 'string',
-          description: 'Output only. URI reference of the chunk.',
-        },
         title: {
           type: 'string',
           description: 'Output only. Title of the chunk.',
+        },
+        uri: {
+          type: 'string',
+          description: 'Output only. URI reference of the chunk.',
         },
       },
     },
@@ -8688,18 +8742,18 @@ export const GroundingChunkCustomMetadataSchema = {
   type: 'object',
   description: 'User provided metadata about the GroundingFact.',
   properties: {
-    stringValue: {
-      type: 'string',
-      description: 'Optional. The string value of the metadata.',
-    },
-    stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
     numericValue: {
       type: 'number',
       format: 'float',
       description:
         'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
     },
+    stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
     key: { type: 'string', description: 'The key of the metadata.' },
+    stringValue: {
+      type: 'string',
+      description: 'Optional. The string value of the metadata.',
+    },
   },
   $defs: {
     GroundingChunkStringList: {
@@ -8733,12 +8787,6 @@ export const GroundingMetadataSchema = {
   description: 'Metadata returned to client when grounding is enabled.',
   properties: {
     searchEntryPoint: { $ref: '#/$defs/SearchEntryPoint' },
-    groundingChunks: {
-      type: 'array',
-      description:
-        'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
-      items: { $ref: '#/$defs/GroundingChunk' },
-    },
     groundingSupports: {
       type: 'array',
       description: 'List of grounding support.',
@@ -8746,21 +8794,27 @@ export const GroundingMetadataSchema = {
         $ref: '#/$defs/GoogleAiGenerativelanguageV1betaGroundingSupport',
       },
     },
-    retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
-    webSearchQueries: {
-      type: 'array',
-      description: 'Web search queries for the following-up web search.',
-      items: { type: 'string' },
-    },
     imageSearchQueries: {
       type: 'array',
       description: 'Image search queries used for grounding.',
       items: { type: 'string' },
     },
+    retrievalMetadata: { $ref: '#/$defs/RetrievalMetadata' },
     googleMapsWidgetContextToken: {
       type: 'string',
       description:
         'Optional. Resource name of the Google Maps widget context token that can be used with the PlacesContextElement widget in order to render contextual data. Only populated in the case that grounding with Google Maps is enabled.',
+    },
+    webSearchQueries: {
+      type: 'array',
+      description: 'Web search queries for the following-up web search.',
+      items: { type: 'string' },
+    },
+    groundingChunks: {
+      type: 'array',
+      description:
+        'List of supporting references retrieved from specified grounding source. When streaming, this only contains the grounding chunks that have not been included in the grounding metadata of previous responses.',
+      items: { $ref: '#/$defs/GroundingChunk' },
     },
   },
   $defs: {
@@ -8769,17 +8823,17 @@ export const GroundingMetadataSchema = {
       description: 'Grounding support.',
       properties: {
         segment: { $ref: '#/$defs/GoogleAiGenerativelanguageV1betaSegment' },
-        groundingChunkIndices: {
-          type: 'array',
-          description:
-            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
-          items: { type: 'integer', format: 'int32' },
-        },
         confidenceScores: {
           type: 'array',
           description:
             'Optional. Confidence score of the support references. Ranges from 0 to 1. 1 is the most confident. This list must have the same size as the grounding_chunk_indices.',
           items: { type: 'number', format: 'float' },
+        },
+        groundingChunkIndices: {
+          type: 'array',
+          description:
+            "Optional. A list of indices (into 'grounding_chunk' in `response.candidate.grounding_metadata`) specifying the citations associated with the claim. For instance [1,3,4] means that grounding_chunk[1], grounding_chunk[3], grounding_chunk[4] are the retrieved content attributed to the claim. If the response is streaming, the grounding_chunk_indices refer to the indices across all responses. It is the client's responsibility to accumulate the grounding chunks from all responses (while maintaining the same order).",
+          items: { type: 'integer', format: 'int32' },
         },
         renderedParts: {
           type: 'array',
@@ -8793,12 +8847,6 @@ export const GroundingMetadataSchema = {
       type: 'object',
       description: 'Segment of the content.',
       properties: {
-        partIndex: {
-          type: 'integer',
-          format: 'int32',
-          description:
-            'The index of a Part object within its parent Content object.',
-        },
         startIndex: {
           type: 'integer',
           format: 'int32',
@@ -8810,6 +8858,12 @@ export const GroundingMetadataSchema = {
           format: 'int32',
           description:
             'End index in the given Part, measured in bytes. Offset from the start of the Part, exclusive, starting at zero.',
+        },
+        partIndex: {
+          type: 'integer',
+          format: 'int32',
+          description:
+            'The index of a Part object within its parent Content object.',
         },
         text: {
           type: 'string',
@@ -8824,27 +8878,27 @@ export const GroundingMetadataSchema = {
         "A `GroundingChunk` represents a segment of supporting evidence that grounds the model's response. It can be a chunk from the web, a retrieved context from a file, or information from Google Maps.",
       properties: {
         web: { $ref: '#/$defs/Web' },
-        image: { $ref: '#/$defs/Image' },
-        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
         maps: { $ref: '#/$defs/Maps' },
+        retrievedContext: { $ref: '#/$defs/RetrievedContext' },
+        image: { $ref: '#/$defs/Image' },
       },
     },
     GroundingChunkCustomMetadata: {
       type: 'object',
       description: 'User provided metadata about the GroundingFact.',
       properties: {
-        stringValue: {
-          type: 'string',
-          description: 'Optional. The string value of the metadata.',
-        },
-        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         numericValue: {
           type: 'number',
           format: 'float',
           description:
             'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
         },
+        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         key: { type: 'string', description: 'The key of the metadata.' },
+        stringValue: {
+          type: 'string',
+          description: 'Optional. The string value of the metadata.',
+        },
       },
     },
     GroundingChunkStringList: {
@@ -8866,15 +8920,15 @@ export const GroundingMetadataSchema = {
           type: 'string',
           description: 'The web page URI for attribution.',
         },
-        imageUri: { type: 'string', description: 'The image asset URL.' },
-        title: {
-          type: 'string',
-          description: 'The title of the web page that the image is from.',
-        },
         domain: {
           type: 'string',
           description:
             'The root domain of the web page that the image is from, e.g. "example.com".',
+        },
+        imageUri: { type: 'string', description: 'The image asset URL.' },
+        title: {
+          type: 'string',
+          description: 'The title of the web page that the image is from.',
         },
       },
     },
@@ -8883,18 +8937,18 @@ export const GroundingMetadataSchema = {
       description:
         'A grounding chunk from Google Maps. A Maps chunk corresponds to a single place.',
       properties: {
-        uri: { type: 'string', description: 'URI reference of the place.' },
-        title: { type: 'string', description: 'Title of the place.' },
-        text: {
-          type: 'string',
-          description: 'Text description of the place answer.',
-        },
         placeId: {
           type: 'string',
           description:
             'The ID of the place, in `places/{place_id}` format. A user can use this ID to look up that place.',
         },
+        uri: { type: 'string', description: 'URI reference of the place.' },
+        text: {
+          type: 'string',
+          description: 'Text description of the place answer.',
+        },
         placeAnswerSources: { $ref: '#/$defs/PlaceAnswerSources' },
+        title: { type: 'string', description: 'Title of the place.' },
       },
     },
     PlaceAnswerSources: {
@@ -8926,20 +8980,20 @@ export const GroundingMetadataSchema = {
       type: 'object',
       description: 'Chunk from context retrieved by the file search tool.',
       properties: {
-        uri: {
-          type: 'string',
+        pageNumber: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. URI reference of the semantic retrieval document.',
+            'Optional. Page number of the retrieved context, if applicable.',
         },
         title: {
           type: 'string',
           description: 'Optional. Title of the document.',
         },
-        text: { type: 'string', description: 'Optional. Text of the chunk.' },
-        fileSearchStore: {
+        uri: {
           type: 'string',
           description:
-            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
+            'Optional. URI reference of the semantic retrieval document.',
         },
         customMetadata: {
           type: 'array',
@@ -8947,17 +9001,17 @@ export const GroundingMetadataSchema = {
             'Optional. User-provided metadata about the retrieved context.',
           items: { $ref: '#/$defs/GroundingChunkCustomMetadata' },
         },
-        pageNumber: {
-          type: 'integer',
-          format: 'int32',
+        fileSearchStore: {
+          type: 'string',
           description:
-            'Optional. Page number of the retrieved context, if applicable.',
+            'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
         },
         mediaId: {
           type: 'string',
           description:
             'Optional. The media blob resource name for multimodal file search results. Format: fileSearchStores/{file_search_store_id}/media/{blob_id}',
         },
+        text: { type: 'string', description: 'Optional. Text of the chunk.' },
       },
     },
     ReviewSnippet: {
@@ -8965,16 +9019,16 @@ export const GroundingMetadataSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
     SearchEntryPoint: {
@@ -8998,13 +9052,13 @@ export const GroundingMetadataSchema = {
       type: 'object',
       description: 'Chunk from the web.',
       properties: {
-        uri: {
-          type: 'string',
-          description: 'Output only. URI reference of the chunk.',
-        },
         title: {
           type: 'string',
           description: 'Output only. Title of the chunk.',
+        },
+        uri: {
+          type: 'string',
+          description: 'Output only. URI reference of the chunk.',
         },
       },
     },
@@ -9015,12 +9069,12 @@ export const GroundingPassageSchema = {
   type: 'object',
   description: 'Passage included inline with a grounding configuration.',
   properties: {
+    content: { $ref: '#/$defs/Content' },
     id: {
       type: 'string',
       description:
         'Identifier for the passage for attributing this passage in grounded answers.',
     },
-    content: { $ref: '#/$defs/Content' },
   },
   $defs: {
     Blob: {
@@ -9045,10 +9099,10 @@ export const GroundingPassageSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -9060,10 +9114,10 @@ export const GroundingPassageSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -9072,16 +9126,16 @@ export const GroundingPassageSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -9090,11 +9144,6 @@ export const GroundingPassageSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -9103,6 +9152,11 @@ export const GroundingPassageSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -9154,6 +9208,17 @@ export const GroundingPassageSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -9173,17 +9238,6 @@ export const GroundingPassageSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -9221,27 +9275,17 @@ export const GroundingPassageSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -9251,7 +9295,17 @@ export const GroundingPassageSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -9397,10 +9451,10 @@ export const GroundingPassagesSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -9412,10 +9466,10 @@ export const GroundingPassagesSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -9424,16 +9478,16 @@ export const GroundingPassagesSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -9442,11 +9496,6 @@ export const GroundingPassagesSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -9455,6 +9504,11 @@ export const GroundingPassagesSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -9506,6 +9560,17 @@ export const GroundingPassagesSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -9525,17 +9590,6 @@ export const GroundingPassagesSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -9566,12 +9620,12 @@ export const GroundingPassagesSchema = {
       type: 'object',
       description: 'Passage included inline with a grounding configuration.',
       properties: {
+        content: { $ref: '#/$defs/Content' },
         id: {
           type: 'string',
           description:
             'Identifier for the passage for attributing this passage in grounded answers.',
         },
-        content: { $ref: '#/$defs/Content' },
       },
     },
     MediaResolution: {
@@ -9585,27 +9639,17 @@ export const GroundingPassagesSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -9615,7 +9659,17 @@ export const GroundingPassagesSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -9718,15 +9772,15 @@ export const ImageSchema = {
       type: 'string',
       description: 'The web page URI for attribution.',
     },
-    imageUri: { type: 'string', description: 'The image asset URL.' },
-    title: {
-      type: 'string',
-      description: 'The title of the web page that the image is from.',
-    },
     domain: {
       type: 'string',
       description:
         'The root domain of the web page that the image is from, e.g. "example.com".',
+    },
+    imageUri: { type: 'string', description: 'The image asset URL.' },
+    title: {
+      type: 'string',
+      description: 'The title of the web page that the image is from.',
     },
   },
 } as const
@@ -9735,15 +9789,15 @@ export const ImageConfigSchema = {
   type: 'object',
   description: 'Config for image generation features.',
   properties: {
-    aspectRatio: {
-      type: 'string',
-      description:
-        'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
-    },
     imageSize: {
       type: 'string',
       description:
         'Optional. Specifies the size of generated images. Supported values are `512`, `1K`, `2K`, `4K`. If not specified, the model will use default value `1K`.',
+    },
+    aspectRatio: {
+      type: 'string',
+      description:
+        'Optional. The aspect ratio of the image to generate. Supported aspect ratios: `1:1`, `1:4`, `4:1`, `1:8`, `8:1`, `2:3`, `3:2`, `3:4`, `4:3`, `4:5`, `5:4`, `9:16`, `16:9`, or `21:9`. If not specified, the model will choose a default aspect ratio based on any reference images provided.',
     },
   },
 } as const
@@ -9752,16 +9806,6 @@ export const ImageResponseFormatSchema = {
   type: 'object',
   description: 'Configuration for image output format.',
   properties: {
-    mimeType: {
-      type: 'string',
-      description: 'Optional. The MIME type of the image output.',
-      enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
-    },
-    delivery: {
-      type: 'string',
-      description: 'Optional. The delivery mode for the image output.',
-      enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
-    },
     aspectRatio: {
       type: 'string',
       description: 'Optional. The aspect ratio for the image output.',
@@ -9782,6 +9826,16 @@ export const ImageResponseFormatSchema = {
         'ASPECT_RATIO_ONE_BY_FOUR',
         'ASPECT_RATIO_FOUR_BY_ONE',
       ],
+    },
+    mimeType: {
+      type: 'string',
+      description: 'Optional. The MIME type of the image output.',
+      enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
+    },
+    delivery: {
+      type: 'string',
+      description: 'Optional. The delivery mode for the image output.',
+      enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
     },
     imageSize: {
       type: 'string',
@@ -9827,6 +9881,21 @@ export const InputFeedbackSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -9845,21 +9914,6 @@ export const InputFeedbackSchema = {
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
         },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
-        },
       },
     },
   },
@@ -9870,17 +9924,17 @@ export const IntervalSchema = {
   description:
     'Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.',
   properties: {
-    startTime: {
-      type: 'string',
-      format: 'google-datetime',
-      description:
-        'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
-    },
     endTime: {
       type: 'string',
       format: 'google-datetime',
       description:
         'Optional. Exclusive end of the interval. If specified, a Timestamp matching this interval will have to be before the end.',
+    },
+    startTime: {
+      type: 'string',
+      format: 'google-datetime',
+      description:
+        'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
     },
   },
 } as const
@@ -9890,17 +9944,17 @@ export const LatLngSchema = {
   description:
     'An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.',
   properties: {
-    latitude: {
-      type: 'number',
-      format: 'double',
-      description:
-        'The latitude in degrees. It must be in the range [-90.0, +90.0].',
-    },
     longitude: {
       type: 'number',
       format: 'double',
       description:
         'The longitude in degrees. It must be in the range [-180.0, +180.0].',
+    },
+    latitude: {
+      type: 'number',
+      format: 'double',
+      description:
+        'The latitude in degrees. It must be in the range [-90.0, +90.0].',
     },
   },
 } as const
@@ -9914,16 +9968,16 @@ export const LogprobsResultSchema = {
       format: 'float',
       description: 'Sum of log probabilities for all tokens.',
     },
-    topCandidates: {
-      type: 'array',
-      description: 'Length = total number of decoding steps.',
-      items: { $ref: '#/$defs/TopCandidates' },
-    },
     chosenCandidates: {
       type: 'array',
       description:
         'Length = total number of decoding steps. The chosen candidates may or may not be in top_candidates.',
       items: { $ref: '#/$defs/LogprobsResultCandidate' },
+    },
+    topCandidates: {
+      type: 'array',
+      description: 'Length = total number of decoding steps.',
+      items: { $ref: '#/$defs/TopCandidates' },
     },
   },
   $defs: {
@@ -9988,18 +10042,18 @@ export const MapsSchema = {
   description:
     'A grounding chunk from Google Maps. A Maps chunk corresponds to a single place.',
   properties: {
-    uri: { type: 'string', description: 'URI reference of the place.' },
-    title: { type: 'string', description: 'Title of the place.' },
-    text: {
-      type: 'string',
-      description: 'Text description of the place answer.',
-    },
     placeId: {
       type: 'string',
       description:
         'The ID of the place, in `places/{place_id}` format. A user can use this ID to look up that place.',
     },
+    uri: { type: 'string', description: 'URI reference of the place.' },
+    text: {
+      type: 'string',
+      description: 'Text description of the place answer.',
+    },
     placeAnswerSources: { $ref: '#/$defs/PlaceAnswerSources' },
+    title: { type: 'string', description: 'Title of the place.' },
   },
   $defs: {
     PlaceAnswerSources: {
@@ -10020,16 +10074,16 @@ export const MapsSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
   },
@@ -10049,21 +10103,11 @@ export const McpServerSchema = {
       description:
         'A transport that can stream HTTP requests and responses. Next ID: 6',
       properties: {
-        url: {
-          type: 'string',
-          description:
-            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
-        },
         headers: {
           type: 'object',
           description:
             'Optional: Fields for authentication headers, timeouts, etc., if needed.',
           additionalProperties: { type: 'string' },
-        },
-        timeout: {
-          type: 'string',
-          format: 'google-duration',
-          description: 'HTTP timeout for regular operations.',
         },
         sseReadTimeout: {
           type: 'string',
@@ -10074,6 +10118,16 @@ export const McpServerSchema = {
           type: 'boolean',
           description:
             'Whether to close the client session when the transport closes.',
+        },
+        timeout: {
+          type: 'string',
+          format: 'google-duration',
+          description: 'HTTP timeout for regular operations.',
+        },
+        url: {
+          type: 'string',
+          description:
+            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
         },
       },
     },
@@ -10092,16 +10146,16 @@ export const MessageSchema = {
   description:
     'The base unit of structured text. A `Message` includes an `author` and the `content` of the `Message`. The `author` is used to tag messages when they are fed to the model as text.',
   properties: {
-    author: {
-      type: 'string',
-      description:
-        'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
-    },
     content: {
       type: 'string',
       description: 'Required. The text content of the structured `Message`.',
     },
     citationMetadata: { $ref: '#/$defs/CitationMetadata' },
+    author: {
+      type: 'string',
+      description:
+        'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
+    },
   },
   $defs: {
     CitationMetadata: {
@@ -10121,11 +10175,10 @@ export const MessageSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -10137,10 +10190,11 @@ export const MessageSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -10152,16 +10206,16 @@ export const MessagePromptSchema = {
   description:
     'All of the structured input text passed to the model as a prompt. A `MessagePrompt` contains a structured set of fields that provide context for the conversation, examples of user input/model output message pairs that prime the model to respond in different ways, and the conversation history or list of messages representing the alternating turns of the conversation between the user and the model.',
   properties: {
-    context: {
-      type: 'string',
-      description:
-        'Optional. Text that should be provided to the model first to ground the response. If not empty, this `context` will be given to the model first before the `examples` and `messages`. When using a `context` be sure to provide it with every request to maintain continuity. This field can be a description of your prompt to the model to help provide context and guide the responses. Examples: "Translate the phrase from English to French." or "Given a statement, classify the sentiment as happy, sad or neutral." Anything included in this field will take precedence over message history if the total input size exceeds the model\'s `input_token_limit` and the input request is truncated.',
-    },
     examples: {
       type: 'array',
       description:
         "Optional. Examples of what the model should generate. This includes both user input and the response that the model should emulate. These `examples` are treated identically to conversation messages except that they take precedence over the history in `messages`: If the total input size exceeds the model's `input_token_limit` the input will be truncated. Items will be dropped from `messages` before `examples`.",
       items: { $ref: '#/$defs/Example' },
+    },
+    context: {
+      type: 'string',
+      description:
+        'Optional. Text that should be provided to the model first to ground the response. If not empty, this `context` will be given to the model first before the `examples` and `messages`. When using a `context` be sure to provide it with every request to maintain continuity. This field can be a description of your prompt to the model to help provide context and guide the responses. Examples: "Translate the phrase from English to French." or "Given a statement, classify the sentiment as happy, sad or neutral." Anything included in this field will take precedence over message history if the total input size exceeds the model\'s `input_token_limit` and the input request is truncated.',
     },
     messages: {
       type: 'array',
@@ -10188,11 +10242,10 @@ export const MessagePromptSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -10204,10 +10257,11 @@ export const MessagePromptSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -10225,17 +10279,17 @@ export const MessagePromptSchema = {
       description:
         'The base unit of structured text. A `Message` includes an `author` and the `content` of the `Message`. The `author` is used to tag messages when they are fed to the model as text.',
       properties: {
-        author: {
-          type: 'string',
-          description:
-            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
-        },
         content: {
           type: 'string',
           description:
             'Required. The text content of the structured `Message`.',
         },
         citationMetadata: { $ref: '#/$defs/CitationMetadata' },
+        author: {
+          type: 'string',
+          description:
+            'Optional. The author of this Message. This serves as a key for tagging the content of this Message when it is fed to the model as text. The author can be any alphanumeric string.',
+        },
       },
     },
   },
@@ -10266,11 +10320,6 @@ export const MetadataFilterSchema = {
           type: 'string',
           description: 'The string value to filter the metadata on.',
         },
-        numericValue: {
-          type: 'number',
-          format: 'float',
-          description: 'The numeric value to filter the metadata on.',
-        },
         operation: {
           type: 'string',
           description:
@@ -10286,6 +10335,11 @@ export const MetadataFilterSchema = {
             'INCLUDES',
             'EXCLUDES',
           ],
+        },
+        numericValue: {
+          type: 'number',
+          format: 'float',
+          description: 'The numeric value to filter the metadata on.',
         },
       },
     },
@@ -10335,14 +10389,14 @@ export const ModelStatusSchema = {
         'RETIRED',
       ],
     },
+    message: {
+      type: 'string',
+      description: 'A message explaining the model status.',
+    },
     retirementTime: {
       type: 'string',
       format: 'google-datetime',
       description: 'The time at which the model will be retired.',
-    },
-    message: {
-      type: 'string',
-      description: 'A message explaining the model status.',
     },
   },
 } as const
@@ -10373,12 +10427,12 @@ export const MultiSpeakerVoiceConfigSchema = {
       description:
         'The configuration for a single speaker in a multi speaker setup.',
       properties: {
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         speaker: {
           type: 'string',
           description:
             'Required. The name of the speaker to use. Should be the same as in the prompt.',
         },
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     VoiceConfig: {
@@ -10396,26 +10450,16 @@ export const PartSchema = {
   description:
     'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
   properties: {
-    text: { type: 'string', description: 'Inline text.' },
-    inlineData: { $ref: '#/$defs/Blob' },
-    functionCall: { $ref: '#/$defs/FunctionCall' },
-    functionResponse: { $ref: '#/$defs/FunctionResponse' },
-    fileData: { $ref: '#/$defs/FileData' },
-    executableCode: { $ref: '#/$defs/ExecutableCode' },
-    codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-    toolCall: { $ref: '#/$defs/ToolCall' },
-    toolResponse: { $ref: '#/$defs/ToolResponse' },
     videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+    text: { type: 'string', description: 'Inline text.' },
+    executableCode: { $ref: '#/$defs/ExecutableCode' },
+    functionResponse: { $ref: '#/$defs/FunctionResponse' },
     thought: {
       type: 'boolean',
       description: 'Optional. Indicates if the part is thought from the model.',
     },
-    thoughtSignature: {
-      type: 'string',
-      format: 'byte',
-      description:
-        'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-    },
+    mediaResolution: { $ref: '#/$defs/MediaResolution' },
+    fileData: { $ref: '#/$defs/FileData' },
     partMetadata: {
       type: 'object',
       description:
@@ -10425,7 +10469,17 @@ export const PartSchema = {
         description: 'Properties of the object.',
       },
     },
-    mediaResolution: { $ref: '#/$defs/MediaResolution' },
+    functionCall: { $ref: '#/$defs/FunctionCall' },
+    toolResponse: { $ref: '#/$defs/ToolResponse' },
+    inlineData: { $ref: '#/$defs/Blob' },
+    codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+    toolCall: { $ref: '#/$defs/ToolCall' },
+    thoughtSignature: {
+      type: 'string',
+      format: 'byte',
+      description:
+        'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+    },
   },
   $defs: {
     Blob: {
@@ -10450,10 +10504,10 @@ export const PartSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -10465,10 +10519,10 @@ export const PartSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -10477,11 +10531,6 @@ export const PartSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -10490,6 +10539,11 @@ export const PartSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -10541,6 +10595,17 @@ export const PartSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -10560,17 +10625,6 @@ export const PartSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -10713,16 +10767,16 @@ export const PlaceAnswerSourcesSchema = {
       description:
         'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
       properties: {
-        reviewId: {
-          type: 'string',
-          description: 'The ID of the review snippet.',
-        },
+        title: { type: 'string', description: 'Title of the review.' },
         googleMapsUri: {
           type: 'string',
           description:
             'A link that corresponds to the user review on Google Maps.',
         },
-        title: { type: 'string', description: 'Title of the review.' },
+        reviewId: {
+          type: 'string',
+          description: 'The ID of the review snippet.',
+        },
       },
     },
   },
@@ -10770,6 +10824,21 @@ export const PromptFeedbackSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -10787,21 +10856,6 @@ export const PromptFeedbackSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -10857,16 +10911,6 @@ export const ResponseFormatConfigSchema = {
       type: 'object',
       description: 'Configuration for image output format.',
       properties: {
-        mimeType: {
-          type: 'string',
-          description: 'Optional. The MIME type of the image output.',
-          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
-        },
-        delivery: {
-          type: 'string',
-          description: 'Optional. The delivery mode for the image output.',
-          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
-        },
         aspectRatio: {
           type: 'string',
           description: 'Optional. The aspect ratio for the image output.',
@@ -10887,6 +10931,16 @@ export const ResponseFormatConfigSchema = {
             'ASPECT_RATIO_ONE_BY_FOUR',
             'ASPECT_RATIO_FOUR_BY_ONE',
           ],
+        },
+        mimeType: {
+          type: 'string',
+          description: 'Optional. The MIME type of the image output.',
+          enum: ['MIME_TYPE_UNSPECIFIED', 'IMAGE_JPEG'],
+        },
+        delivery: {
+          type: 'string',
+          description: 'Optional. The delivery mode for the image output.',
+          enum: ['DELIVERY_UNSPECIFIED', 'INLINE', 'URI'],
         },
         imageSize: {
           type: 'string',
@@ -10937,17 +10991,17 @@ export const RetrievalConfigSchema = {
       description:
         'An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.',
       properties: {
-        latitude: {
-          type: 'number',
-          format: 'double',
-          description:
-            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
-        },
         longitude: {
           type: 'number',
           format: 'double',
           description:
             'The longitude in degrees. It must be in the range [-180.0, +180.0].',
+        },
+        latitude: {
+          type: 'number',
+          format: 'double',
+          description:
+            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
         },
       },
     },
@@ -10971,17 +11025,17 @@ export const RetrievedContextSchema = {
   type: 'object',
   description: 'Chunk from context retrieved by the file search tool.',
   properties: {
+    pageNumber: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Optional. Page number of the retrieved context, if applicable.',
+    },
+    title: { type: 'string', description: 'Optional. Title of the document.' },
     uri: {
       type: 'string',
       description:
         'Optional. URI reference of the semantic retrieval document.',
-    },
-    title: { type: 'string', description: 'Optional. Title of the document.' },
-    text: { type: 'string', description: 'Optional. Text of the chunk.' },
-    fileSearchStore: {
-      type: 'string',
-      description:
-        'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
     },
     customMetadata: {
       type: 'array',
@@ -10989,35 +11043,35 @@ export const RetrievedContextSchema = {
         'Optional. User-provided metadata about the retrieved context.',
       items: { $ref: '#/$defs/GroundingChunkCustomMetadata' },
     },
-    pageNumber: {
-      type: 'integer',
-      format: 'int32',
+    fileSearchStore: {
+      type: 'string',
       description:
-        'Optional. Page number of the retrieved context, if applicable.',
+        'Optional. Name of the `FileSearchStore` containing the document. Example: `fileSearchStores/123`',
     },
     mediaId: {
       type: 'string',
       description:
         'Optional. The media blob resource name for multimodal file search results. Format: fileSearchStores/{file_search_store_id}/media/{blob_id}',
     },
+    text: { type: 'string', description: 'Optional. Text of the chunk.' },
   },
   $defs: {
     GroundingChunkCustomMetadata: {
       type: 'object',
       description: 'User provided metadata about the GroundingFact.',
       properties: {
-        stringValue: {
-          type: 'string',
-          description: 'Optional. The string value of the metadata.',
-        },
-        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         numericValue: {
           type: 'number',
           format: 'float',
           description:
             'Optional. The numeric value of the metadata. The expected range for this value depends on the specific `key` used.',
         },
+        stringListValue: { $ref: '#/$defs/GroundingChunkStringList' },
         key: { type: 'string', description: 'The key of the metadata.' },
+        stringValue: {
+          type: 'string',
+          description: 'Optional. The string value of the metadata.',
+        },
       },
     },
     GroundingChunkStringList: {
@@ -11039,12 +11093,12 @@ export const ReviewSnippetSchema = {
   description:
     'Encapsulates a snippet of a user review that answers a question about the features of a specific place in Google Maps.',
   properties: {
-    reviewId: { type: 'string', description: 'The ID of the review snippet.' },
+    title: { type: 'string', description: 'Title of the review.' },
     googleMapsUri: {
       type: 'string',
       description: 'A link that corresponds to the user review on Google Maps.',
     },
-    title: { type: 'string', description: 'Title of the review.' },
+    reviewId: { type: 'string', description: 'The ID of the review snippet.' },
   },
 } as const
 
@@ -11062,6 +11116,21 @@ export const SafetyFeedbackSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -11079,21 +11148,6 @@ export const SafetyFeedbackSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -11143,6 +11197,21 @@ export const SafetyRatingSchema = {
   description:
     'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
   properties: {
+    probability: {
+      type: 'string',
+      description: 'Required. The probability of harm for this content.',
+      enum: [
+        'HARM_PROBABILITY_UNSPECIFIED',
+        'NEGLIGIBLE',
+        'LOW',
+        'MEDIUM',
+        'HIGH',
+      ],
+    },
+    blocked: {
+      type: 'boolean',
+      description: 'Was this content blocked because of this rating?',
+    },
     category: {
       type: 'string',
       description: 'Required. The category for this rating.',
@@ -11160,21 +11229,6 @@ export const SafetyRatingSchema = {
         'HARM_CATEGORY_DANGEROUS_CONTENT',
         'HARM_CATEGORY_CIVIC_INTEGRITY',
       ],
-    },
-    probability: {
-      type: 'string',
-      description: 'Required. The probability of harm for this content.',
-      enum: [
-        'HARM_PROBABILITY_UNSPECIFIED',
-        'NEGLIGIBLE',
-        'LOW',
-        'MEDIUM',
-        'HIGH',
-      ],
-    },
-    blocked: {
-      type: 'boolean',
-      description: 'Was this content blocked because of this rating?',
     },
   },
 } as const
@@ -11223,6 +11277,44 @@ export const SchemaSchema = {
   description:
     'The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).',
   properties: {
+    format: {
+      type: 'string',
+      description:
+        'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
+    },
+    maxProperties: {
+      type: 'string',
+      format: 'int64',
+      description:
+        'Optional. Maximum number of the properties for Type.OBJECT.',
+    },
+    description: {
+      type: 'string',
+      description:
+        'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
+    },
+    maxLength: {
+      type: 'string',
+      format: 'int64',
+      description: 'Optional. Maximum length of the Type.STRING',
+    },
+    items: { $ref: '#/$defs/Schema' },
+    maxItems: {
+      type: 'string',
+      format: 'int64',
+      description: 'Optional. Maximum number of the elements for Type.ARRAY.',
+    },
+    anyOf: {
+      type: 'array',
+      description:
+        'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
+      items: { $ref: '#/$defs/Schema' },
+    },
+    default: {
+      type: 'any',
+      description:
+        "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
+    },
     type: {
       type: 'string',
       description: 'Required. Data type.',
@@ -11237,35 +11329,36 @@ export const SchemaSchema = {
         'NULL',
       ],
     },
-    format: {
-      type: 'string',
-      description:
-        'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
-    },
-    title: {
-      type: 'string',
-      description: 'Optional. The title of the schema.',
-    },
-    description: {
-      type: 'string',
-      description:
-        'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
-    },
     nullable: {
       type: 'boolean',
       description: 'Optional. Indicates if the value may be null.',
     },
-    enum: {
+    propertyOrdering: {
       type: 'array',
       description:
-        'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
+        'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
       items: { type: 'string' },
     },
-    items: { $ref: '#/$defs/Schema' },
-    maxItems: {
+    pattern: {
+      type: 'string',
+      description:
+        'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
+    },
+    required: {
+      type: 'array',
+      description: 'Optional. Required properties of Type.OBJECT.',
+      items: { type: 'string' },
+    },
+    minLength: {
       type: 'string',
       format: 'int64',
-      description: 'Optional. Maximum number of the elements for Type.ARRAY.',
+      description:
+        'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
+    },
+    example: {
+      type: 'any',
+      description:
+        'Optional. Example of the object. Will only populated when the object is the root.',
     },
     minItems: {
       type: 'string',
@@ -11277,10 +11370,15 @@ export const SchemaSchema = {
       description: 'Optional. Properties of Type.OBJECT.',
       additionalProperties: { $ref: '#/$defs/Schema' },
     },
-    required: {
-      type: 'array',
-      description: 'Optional. Required properties of Type.OBJECT.',
-      items: { type: 'string' },
+    maximum: {
+      type: 'number',
+      format: 'double',
+      description:
+        'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
+    },
+    title: {
+      type: 'string',
+      description: 'Optional. The title of the schema.',
     },
     minProperties: {
       type: 'string',
@@ -11288,61 +11386,17 @@ export const SchemaSchema = {
       description:
         'Optional. Minimum number of the properties for Type.OBJECT.',
     },
-    maxProperties: {
-      type: 'string',
-      format: 'int64',
-      description:
-        'Optional. Maximum number of the properties for Type.OBJECT.',
-    },
     minimum: {
       type: 'number',
       format: 'double',
       description:
         'Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER Minimum value of the Type.INTEGER and Type.NUMBER',
     },
-    maximum: {
-      type: 'number',
-      format: 'double',
-      description:
-        'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
-    },
-    minLength: {
-      type: 'string',
-      format: 'int64',
-      description:
-        'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
-    },
-    maxLength: {
-      type: 'string',
-      format: 'int64',
-      description: 'Optional. Maximum length of the Type.STRING',
-    },
-    pattern: {
-      type: 'string',
-      description:
-        'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
-    },
-    example: {
-      type: 'any',
-      description:
-        'Optional. Example of the object. Will only populated when the object is the root.',
-    },
-    anyOf: {
+    enum: {
       type: 'array',
       description:
-        'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
-      items: { $ref: '#/$defs/Schema' },
-    },
-    propertyOrdering: {
-      type: 'array',
-      description:
-        'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
+        'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
       items: { type: 'string' },
-    },
-    default: {
-      type: 'any',
-      description:
-        "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
     },
   },
 } as const
@@ -11392,15 +11446,15 @@ export const SemanticRetrieverChunkSchema = {
   description:
     'Identifier for a `Chunk` retrieved via Semantic Retriever specified in the `GenerateAnswerRequest` using `SemanticRetrieverConfig`.',
   properties: {
-    source: {
-      type: 'string',
-      description:
-        "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
-    },
     chunk: {
       type: 'string',
       description:
         'Output only. Name of the `Chunk` containing the attributed text. Example: `corpora/123/documents/abc/chunks/xyz`',
+    },
+    source: {
+      type: 'string',
+      description:
+        "Output only. Name of the source matching the request's `SemanticRetrieverConfig.source`. Example: `corpora/123` or `corpora/123/documents/abc`",
     },
   },
 } as const
@@ -11457,10 +11511,10 @@ export const SemanticRetrieverConfigSchema = {
       description:
         'Result of executing the `ExecutableCode`. Generated only when the `CodeExecution` tool is used.',
       properties: {
-        id: {
+        output: {
           type: 'string',
           description:
-            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
+            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
         },
         outcome: {
           type: 'string',
@@ -11472,10 +11526,10 @@ export const SemanticRetrieverConfigSchema = {
             'OUTCOME_DEADLINE_EXCEEDED',
           ],
         },
-        output: {
+        id: {
           type: 'string',
           description:
-            'Optional. Contains stdout when code execution is successful, stderr or other description otherwise.',
+            'Optional. The identifier of the `ExecutableCode` part this result is for. Only populated if the corresponding `ExecutableCode` has an id.',
         },
       },
     },
@@ -11486,11 +11540,6 @@ export const SemanticRetrieverConfigSchema = {
         stringValue: {
           type: 'string',
           description: 'The string value to filter the metadata on.',
-        },
-        numericValue: {
-          type: 'number',
-          format: 'float',
-          description: 'The numeric value to filter the metadata on.',
         },
         operation: {
           type: 'string',
@@ -11508,6 +11557,11 @@ export const SemanticRetrieverConfigSchema = {
             'EXCLUDES',
           ],
         },
+        numericValue: {
+          type: 'number',
+          format: 'float',
+          description: 'The numeric value to filter the metadata on.',
+        },
       },
     },
     Content: {
@@ -11515,16 +11569,16 @@ export const SemanticRetrieverConfigSchema = {
       description:
         'The base structured datatype containing multi-part content of a message. A `Content` includes a `role` field designating the producer of the `Content` and a `parts` field containing multi-part data that contains the content of the message turn.',
       properties: {
+        role: {
+          type: 'string',
+          description:
+            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
+        },
         parts: {
           type: 'array',
           description:
             'Ordered `Parts` that constitute a single message. Parts may have different MIME types.',
           items: { $ref: '#/$defs/Part' },
-        },
-        role: {
-          type: 'string',
-          description:
-            "Optional. The producer of the content. Must be either 'user' or 'model'. Useful to set for multi-turn conversations, otherwise can be left blank or unset.",
         },
       },
     },
@@ -11533,11 +11587,6 @@ export const SemanticRetrieverConfigSchema = {
       description:
         'Code generated by the model that is meant to be executed, and the result returned to the model. Only generated when using the `CodeExecution` tool, in which the code will be automatically executed, and a corresponding `CodeExecutionResult` will also be generated.',
       properties: {
-        id: {
-          type: 'string',
-          description:
-            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
-        },
         language: {
           type: 'string',
           description: 'Required. Programming language of the `code`.',
@@ -11546,6 +11595,11 @@ export const SemanticRetrieverConfigSchema = {
         code: {
           type: 'string',
           description: 'Required. The code to be executed.',
+        },
+        id: {
+          type: 'string',
+          description:
+            'Optional. Unique identifier of the `ExecutableCode` part. The server returns the `CodeExecutionResult` with the matching `id`.',
         },
       },
     },
@@ -11597,6 +11651,17 @@ export const SemanticRetrieverConfigSchema = {
           description:
             'Optional. The identifier of the function call this response is for. Populated by the client to match the corresponding function call `id`.',
         },
+        scheduling: {
+          type: 'string',
+          description:
+            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
+          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
+        },
+        willContinue: {
+          type: 'boolean',
+          description:
+            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
+        },
         name: {
           type: 'string',
           description:
@@ -11616,17 +11681,6 @@ export const SemanticRetrieverConfigSchema = {
           description:
             'Optional. Ordered `Parts` that constitute a function response. Parts may have different IANA MIME types.',
           items: { $ref: '#/$defs/FunctionResponsePart' },
-        },
-        willContinue: {
-          type: 'boolean',
-          description:
-            'Optional. Signals that function call continues, and more responses will be returned, turning the function call into a generator. Is only applicable to NON_BLOCKING function calls, is ignored otherwise. If set to false, future responses will not be considered. It is allowed to return empty `response` with `will_continue=False` to signal that the function call is finished. This may still trigger the model generation. To avoid triggering the generation and finish the function call, additionally set `scheduling` to `SILENT`.',
-        },
-        scheduling: {
-          type: 'string',
-          description:
-            'Optional. Specifies how the response should be scheduled in the conversation. Only applicable to NON_BLOCKING function calls, is ignored otherwise. Defaults to WHEN_IDLE.',
-          enum: ['SCHEDULING_UNSPECIFIED', 'SILENT', 'WHEN_IDLE', 'INTERRUPT'],
         },
       },
     },
@@ -11681,27 +11735,17 @@ export const SemanticRetrieverConfigSchema = {
       description:
         'A datatype containing media that is part of a multi-part `Content` message. A `Part` consists of data which has an associated datatype. A `Part` can only contain one of the accepted types in `Part.data`. A `Part` must have a fixed IANA MIME type identifying the type and subtype of the media if the `inline_data` field is filled with raw bytes.',
       properties: {
-        text: { type: 'string', description: 'Inline text.' },
-        inlineData: { $ref: '#/$defs/Blob' },
-        functionCall: { $ref: '#/$defs/FunctionCall' },
-        functionResponse: { $ref: '#/$defs/FunctionResponse' },
-        fileData: { $ref: '#/$defs/FileData' },
-        executableCode: { $ref: '#/$defs/ExecutableCode' },
-        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
-        toolCall: { $ref: '#/$defs/ToolCall' },
-        toolResponse: { $ref: '#/$defs/ToolResponse' },
         videoMetadata: { $ref: '#/$defs/VideoMetadata' },
+        text: { type: 'string', description: 'Inline text.' },
+        executableCode: { $ref: '#/$defs/ExecutableCode' },
+        functionResponse: { $ref: '#/$defs/FunctionResponse' },
         thought: {
           type: 'boolean',
           description:
             'Optional. Indicates if the part is thought from the model.',
         },
-        thoughtSignature: {
-          type: 'string',
-          format: 'byte',
-          description:
-            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
-        },
+        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        fileData: { $ref: '#/$defs/FileData' },
         partMetadata: {
           type: 'object',
           description:
@@ -11711,7 +11755,17 @@ export const SemanticRetrieverConfigSchema = {
             description: 'Properties of the object.',
           },
         },
-        mediaResolution: { $ref: '#/$defs/MediaResolution' },
+        functionCall: { $ref: '#/$defs/FunctionCall' },
+        toolResponse: { $ref: '#/$defs/ToolResponse' },
+        inlineData: { $ref: '#/$defs/Blob' },
+        codeExecutionResult: { $ref: '#/$defs/CodeExecutionResult' },
+        toolCall: { $ref: '#/$defs/ToolCall' },
+        thoughtSignature: {
+          type: 'string',
+          format: 'byte',
+          description:
+            'Optional. An opaque signature for the thought so it can be reused in subsequent requests.',
+        },
       },
     },
     ToolCall: {
@@ -11811,12 +11865,12 @@ export const SpeakerVoiceConfigSchema = {
   description:
     'The configuration for a single speaker in a multi speaker setup.',
   properties: {
+    voiceConfig: { $ref: '#/$defs/VoiceConfig' },
     speaker: {
       type: 'string',
       description:
         'Required. The name of the speaker to use. Should be the same as in the prompt.',
     },
-    voiceConfig: { $ref: '#/$defs/VoiceConfig' },
   },
   $defs: {
     PrebuiltVoiceConfig: {
@@ -11843,13 +11897,13 @@ export const SpeechConfigSchema = {
   type: 'object',
   description: 'Config for speech generation and transcription.',
   properties: {
-    voiceConfig: { $ref: '#/$defs/VoiceConfig' },
     multiSpeakerVoiceConfig: { $ref: '#/$defs/MultiSpeakerVoiceConfig' },
     languageCode: {
       type: 'string',
       description:
         'Optional. The IETF [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language code that the user configured the app to use. Used for speech recognition and synthesis. Valid values are: `de-DE`, `en-AU`, `en-GB`, `en-IN`, `en-US`, `es-US`, `fr-FR`, `hi-IN`, `pt-BR`, `ar-XA`, `es-ES`, `fr-CA`, `id-ID`, `it-IT`, `ja-JP`, `tr-TR`, `vi-VN`, `bn-IN`, `gu-IN`, `kn-IN`, `ml-IN`, `mr-IN`, `ta-IN`, `te-IN`, `nl-NL`, `ko-KR`, `cmn-CN`, `pl-PL`, `ru-RU`, and `th-TH`.',
     },
+    voiceConfig: { $ref: '#/$defs/VoiceConfig' },
   },
   $defs: {
     MultiSpeakerVoiceConfig: {
@@ -11878,12 +11932,12 @@ export const SpeechConfigSchema = {
       description:
         'The configuration for a single speaker in a multi speaker setup.',
       properties: {
+        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
         speaker: {
           type: 'string',
           description:
             'Required. The name of the speaker to use. Should be the same as in the prompt.',
         },
-        voiceConfig: { $ref: '#/$defs/VoiceConfig' },
       },
     },
     VoiceConfig: {
@@ -11901,21 +11955,11 @@ export const StreamableHttpTransportSchema = {
   description:
     'A transport that can stream HTTP requests and responses. Next ID: 6',
   properties: {
-    url: {
-      type: 'string',
-      description:
-        'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
-    },
     headers: {
       type: 'object',
       description:
         'Optional: Fields for authentication headers, timeouts, etc., if needed.',
       additionalProperties: { type: 'string' },
-    },
-    timeout: {
-      type: 'string',
-      format: 'google-duration',
-      description: 'HTTP timeout for regular operations.',
     },
     sseReadTimeout: {
       type: 'string',
@@ -11926,6 +11970,16 @@ export const StreamableHttpTransportSchema = {
       type: 'boolean',
       description:
         'Whether to close the client session when the transport closes.',
+    },
+    timeout: {
+      type: 'string',
+      format: 'google-duration',
+      description: 'HTTP timeout for regular operations.',
+    },
+    url: {
+      type: 'string',
+      description:
+        'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
     },
   },
 } as const
@@ -11964,11 +12018,10 @@ export const TextCompletionSchema = {
       description:
         'A citation to a source for a portion of a specific response.',
       properties: {
-        startIndex: {
-          type: 'integer',
-          format: 'int32',
+        license: {
+          type: 'string',
           description:
-            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
+            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
         },
         endIndex: {
           type: 'integer',
@@ -11980,10 +12033,11 @@ export const TextCompletionSchema = {
           description:
             'Optional. URI that is attributed as a source for a portion of the text.',
         },
-        license: {
-          type: 'string',
+        startIndex: {
+          type: 'integer',
+          format: 'int32',
           description:
-            'Optional. License for the GitHub project that is attributed as a source for segment. License info is required for code citations.',
+            'Optional. Start of segment of the response that is attributed to this source. Index indicates the start of the segment, measured in bytes.',
         },
       },
     },
@@ -11992,6 +12046,21 @@ export const TextCompletionSchema = {
       description:
         'Safety rating for a piece of content. The safety rating contains the category of harm and the harm probability level in that category for a piece of content. Content is classified for safety across a number of harm categories and the probability of the harm classification is included here.',
       properties: {
+        probability: {
+          type: 'string',
+          description: 'Required. The probability of harm for this content.',
+          enum: [
+            'HARM_PROBABILITY_UNSPECIFIED',
+            'NEGLIGIBLE',
+            'LOW',
+            'MEDIUM',
+            'HIGH',
+          ],
+        },
+        blocked: {
+          type: 'boolean',
+          description: 'Was this content blocked because of this rating?',
+        },
         category: {
           type: 'string',
           description: 'Required. The category for this rating.',
@@ -12009,21 +12078,6 @@ export const TextCompletionSchema = {
             'HARM_CATEGORY_DANGEROUS_CONTENT',
             'HARM_CATEGORY_CIVIC_INTEGRITY',
           ],
-        },
-        probability: {
-          type: 'string',
-          description: 'Required. The probability of harm for this content.',
-          enum: [
-            'HARM_PROBABILITY_UNSPECIFIED',
-            'NEGLIGIBLE',
-            'LOW',
-            'MEDIUM',
-            'HIGH',
-          ],
-        },
-        blocked: {
-          type: 'boolean',
-          description: 'Was this content blocked because of this rating?',
         },
       },
     },
@@ -12060,16 +12114,16 @@ export const ThinkingConfigSchema = {
   type: 'object',
   description: 'Config for thinking features.',
   properties: {
-    includeThoughts: {
-      type: 'boolean',
-      description:
-        'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
-    },
     thinkingBudget: {
       type: 'integer',
       format: 'int32',
       description:
         'The number of thoughts tokens that the model should generate.',
+    },
+    includeThoughts: {
+      type: 'boolean',
+      description:
+        'Indicates whether to include thoughts in the response. If true, thoughts are returned only when available.',
     },
     thinkingLevel: {
       type: 'string',
@@ -12085,24 +12139,24 @@ export const ToolSchema = {
   description:
     'Tool details that the model may use to generate response. A `Tool` is a piece of code that enables the system to interact with external systems to perform an action, or set of actions, outside of knowledge and scope of the model. Next ID: 16',
   properties: {
+    googleSearchRetrieval: { $ref: '#/$defs/GoogleSearchRetrieval' },
+    mcpServers: {
+      type: 'array',
+      description: 'Optional. MCP Servers to connect to.',
+      items: { $ref: '#/$defs/McpServer' },
+    },
+    googleSearch: { $ref: '#/$defs/GoogleSearch' },
+    codeExecution: { $ref: '#/$defs/CodeExecution' },
+    computerUse: { $ref: '#/$defs/ComputerUse' },
+    googleMaps: { $ref: '#/$defs/GoogleMaps' },
     functionDeclarations: {
       type: 'array',
       description:
         'Optional. A list of `FunctionDeclarations` available to the model that can be used for function calling. The model or system does not execute the function. Instead the defined function may be returned as a FunctionCall with arguments to the client side for execution. The model may decide to call a subset of these functions by populating FunctionCall in the response. The next conversation turn may contain a FunctionResponse with the Content.role "function" generation context for the next model turn.',
       items: { $ref: '#/$defs/FunctionDeclaration' },
     },
-    googleSearchRetrieval: { $ref: '#/$defs/GoogleSearchRetrieval' },
-    codeExecution: { $ref: '#/$defs/CodeExecution' },
-    googleSearch: { $ref: '#/$defs/GoogleSearch' },
-    computerUse: { $ref: '#/$defs/ComputerUse' },
     urlContext: { $ref: '#/$defs/UrlContext' },
     fileSearch: { $ref: '#/$defs/FileSearch' },
-    mcpServers: {
-      type: 'array',
-      description: 'Optional. MCP Servers to connect to.',
-      items: { $ref: '#/$defs/McpServer' },
-    },
-    googleMaps: { $ref: '#/$defs/GoogleMaps' },
   },
   $defs: {
     CodeExecution: {
@@ -12115,16 +12169,16 @@ export const ToolSchema = {
       type: 'object',
       description: 'Computer Use tool type.',
       properties: {
-        environment: {
-          type: 'string',
-          description: 'Required. The environment being operated.',
-          enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
-        },
         excludedPredefinedFunctions: {
           type: 'array',
           description:
             'Optional. By default, predefined functions are included in the final model call. Some of them can be explicitly excluded from being automatically included. This can serve two purposes: 1. Using a more restricted / different action space. 2. Improving the definitions / instructions of predefined functions.',
           items: { type: 'string' },
+        },
+        environment: {
+          type: 'string',
+          description: 'Required. The environment being operated.',
+          enum: ['ENVIRONMENT_UNSPECIFIED', 'ENVIRONMENT_BROWSER'],
         },
       },
     },
@@ -12157,16 +12211,16 @@ export const ToolSchema = {
             'Required. The names of the file_search_stores to retrieve from. Example: `fileSearchStores/my-file-search-store-123`',
           items: { type: 'string' },
         },
+        metadataFilter: {
+          type: 'string',
+          description:
+            'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
+        },
         topK: {
           type: 'integer',
           format: 'int32',
           description:
             'Optional. The number of semantic retrieval chunks to retrieve.',
-        },
-        metadataFilter: {
-          type: 'string',
-          description:
-            'Optional. Metadata filter to apply to the semantic retrieval documents and chunks.',
         },
       },
     },
@@ -12175,32 +12229,32 @@ export const ToolSchema = {
       description:
         'Structured representation of a function declaration as defined by the [OpenAPI 3.03 specification](https://spec.openapis.org/oas/v3.0.3). Included in this declaration are the function name and parameters. This FunctionDeclaration is a representation of a block of code that can be used as a `Tool` by the model and executed by the client.',
       properties: {
-        name: {
-          type: 'string',
-          description:
-            'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
-        },
         description: {
           type: 'string',
           description: 'Required. A brief description of the function.',
         },
         parameters: { $ref: '#/$defs/Schema' },
-        parametersJsonSchema: {
-          type: 'any',
-          description:
-            'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
-        },
-        response: { $ref: '#/$defs/Schema' },
         responseJsonSchema: {
           type: 'any',
           description:
             'Optional. Describes the output from this function in JSON Schema format. The value specified by the schema is the response value of the function. This field is mutually exclusive with `response`.',
         },
+        name: {
+          type: 'string',
+          description:
+            'Required. The name of the function. Must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.',
+        },
+        response: { $ref: '#/$defs/Schema' },
         behavior: {
           type: 'string',
           description:
             'Optional. Specifies the function Behavior. Currently only supported by the BidiGenerateContent method.',
           enum: ['UNSPECIFIED', 'BLOCKING', 'NON_BLOCKING'],
+        },
+        parametersJsonSchema: {
+          type: 'any',
+          description:
+            'Optional. Describes the parameters to the function in JSON Schema format. The schema must describe an object where the properties are the parameters to the function. For example: ``` { "type": "object", "properties": { "name": { "type": "string" }, "age": { "type": "integer" } }, "additionalProperties": false, "required": ["name", "age"], "propertyOrdering": ["name", "age"] } ``` This field is mutually exclusive with `parameters`.',
         },
       },
     },
@@ -12243,17 +12297,17 @@ export const ToolSchema = {
       description:
         'Represents a time interval, encoded as a Timestamp start (inclusive) and a Timestamp end (exclusive). The start must be less than or equal to the end. When the start equals the end, the interval is empty (matches no time). When both start and end are unspecified, the interval matches any time.',
       properties: {
-        startTime: {
-          type: 'string',
-          format: 'google-datetime',
-          description:
-            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
-        },
         endTime: {
           type: 'string',
           format: 'google-datetime',
           description:
             'Optional. Exclusive end of the interval. If specified, a Timestamp matching this interval will have to be before the end.',
+        },
+        startTime: {
+          type: 'string',
+          format: 'google-datetime',
+          description:
+            'Optional. Inclusive start of the interval. If specified, a Timestamp matching this interval will have to be the same or after the start.',
         },
       },
     },
@@ -12271,6 +12325,45 @@ export const ToolSchema = {
       description:
         'The `Schema` object allows the definition of input and output data types. These types can be objects, but also primitives and arrays. Represents a select subset of an [OpenAPI 3.0 schema object](https://spec.openapis.org/oas/v3.0.3#schema).',
       properties: {
+        format: {
+          type: 'string',
+          description:
+            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
+        },
+        maxProperties: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the properties for Type.OBJECT.',
+        },
+        description: {
+          type: 'string',
+          description:
+            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
+        },
+        maxLength: {
+          type: 'string',
+          format: 'int64',
+          description: 'Optional. Maximum length of the Type.STRING',
+        },
+        items: { $ref: '#/$defs/Schema' },
+        maxItems: {
+          type: 'string',
+          format: 'int64',
+          description:
+            'Optional. Maximum number of the elements for Type.ARRAY.',
+        },
+        anyOf: {
+          type: 'array',
+          description:
+            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
+          items: { $ref: '#/$defs/Schema' },
+        },
+        default: {
+          type: 'any',
+          description:
+            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
+        },
         type: {
           type: 'string',
           description: 'Required. Data type.',
@@ -12285,36 +12378,36 @@ export const ToolSchema = {
             'NULL',
           ],
         },
-        format: {
-          type: 'string',
-          description:
-            'Optional. The format of the data. Any value is allowed, but most do not trigger any special functionality.',
-        },
-        title: {
-          type: 'string',
-          description: 'Optional. The title of the schema.',
-        },
-        description: {
-          type: 'string',
-          description:
-            'Optional. A brief description of the parameter. This could contain examples of use. Parameter description may be formatted as Markdown.',
-        },
         nullable: {
           type: 'boolean',
           description: 'Optional. Indicates if the value may be null.',
         },
-        enum: {
+        propertyOrdering: {
           type: 'array',
           description:
-            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
+            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
           items: { type: 'string' },
         },
-        items: { $ref: '#/$defs/Schema' },
-        maxItems: {
+        pattern: {
+          type: 'string',
+          description:
+            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
+        },
+        required: {
+          type: 'array',
+          description: 'Optional. Required properties of Type.OBJECT.',
+          items: { type: 'string' },
+        },
+        minLength: {
           type: 'string',
           format: 'int64',
           description:
-            'Optional. Maximum number of the elements for Type.ARRAY.',
+            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
+        },
+        example: {
+          type: 'any',
+          description:
+            'Optional. Example of the object. Will only populated when the object is the root.',
         },
         minItems: {
           type: 'string',
@@ -12327,10 +12420,15 @@ export const ToolSchema = {
           description: 'Optional. Properties of Type.OBJECT.',
           additionalProperties: { $ref: '#/$defs/Schema' },
         },
-        required: {
-          type: 'array',
-          description: 'Optional. Required properties of Type.OBJECT.',
-          items: { type: 'string' },
+        maximum: {
+          type: 'number',
+          format: 'double',
+          description:
+            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
+        },
+        title: {
+          type: 'string',
+          description: 'Optional. The title of the schema.',
         },
         minProperties: {
           type: 'string',
@@ -12338,61 +12436,17 @@ export const ToolSchema = {
           description:
             'Optional. Minimum number of the properties for Type.OBJECT.',
         },
-        maxProperties: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. Maximum number of the properties for Type.OBJECT.',
-        },
         minimum: {
           type: 'number',
           format: 'double',
           description:
             'Optional. SCHEMA FIELDS FOR TYPE INTEGER and NUMBER Minimum value of the Type.INTEGER and Type.NUMBER',
         },
-        maximum: {
-          type: 'number',
-          format: 'double',
-          description:
-            'Optional. Maximum value of the Type.INTEGER and Type.NUMBER',
-        },
-        minLength: {
-          type: 'string',
-          format: 'int64',
-          description:
-            'Optional. SCHEMA FIELDS FOR TYPE STRING Minimum length of the Type.STRING',
-        },
-        maxLength: {
-          type: 'string',
-          format: 'int64',
-          description: 'Optional. Maximum length of the Type.STRING',
-        },
-        pattern: {
-          type: 'string',
-          description:
-            'Optional. Pattern of the Type.STRING to restrict a string to a regular expression.',
-        },
-        example: {
-          type: 'any',
-          description:
-            'Optional. Example of the object. Will only populated when the object is the root.',
-        },
-        anyOf: {
+        enum: {
           type: 'array',
           description:
-            'Optional. The value should be validated against any (one or more) of the subschemas in the list.',
-          items: { $ref: '#/$defs/Schema' },
-        },
-        propertyOrdering: {
-          type: 'array',
-          description:
-            'Optional. The order of the properties. Not a standard field in open api spec. Used to determine the order of the properties in the response.',
+            'Optional. Possible values of the element of Type.STRING with enum format. For example we can define an Enum Direction as : {type:STRING, format:enum, enum:["EAST", NORTH", "SOUTH", "WEST"]}',
           items: { type: 'string' },
-        },
-        default: {
-          type: 'any',
-          description:
-            "Optional. Default value of the field. Per JSON Schema, this field is intended for documentation generators and doesn't affect validation. Thus it's included here and ignored so that developers who send schemas with a `default` field don't get unknown-field errors.",
         },
       },
     },
@@ -12410,21 +12464,11 @@ export const ToolSchema = {
       description:
         'A transport that can stream HTTP requests and responses. Next ID: 6',
       properties: {
-        url: {
-          type: 'string',
-          description:
-            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
-        },
         headers: {
           type: 'object',
           description:
             'Optional: Fields for authentication headers, timeouts, etc., if needed.',
           additionalProperties: { type: 'string' },
-        },
-        timeout: {
-          type: 'string',
-          format: 'google-duration',
-          description: 'HTTP timeout for regular operations.',
         },
         sseReadTimeout: {
           type: 'string',
@@ -12435,6 +12479,16 @@ export const ToolSchema = {
           type: 'boolean',
           description:
             'Whether to close the client session when the transport closes.',
+        },
+        timeout: {
+          type: 'string',
+          format: 'google-duration',
+          description: 'HTTP timeout for regular operations.',
+        },
+        url: {
+          type: 'string',
+          description:
+            'The full URL for the MCPServer endpoint. Example: "https://api.example.com/mcp"',
         },
       },
     },
@@ -12491,13 +12545,13 @@ export const ToolConfigSchema = {
   description:
     'The Tool configuration containing parameters for specifying `Tool` use in the request.',
   properties: {
-    functionCallingConfig: { $ref: '#/$defs/FunctionCallingConfig' },
-    retrievalConfig: { $ref: '#/$defs/RetrievalConfig' },
     includeServerSideToolInvocations: {
       type: 'boolean',
       description:
         "Optional. If true, the API response will include the server-side tool calls and responses within the `Content` message. This allows clients to observe the server's tool interactions.",
     },
+    functionCallingConfig: { $ref: '#/$defs/FunctionCallingConfig' },
+    retrievalConfig: { $ref: '#/$defs/RetrievalConfig' },
   },
   $defs: {
     FunctionCallingConfig: {
@@ -12523,17 +12577,17 @@ export const ToolConfigSchema = {
       description:
         'An object that represents a latitude/longitude pair. This is expressed as a pair of doubles to represent degrees latitude and degrees longitude. Unless specified otherwise, this object must conform to the WGS84 standard. Values must be within normalized ranges.',
       properties: {
-        latitude: {
-          type: 'number',
-          format: 'double',
-          description:
-            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
-        },
         longitude: {
           type: 'number',
           format: 'double',
           description:
             'The longitude in degrees. It must be in the range [-180.0, +180.0].',
+        },
+        latitude: {
+          type: 'number',
+          format: 'double',
+          description:
+            'The latitude in degrees. It must be in the range [-90.0, +90.0].',
         },
       },
     },
@@ -12620,6 +12674,23 @@ export const TopCandidatesSchema = {
   },
 } as const
 
+export const TranslationConfigSchema = {
+  type: 'object',
+  description: 'Config for translation features.',
+  properties: {
+    echoTargetLanguage: {
+      type: 'boolean',
+      description:
+        'Optional. If true, the model will generate audio when the target language is spoken, essentially it will parrot the input. If false, we will not produce audio for the target language.',
+    },
+    targetLanguageCode: {
+      type: 'string',
+      description:
+        'Required. The target language for translation. Supported values are BCP-47 language codes (e.g. "en", "es", "fr").',
+    },
+  },
+} as const
+
 export const UrlContextSchema = {
   type: 'object',
   description: 'Tool to support URL context retrieval.',
@@ -12690,41 +12761,17 @@ export const UsageMetadataSchema = {
       description:
         'Number of tokens in the prompt. When `cached_content` is set, this is still the total effective prompt size meaning this includes the number of tokens in the cached content.',
     },
+    toolUsePromptTokensDetails: {
+      type: 'array',
+      description:
+        'Output only. List of modalities that were processed for tool-use request inputs.',
+      items: { $ref: '#/$defs/ModalityTokenCount' },
+    },
     cachedContentTokenCount: {
       type: 'integer',
       format: 'int32',
       description:
         'Number of tokens in the cached part of the prompt (the cached content)',
-    },
-    candidatesTokenCount: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Total number of tokens across all the generated response candidates.',
-    },
-    toolUsePromptTokenCount: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Output only. Number of tokens present in tool-use prompt(s).',
-    },
-    thoughtsTokenCount: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Output only. Number of tokens of thoughts for thinking models.',
-    },
-    totalTokenCount: {
-      type: 'integer',
-      format: 'int32',
-      description:
-        'Total token count for the generation request (prompt + thoughts + response candidates).',
-    },
-    promptTokensDetails: {
-      type: 'array',
-      description:
-        'Output only. List of modalities that were processed in the request input.',
-      items: { $ref: '#/$defs/ModalityTokenCount' },
     },
     cacheTokensDetails: {
       type: 'array',
@@ -12738,10 +12785,34 @@ export const UsageMetadataSchema = {
         'Output only. List of modalities that were returned in the response.',
       items: { $ref: '#/$defs/ModalityTokenCount' },
     },
-    toolUsePromptTokensDetails: {
+    toolUsePromptTokenCount: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Output only. Number of tokens present in tool-use prompt(s).',
+    },
+    totalTokenCount: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Total token count for the generation request (prompt + thoughts + response candidates).',
+    },
+    candidatesTokenCount: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Total number of tokens across all the generated response candidates.',
+    },
+    thoughtsTokenCount: {
+      type: 'integer',
+      format: 'int32',
+      description:
+        'Output only. Number of tokens of thoughts for thinking models.',
+    },
+    promptTokensDetails: {
       type: 'array',
       description:
-        'Output only. List of modalities that were processed for tool-use request inputs.',
+        'Output only. List of modalities that were processed in the request input.',
       items: { $ref: '#/$defs/ModalityTokenCount' },
     },
     serviceTier: {
@@ -12823,11 +12894,11 @@ export const WebSchema = {
   type: 'object',
   description: 'Chunk from the web.',
   properties: {
+    title: { type: 'string', description: 'Output only. Title of the chunk.' },
     uri: {
       type: 'string',
       description: 'Output only. URI reference of the chunk.',
     },
-    title: { type: 'string', description: 'Output only. Title of the chunk.' },
   },
 } as const
 

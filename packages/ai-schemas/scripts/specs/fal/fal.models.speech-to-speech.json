@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.774Z",
+  "generated_at": "2026-06-11T02:20:29.651Z",
   "total_models": 2,
   "category": "speech-to-speech",
   "models": [
@@ -91,15 +91,25 @@
               "required": ["status", "request_id"]
             },
             "ChatterboxSpeechToSpeechInput": {
+              "title": "ChatterboxVCRequest",
+              "x-fal-order-properties": [
+                "source_audio_url",
+                "target_voice_audio_url"
+              ],
               "properties": {
                 "source_audio_url": {
-                  "type": "string",
                   "title": "Source Audio Url",
                   "examples": [
                     "https://storage.googleapis.com/chatterbox-demo-samples/samples/duff_stewie.wav"
-                  ]
+                  ],
+                  "type": "string"
                 },
                 "target_voice_audio_url": {
+                  "title": "Target Voice Audio Url",
+                  "description": "Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio.",
+                  "examples": [
+                    "https://v3.fal.media/files/tiger/0XODRhebRLiBdu8MqgZc5_tmpljqsylwu.wav"
+                  ],
                   "anyOf": [
                     {
                       "type": "string"
@@ -107,42 +117,60 @@
                     {
                       "type": "null"
                     }
-                  ],
-                  "title": "Target Voice Audio Url",
-                  "examples": [
-                    "https://v3.fal.media/files/tiger/0XODRhebRLiBdu8MqgZc5_tmpljqsylwu.wav"
-                  ],
-                  "description": "Optional URL to an audio file to use as a reference for the generated speech. If provided, the model will try to match the style and tone of the reference audio."
+                  ]
                 }
               },
-              "type": "object",
-              "x-fal-order-properties": [
-                "source_audio_url",
-                "target_voice_audio_url"
-              ],
               "required": ["source_audio_url"],
-              "title": "ChatterboxVCRequest"
+              "type": "object"
             },
             "ChatterboxSpeechToSpeechOutput": {
+              "title": "ChatterboxOutput",
+              "x-fal-order-properties": ["audio"],
               "properties": {
                 "audio": {
-                  "$ref": "#/components/schemas/File",
+                  "description": "The generated speech audio",
                   "examples": [
                     {
                       "url": "https://v3.fal.media/files/kangaroo/RQ_pxc7oPdueYqWUqEbPE_tmpjnzvvzx_.wav"
                     }
                   ],
-                  "description": "The generated speech audio"
+                  "$ref": "#/components/schemas/File"
                 }
               },
-              "type": "object",
-              "x-fal-order-properties": ["audio"],
               "required": ["audio"],
-              "title": "ChatterboxOutput"
+              "type": "object"
             },
             "File": {
+              "title": "File",
+              "x-fal-order-properties": [
+                "url",
+                "content_type",
+                "file_name",
+                "file_size"
+              ],
               "properties": {
+                "content_type": {
+                  "title": "Content Type",
+                  "description": "The mime type of the file.",
+                  "examples": ["image/png"],
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "url": {
+                  "title": "Url",
+                  "description": "The URL where the file can be downloaded from.",
+                  "type": "string"
+                },
                 "file_size": {
+                  "title": "File Size",
+                  "description": "The size of the file in bytes.",
+                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -150,25 +178,12 @@
                     {
                       "type": "null"
                     }
-                  ],
-                  "title": "File Size",
-                  "examples": [4404019],
-                  "description": "The size of the file in bytes."
+                  ]
                 },
                 "file_name": {
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ],
                   "title": "File Name",
+                  "description": "The name of the file. It will be auto-generated if not provided.",
                   "examples": ["z9RV14K95DvU.png"],
-                  "description": "The name of the file. It will be auto-generated if not provided."
-                },
-                "content_type": {
                   "anyOf": [
                     {
                       "type": "string"
@@ -176,26 +191,11 @@
                     {
                       "type": "null"
                     }
-                  ],
-                  "title": "Content Type",
-                  "examples": ["image/png"],
-                  "description": "The mime type of the file."
-                },
-                "url": {
-                  "type": "string",
-                  "title": "Url",
-                  "description": "The URL where the file can be downloaded from."
+                  ]
                 }
               },
-              "type": "object",
-              "x-fal-order-properties": [
-                "url",
-                "content_type",
-                "file_name",
-                "file_size"
-              ],
               "required": ["url"],
-              "title": "File"
+              "type": "object"
             }
           }
         },

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.771Z",
+  "generated_at": "2026-06-11T02:20:29.646Z",
   "total_models": 6,
   "category": "json",
   "models": [
@@ -1260,105 +1260,74 @@
               "required": ["status", "request_id"]
             },
             "OmnilottieInput": {
-              "title": "TextToLottieInput",
               "required": ["prompt"],
-              "type": "object",
               "properties": {
-                "top_p": {
-                  "title": "Top P",
-                  "minimum": 0,
-                  "type": "number",
-                  "description": "Nucleus sampling probability threshold.",
-                  "default": 0.25,
-                  "maximum": 1
-                },
                 "max_tokens": {
-                  "title": "Max Tokens",
+                  "default": 4096,
                   "minimum": 256,
                   "type": "integer",
-                  "description": "Maximum number of Lottie tokens to generate.",
-                  "default": 4096,
-                  "maximum": 8192
+                  "title": "Max Tokens",
+                  "maximum": 8192,
+                  "description": "Maximum number of Lottie tokens to generate."
                 },
-                "temperature": {
-                  "title": "Temperature",
+                "top_p": {
+                  "default": 0.25,
                   "minimum": 0,
                   "type": "number",
-                  "description": "Sampling temperature for generation.",
-                  "default": 0.9,
-                  "maximum": 2
+                  "title": "Top P",
+                  "maximum": 1,
+                  "description": "Nucleus sampling probability threshold."
                 },
-                "top_k": {
-                  "title": "Top K",
-                  "minimum": 1,
-                  "type": "integer",
-                  "description": "Top-k sampling parameter.",
-                  "default": 5,
-                  "maximum": 100
+                "temperature": {
+                  "default": 0.9,
+                  "minimum": 0,
+                  "type": "number",
+                  "title": "Temperature",
+                  "maximum": 2,
+                  "description": "Sampling temperature for generation."
                 },
                 "prompt": {
                   "title": "Prompt",
                   "type": "string",
-                  "description": "Text description of the Lottie animation to generate.",
                   "maxLength": 2000,
-                  "examples": ["A red ball bouncing up and down"]
+                  "examples": ["A red ball bouncing up and down"],
+                  "description": "Text description of the Lottie animation to generate."
+                },
+                "top_k": {
+                  "default": 5,
+                  "minimum": 1,
+                  "type": "integer",
+                  "title": "Top K",
+                  "maximum": 100,
+                  "description": "Top-k sampling parameter."
                 }
               },
+              "title": "TextToLottieInput",
               "x-fal-order-properties": [
                 "prompt",
                 "max_tokens",
                 "temperature",
                 "top_p",
                 "top_k"
-              ]
+              ],
+              "type": "object"
             },
             "OmnilottieOutput": {
-              "title": "LottieOutput",
               "required": ["lottie_file"],
-              "type": "object",
               "properties": {
                 "lottie_file": {
                   "$ref": "#/components/schemas/File",
                   "description": "The generated Lottie animation as a JSON file."
                 }
               },
-              "x-fal-order-properties": ["lottie_file"]
+              "title": "LottieOutput",
+              "x-fal-order-properties": ["lottie_file"],
+              "type": "object"
             },
             "File": {
-              "title": "File",
               "required": ["url"],
-              "type": "object",
               "properties": {
-                "file_name": {
-                  "title": "File Name",
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "examples": ["z9RV14K95DvU.png"],
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "content_type": {
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"],
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
                 "file_size": {
-                  "title": "File Size",
-                  "description": "The size of the file in bytes.",
-                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -1366,20 +1335,51 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Size",
+                  "examples": [4404019],
+                  "description": "The size of the file in bytes."
                 },
                 "url": {
                   "title": "Url",
                   "type": "string",
                   "description": "The URL where the file can be downloaded from."
+                },
+                "content_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "examples": ["image/png"],
+                  "description": "The mime type of the file."
+                },
+                "file_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "examples": ["z9RV14K95DvU.png"],
+                  "description": "The name of the file. It will be auto-generated if not provided."
                 }
               },
+              "title": "File",
               "x-fal-order-properties": [
                 "url",
                 "content_type",
                 "file_name",
                 "file_size"
-              ]
+              ],
+              "type": "object"
             }
           }
         },
@@ -1900,60 +1900,59 @@
               "required": ["status", "request_id"]
             },
             "OmnilottieImageToLottieInput": {
-              "title": "ImageToLottieInput",
               "required": ["prompt", "image_url"],
-              "type": "object",
               "properties": {
-                "top_p": {
-                  "title": "Top P",
-                  "minimum": 0,
-                  "type": "number",
-                  "description": "Nucleus sampling probability threshold.",
-                  "default": 0.25,
-                  "maximum": 1
-                },
-                "max_tokens": {
-                  "title": "Max Tokens",
-                  "minimum": 256,
-                  "type": "integer",
-                  "description": "Maximum number of Lottie tokens to generate.",
-                  "default": 4096,
-                  "maximum": 8192
-                },
-                "temperature": {
-                  "title": "Temperature",
-                  "minimum": 0,
-                  "type": "number",
-                  "description": "Sampling temperature for generation.",
-                  "default": 0.9,
-                  "maximum": 2
-                },
-                "top_k": {
-                  "title": "Top K",
-                  "minimum": 1,
-                  "type": "integer",
-                  "description": "Top-k sampling parameter.",
-                  "default": 5,
-                  "maximum": 100
-                },
                 "image_url": {
                   "title": "Image Url",
                   "type": "string",
-                  "description": "URL of the reference image to animate.",
                   "examples": [
                     "https://storage.googleapis.com/falserverless/gallery/00de75e2c031cb3fc3f472e356aba5b6.png"
-                  ]
+                  ],
+                  "description": "URL of the reference image to animate."
+                },
+                "top_p": {
+                  "default": 0.25,
+                  "minimum": 0,
+                  "type": "number",
+                  "title": "Top P",
+                  "maximum": 1,
+                  "description": "Nucleus sampling probability threshold."
+                },
+                "temperature": {
+                  "default": 0.9,
+                  "minimum": 0,
+                  "type": "number",
+                  "title": "Temperature",
+                  "maximum": 2,
+                  "description": "Sampling temperature for generation."
+                },
+                "max_tokens": {
+                  "default": 4096,
+                  "minimum": 256,
+                  "type": "integer",
+                  "title": "Max Tokens",
+                  "maximum": 8192,
+                  "description": "Maximum number of Lottie tokens to generate."
                 },
                 "prompt": {
                   "title": "Prompt",
                   "type": "string",
-                  "description": "Text description guiding the animation of the image.",
                   "maxLength": 2000,
                   "examples": [
                     "A cyan-colored, elongated shape resembling a smiley face, consisting of two pink oval eyes with navy blue circular pupils positioned symmetrically. The shape rotates gradually around its horizontal axis, revealing small animated sparklesâpink and tealâthat appear sporadically near the eyes, enhancing the dynamic visual effect."
-                  ]
+                  ],
+                  "description": "Text description guiding the animation of the image."
+                },
+                "top_k": {
+                  "default": 5,
+                  "minimum": 1,
+                  "type": "integer",
+                  "title": "Top K",
+                  "maximum": 100,
+                  "description": "Top-k sampling parameter."
                 }
               },
+              "title": "ImageToLottieInput",
               "x-fal-order-properties": [
                 "prompt",
                 "image_url",
@@ -1961,55 +1960,25 @@
                 "temperature",
                 "top_p",
                 "top_k"
-              ]
+              ],
+              "type": "object"
             },
             "OmnilottieImageToLottieOutput": {
-              "title": "LottieOutput",
               "required": ["lottie_file"],
-              "type": "object",
               "properties": {
                 "lottie_file": {
                   "$ref": "#/components/schemas/File",
                   "description": "The generated Lottie animation as a JSON file."
                 }
               },
-              "x-fal-order-properties": ["lottie_file"]
+              "title": "LottieOutput",
+              "x-fal-order-properties": ["lottie_file"],
+              "type": "object"
             },
             "File": {
-              "title": "File",
               "required": ["url"],
-              "type": "object",
               "properties": {
-                "file_name": {
-                  "title": "File Name",
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "examples": ["z9RV14K95DvU.png"],
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "content_type": {
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"],
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
                 "file_size": {
-                  "title": "File Size",
-                  "description": "The size of the file in bytes.",
-                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -2017,20 +1986,51 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Size",
+                  "examples": [4404019],
+                  "description": "The size of the file in bytes."
                 },
                 "url": {
                   "title": "Url",
                   "type": "string",
                   "description": "The URL where the file can be downloaded from."
+                },
+                "content_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "examples": ["image/png"],
+                  "description": "The mime type of the file."
+                },
+                "file_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "examples": ["z9RV14K95DvU.png"],
+                  "description": "The name of the file. It will be auto-generated if not provided."
                 }
               },
+              "title": "File",
               "x-fal-order-properties": [
                 "url",
                 "content_type",
                 "file_name",
                 "file_size"
-              ]
+              ],
+              "type": "object"
             }
           }
         },
@@ -2254,64 +2254,63 @@
               "required": ["status", "request_id"]
             },
             "OmnilottieVideoToLottieInput": {
-              "title": "VideoToLottieInput",
               "required": ["video_url"],
-              "type": "object",
               "properties": {
-                "video_url": {
-                  "title": "Video Url",
-                  "type": "string",
-                  "description": "URL of the video to convert into a Lottie animation.",
-                  "examples": [
-                    "https://storage.googleapis.com/falserverless/gallery/0dd62535b46d6f8ecf42f22dc0e148cd.mp4"
-                  ]
-                },
-                "top_p": {
-                  "title": "Top P",
-                  "minimum": 0,
-                  "type": "number",
-                  "description": "Nucleus sampling probability threshold.",
-                  "default": 0.25,
-                  "maximum": 1
-                },
                 "max_tokens": {
-                  "title": "Max Tokens",
+                  "default": 4096,
                   "minimum": 256,
                   "type": "integer",
-                  "description": "Maximum number of Lottie tokens to generate.",
-                  "default": 4096,
-                  "maximum": 8192
+                  "title": "Max Tokens",
+                  "maximum": 8192,
+                  "description": "Maximum number of Lottie tokens to generate."
                 },
-                "temperature": {
-                  "title": "Temperature",
+                "top_p": {
+                  "default": 0.25,
                   "minimum": 0,
                   "type": "number",
-                  "description": "Sampling temperature for generation.",
-                  "default": 0.9,
-                  "maximum": 2
+                  "title": "Top P",
+                  "maximum": 1,
+                  "description": "Nucleus sampling probability threshold."
                 },
-                "top_k": {
-                  "title": "Top K",
-                  "minimum": 1,
-                  "type": "integer",
-                  "description": "Top-k sampling parameter.",
-                  "default": 5,
-                  "maximum": 100
+                "temperature": {
+                  "default": 0.9,
+                  "minimum": 0,
+                  "type": "number",
+                  "title": "Temperature",
+                  "maximum": 2,
+                  "description": "Sampling temperature for generation."
                 },
                 "prompt": {
-                  "title": "Prompt",
-                  "description": "Optional text description guiding the conversion.",
                   "anyOf": [
                     {
-                      "type": "string",
-                      "maxLength": 2000
+                      "maxLength": 2000,
+                      "type": "string"
                     },
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "Prompt",
+                  "description": "Optional text description guiding the conversion."
+                },
+                "video_url": {
+                  "title": "Video Url",
+                  "type": "string",
+                  "examples": [
+                    "https://storage.googleapis.com/falserverless/gallery/0dd62535b46d6f8ecf42f22dc0e148cd.mp4"
+                  ],
+                  "description": "URL of the video to convert into a Lottie animation."
+                },
+                "top_k": {
+                  "default": 5,
+                  "minimum": 1,
+                  "type": "integer",
+                  "title": "Top K",
+                  "maximum": 100,
+                  "description": "Top-k sampling parameter."
                 }
               },
+              "title": "VideoToLottieInput",
               "x-fal-order-properties": [
                 "prompt",
                 "video_url",
@@ -2319,55 +2318,25 @@
                 "temperature",
                 "top_p",
                 "top_k"
-              ]
+              ],
+              "type": "object"
             },
             "OmnilottieVideoToLottieOutput": {
-              "title": "LottieOutput",
               "required": ["lottie_file"],
-              "type": "object",
               "properties": {
                 "lottie_file": {
                   "$ref": "#/components/schemas/File",
                   "description": "The generated Lottie animation as a JSON file."
                 }
               },
-              "x-fal-order-properties": ["lottie_file"]
+              "title": "LottieOutput",
+              "x-fal-order-properties": ["lottie_file"],
+              "type": "object"
             },
             "File": {
-              "title": "File",
               "required": ["url"],
-              "type": "object",
               "properties": {
-                "file_name": {
-                  "title": "File Name",
-                  "description": "The name of the file. It will be auto-generated if not provided.",
-                  "examples": ["z9RV14K95DvU.png"],
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
-                "content_type": {
-                  "title": "Content Type",
-                  "description": "The mime type of the file.",
-                  "examples": ["image/png"],
-                  "anyOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "null"
-                    }
-                  ]
-                },
                 "file_size": {
-                  "title": "File Size",
-                  "description": "The size of the file in bytes.",
-                  "examples": [4404019],
                   "anyOf": [
                     {
                       "type": "integer"
@@ -2375,20 +2344,51 @@
                     {
                       "type": "null"
                     }
-                  ]
+                  ],
+                  "title": "File Size",
+                  "examples": [4404019],
+                  "description": "The size of the file in bytes."
                 },
                 "url": {
                   "title": "Url",
                   "type": "string",
                   "description": "The URL where the file can be downloaded from."
+                },
+                "content_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Content Type",
+                  "examples": ["image/png"],
+                  "description": "The mime type of the file."
+                },
+                "file_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "File Name",
+                  "examples": ["z9RV14K95DvU.png"],
+                  "description": "The name of the file. It will be auto-generated if not provided."
                 }
               },
+              "title": "File",
               "x-fal-order-properties": [
                 "url",
                 "content_type",
                 "file_name",
                 "file_size"
-              ]
+              ],
+              "type": "object"
             }
           }
         },

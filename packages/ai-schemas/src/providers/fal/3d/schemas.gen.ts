@@ -82,37 +82,37 @@ export const BasicAnimationsSchema = {
 } as const
 
 export const BoxPromptBaseSchema = {
-  type: 'object',
+  title: 'BoxPromptBase',
+  'x-fal-order-properties': ['x_min', 'y_min', 'x_max', 'y_max', 'object_id'],
   properties: {
-    x_min: {
-      title: 'X Min',
+    y_min: {
+      title: 'Y Min',
+      description: 'Y Min Coordinate of the box',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'X Min Coordinate of the box',
     },
     y_max: {
       title: 'Y Max',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
       description: 'Y Max Coordinate of the box',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
     x_max: {
       title: 'X Max',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
       description: 'X Max Coordinate of the box',
-    },
-    y_min: {
-      title: 'Y Min',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Y Min Coordinate of the box',
+    },
+    x_min: {
+      title: 'X Min',
+      description: 'X Min Coordinate of the box',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
     object_id: {
       title: 'Object Id',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
       description:
         'Optional object identifier. Boxes sharing an object id refine the same object.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
   },
-  title: 'BoxPromptBase',
-  'x-fal-order-properties': ['x_min', 'y_min', 'x_max', 'y_max', 'object_id'],
+  type: 'object',
 } as const
 
 export const FileSchema = {
@@ -149,97 +149,6 @@ export const FileSchema = {
 } as const
 
 export const H31ImageTo3dInputSchema = {
-  description:
-    'Input for Image to 3D generation using full-featured models (H3.1, v2.5).',
-  type: 'object',
-  properties: {
-    auto_size: {
-      default: false,
-      type: 'boolean',
-      title: 'Auto Size',
-      description: 'Auto-scale the model to real-world dimensions (meters).',
-    },
-    texture_alignment: {
-      default: 'original_image',
-      type: 'string',
-      enum: ['original_image', 'geometry'],
-      title: 'Texture Alignment',
-      description:
-        "How textures are aligned. 'original_image' aligns to input image, 'geometry' aligns to generated geometry.",
-    },
-    geometry_quality: {
-      default: 'standard',
-      type: 'string',
-      enum: ['standard', 'detailed'],
-      title: 'Geometry Quality',
-      description: 'Quality level for geometry.',
-    },
-    face_limit: {
-      title: 'Face Limit',
-      anyOf: [
-        { minimum: 1000, type: 'integer', maximum: 2000000 },
-        { type: 'null' },
-      ],
-      description:
-        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
-    },
-    image_url: {
-      examples: [
-        'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
-      ],
-      type: 'string',
-      title: 'Image Url',
-      description: 'URL of the input image for 3D model creation.',
-      'x-fal-file-input': true,
-    },
-    texture_quality: {
-      default: 'standard',
-      type: 'string',
-      enum: ['standard', 'detailed'],
-      title: 'Texture Quality',
-      description:
-        "Quality level for textures. 'detailed' produces higher-resolution textures.",
-    },
-    quad: {
-      default: false,
-      type: 'boolean',
-      title: 'Quad',
-      description:
-        'Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX.',
-    },
-    model_seed: {
-      title: 'Model Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for geometry generation reproducibility.',
-    },
-    texture_seed: {
-      title: 'Texture Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for texture generation reproducibility.',
-    },
-    orientation: {
-      default: 'default',
-      type: 'string',
-      enum: ['default', 'align_image'],
-      title: 'Orientation',
-      description:
-        "Model orientation. 'align_image' auto-rotates to match the input image.",
-    },
-    texture: {
-      default: true,
-      type: 'boolean',
-      title: 'Texture',
-      description: 'Whether to generate textures for the model.',
-    },
-    pbr: {
-      default: true,
-      type: 'boolean',
-      title: 'Pbr',
-      description:
-        'Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled.',
-    },
-  },
-  title: 'FullImageTo3DInput',
   'x-fal-order-properties': [
     'image_url',
     'face_limit',
@@ -254,11 +163,104 @@ export const H31ImageTo3dInputSchema = {
     'orientation',
     'quad',
   ],
+  title: 'FullImageTo3DInput',
   required: ['image_url'],
+  type: 'object',
+  properties: {
+    texture_alignment: {
+      title: 'Texture Alignment',
+      enum: ['original_image', 'geometry'],
+      type: 'string',
+      default: 'original_image',
+      description:
+        "How textures are aligned. 'original_image' aligns to input image, 'geometry' aligns to generated geometry.",
+    },
+    texture: {
+      title: 'Texture',
+      type: 'boolean',
+      default: true,
+      description: 'Whether to generate textures for the model.',
+    },
+    texture_quality: {
+      title: 'Texture Quality',
+      enum: ['standard', 'detailed'],
+      type: 'string',
+      default: 'standard',
+      description:
+        "Quality level for textures. 'detailed' produces higher-resolution textures.",
+    },
+    model_seed: {
+      title: 'Model Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for geometry generation reproducibility.',
+    },
+    auto_size: {
+      title: 'Auto Size',
+      type: 'boolean',
+      default: false,
+      description: 'Auto-scale the model to real-world dimensions (meters).',
+    },
+    image_url: {
+      description: 'URL of the input image for 3D model creation.',
+      title: 'Image Url',
+      type: 'string',
+      examples: [
+        'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
+      ],
+      'x-fal-file-input': true,
+    },
+    geometry_quality: {
+      title: 'Geometry Quality',
+      enum: ['standard', 'detailed'],
+      type: 'string',
+      default: 'standard',
+      description: 'Quality level for geometry.',
+    },
+    orientation: {
+      title: 'Orientation',
+      enum: ['default', 'align_image'],
+      type: 'string',
+      default: 'default',
+      description:
+        "Model orientation. 'align_image' auto-rotates to match the input image.",
+    },
+    quad: {
+      title: 'Quad',
+      type: 'boolean',
+      default: false,
+      description:
+        'Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX.',
+    },
+    face_limit: {
+      title: 'Face Limit',
+      anyOf: [
+        { minimum: 1000, type: 'integer', maximum: 2000000 },
+        { type: 'null' },
+      ],
+      description:
+        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
+    },
+    pbr: {
+      title: 'Pbr',
+      type: 'boolean',
+      default: true,
+      description:
+        'Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled.',
+    },
+    texture_seed: {
+      title: 'Texture Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for texture generation reproducibility.',
+    },
+  },
+  description:
+    'Input for Image to 3D generation using full-featured models (H3.1, v2.5).',
 } as const
 
 export const H31ImageTo3dOutputSchema = {
-  description: 'Output for Tripo3D generation',
+  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
+  title: 'Tripo3DOutput',
+  required: ['model_mesh', 'model_urls'],
   type: 'object',
   properties: {
     model_mesh: {
@@ -275,9 +277,7 @@ export const H31ImageTo3dOutputSchema = {
       description: 'URLs for different 3D model variants.',
     },
   },
-  title: 'Tripo3DOutput',
-  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
-  required: ['model_mesh', 'model_urls'],
+  description: 'Output for Tripo3D generation',
   $defs: {
     File: {
       title: 'File',
@@ -317,17 +317,10 @@ export const H31ImageTo3dOutputSchema = {
       ],
     },
     ModelUrlsType3: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       title: 'ModelUrls',
+      type: 'object',
       properties: {
-        base_model: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'Base (untextured) model',
-        },
-        glb: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'GLB format 3D model',
-        },
         pbr_model: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'PBR-textured model',
@@ -336,108 +329,21 @@ export const H31ImageTo3dOutputSchema = {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'FBX format 3D model',
         },
+        base_model: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Base (untextured) model',
+        },
+        glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'GLB format 3D model',
+        },
       },
-      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       description: '3D model download URLs',
     },
   },
 } as const
 
 export const H31MultiviewTo3dInputSchema = {
-  description:
-    'Input for Multiview to 3D generation using full-featured models (H3.1, v2.5).\n\nProvide 2-4 images of the same object from different angles.\nImages should be in order: [front, left, back, right].\nFront view is required; others are optional.\nNote: P1 is not available for multiview-to-3d.',
-  type: 'object',
-  properties: {
-    auto_size: {
-      default: false,
-      type: 'boolean',
-      title: 'Auto Size',
-      description: 'Auto-scale the model to real-world dimensions (meters).',
-    },
-    texture_alignment: {
-      default: 'original_image',
-      type: 'string',
-      enum: ['original_image', 'geometry'],
-      title: 'Texture Alignment',
-      description: 'How textures are aligned.',
-    },
-    geometry_quality: {
-      default: 'standard',
-      type: 'string',
-      enum: ['standard', 'detailed'],
-      title: 'Geometry Quality',
-      description: 'Quality level for geometry.',
-    },
-    model_seed: {
-      title: 'Model Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for geometry generation reproducibility.',
-    },
-    quad: {
-      default: false,
-      type: 'boolean',
-      title: 'Quad',
-      description:
-        'Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX.',
-    },
-    texture_quality: {
-      default: 'standard',
-      type: 'string',
-      enum: ['standard', 'detailed'],
-      title: 'Texture Quality',
-      description: 'Quality level for textures.',
-    },
-    face_limit: {
-      title: 'Face Limit',
-      anyOf: [
-        { minimum: 1000, type: 'integer', maximum: 2000000 },
-        { type: 'null' },
-      ],
-      description:
-        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
-    },
-    image_urls: {
-      description:
-        '2 to 4 image URLs of the same object from different angles. Order: [front, left, back, right]. Front view is required.',
-      maxItems: 4,
-      type: 'array',
-      minItems: 2,
-      items: { type: 'string', 'x-fal-file-input': true },
-      title: 'Image Urls',
-      examples: [
-        [
-          'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
-          'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
-        ],
-      ],
-    },
-    texture_seed: {
-      title: 'Texture Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for texture generation reproducibility.',
-    },
-    orientation: {
-      default: 'default',
-      type: 'string',
-      enum: ['default', 'align_image'],
-      title: 'Orientation',
-      description: 'Model orientation.',
-    },
-    texture: {
-      default: true,
-      type: 'boolean',
-      title: 'Texture',
-      description: 'Whether to generate textures for the model.',
-    },
-    pbr: {
-      default: true,
-      type: 'boolean',
-      title: 'Pbr',
-      description:
-        'Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled.',
-    },
-  },
-  title: 'FullMultiviewTo3DInput',
   'x-fal-order-properties': [
     'image_urls',
     'face_limit',
@@ -452,11 +358,107 @@ export const H31MultiviewTo3dInputSchema = {
     'orientation',
     'quad',
   ],
+  title: 'FullMultiviewTo3DInput',
   required: ['image_urls'],
+  type: 'object',
+  properties: {
+    texture_alignment: {
+      title: 'Texture Alignment',
+      enum: ['original_image', 'geometry'],
+      type: 'string',
+      default: 'original_image',
+      description: 'How textures are aligned.',
+    },
+    texture: {
+      title: 'Texture',
+      type: 'boolean',
+      default: true,
+      description: 'Whether to generate textures for the model.',
+    },
+    texture_quality: {
+      title: 'Texture Quality',
+      enum: ['standard', 'detailed'],
+      type: 'string',
+      default: 'standard',
+      description: 'Quality level for textures.',
+    },
+    model_seed: {
+      title: 'Model Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for geometry generation reproducibility.',
+    },
+    auto_size: {
+      title: 'Auto Size',
+      type: 'boolean',
+      default: false,
+      description: 'Auto-scale the model to real-world dimensions (meters).',
+    },
+    quad: {
+      title: 'Quad',
+      type: 'boolean',
+      default: false,
+      description:
+        'Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX.',
+    },
+    geometry_quality: {
+      title: 'Geometry Quality',
+      enum: ['standard', 'detailed'],
+      type: 'string',
+      default: 'standard',
+      description: 'Quality level for geometry.',
+    },
+    orientation: {
+      title: 'Orientation',
+      enum: ['default', 'align_image'],
+      type: 'string',
+      default: 'default',
+      description: 'Model orientation.',
+    },
+    pbr: {
+      title: 'Pbr',
+      type: 'boolean',
+      default: true,
+      description:
+        'Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled.',
+    },
+    face_limit: {
+      title: 'Face Limit',
+      anyOf: [
+        { minimum: 1000, type: 'integer', maximum: 2000000 },
+        { type: 'null' },
+      ],
+      description:
+        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
+    },
+    image_urls: {
+      description:
+        '2 to 4 image URLs of the same object from different angles. Order: [front, left, back, right]. Front view is required.',
+      examples: [
+        [
+          'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
+          'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
+        ],
+      ],
+      minItems: 2,
+      title: 'Image Urls',
+      type: 'array',
+      maxItems: 4,
+      items: { type: 'string', 'x-fal-file-input': true },
+    },
+    texture_seed: {
+      title: 'Texture Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for texture generation reproducibility.',
+    },
+  },
+  description:
+    'Input for Multiview to 3D generation using full-featured models (H3.1, v2.5).\n\nProvide 2-4 images of the same object from different angles.\nImages should be in order: [front, left, back, right].\nFront view is required; others are optional.\nNote: P1 is not available for multiview-to-3d.',
 } as const
 
 export const H31MultiviewTo3dOutputSchema = {
-  description: 'Output for Tripo3D generation',
+  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
+  title: 'Tripo3DOutput',
+  required: ['model_mesh', 'model_urls'],
   type: 'object',
   properties: {
     model_mesh: {
@@ -473,9 +475,7 @@ export const H31MultiviewTo3dOutputSchema = {
       description: 'URLs for different 3D model variants.',
     },
   },
-  title: 'Tripo3DOutput',
-  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
-  required: ['model_mesh', 'model_urls'],
+  description: 'Output for Tripo3D generation',
   $defs: {
     File: {
       title: 'File',
@@ -515,17 +515,10 @@ export const H31MultiviewTo3dOutputSchema = {
       ],
     },
     ModelUrlsType3: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       title: 'ModelUrls',
+      type: 'object',
       properties: {
-        base_model: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'Base (untextured) model',
-        },
-        glb: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'GLB format 3D model',
-        },
         pbr_model: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'PBR-textured model',
@@ -534,98 +527,21 @@ export const H31MultiviewTo3dOutputSchema = {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'FBX format 3D model',
         },
+        base_model: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Base (untextured) model',
+        },
+        glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'GLB format 3D model',
+        },
       },
-      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       description: '3D model download URLs',
     },
   },
 } as const
 
 export const H31TextTo3dInputSchema = {
-  description:
-    'Input for Text to 3D generation using full-featured models (H3.1, v2.5).',
-  type: 'object',
-  properties: {
-    auto_size: {
-      default: false,
-      type: 'boolean',
-      title: 'Auto Size',
-      description: 'Auto-scale the model to real-world dimensions (meters).',
-    },
-    quad: {
-      default: false,
-      type: 'boolean',
-      title: 'Quad',
-      description:
-        'Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX.',
-    },
-    model_seed: {
-      title: 'Model Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for geometry generation reproducibility.',
-    },
-    face_limit: {
-      title: 'Face Limit',
-      anyOf: [
-        { minimum: 1000, type: 'integer', maximum: 2000000 },
-        { type: 'null' },
-      ],
-      description:
-        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
-    },
-    negative_prompt: {
-      title: 'Negative Prompt',
-      anyOf: [{ type: 'string', maxLength: 1024 }, { type: 'null' }],
-      description: 'Text describing features to avoid in the generated model.',
-    },
-    geometry_quality: {
-      default: 'standard',
-      type: 'string',
-      enum: ['standard', 'detailed'],
-      title: 'Geometry Quality',
-      description: 'Quality level for geometry.',
-    },
-    texture_quality: {
-      default: 'standard',
-      type: 'string',
-      enum: ['standard', 'detailed'],
-      title: 'Texture Quality',
-      description:
-        "Quality level for textures. 'detailed' produces higher-resolution textures.",
-    },
-    texture_seed: {
-      title: 'Texture Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for texture generation reproducibility.',
-    },
-    image_seed: {
-      title: 'Image Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for the text-to-image step.',
-    },
-    prompt: {
-      examples: ['A small house with a red roof and white walls'],
-      type: 'string',
-      title: 'Prompt',
-      maxLength: 1024,
-      description:
-        'Text description of the 3D object to generate. Maximum 1024 characters.',
-    },
-    texture: {
-      default: true,
-      type: 'boolean',
-      title: 'Texture',
-      description: 'Whether to generate textures for the model.',
-    },
-    pbr: {
-      default: true,
-      type: 'boolean',
-      title: 'Pbr',
-      description:
-        'Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled.',
-    },
-  },
-  title: 'FullTextTo3DInput',
   'x-fal-order-properties': [
     'prompt',
     'negative_prompt',
@@ -640,11 +556,97 @@ export const H31TextTo3dInputSchema = {
     'auto_size',
     'quad',
   ],
+  title: 'FullTextTo3DInput',
   required: ['prompt'],
+  type: 'object',
+  properties: {
+    image_seed: {
+      title: 'Image Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for the text-to-image step.',
+    },
+    texture_quality: {
+      title: 'Texture Quality',
+      enum: ['standard', 'detailed'],
+      type: 'string',
+      default: 'standard',
+      description:
+        "Quality level for textures. 'detailed' produces higher-resolution textures.",
+    },
+    model_seed: {
+      title: 'Model Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for geometry generation reproducibility.',
+    },
+    texture: {
+      title: 'Texture',
+      type: 'boolean',
+      default: true,
+      description: 'Whether to generate textures for the model.',
+    },
+    auto_size: {
+      title: 'Auto Size',
+      type: 'boolean',
+      default: false,
+      description: 'Auto-scale the model to real-world dimensions (meters).',
+    },
+    quad: {
+      title: 'Quad',
+      type: 'boolean',
+      default: false,
+      description:
+        'Generate quad (4-sided) mesh topology instead of triangles. When Tripo emits FBX bytes for quad output, the returned model file is FBX.',
+    },
+    geometry_quality: {
+      title: 'Geometry Quality',
+      enum: ['standard', 'detailed'],
+      type: 'string',
+      default: 'standard',
+      description: 'Quality level for geometry.',
+    },
+    pbr: {
+      title: 'Pbr',
+      type: 'boolean',
+      default: true,
+      description:
+        'Whether to generate PBR (Physically Based Rendering) materials. If true, texture is also enabled.',
+    },
+    face_limit: {
+      title: 'Face Limit',
+      anyOf: [
+        { minimum: 1000, type: 'integer', maximum: 2000000 },
+        { type: 'null' },
+      ],
+      description:
+        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
+    },
+    texture_seed: {
+      title: 'Texture Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for texture generation reproducibility.',
+    },
+    prompt: {
+      maxLength: 1024,
+      description:
+        'Text description of the 3D object to generate. Maximum 1024 characters.',
+      title: 'Prompt',
+      type: 'string',
+      examples: ['A small house with a red roof and white walls'],
+    },
+    negative_prompt: {
+      title: 'Negative Prompt',
+      anyOf: [{ type: 'string', maxLength: 1024 }, { type: 'null' }],
+      description: 'Text describing features to avoid in the generated model.',
+    },
+  },
+  description:
+    'Input for Text to 3D generation using full-featured models (H3.1, v2.5).',
 } as const
 
 export const H31TextTo3dOutputSchema = {
-  description: 'Output for Tripo3D generation',
+  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
+  title: 'Tripo3DOutput',
+  required: ['model_mesh', 'model_urls'],
   type: 'object',
   properties: {
     model_mesh: {
@@ -661,9 +663,7 @@ export const H31TextTo3dOutputSchema = {
       description: 'URLs for different 3D model variants.',
     },
   },
-  title: 'Tripo3DOutput',
-  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
-  required: ['model_mesh', 'model_urls'],
+  description: 'Output for Tripo3D generation',
   $defs: {
     File: {
       title: 'File',
@@ -703,17 +703,10 @@ export const H31TextTo3dOutputSchema = {
       ],
     },
     ModelUrlsType3: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       title: 'ModelUrls',
+      type: 'object',
       properties: {
-        base_model: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'Base (untextured) model',
-        },
-        glb: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'GLB format 3D model',
-        },
         pbr_model: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'PBR-textured model',
@@ -722,8 +715,15 @@ export const H31TextTo3dOutputSchema = {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'FBX format 3D model',
         },
+        base_model: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Base (untextured) model',
+        },
+        glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'GLB format 3D model',
+        },
       },
-      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       description: '3D model download URLs',
     },
   },
@@ -734,52 +734,51 @@ export const Hunyuan3dV2InputSchema = {
   properties: {
     guidance_scale: {
       type: 'number',
-      description: 'Guidance scale for the model.',
       maximum: 20,
       minimum: 0,
-      default: 7.5,
       title: 'Guidance Scale',
+      default: 7.5,
+      description: 'Guidance scale for the model.',
     },
     input_image_url: {
       type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Input Image Url',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/video_models/robot.png',
       ],
+      title: 'Input Image Url',
+      description: 'URL of image to use while generating the 3D model.',
       'x-fal-file-input': true,
     },
-    octree_resolution: {
-      type: 'integer',
-      description: 'Octree resolution for the model.',
-      maximum: 1024,
-      minimum: 1,
-      default: 256,
-      title: 'Octree Resolution',
-    },
-    num_inference_steps: {
-      type: 'integer',
-      description: 'Number of inference steps to perform.',
-      maximum: 50,
-      minimum: 1,
-      default: 50,
-      title: 'Num Inference Steps',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
-    },
     textured_mesh: {
+      type: 'boolean',
+      title: 'Textured Mesh',
       default: false,
       description:
         'If set true, textured mesh will be generated and the price charged would be 3 times that of white mesh.',
-      title: 'Textured Mesh',
-      type: 'boolean',
+    },
+    num_inference_steps: {
+      type: 'integer',
+      maximum: 50,
+      minimum: 1,
+      title: 'Num Inference Steps',
+      default: 50,
+      description: 'Number of inference steps to perform.',
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
+    },
+    octree_resolution: {
+      type: 'integer',
+      maximum: 1024,
+      minimum: 1,
+      title: 'Octree Resolution',
+      default: 256,
+      description: 'Octree resolution for the model.',
     },
   },
-  title: 'Hunyuan3DInput',
   'x-fal-order-properties': [
     'input_image_url',
     'seed',
@@ -788,6 +787,7 @@ export const Hunyuan3dV2InputSchema = {
     'octree_resolution',
     'textured_mesh',
   ],
+  title: 'Hunyuan3DInput',
   required: ['input_image_url'],
 } as const
 
@@ -796,52 +796,51 @@ export const Hunyuan3dV2MiniInputSchema = {
   properties: {
     guidance_scale: {
       type: 'number',
-      description: 'Guidance scale for the model.',
       maximum: 20,
       minimum: 0,
-      default: 7.5,
       title: 'Guidance Scale',
+      default: 7.5,
+      description: 'Guidance scale for the model.',
     },
     input_image_url: {
       type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Input Image Url',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/video_models/robot.png',
       ],
+      title: 'Input Image Url',
+      description: 'URL of image to use while generating the 3D model.',
       'x-fal-file-input': true,
     },
-    octree_resolution: {
-      type: 'integer',
-      description: 'Octree resolution for the model.',
-      maximum: 1024,
-      minimum: 1,
-      default: 256,
-      title: 'Octree Resolution',
-    },
-    num_inference_steps: {
-      type: 'integer',
-      description: 'Number of inference steps to perform.',
-      maximum: 50,
-      minimum: 1,
-      default: 50,
-      title: 'Num Inference Steps',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
-    },
     textured_mesh: {
+      type: 'boolean',
+      title: 'Textured Mesh',
       default: false,
       description:
         'If set true, textured mesh will be generated and the price charged would be 3 times that of white mesh.',
-      title: 'Textured Mesh',
-      type: 'boolean',
+    },
+    num_inference_steps: {
+      type: 'integer',
+      maximum: 50,
+      minimum: 1,
+      title: 'Num Inference Steps',
+      default: 50,
+      description: 'Number of inference steps to perform.',
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
+    },
+    octree_resolution: {
+      type: 'integer',
+      maximum: 1024,
+      minimum: 1,
+      title: 'Octree Resolution',
+      default: 256,
+      description: 'Octree resolution for the model.',
     },
   },
-  title: 'Hunyuan3DInput',
   'x-fal-order-properties': [
     'input_image_url',
     'seed',
@@ -850,6 +849,7 @@ export const Hunyuan3dV2MiniInputSchema = {
     'octree_resolution',
     'textured_mesh',
   ],
+  title: 'Hunyuan3DInput',
   required: ['input_image_url'],
 } as const
 
@@ -857,8 +857,6 @@ export const Hunyuan3dV2MiniOutputSchema = {
   type: 'object',
   properties: {
     model_mesh: {
-      description: 'Generated 3D object file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/WqIhtKPaSoeBtC30qzIGG_white_mesh.glb',
@@ -867,15 +865,17 @@ export const Hunyuan3dV2MiniOutputSchema = {
           file_size: 720696,
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
     seed: {
       type: 'integer',
-      description: 'Seed value used for generation.',
       title: 'Seed',
+      description: 'Seed value used for generation.',
     },
   },
-  title: 'ObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed'],
+  title: 'ObjectOutput',
   required: ['model_mesh', 'seed'],
   $defs: {
     File: {
@@ -923,52 +923,51 @@ export const Hunyuan3dV2MiniTurboInputSchema = {
   properties: {
     guidance_scale: {
       type: 'number',
-      description: 'Guidance scale for the model.',
       maximum: 20,
       minimum: 0,
-      default: 7.5,
       title: 'Guidance Scale',
+      default: 7.5,
+      description: 'Guidance scale for the model.',
     },
     input_image_url: {
       type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Input Image Url',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/video_models/robot.png',
       ],
+      title: 'Input Image Url',
+      description: 'URL of image to use while generating the 3D model.',
       'x-fal-file-input': true,
     },
-    octree_resolution: {
-      type: 'integer',
-      description: 'Octree resolution for the model.',
-      maximum: 1024,
-      minimum: 1,
-      default: 256,
-      title: 'Octree Resolution',
-    },
-    num_inference_steps: {
-      type: 'integer',
-      description: 'Number of inference steps to perform.',
-      maximum: 50,
-      minimum: 1,
-      default: 50,
-      title: 'Num Inference Steps',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
-    },
     textured_mesh: {
+      type: 'boolean',
+      title: 'Textured Mesh',
       default: false,
       description:
         'If set true, textured mesh will be generated and the price charged would be 3 times that of white mesh.',
-      title: 'Textured Mesh',
-      type: 'boolean',
+    },
+    num_inference_steps: {
+      type: 'integer',
+      maximum: 50,
+      minimum: 1,
+      title: 'Num Inference Steps',
+      default: 50,
+      description: 'Number of inference steps to perform.',
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
+    },
+    octree_resolution: {
+      type: 'integer',
+      maximum: 1024,
+      minimum: 1,
+      title: 'Octree Resolution',
+      default: 256,
+      description: 'Octree resolution for the model.',
     },
   },
-  title: 'Hunyuan3DInput',
   'x-fal-order-properties': [
     'input_image_url',
     'seed',
@@ -977,6 +976,7 @@ export const Hunyuan3dV2MiniTurboInputSchema = {
     'octree_resolution',
     'textured_mesh',
   ],
+  title: 'Hunyuan3DInput',
   required: ['input_image_url'],
 } as const
 
@@ -984,8 +984,6 @@ export const Hunyuan3dV2MiniTurboOutputSchema = {
   type: 'object',
   properties: {
     model_mesh: {
-      description: 'Generated 3D object file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/WqIhtKPaSoeBtC30qzIGG_white_mesh.glb',
@@ -994,15 +992,17 @@ export const Hunyuan3dV2MiniTurboOutputSchema = {
           file_size: 720696,
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
     seed: {
       type: 'integer',
-      description: 'Seed value used for generation.',
       title: 'Seed',
+      description: 'Seed value used for generation.',
     },
   },
-  title: 'ObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed'],
+  title: 'ObjectOutput',
   required: ['model_mesh', 'seed'],
   $defs: {
     File: {
@@ -1050,70 +1050,69 @@ export const Hunyuan3dV2MultiViewInputSchema = {
   properties: {
     guidance_scale: {
       type: 'number',
-      description: 'Guidance scale for the model.',
       maximum: 20,
       minimum: 0,
-      default: 7.5,
       title: 'Guidance Scale',
-    },
-    num_inference_steps: {
-      type: 'integer',
-      description: 'Number of inference steps to perform.',
-      maximum: 50,
-      minimum: 1,
-      default: 50,
-      title: 'Num Inference Steps',
+      default: 7.5,
+      description: 'Guidance scale for the model.',
     },
     octree_resolution: {
       type: 'integer',
-      description: 'Octree resolution for the model.',
       maximum: 1024,
       minimum: 1,
-      default: 256,
       title: 'Octree Resolution',
-    },
-    front_image_url: {
-      type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Front Image Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
-      ],
-      'x-fal-file-input': true,
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
-    },
-    left_image_url: {
-      type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Left Image Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
-      ],
-      'x-fal-file-input': true,
+      default: 256,
+      description: 'Octree resolution for the model.',
     },
     back_image_url: {
       type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Back Image Url',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/video_models/back.png',
       ],
+      title: 'Back Image Url',
+      description: 'URL of image to use while generating the 3D model.',
       'x-fal-file-input': true,
     },
+    left_image_url: {
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
+      ],
+      title: 'Left Image Url',
+      description: 'URL of image to use while generating the 3D model.',
+      'x-fal-file-input': true,
+    },
+    front_image_url: {
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
+      ],
+      title: 'Front Image Url',
+      description: 'URL of image to use while generating the 3D model.',
+      'x-fal-file-input': true,
+    },
+    num_inference_steps: {
+      type: 'integer',
+      maximum: 50,
+      minimum: 1,
+      title: 'Num Inference Steps',
+      default: 50,
+      description: 'Number of inference steps to perform.',
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
+    },
     textured_mesh: {
+      type: 'boolean',
+      title: 'Textured Mesh',
       default: false,
       description:
         'If set true, textured mesh will be generated and the price charged would be 3 times that of white mesh.',
-      title: 'Textured Mesh',
-      type: 'boolean',
     },
   },
-  title: 'Hunyuan3DInputMultiView',
   'x-fal-order-properties': [
     'front_image_url',
     'back_image_url',
@@ -1124,6 +1123,7 @@ export const Hunyuan3dV2MultiViewInputSchema = {
     'octree_resolution',
     'textured_mesh',
   ],
+  title: 'Hunyuan3DInputMultiView',
   required: ['front_image_url', 'back_image_url', 'left_image_url'],
 } as const
 
@@ -1131,8 +1131,6 @@ export const Hunyuan3dV2MultiViewOutputSchema = {
   type: 'object',
   properties: {
     model_mesh: {
-      description: 'Generated 3D object file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/mesh.glb',
@@ -1141,15 +1139,17 @@ export const Hunyuan3dV2MultiViewOutputSchema = {
           file_size: 720696,
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
     seed: {
       type: 'integer',
-      description: 'Seed value used for generation.',
       title: 'Seed',
+      description: 'Seed value used for generation.',
     },
   },
-  title: 'MultiViewObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed'],
+  title: 'MultiViewObjectOutput',
   required: ['model_mesh', 'seed'],
   $defs: {
     File: {
@@ -1197,70 +1197,69 @@ export const Hunyuan3dV2MultiViewTurboInputSchema = {
   properties: {
     guidance_scale: {
       type: 'number',
-      description: 'Guidance scale for the model.',
       maximum: 20,
       minimum: 0,
-      default: 7.5,
       title: 'Guidance Scale',
-    },
-    num_inference_steps: {
-      type: 'integer',
-      description: 'Number of inference steps to perform.',
-      maximum: 50,
-      minimum: 1,
-      default: 50,
-      title: 'Num Inference Steps',
+      default: 7.5,
+      description: 'Guidance scale for the model.',
     },
     octree_resolution: {
       type: 'integer',
-      description: 'Octree resolution for the model.',
       maximum: 1024,
       minimum: 1,
-      default: 256,
       title: 'Octree Resolution',
-    },
-    front_image_url: {
-      type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Front Image Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
-      ],
-      'x-fal-file-input': true,
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
-    },
-    left_image_url: {
-      type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Left Image Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
-      ],
-      'x-fal-file-input': true,
+      default: 256,
+      description: 'Octree resolution for the model.',
     },
     back_image_url: {
       type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Back Image Url',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/video_models/back.png',
       ],
+      title: 'Back Image Url',
+      description: 'URL of image to use while generating the 3D model.',
       'x-fal-file-input': true,
     },
+    left_image_url: {
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
+      ],
+      title: 'Left Image Url',
+      description: 'URL of image to use while generating the 3D model.',
+      'x-fal-file-input': true,
+    },
+    front_image_url: {
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
+      ],
+      title: 'Front Image Url',
+      description: 'URL of image to use while generating the 3D model.',
+      'x-fal-file-input': true,
+    },
+    num_inference_steps: {
+      type: 'integer',
+      maximum: 50,
+      minimum: 1,
+      title: 'Num Inference Steps',
+      default: 50,
+      description: 'Number of inference steps to perform.',
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
+    },
     textured_mesh: {
+      type: 'boolean',
+      title: 'Textured Mesh',
       default: false,
       description:
         'If set true, textured mesh will be generated and the price charged would be 3 times that of white mesh.',
-      title: 'Textured Mesh',
-      type: 'boolean',
     },
   },
-  title: 'Hunyuan3DInputMultiView',
   'x-fal-order-properties': [
     'front_image_url',
     'back_image_url',
@@ -1271,6 +1270,7 @@ export const Hunyuan3dV2MultiViewTurboInputSchema = {
     'octree_resolution',
     'textured_mesh',
   ],
+  title: 'Hunyuan3DInputMultiView',
   required: ['front_image_url', 'back_image_url', 'left_image_url'],
 } as const
 
@@ -1278,8 +1278,6 @@ export const Hunyuan3dV2MultiViewTurboOutputSchema = {
   type: 'object',
   properties: {
     model_mesh: {
-      description: 'Generated 3D object file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/mesh.glb',
@@ -1288,15 +1286,17 @@ export const Hunyuan3dV2MultiViewTurboOutputSchema = {
           file_size: 720696,
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
     seed: {
       type: 'integer',
-      description: 'Seed value used for generation.',
       title: 'Seed',
+      description: 'Seed value used for generation.',
     },
   },
-  title: 'MultiViewObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed'],
+  title: 'MultiViewObjectOutput',
   required: ['model_mesh', 'seed'],
   $defs: {
     File: {
@@ -1343,8 +1343,6 @@ export const Hunyuan3dV2OutputSchema = {
   type: 'object',
   properties: {
     model_mesh: {
-      description: 'Generated 3D object file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/WqIhtKPaSoeBtC30qzIGG_white_mesh.glb',
@@ -1353,15 +1351,17 @@ export const Hunyuan3dV2OutputSchema = {
           file_size: 720696,
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
     seed: {
       type: 'integer',
-      description: 'Seed value used for generation.',
       title: 'Seed',
+      description: 'Seed value used for generation.',
     },
   },
-  title: 'ObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed'],
+  title: 'ObjectOutput',
   required: ['model_mesh', 'seed'],
   $defs: {
     File: {
@@ -1409,52 +1409,51 @@ export const Hunyuan3dV2TurboInputSchema = {
   properties: {
     guidance_scale: {
       type: 'number',
-      description: 'Guidance scale for the model.',
       maximum: 20,
       minimum: 0,
-      default: 7.5,
       title: 'Guidance Scale',
+      default: 7.5,
+      description: 'Guidance scale for the model.',
     },
     input_image_url: {
       type: 'string',
-      description: 'URL of image to use while generating the 3D model.',
-      title: 'Input Image Url',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/video_models/robot.png',
       ],
+      title: 'Input Image Url',
+      description: 'URL of image to use while generating the 3D model.',
       'x-fal-file-input': true,
     },
-    octree_resolution: {
-      type: 'integer',
-      description: 'Octree resolution for the model.',
-      maximum: 1024,
-      minimum: 1,
-      default: 256,
-      title: 'Octree Resolution',
-    },
-    num_inference_steps: {
-      type: 'integer',
-      description: 'Number of inference steps to perform.',
-      maximum: 50,
-      minimum: 1,
-      default: 50,
-      title: 'Num Inference Steps',
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description:
-        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
-    },
     textured_mesh: {
+      type: 'boolean',
+      title: 'Textured Mesh',
       default: false,
       description:
         'If set true, textured mesh will be generated and the price charged would be 3 times that of white mesh.',
-      title: 'Textured Mesh',
-      type: 'boolean',
+    },
+    num_inference_steps: {
+      type: 'integer',
+      maximum: 50,
+      minimum: 1,
+      title: 'Num Inference Steps',
+      default: 50,
+      description: 'Number of inference steps to perform.',
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description:
+        '\n            The same seed and the same prompt given to the same version of the model\n            will output the same image every time.\n        ',
+    },
+    octree_resolution: {
+      type: 'integer',
+      maximum: 1024,
+      minimum: 1,
+      title: 'Octree Resolution',
+      default: 256,
+      description: 'Octree resolution for the model.',
     },
   },
-  title: 'Hunyuan3DInput',
   'x-fal-order-properties': [
     'input_image_url',
     'seed',
@@ -1463,6 +1462,7 @@ export const Hunyuan3dV2TurboInputSchema = {
     'octree_resolution',
     'textured_mesh',
   ],
+  title: 'Hunyuan3DInput',
   required: ['input_image_url'],
 } as const
 
@@ -1470,8 +1470,6 @@ export const Hunyuan3dV2TurboOutputSchema = {
   type: 'object',
   properties: {
     model_mesh: {
-      description: 'Generated 3D object file.',
-      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/lion/WqIhtKPaSoeBtC30qzIGG_white_mesh.glb',
@@ -1480,15 +1478,17 @@ export const Hunyuan3dV2TurboOutputSchema = {
           file_size: 720696,
         },
       ],
+      $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
     seed: {
       type: 'integer',
-      description: 'Seed value used for generation.',
       title: 'Seed',
+      description: 'Seed value used for generation.',
     },
   },
-  title: 'ObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed'],
+  title: 'ObjectOutput',
   required: ['model_mesh', 'seed'],
   $defs: {
     File: {
@@ -1532,47 +1532,47 @@ export const Hunyuan3dV2TurboOutputSchema = {
 } as const
 
 export const Hunyuan3dV31PartInputSchema = {
-  type: 'object',
+  required: ['input_file_url'],
+  'x-fal-order-properties': ['input_file_url'],
   properties: {
     input_file_url: {
-      type: 'string',
-      description:
-        'URL of FBX file to split into parts. ONLY FBX format supported. Max size: 100MB, face count ≤30,000. Recommended: AIGC-generated models.',
-      title: 'Input File Url',
       examples: [
         'https://v3b.fal.media/files/b/0a8bf92a/XECcItG5QHt0LViFTRCON_converted.fbx',
       ],
+      description:
+        'URL of FBX file to split into parts. ONLY FBX format supported. Max size: 100MB, face count ≤30,000. Recommended: AIGC-generated models.',
+      title: 'Input File Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
   },
   title: 'PartInput',
-  'x-fal-order-properties': ['input_file_url'],
-  required: ['input_file_url'],
+  type: 'object',
 } as const
 
 export const Hunyuan3dV31PartOutputSchema = {
-  type: 'object',
+  required: ['result_files'],
+  'x-fal-order-properties': ['result_files'],
   properties: {
     result_files: {
       items: { $ref: '#/$defs/File' },
-      description: 'List of generated part files in FBX format',
-      title: 'Result Files',
-      type: 'array',
       examples: [
         [
           {
+            file_size: 2048000,
+            file_name: 'part_0.fbx',
             url: 'https://v3b.fal.media/files/b/0a8bf94b/zOP--lT23slziGKp99dJm_part_0.fbx',
             content_type: 'application/octet-stream',
-            file_name: 'part_0.fbx',
-            file_size: 2048000,
           },
         ],
       ],
+      description: 'List of generated part files in FBX format',
+      title: 'Result Files',
+      type: 'array',
     },
   },
   title: 'PartOutput',
-  'x-fal-order-properties': ['result_files'],
-  required: ['result_files'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -1615,113 +1615,7 @@ export const Hunyuan3dV31PartOutputSchema = {
 } as const
 
 export const Hunyuan3dV31ProImageTo3dInputSchema = {
-  type: 'object',
-  properties: {
-    generate_type: {
-      default: 'Normal',
-      description:
-        'Generation task type. Normal: textured model. Geometry: geometry-only white model (no textures). LowPoly/Sketch are not available in v3.1.',
-      title: 'Generate Type',
-      type: 'string',
-      enum: ['Normal', 'Geometry'],
-    },
-    face_count: {
-      default: 500000,
-      description:
-        'Target polygon face count. Range: 40,000-1,500,000. Default: 500,000.',
-      maximum: 1500000,
-      minimum: 40000,
-      title: 'Face Count',
-      type: 'integer',
-    },
-    right_image_url: {
-      description: 'Optional right side view image URL (JPG/PNG recommended).',
-      title: 'Right Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    bottom_image_url: {
-      description:
-        'Optional bottom view image URL (v3.1 exclusive, JPG/PNG recommended).',
-      title: 'Bottom Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    input_image_url: {
-      type: 'string',
-      title: 'Input Image Url',
-      description:
-        'Front view image URL. Resolution: 128-5000px, max 8MB, formats: JPG/PNG/WEBP. Tips: simple background, single object, object >50% of frame.',
-      _fal_ui_field: 'image',
-      examples: [
-        'https://v3b.fal.media/files/b/0a8c3155/BTXNRrzOFsO6OvdSxdXmv_6ZcaGmrY.png',
-      ],
-      max_file_size: 8388608,
-      'x-fal-file-input': true,
-    },
-    right_front_image_url: {
-      description:
-        'Optional right-front 45 degree angle view image URL (v3.1 exclusive, JPG/PNG recommended).',
-      title: 'Right Front Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    left_image_url: {
-      description: 'Optional left side view image URL (JPG/PNG recommended).',
-      title: 'Left Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    left_front_image_url: {
-      description:
-        'Optional left-front 45 degree angle view image URL (v3.1 exclusive, JPG/PNG recommended).',
-      title: 'Left Front Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    back_image_url: {
-      description: 'Optional back/rear view image URL (JPG/PNG recommended).',
-      title: 'Back Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    top_image_url: {
-      description:
-        'Optional top view image URL (v3.1 exclusive, JPG/PNG recommended).',
-      title: 'Top Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-      max_file_size: 8388608,
-    },
-    enable_pbr: {
-      default: false,
-      description:
-        'Enable PBR material generation (metallic, roughness, normal textures). Ignored when generate_type is Geometry.',
-      title: 'Enable Pbr',
-      type: 'boolean',
-    },
-  },
-  title: 'ProImageTo3DInput',
+  required: ['input_image_url'],
   'x-fal-order-properties': [
     'input_image_url',
     'back_image_url',
@@ -1735,156 +1629,73 @@ export const Hunyuan3dV31ProImageTo3dInputSchema = {
     'enable_pbr',
     'face_count',
   ],
-  required: ['input_image_url'],
-} as const
-
-export const Hunyuan3dV31ProImageTo3dOutputSchema = {
-  type: 'object',
   properties: {
-    model_urls: {
-      $ref: '#/$defs/ModelUrlsType2',
-      description: 'URLs for different 3D model formats',
-      examples: [
-        {
-          obj: {
-            url: 'https://v3b.fal.media/files/b/0a8c3186/no-aBFEDnOuthILfv-wzs_model.obj',
-            content_type: 'model/obj',
-            file_name: 'model.obj',
-            file_size: 31447160,
-          },
-          glb: {
-            url: 'https://v3b.fal.media/files/b/0a8c3187/jOeZmtBuhdQMkDu65AkdT_model.glb',
-            content_type: 'model/gltf-binary',
-            file_name: 'model.glb',
-            file_size: 38554640,
-          },
-        },
+    top_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
       ],
+      title: 'Top Image Url',
+      description:
+        'Optional top view image URL (v3.1 exclusive, JPG/PNG recommended).',
     },
-    seed: {
-      description: 'The seed used for generation',
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    model_glb: {
-      $ref: '#/$defs/File',
-      description: 'Generated 3D object in GLB format.',
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c3187/jOeZmtBuhdQMkDu65AkdT_model.glb',
-          content_type: 'model/gltf-binary',
-          file_name: 'model.glb',
-          file_size: 38554640,
-        },
-      ],
-    },
-    thumbnail: {
-      description: 'Preview thumbnail of the generated model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c3187/gxidaODj4OvPXruCfrZ-__preview.png',
-          content_type: 'image/png',
-          file_name: 'preview.png',
-          file_size: 194908,
-        },
-      ],
-    },
-  },
-  title: 'ProImageTo3DOutput',
-  'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
-  required: ['model_glb', 'model_urls'],
-  $defs: {
-    File: {
-      title: 'File',
-      required: ['url'],
-      type: 'object',
-      properties: {
-        file_name: {
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        content_type: {
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          title: 'File Size',
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        url: {
-          title: 'Url',
-          type: 'string',
-          description: 'The URL where the file can be downloaded from.',
-        },
-      },
-      'x-fal-order-properties': [
-        'url',
-        'content_type',
-        'file_name',
-        'file_size',
-      ],
-    },
-    ModelUrlsType2: {
-      type: 'object',
-      properties: {
-        texture: {
-          description: 'Texture image for the 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        usdz: {
-          description: 'USDZ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        glb: {
-          description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        mtl: {
-          description: 'MTL material file for OBJ model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        fbx: {
-          description: 'FBX format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-      },
-      title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
-    },
-  },
-} as const
-
-export const Hunyuan3dV31ProTextTo3dInputSchema = {
-  type: 'object',
-  properties: {
     generate_type: {
       default: 'Normal',
+      enum: ['Normal', 'Geometry'],
       description:
         'Generation task type. Normal: textured model. Geometry: geometry-only white model (no textures). LowPoly/Sketch are not available in v3.1.',
       title: 'Generate Type',
       type: 'string',
-      enum: ['Normal', 'Geometry'],
+    },
+    bottom_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
+      ],
+      title: 'Bottom Image Url',
+      description:
+        'Optional bottom view image URL (v3.1 exclusive, JPG/PNG recommended).',
+    },
+    input_image_url: {
+      _fal_ui_field: 'image',
+      max_file_size: 8388608,
+      title: 'Input Image Url',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8c3155/BTXNRrzOFsO6OvdSxdXmv_6ZcaGmrY.png',
+      ],
+      description:
+        'Front view image URL. Resolution: 128-5000px, max 8MB, formats: JPG/PNG/WEBP. Tips: simple background, single object, object >50% of frame.',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    back_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
+      ],
+      title: 'Back Image Url',
+      description: 'Optional back/rear view image URL (JPG/PNG recommended).',
     },
     face_count: {
       default: 500000,
-      description:
-        'Target polygon face count. Range: 40,000-1,500,000. Default: 500,000.',
       maximum: 1500000,
       minimum: 40000,
+      description:
+        'Target polygon face count. Range: 40,000-1,500,000. Default: 500,000.',
       title: 'Face Count',
       type: 'integer',
+    },
+    left_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
+      ],
+      title: 'Left Image Url',
+      description: 'Optional left side view image URL (JPG/PNG recommended).',
     },
     enable_pbr: {
       default: false,
@@ -1893,93 +1704,96 @@ export const Hunyuan3dV31ProTextTo3dInputSchema = {
       title: 'Enable Pbr',
       type: 'boolean',
     },
-    prompt: {
-      type: 'string',
+    left_front_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
+      ],
+      title: 'Left Front Image Url',
       description:
-        'Text description of the 3D content to generate. Max 1024 UTF-8 characters.',
-      title: 'Prompt',
-      maxLength: 1024,
-      examples: ['A super cool space ship with details'],
+        'Optional left-front 45 degree angle view image URL (v3.1 exclusive, JPG/PNG recommended).',
+    },
+    right_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
+      ],
+      title: 'Right Image Url',
+      description: 'Optional right side view image URL (JPG/PNG recommended).',
+    },
+    right_front_image_url: {
+      max_file_size: 8388608,
+      anyOf: [
+        { _fal_ui_field: 'image', ui: { field: 'image' }, type: 'string' },
+        { type: 'null' },
+      ],
+      title: 'Right Front Image Url',
+      description:
+        'Optional right-front 45 degree angle view image URL (v3.1 exclusive, JPG/PNG recommended).',
     },
   },
-  title: 'ProTextTo3DInput',
-  'x-fal-order-properties': [
-    'prompt',
-    'generate_type',
-    'enable_pbr',
-    'face_count',
-  ],
-  required: ['prompt'],
+  title: 'ProImageTo3DInput',
+  type: 'object',
 } as const
 
-export const Hunyuan3dV31ProTextTo3dOutputSchema = {
-  type: 'object',
+export const Hunyuan3dV31ProImageTo3dOutputSchema = {
+  required: ['model_glb', 'model_urls'],
+  'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
   properties: {
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+      description: 'The seed used for generation',
+    },
     model_urls: {
       $ref: '#/$defs/ModelUrlsType2',
-      description: 'URLs for different 3D model formats',
       examples: [
         {
-          texture: {
-            url: 'https://v3b.fal.media/files/b/0a8c5482/jOL2nBpcOGspwxQf0_U-z_texture_20250901.png',
-            content_type: 'image/png',
-            file_name: 'texture_20250901.png',
-            file_size: 19996580,
+          glb: {
+            file_size: 38554640,
+            file_name: 'model.glb',
+            url: 'https://v3b.fal.media/files/b/0a8c3187/jOeZmtBuhdQMkDu65AkdT_model.glb',
+            content_type: 'model/gltf-binary',
           },
           obj: {
-            url: 'https://v3b.fal.media/files/b/0a8c5482/ZzC1xlOftyGQxhDkbZzVW_6168030a8817075aaa55c94cc5145000.obj',
+            file_size: 31447160,
+            file_name: 'model.obj',
+            url: 'https://v3b.fal.media/files/b/0a8c3186/no-aBFEDnOuthILfv-wzs_model.obj',
             content_type: 'model/obj',
-            file_name: '6168030a8817075aaa55c94cc5145000.obj',
-            file_size: 34755929,
-          },
-          glb: {
-            url: 'https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb',
-            content_type: 'model/gltf-binary',
-            file_name: 'model.glb',
-            file_size: 35833072,
-          },
-          mtl: {
-            url: 'https://v3b.fal.media/files/b/0a8c5482/ZxJepsEkhM67VSugmZ7QT_material.mtl',
-            content_type: 'text/plain',
-            file_name: 'material.mtl',
-            file_size: 88,
           },
         },
       ],
-    },
-    seed: {
-      description: 'The seed used for generation',
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'URLs for different 3D model formats',
     },
     model_glb: {
       $ref: '#/$defs/File',
-      description: 'Generated 3D object in GLB format.',
       examples: [
         {
-          url: 'https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb',
-          content_type: 'model/gltf-binary',
+          file_size: 38554640,
           file_name: 'model.glb',
-          file_size: 35833072,
+          url: 'https://v3b.fal.media/files/b/0a8c3187/jOeZmtBuhdQMkDu65AkdT_model.glb',
+          content_type: 'model/gltf-binary',
         },
       ],
+      description: 'Generated 3D object in GLB format.',
     },
     thumbnail: {
-      description: 'Preview thumbnail of the generated model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
       examples: [
         {
-          url: 'https://v3b.fal.media/files/b/0a8c5483/EE97ZV7cM-3UVG4peyWTQ_preview.png',
-          content_type: 'image/png',
+          file_size: 194908,
           file_name: 'preview.png',
-          file_size: 68927,
+          url: 'https://v3b.fal.media/files/b/0a8c3187/gxidaODj4OvPXruCfrZ-__preview.png',
+          content_type: 'image/png',
         },
       ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Preview thumbnail of the generated model',
     },
   },
-  title: 'ProTextTo3DOutput',
-  'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
-  required: ['model_glb', 'model_urls'],
+  title: 'ProImageTo3DOutput',
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -2019,52 +1833,243 @@ export const Hunyuan3dV31ProTextTo3dOutputSchema = {
       ],
     },
     ModelUrlsType2: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
       properties: {
-        texture: {
-          description: 'Texture image for the 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        usdz: {
-          description: 'USDZ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        mtl: {
-          description: 'MTL material file for OBJ model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
         fbx: {
-          description: 'FBX format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
+        },
+        obj: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        mtl: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'MTL material file for OBJ model',
+        },
+        texture: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Texture image for the 3D model',
+        },
+        usdz: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
       },
       title: 'ModelUrls',
+      type: 'object',
+    },
+  },
+} as const
+
+export const Hunyuan3dV31ProTextTo3dInputSchema = {
+  required: ['prompt'],
+  'x-fal-order-properties': [
+    'prompt',
+    'generate_type',
+    'enable_pbr',
+    'face_count',
+  ],
+  properties: {
+    generate_type: {
+      default: 'Normal',
+      enum: ['Normal', 'Geometry'],
+      description:
+        'Generation task type. Normal: textured model. Geometry: geometry-only white model (no textures). LowPoly/Sketch are not available in v3.1.',
+      title: 'Generate Type',
+      type: 'string',
+    },
+    enable_pbr: {
+      default: false,
+      description:
+        'Enable PBR material generation (metallic, roughness, normal textures). Ignored when generate_type is Geometry.',
+      title: 'Enable Pbr',
+      type: 'boolean',
+    },
+    face_count: {
+      default: 500000,
+      maximum: 1500000,
+      minimum: 40000,
+      description:
+        'Target polygon face count. Range: 40,000-1,500,000. Default: 500,000.',
+      title: 'Face Count',
+      type: 'integer',
+    },
+    prompt: {
+      description:
+        'Text description of the 3D content to generate. Max 1024 UTF-8 characters.',
+      examples: ['A super cool space ship with details'],
+      maxLength: 1024,
+      title: 'Prompt',
+      type: 'string',
+    },
+  },
+  title: 'ProTextTo3DInput',
+  type: 'object',
+} as const
+
+export const Hunyuan3dV31ProTextTo3dOutputSchema = {
+  required: ['model_glb', 'model_urls'],
+  'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
+  properties: {
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+      description: 'The seed used for generation',
+    },
+    model_urls: {
+      $ref: '#/$defs/ModelUrlsType2',
+      examples: [
+        {
+          glb: {
+            file_size: 35833072,
+            file_name: 'model.glb',
+            url: 'https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb',
+            content_type: 'model/gltf-binary',
+          },
+          obj: {
+            file_size: 34755929,
+            file_name: '6168030a8817075aaa55c94cc5145000.obj',
+            url: 'https://v3b.fal.media/files/b/0a8c5482/ZzC1xlOftyGQxhDkbZzVW_6168030a8817075aaa55c94cc5145000.obj',
+            content_type: 'model/obj',
+          },
+          mtl: {
+            file_size: 88,
+            file_name: 'material.mtl',
+            url: 'https://v3b.fal.media/files/b/0a8c5482/ZxJepsEkhM67VSugmZ7QT_material.mtl',
+            content_type: 'text/plain',
+          },
+          texture: {
+            file_size: 19996580,
+            file_name: 'texture_20250901.png',
+            url: 'https://v3b.fal.media/files/b/0a8c5482/jOL2nBpcOGspwxQf0_U-z_texture_20250901.png',
+            content_type: 'image/png',
+          },
+        },
+      ],
+      description: 'URLs for different 3D model formats',
+    },
+    model_glb: {
+      $ref: '#/$defs/File',
+      examples: [
+        {
+          file_size: 35833072,
+          file_name: 'model.glb',
+          url: 'https://v3b.fal.media/files/b/0a8c5483/z6sbpr5wBRjqgnQlJM2Ot_model.glb',
+          content_type: 'model/gltf-binary',
+        },
+      ],
+      description: 'Generated 3D object in GLB format.',
+    },
+    thumbnail: {
+      examples: [
+        {
+          file_size: 68927,
+          file_name: 'preview.png',
+          url: 'https://v3b.fal.media/files/b/0a8c5483/EE97ZV7cM-3UVG4peyWTQ_preview.png',
+          content_type: 'image/png',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Preview thumbnail of the generated model',
+    },
+  },
+  title: 'ProTextTo3DOutput',
+  type: 'object',
+  $defs: {
+    File: {
+      title: 'File',
+      required: ['url'],
+      type: 'object',
+      properties: {
+        file_name: {
+          title: 'File Name',
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          examples: ['z9RV14K95DvU.png'],
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+        content_type: {
+          title: 'Content Type',
+          description: 'The mime type of the file.',
+          examples: ['image/png'],
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+        file_size: {
+          title: 'File Size',
+          description: 'The size of the file in bytes.',
+          examples: [4404019],
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+      },
+      'x-fal-order-properties': [
+        'url',
+        'content_type',
+        'file_name',
+        'file_size',
+      ],
+    },
+    ModelUrlsType2: {
       'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
+      properties: {
+        glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'GLB format 3D model',
+        },
+        fbx: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
+        },
+        obj: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        mtl: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'MTL material file for OBJ model',
+        },
+        texture: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Texture image for the 3D model',
+        },
+        usdz: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
+        },
+      },
+      title: 'ModelUrls',
+      type: 'object',
     },
   },
 } as const
 
 export const Hunyuan3dV31RapidImageTo3dInputSchema = {
-  type: 'object',
+  required: ['input_image_url'],
+  'x-fal-order-properties': [
+    'input_image_url',
+    'enable_pbr',
+    'enable_geometry',
+  ],
   properties: {
     input_image_url: {
-      type: 'string',
-      title: 'Input Image Url',
-      description:
-        'Front view image URL. Resolution: 128-5000px, max 8MB (recommended ≤6MB for base64 encoding), formats: JPG/PNG/WEBP. Tips: simple background, single object, object >50% of frame.',
       _fal_ui_field: 'image',
+      max_file_size: 8388608,
+      title: 'Input Image Url',
       examples: [
         'https://v3b.fal.media/files/b/0a865ab1/omYcawLUo4RZbO8J6ZgZR.png',
       ],
-      max_file_size: 8388608,
+      description:
+        'Front view image URL. Resolution: 128-5000px, max 8MB (recommended ≤6MB for base64 encoding), formats: JPG/PNG/WEBP. Tips: simple background, single object, object >50% of frame.',
+      type: 'string',
       'x-fal-file-input': true,
     },
     enable_pbr: {
@@ -2083,94 +2088,11 @@ export const Hunyuan3dV31RapidImageTo3dInputSchema = {
     },
   },
   title: 'RapidImageTo3DInput',
-  'x-fal-order-properties': [
-    'input_image_url',
-    'enable_pbr',
-    'enable_geometry',
-  ],
-  required: ['input_image_url'],
+  type: 'object',
 } as const
 
 export const Hunyuan3dV31RapidImageTo3dOutputSchema = {
-  type: 'object',
-  properties: {
-    texture: {
-      description: 'Texture image for the 3D model.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c4439/_4NXiSoGcZ-GYwmgUTfHZ_texture_20250901.png',
-          content_type: 'image/png',
-          file_name: 'texture_20250901.png',
-          file_size: 11728567,
-        },
-      ],
-    },
-    model_urls: {
-      $ref: '#/$defs/ModelUrlsType2',
-      description: 'URLs for different 3D model formats.',
-      examples: [
-        {
-          texture: {
-            url: 'https://v3b.fal.media/files/b/0a8c4439/_4NXiSoGcZ-GYwmgUTfHZ_texture_20250901.png',
-            content_type: 'image/png',
-            file_name: 'texture_20250901.png',
-            file_size: 11728567,
-          },
-          obj: {
-            url: 'https://v3b.fal.media/files/b/0a8c4439/vj933H8B4W3wbd3e2RNby_8b1dbea208d194b9089a950abc2df426.obj',
-            content_type: 'model/obj',
-            file_name: '8b1dbea208d194b9089a950abc2df426.obj',
-            file_size: 3172659,
-          },
-          mtl: {
-            url: 'https://v3b.fal.media/files/b/0a8c4439/_RhytNH4xZ5EFHr34YzJt_material.mtl',
-            content_type: 'text/plain',
-            file_name: 'material.mtl',
-            file_size: 88,
-          },
-        },
-      ],
-    },
-    material_mtl: {
-      description: 'MTL material file for the OBJ model.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c4439/_RhytNH4xZ5EFHr34YzJt_material.mtl',
-          content_type: 'text/plain',
-          file_name: 'material.mtl',
-          file_size: 88,
-        },
-      ],
-    },
-    model_glb: {
-      description:
-        'Generated 3D model file. Contains GLB if available, otherwise OBJ.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c4439/vj933H8B4W3wbd3e2RNby_8b1dbea208d194b9089a950abc2df426.obj',
-          content_type: 'model/obj',
-          file_name: '8b1dbea208d194b9089a950abc2df426.obj',
-          file_size: 3172659,
-        },
-      ],
-    },
-    thumbnail: {
-      description: 'Preview thumbnail of the generated model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c4439/70Sm1pZ16SQP-mEbaKICC_preview.png',
-          content_type: 'image/png',
-          file_name: 'preview.png',
-          file_size: 82521,
-        },
-      ],
-    },
-  },
-  title: 'RapidImageTo3DOutput',
+  required: ['model_urls'],
   'x-fal-order-properties': [
     'model_glb',
     'material_mtl',
@@ -2178,7 +2100,85 @@ export const Hunyuan3dV31RapidImageTo3dOutputSchema = {
     'thumbnail',
     'model_urls',
   ],
-  required: ['model_urls'],
+  properties: {
+    model_urls: {
+      $ref: '#/$defs/ModelUrlsType2',
+      examples: [
+        {
+          obj: {
+            file_size: 3172659,
+            file_name: '8b1dbea208d194b9089a950abc2df426.obj',
+            url: 'https://v3b.fal.media/files/b/0a8c4439/vj933H8B4W3wbd3e2RNby_8b1dbea208d194b9089a950abc2df426.obj',
+            content_type: 'model/obj',
+          },
+          mtl: {
+            file_size: 88,
+            file_name: 'material.mtl',
+            url: 'https://v3b.fal.media/files/b/0a8c4439/_RhytNH4xZ5EFHr34YzJt_material.mtl',
+            content_type: 'text/plain',
+          },
+          texture: {
+            file_size: 11728567,
+            file_name: 'texture_20250901.png',
+            url: 'https://v3b.fal.media/files/b/0a8c4439/_4NXiSoGcZ-GYwmgUTfHZ_texture_20250901.png',
+            content_type: 'image/png',
+          },
+        },
+      ],
+      description: 'URLs for different 3D model formats.',
+    },
+    material_mtl: {
+      examples: [
+        {
+          file_size: 88,
+          file_name: 'material.mtl',
+          url: 'https://v3b.fal.media/files/b/0a8c4439/_RhytNH4xZ5EFHr34YzJt_material.mtl',
+          content_type: 'text/plain',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'MTL material file for the OBJ model.',
+    },
+    model_glb: {
+      examples: [
+        {
+          file_size: 3172659,
+          file_name: '8b1dbea208d194b9089a950abc2df426.obj',
+          url: 'https://v3b.fal.media/files/b/0a8c4439/vj933H8B4W3wbd3e2RNby_8b1dbea208d194b9089a950abc2df426.obj',
+          content_type: 'model/obj',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description:
+        'Generated 3D model file. Contains GLB if available, otherwise OBJ.',
+    },
+    texture: {
+      examples: [
+        {
+          file_size: 11728567,
+          file_name: 'texture_20250901.png',
+          url: 'https://v3b.fal.media/files/b/0a8c4439/_4NXiSoGcZ-GYwmgUTfHZ_texture_20250901.png',
+          content_type: 'image/png',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Texture image for the 3D model.',
+    },
+    thumbnail: {
+      examples: [
+        {
+          file_size: 82521,
+          file_name: 'preview.png',
+          url: 'https://v3b.fal.media/files/b/0a8c4439/70Sm1pZ16SQP-mEbaKICC_preview.png',
+          content_type: 'image/png',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Preview thumbnail of the generated model',
+    },
+  },
+  title: 'RapidImageTo3DOutput',
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -2218,49 +2218,43 @@ export const Hunyuan3dV31RapidImageTo3dOutputSchema = {
       ],
     },
     ModelUrlsType2: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
       properties: {
-        texture: {
-          description: 'Texture image for the 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        usdz: {
-          description: 'USDZ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        mtl: {
-          description: 'MTL material file for OBJ model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
         fbx: {
-          description: 'FBX format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
+        },
+        obj: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        mtl: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'MTL material file for OBJ model',
+        },
+        texture: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Texture image for the 3D model',
+        },
+        usdz: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
       },
       title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
+      type: 'object',
     },
   },
 } as const
 
 export const Hunyuan3dV31RapidTextTo3dInputSchema = {
-  type: 'object',
+  required: ['prompt'],
+  'x-fal-order-properties': ['prompt', 'enable_pbr', 'enable_geometry'],
   properties: {
-    enable_geometry: {
-      default: false,
-      description:
-        'Generate geometry-only white model without textures. When enabled, enable_pbr is ignored and OBJ is not supported (default output is GLB).',
-      title: 'Enable Geometry',
-      type: 'boolean',
-    },
     enable_pbr: {
       default: false,
       description:
@@ -2269,100 +2263,29 @@ export const Hunyuan3dV31RapidTextTo3dInputSchema = {
       type: 'boolean',
     },
     prompt: {
-      type: 'string',
       description:
         'Text description of the 3D content to generate. Max 200 UTF-8 characters.',
-      title: 'Prompt',
-      maxLength: 200,
       examples: [
         'A rustic wooden treasure chest with metal bands and ornate lock',
       ],
+      maxLength: 200,
+      title: 'Prompt',
+      type: 'string',
+    },
+    enable_geometry: {
+      default: false,
+      description:
+        'Generate geometry-only white model without textures. When enabled, enable_pbr is ignored and OBJ is not supported (default output is GLB).',
+      title: 'Enable Geometry',
+      type: 'boolean',
     },
   },
   title: 'RapidTextTo3DInput',
-  'x-fal-order-properties': ['prompt', 'enable_pbr', 'enable_geometry'],
-  required: ['prompt'],
+  type: 'object',
 } as const
 
 export const Hunyuan3dV31RapidTextTo3dOutputSchema = {
-  type: 'object',
-  properties: {
-    texture: {
-      description: 'Texture image for the 3D model.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png',
-          content_type: 'image/png',
-          file_name: 'material.png',
-          file_size: 5915609,
-        },
-      ],
-    },
-    model_urls: {
-      $ref: '#/$defs/ModelUrlsType2',
-      description: 'URLs for different 3D model formats.',
-      examples: [
-        {
-          texture: {
-            url: 'https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png',
-            content_type: 'image/png',
-            file_name: 'material.png',
-            file_size: 5915609,
-          },
-          obj: {
-            url: 'https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
-            content_type: 'model/obj',
-            file_name: '0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
-            file_size: 5306476,
-          },
-          mtl: {
-            url: 'https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl',
-            content_type: 'text/plain',
-            file_name: 'material.mtl',
-            file_size: 157,
-          },
-        },
-      ],
-    },
-    material_mtl: {
-      description: 'MTL material file for the OBJ model.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl',
-          content_type: 'text/plain',
-          file_name: 'material.mtl',
-          file_size: 157,
-        },
-      ],
-    },
-    model_obj: {
-      description: 'Generated 3D model in OBJ format.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
-          content_type: 'model/obj',
-          file_name: '0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
-          file_size: 5306476,
-        },
-      ],
-    },
-    thumbnail: {
-      description: 'Preview thumbnail of the generated model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          url: 'https://v3b.fal.media/files/b/0a8c44d6/D9_IYgpugP0deXvSwBC2J_preview.png',
-          content_type: 'image/png',
-          file_name: 'preview.png',
-          file_size: 281374,
-        },
-      ],
-    },
-  },
-  title: 'RapidTextTo3DOutput',
+  required: ['model_urls'],
   'x-fal-order-properties': [
     'model_obj',
     'material_mtl',
@@ -2370,7 +2293,84 @@ export const Hunyuan3dV31RapidTextTo3dOutputSchema = {
     'thumbnail',
     'model_urls',
   ],
-  required: ['model_urls'],
+  properties: {
+    model_urls: {
+      $ref: '#/$defs/ModelUrlsType2',
+      examples: [
+        {
+          obj: {
+            file_size: 5306476,
+            file_name: '0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
+            url: 'https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
+            content_type: 'model/obj',
+          },
+          mtl: {
+            file_size: 157,
+            file_name: 'material.mtl',
+            url: 'https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl',
+            content_type: 'text/plain',
+          },
+          texture: {
+            file_size: 5915609,
+            file_name: 'material.png',
+            url: 'https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png',
+            content_type: 'image/png',
+          },
+        },
+      ],
+      description: 'URLs for different 3D model formats.',
+    },
+    material_mtl: {
+      examples: [
+        {
+          file_size: 157,
+          file_name: 'material.mtl',
+          url: 'https://v3b.fal.media/files/b/0a8c44d5/EHzTxJtHpdIliaMNnEke-_material.mtl',
+          content_type: 'text/plain',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'MTL material file for the OBJ model.',
+    },
+    model_obj: {
+      examples: [
+        {
+          file_size: 5306476,
+          file_name: '0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
+          url: 'https://v3b.fal.media/files/b/0a8c44d5/2W2KRP1DM_-4qI8F_n05b_0f7f7a1ac578c80d4397a7f2b69b40ff.obj',
+          content_type: 'model/obj',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Generated 3D model in OBJ format.',
+    },
+    texture: {
+      examples: [
+        {
+          file_size: 5915609,
+          file_name: 'material.png',
+          url: 'https://v3b.fal.media/files/b/0a8c44d5/T0q-P0aqXVG_y7jff-XTa_material.png',
+          content_type: 'image/png',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Texture image for the 3D model.',
+    },
+    thumbnail: {
+      examples: [
+        {
+          file_size: 281374,
+          file_name: 'preview.png',
+          url: 'https://v3b.fal.media/files/b/0a8c44d6/D9_IYgpugP0deXvSwBC2J_preview.png',
+          content_type: 'image/png',
+        },
+      ],
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Preview thumbnail of the generated model',
+    },
+  },
+  title: 'RapidTextTo3DOutput',
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -2410,126 +2410,126 @@ export const Hunyuan3dV31RapidTextTo3dOutputSchema = {
       ],
     },
     ModelUrlsType2: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
       properties: {
-        texture: {
-          description: 'Texture image for the 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        usdz: {
-          description: 'USDZ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        mtl: {
-          description: 'MTL material file for OBJ model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
         fbx: {
-          description: 'FBX format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
+        },
+        obj: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        mtl: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'MTL material file for OBJ model',
+        },
+        texture: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Texture image for the 3D model',
+        },
+        usdz: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
       },
       title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
+      type: 'object',
     },
   },
 } as const
 
 export const Hunyuan3dV31SmartTopologyInputSchema = {
-  type: 'object',
-  properties: {
-    polygon_type: {
-      default: 'triangle',
-      description:
-        'Output polygon type. triangle: triangular faces only. quadrilateral: mixed quad and triangle faces.',
-      title: 'Polygon Type',
-      type: 'string',
-      enum: ['triangle', 'quadrilateral'],
-    },
-    face_level: {
-      default: 'medium',
-      description:
-        'Target polygon density. high: more detail/polygons, medium: balanced, low: fewer polygons.',
-      title: 'Face Level',
-      type: 'string',
-      enum: ['high', 'medium', 'low'],
-    },
-    input_file_type: {
-      default: 'glb',
-      description: 'Input 3D file format.',
-      title: 'Input File Type',
-      type: 'string',
-      enum: ['glb', 'obj'],
-    },
-    input_file_url: {
-      default:
-        'https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb',
-      title: 'Input File Url',
-      description:
-        'URL of GLB or OBJ file to optimize topology. Max size: 200MB.',
-      examples: [
-        'https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb',
-      ],
-      type: 'string',
-      'x-fal-file-input': true,
-    },
-  },
-  title: 'SmartTopologyInput',
   'x-fal-order-properties': [
     'input_file_url',
     'input_file_type',
     'polygon_type',
     'face_level',
   ],
+  properties: {
+    face_level: {
+      default: 'medium',
+      enum: ['high', 'medium', 'low'],
+      description:
+        'Target polygon density. high: more detail/polygons, medium: balanced, low: fewer polygons.',
+      title: 'Face Level',
+      type: 'string',
+    },
+    input_file_url: {
+      default:
+        'https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb',
+      title: 'Input File Url',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb',
+      ],
+      description:
+        'URL of GLB or OBJ file to optimize topology. Max size: 200MB.',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    polygon_type: {
+      default: 'triangle',
+      enum: ['triangle', 'quadrilateral'],
+      description:
+        'Output polygon type. triangle: triangular faces only. quadrilateral: mixed quad and triangle faces.',
+      title: 'Polygon Type',
+      type: 'string',
+    },
+    input_file_type: {
+      default: 'glb',
+      enum: ['glb', 'obj'],
+      description: 'Input 3D file format.',
+      title: 'Input File Type',
+      type: 'string',
+    },
+  },
+  title: 'SmartTopologyInput',
+  type: 'object',
 } as const
 
 export const Hunyuan3dV31SmartTopologyOutputSchema = {
-  type: 'object',
+  required: ['model_glb', 'model_urls'],
+  'x-fal-order-properties': ['model_glb', 'model_urls'],
   properties: {
     model_urls: {
       $ref: '#/$defs/ModelUrlsType2',
-      description: 'URLs for different 3D model formats',
       examples: [
         {
-          obj: {
-            url: 'https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj',
-            content_type: 'model/obj',
-            file_name: 'model.obj',
-            file_size: 394409,
-          },
           glb: {
+            file_size: 206004,
+            file_name: 'model.glb',
             url: 'https://v3b.fal.media/files/b/0a8c0ab4/eX-_x0Wv8fZL05l9CGp6Y_model.glb',
             content_type: 'model/gltf-binary',
-            file_name: 'model.glb',
-            file_size: 206004,
+          },
+          obj: {
+            file_size: 394409,
+            file_name: 'model.obj',
+            url: 'https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj',
+            content_type: 'model/obj',
           },
         },
       ],
+      description: 'URLs for different 3D model formats',
     },
     model_glb: {
       $ref: '#/$defs/File',
-      description: 'Processed 3D model with optimized topology (primary file).',
       examples: [
         {
+          file_size: 394409,
+          file_name: 'model.obj',
           url: 'https://v3b.fal.media/files/b/0a8c0ab4/tqMY5NJLnHjpwN8rQ15dj_model.obj',
           content_type: 'model/obj',
-          file_name: 'model.obj',
-          file_size: 394409,
         },
       ],
+      description: 'Processed 3D model with optimized topology (primary file).',
     },
   },
   title: 'SmartTopologyOutput',
-  'x-fal-order-properties': ['model_glb', 'model_urls'],
-  required: ['model_glb', 'model_urls'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -2569,115 +2569,43 @@ export const Hunyuan3dV31SmartTopologyOutputSchema = {
       ],
     },
     ModelUrlsType2: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
       properties: {
-        texture: {
-          description: 'Texture image for the 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        usdz: {
-          description: 'USDZ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        mtl: {
-          description: 'MTL material file for OBJ model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
         fbx: {
-          description: 'FBX format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
+        },
+        obj: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        mtl: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'MTL material file for OBJ model',
+        },
+        texture: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Texture image for the 3D model',
+        },
+        usdz: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
       },
       title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
+      type: 'object',
     },
   },
 } as const
 
 export const Hunyuan3dV3ImageTo3dInputSchema = {
+  title: 'ImageTo3DInput',
   required: ['input_image_url'],
   type: 'object',
-  properties: {
-    input_image_url: {
-      description: 'URL of image to use while generating the 3D model.',
-      max_file_size: 8388608,
-      examples: [
-        'https://v3b.fal.media/files/b/0a865ab1/omYcawLUo4RZbO8J6ZgZR.png',
-      ],
-      type: 'string',
-      title: 'Input Image Url',
-      _fal_ui_field: 'image',
-      'x-fal-file-input': true,
-    },
-    face_count: {
-      description: 'Target face count. Range: 40000-1500000',
-      maximum: 1500000,
-      type: 'integer',
-      minimum: 40000,
-      title: 'Face Count',
-      default: 500000,
-    },
-    left_image_url: {
-      description: 'Optional left view image URL for better 3D reconstruction.',
-      max_file_size: 8388608,
-      title: 'Left Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-    },
-    back_image_url: {
-      description: 'Optional back view image URL for better 3D reconstruction.',
-      max_file_size: 8388608,
-      title: 'Back Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-    },
-    right_image_url: {
-      description:
-        'Optional right view image URL for better 3D reconstruction.',
-      max_file_size: 8388608,
-      title: 'Right Image Url',
-      anyOf: [
-        { type: 'string', ui: { field: 'image' }, _fal_ui_field: 'image' },
-        { type: 'null' },
-      ],
-    },
-    polygon_type: {
-      enum: ['triangle', 'quadrilateral'],
-      description:
-        'Polygon type. Only takes effect when GenerateType is LowPoly.',
-      type: 'string',
-      title: 'Polygon Type',
-      default: 'triangle',
-    },
-    generate_type: {
-      enum: ['Normal', 'LowPoly', 'Geometry'],
-      description:
-        'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
-      type: 'string',
-      title: 'Generate Type',
-      default: 'Normal',
-    },
-    enable_pbr: {
-      description:
-        'Whether to enable PBR material generation. Does not take effect when generate_type is Geometry.',
-      type: 'boolean',
-      title: 'Enable Pbr',
-      default: false,
-    },
-  },
-  title: 'ImageTo3DInput',
   'x-fal-order-properties': [
     'input_image_url',
     'back_image_url',
@@ -2688,64 +2616,136 @@ export const Hunyuan3dV3ImageTo3dInputSchema = {
     'generate_type',
     'polygon_type',
   ],
+  properties: {
+    polygon_type: {
+      title: 'Polygon Type',
+      enum: ['triangle', 'quadrilateral'],
+      type: 'string',
+      default: 'triangle',
+      description:
+        'Polygon type. Only takes effect when GenerateType is LowPoly.',
+    },
+    left_image_url: {
+      title: 'Left Image Url',
+      anyOf: [
+        { ui: { field: 'image' }, _fal_ui_field: 'image', type: 'string' },
+        { type: 'null' },
+      ],
+      max_file_size: 8388608,
+      description: 'Optional left view image URL for better 3D reconstruction.',
+    },
+    generate_type: {
+      title: 'Generate Type',
+      enum: ['Normal', 'LowPoly', 'Geometry'],
+      type: 'string',
+      default: 'Normal',
+      description:
+        'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
+    },
+    right_image_url: {
+      title: 'Right Image Url',
+      anyOf: [
+        { ui: { field: 'image' }, _fal_ui_field: 'image', type: 'string' },
+        { type: 'null' },
+      ],
+      max_file_size: 8388608,
+      description:
+        'Optional right view image URL for better 3D reconstruction.',
+    },
+    back_image_url: {
+      title: 'Back Image Url',
+      anyOf: [
+        { ui: { field: 'image' }, _fal_ui_field: 'image', type: 'string' },
+        { type: 'null' },
+      ],
+      max_file_size: 8388608,
+      description: 'Optional back view image URL for better 3D reconstruction.',
+    },
+    input_image_url: {
+      description: 'URL of image to use while generating the 3D model.',
+      title: 'Input Image Url',
+      _fal_ui_field: 'image',
+      type: 'string',
+      max_file_size: 8388608,
+      examples: [
+        'https://v3b.fal.media/files/b/0a865ab1/omYcawLUo4RZbO8J6ZgZR.png',
+      ],
+      'x-fal-file-input': true,
+    },
+    enable_pbr: {
+      title: 'Enable Pbr',
+      type: 'boolean',
+      default: false,
+      description:
+        'Whether to enable PBR material generation. Does not take effect when generate_type is Geometry.',
+    },
+    face_count: {
+      title: 'Face Count',
+      minimum: 40000,
+      type: 'integer',
+      default: 500000,
+      maximum: 1500000,
+      description: 'Target face count. Range: 40000-1500000',
+    },
+  },
 } as const
 
 export const Hunyuan3dV3ImageTo3dOutputSchema = {
+  title: 'ImageTo3DOutput',
   required: ['model_glb', 'model_urls'],
   type: 'object',
+  'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
   properties: {
-    model_glb: {
-      description: 'Generated 3D object in GLB format.',
-      $ref: '#/$defs/File',
-      examples: [
-        {
-          file_name: 'model.glb',
-          content_type: 'model/gltf-binary',
-          url: 'https://v3b.fal.media/files/b/0a8686ae/MQN_KtP32PbqtPr_VLcyp_model.glb',
-          file_size: 64122888,
-        },
-      ],
-    },
     thumbnail: {
       description: 'Preview thumbnail of the generated model',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
       examples: [
         {
-          file_name: 'preview.png',
           content_type: 'image/png',
           url: 'https://v3b.fal.media/files/b/0a8686ae/sGIaYWOna5Zabtl5PBjDt_preview.png',
           file_size: 74443,
+          file_name: 'preview.png',
         },
       ],
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'The seed used for generation',
     },
     model_urls: {
       description: 'URLs for different 3D model formats',
       $ref: '#/$defs/ModelUrlsType4',
       examples: [
         {
-          glb: {
-            file_name: 'model.glb',
-            content_type: 'model/gltf-binary',
-            url: 'https://v3b.fal.media/files/b/0a8686ae/MQN_KtP32PbqtPr_VLcyp_model.glb',
-            file_size: 64122888,
-          },
           obj: {
-            file_name: 'model.obj',
             content_type: 'text/plain',
             url: 'https://v3b.fal.media/files/b/0a8686ad/ifdJskhUfQysq-NN20iQR_model.obj',
             file_size: 42886419,
+            file_name: 'model.obj',
+          },
+          glb: {
+            content_type: 'model/gltf-binary',
+            url: 'https://v3b.fal.media/files/b/0a8686ae/MQN_KtP32PbqtPr_VLcyp_model.glb',
+            file_size: 64122888,
+            file_name: 'model.glb',
           },
         },
       ],
     },
-    seed: {
-      description: 'The seed used for generation',
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    model_glb: {
+      description: 'Generated 3D object in GLB format.',
+      $ref: '#/$defs/File',
+      examples: [
+        {
+          content_type: 'model/gltf-binary',
+          url: 'https://v3b.fal.media/files/b/0a8686ae/MQN_KtP32PbqtPr_VLcyp_model.glb',
+          file_size: 64122888,
+          file_name: 'model.glb',
+        },
+      ],
     },
   },
-  title: 'ImageTo3DOutput',
-  'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
   $defs: {
     File: {
       title: 'File',
@@ -2785,69 +2785,68 @@ export const Hunyuan3dV3ImageTo3dOutputSchema = {
       ],
     },
     ModelUrlsType4: {
+      title: 'ModelUrls',
       type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
       properties: {
-        fbx: {
-          description: 'FBX format 3D model',
+        obj: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        fbx: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
         },
         usdz: {
-          description: 'USDZ format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
       },
-      title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
     },
   },
 } as const
 
 export const Hunyuan3dV3SketchTo3dInputSchema = {
-  type: 'object',
-  required: ['input_image_url', 'prompt'],
   title: 'SketchTo3DInput',
+  type: 'object',
   properties: {
-    input_image_url: {
-      max_file_size: 8388608,
+    face_count: {
+      title: 'Face Count',
+      default: 500000,
+      type: 'integer',
+      maximum: 1500000,
+      description: 'Target face count. Range: 40000-1500000',
+      minimum: 40000,
+    },
+    prompt: {
+      title: 'Prompt',
+      maxLength: 1024,
       type: 'string',
+      examples: ['orange cat'],
+      description:
+        'Text prompt describing the 3D content attributes such as color, category, and material.',
+    },
+    enable_pbr: {
+      title: 'Enable Pbr',
+      description: 'Whether to enable PBR material generation.',
+      type: 'boolean',
+      default: false,
+    },
+    input_image_url: {
+      title: 'Input Image Url',
+      type: 'string',
+      max_file_size: 8388608,
+      description:
+        'URL of sketch or line art image to transform into a 3D model. Image resolution must be between 128x128 and 5000x5000 pixels.',
       examples: [
         'https://v3b.fal.media/files/b/0a86888c/Zlw8twOa43SKkCXmTdw3-.png',
       ],
-      title: 'Input Image Url',
-      description:
-        'URL of sketch or line art image to transform into a 3D model. Image resolution must be between 128x128 and 5000x5000 pixels.',
       _fal_ui_field: 'image',
       'x-fal-file-input': true,
-    },
-    prompt: {
-      type: 'string',
-      examples: ['orange cat'],
-      title: 'Prompt',
-      description:
-        'Text prompt describing the 3D content attributes such as color, category, and material.',
-      maxLength: 1024,
-    },
-    face_count: {
-      type: 'integer',
-      maximum: 1500000,
-      title: 'Face Count',
-      minimum: 40000,
-      default: 500000,
-      description: 'Target face count. Range: 40000-1500000',
-    },
-    enable_pbr: {
-      type: 'boolean',
-      default: false,
-      title: 'Enable Pbr',
-      description: 'Whether to enable PBR material generation.',
     },
   },
   'x-fal-order-properties': [
@@ -2856,64 +2855,65 @@ export const Hunyuan3dV3SketchTo3dInputSchema = {
     'enable_pbr',
     'face_count',
   ],
+  required: ['input_image_url', 'prompt'],
 } as const
 
 export const Hunyuan3dV3SketchTo3dOutputSchema = {
-  type: 'object',
-  required: ['model_glb', 'model_urls'],
   title: 'SketchTo3DOutput',
+  type: 'object',
   properties: {
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'The seed used for generation',
+    },
     model_glb: {
+      $ref: '#/$defs/File',
       examples: [
         {
-          file_name: 'model.glb',
+          content_type: 'model/gltf-binary',
           url: 'https://v3b.fal.media/files/b/0a8688bb/vd2SlBP92cZls3zG5EPbg_model.glb',
           file_size: 30655724,
-          content_type: 'model/gltf-binary',
+          file_name: 'model.glb',
         },
       ],
-      $ref: '#/$defs/File',
       description: 'Generated 3D object in GLB format.',
+    },
+    model_urls: {
+      $ref: '#/$defs/ModelUrlsType4',
+      examples: [
+        {
+          obj: {
+            content_type: 'text/plain',
+            url: 'https://v3b.fal.media/files/b/0a8688bb/QNik1DVxzvj23YEF3vhs__model.obj',
+            file_size: 23418473,
+            file_name: 'model.obj',
+          },
+          glb: {
+            content_type: 'model/gltf-binary',
+            url: 'https://v3b.fal.media/files/b/0a8688bb/vd2SlBP92cZls3zG5EPbg_model.glb',
+            file_size: 30655724,
+            file_name: 'model.glb',
+          },
+        },
+      ],
+      description: 'URLs for different 3D model formats',
     },
     thumbnail: {
       examples: [
         {
-          file_name: 'preview.png',
+          content_type: 'image/png',
           url: 'https://v3b.fal.media/files/b/0a8688bb/ZkMb4jHnb5QRNYp4SxkEA_preview.png',
           file_size: 68478,
-          content_type: 'image/png',
+          file_name: 'preview.png',
         },
       ],
-      description: 'Preview thumbnail of the generated model',
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    seed: {
-      title: 'Seed',
-      description: 'The seed used for generation',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    model_urls: {
-      examples: [
-        {
-          obj: {
-            file_name: 'model.obj',
-            url: 'https://v3b.fal.media/files/b/0a8688bb/QNik1DVxzvj23YEF3vhs__model.obj',
-            file_size: 23418473,
-            content_type: 'text/plain',
-          },
-          glb: {
-            file_name: 'model.glb',
-            url: 'https://v3b.fal.media/files/b/0a8688bb/vd2SlBP92cZls3zG5EPbg_model.glb',
-            file_size: 30655724,
-            content_type: 'model/gltf-binary',
-          },
-        },
-      ],
-      $ref: '#/$defs/ModelUrlsType4',
-      description: 'URLs for different 3D model formats',
+      description: 'Preview thumbnail of the generated model',
     },
   },
   'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
+  required: ['model_glb', 'model_urls'],
   $defs: {
     File: {
       title: 'File',
@@ -2953,75 +2953,75 @@ export const Hunyuan3dV3SketchTo3dOutputSchema = {
       ],
     },
     ModelUrlsType4: {
+      title: 'ModelUrls',
       type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
       properties: {
-        fbx: {
-          description: 'FBX format 3D model',
+        obj: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        fbx: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
         },
         usdz: {
-          description: 'USDZ format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
       },
-      title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
     },
   },
 } as const
 
 export const Hunyuan3dV3TextTo3dInputSchema = {
+  required: ['prompt'],
   properties: {
+    polygon_type: {
+      description:
+        'Polygon type. Only takes effect when GenerateType is LowPoly.',
+      type: 'string',
+      default: 'triangle',
+      enum: ['triangle', 'quadrilateral'],
+      title: 'Polygon Type',
+    },
+    enable_pbr: {
+      description: 'Whether to enable PBR material generation',
+      type: 'boolean',
+      default: false,
+      title: 'Enable Pbr',
+    },
+    generate_type: {
+      description:
+        'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
+      type: 'string',
+      default: 'Normal',
+      enum: ['Normal', 'LowPoly', 'Geometry'],
+      title: 'Generate Type',
+    },
+    face_count: {
+      minimum: 40000,
+      maximum: 1500000,
+      description: 'Target face count. Range: 40000-1500000',
+      type: 'integer',
+      default: 500000,
+      title: 'Face Count',
+    },
     prompt: {
+      description:
+        'Text description of the 3D content to generate. Supports up to 1024 UTF-8 characters.',
       type: 'string',
       maxLength: 1024,
+      title: 'Prompt',
       examples: [
         'A rustic wooden treasure chest with metal bands and ornate lock',
       ],
-      description:
-        'Text description of the 3D content to generate. Supports up to 1024 UTF-8 characters.',
-      title: 'Prompt',
-    },
-    polygon_type: {
-      default: 'triangle',
-      type: 'string',
-      title: 'Polygon Type',
-      description:
-        'Polygon type. Only takes effect when GenerateType is LowPoly.',
-      enum: ['triangle', 'quadrilateral'],
-    },
-    enable_pbr: {
-      default: false,
-      type: 'boolean',
-      title: 'Enable Pbr',
-      description: 'Whether to enable PBR material generation',
-    },
-    generate_type: {
-      default: 'Normal',
-      type: 'string',
-      title: 'Generate Type',
-      description:
-        'Generation type. Normal: textured model. LowPoly: polygon reduction. Geometry: white model without texture.',
-      enum: ['Normal', 'LowPoly', 'Geometry'],
-    },
-    face_count: {
-      default: 500000,
-      type: 'integer',
-      title: 'Face Count',
-      minimum: 40000,
-      description: 'Target face count. Range: 40000-1500000',
-      maximum: 1500000,
     },
   },
-  type: 'object',
   'x-fal-order-properties': [
     'prompt',
     'enable_pbr',
@@ -3029,65 +3029,65 @@ export const Hunyuan3dV3TextTo3dInputSchema = {
     'generate_type',
     'polygon_type',
   ],
-  required: ['prompt'],
+  type: 'object',
   title: 'TextTo3DInput',
 } as const
 
 export const Hunyuan3dV3TextTo3dOutputSchema = {
+  required: ['model_glb', 'model_urls'],
   properties: {
+    thumbnail: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Preview thumbnail of the generated model',
+      examples: [
+        {
+          url: 'https://v3b.fal.media/files/b/0a8686a8/khgYO1d6xqWOJPi6_IR_j_preview.png',
+          file_size: 172757,
+          content_type: 'image/png',
+          file_name: 'preview.png',
+        },
+      ],
+    },
     seed: {
       anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
       description: 'The seed used for generation',
+      title: 'Seed',
     },
     model_glb: {
       $ref: '#/$defs/File',
+      description: 'Generated 3D object in GLB format.',
       examples: [
         {
-          file_size: 64724836,
-          file_name: 'model.glb',
-          content_type: 'model/gltf-binary',
           url: 'https://v3b.fal.media/files/b/0a8686a8/1hPquv3AqqkfnqSM9fpmB_model.glb',
+          file_size: 64724836,
+          content_type: 'model/gltf-binary',
+          file_name: 'model.glb',
         },
       ],
-      description: 'Generated 3D object in GLB format.',
     },
     model_urls: {
       $ref: '#/$defs/ModelUrlsType4',
+      description: 'URLs for different 3D model formats',
       examples: [
         {
           glb: {
-            file_size: 64724836,
-            file_name: 'model.glb',
-            content_type: 'model/gltf-binary',
             url: 'https://v3b.fal.media/files/b/0a8686a8/1hPquv3AqqkfnqSM9fpmB_model.glb',
+            file_size: 64724836,
+            content_type: 'model/gltf-binary',
+            file_name: 'model.glb',
           },
           obj: {
-            file_size: 44084728,
-            file_name: 'model.obj',
-            content_type: 'text/plain',
             url: 'https://v3b.fal.media/files/b/0a8686a8/AVgdsVFrGAKGAFr4e2g56_model.obj',
+            file_size: 44084728,
+            content_type: 'text/plain',
+            file_name: 'model.obj',
           },
         },
       ],
-      description: 'URLs for different 3D model formats',
-    },
-    thumbnail: {
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      examples: [
-        {
-          file_size: 172757,
-          file_name: 'preview.png',
-          content_type: 'image/png',
-          url: 'https://v3b.fal.media/files/b/0a8686a8/khgYO1d6xqWOJPi6_IR_j_preview.png',
-        },
-      ],
-      description: 'Preview thumbnail of the generated model',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['model_glb', 'thumbnail', 'model_urls', 'seed'],
-  required: ['model_glb', 'model_urls'],
+  type: 'object',
   title: 'TextTo3DOutput',
   $defs: {
     File: {
@@ -3128,80 +3128,32 @@ export const Hunyuan3dV3TextTo3dOutputSchema = {
       ],
     },
     ModelUrlsType4: {
+      title: 'ModelUrls',
       type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
       properties: {
-        fbx: {
-          description: 'FBX format 3D model',
+        obj: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'OBJ format 3D model',
+        },
+        fbx: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
         },
         usdz: {
-          description: 'USDZ format 3D model',
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'USDZ format 3D model',
         },
         glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'GLB format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-        },
-        obj: {
-          description: 'OBJ format 3D model',
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
         },
       },
-      title: 'ModelUrls',
-      'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
     },
   },
 } as const
 
 export const HunyuanMotionFastInputSchema = {
-  title: 'HYMotionInput',
-  required: ['prompt'],
-  type: 'object',
-  properties: {
-    output_format: {
-      title: 'Output Format',
-      enum: ['fbx', 'dict'],
-      type: 'string',
-      description:
-        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
-      default: 'fbx',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Random seed for reproducible generation.',
-      examples: [42, 12345],
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      minimum: 1,
-      type: 'number',
-      description:
-        'Classifier-free guidance scale. Higher = more faithful to prompt.',
-      examples: [3, 5, 7.5],
-      default: 5,
-      maximum: 10,
-    },
-    prompt: {
-      title: 'Prompt',
-      type: 'string',
-      description: 'Text prompt describing the motion to generate.',
-      examples: [
-        'A person is running then takes a big leap.',
-        'Someone waves hello with their right hand.',
-        'A dancer performs a spinning pirouette.',
-      ],
-    },
-    duration: {
-      title: 'Duration',
-      minimum: 0.5,
-      type: 'number',
-      description: 'Motion duration in seconds (0.5-12.0).',
-      examples: [3, 5, 10],
-      default: 5,
-      maximum: 12,
-    },
-  },
   'x-fal-order-properties': [
     'prompt',
     'seed',
@@ -3209,16 +3161,65 @@ export const HunyuanMotionFastInputSchema = {
     'guidance_scale',
     'output_format',
   ],
+  type: 'object',
+  properties: {
+    prompt: {
+      description: 'Text prompt describing the motion to generate.',
+      examples: [
+        'A person is running then takes a big leap.',
+        'Someone waves hello with their right hand.',
+        'A dancer performs a spinning pirouette.',
+      ],
+      type: 'string',
+      title: 'Prompt',
+    },
+    output_format: {
+      enum: ['fbx', 'dict'],
+      description:
+        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
+      type: 'string',
+      default: 'fbx',
+      title: 'Output Format',
+    },
+    guidance_scale: {
+      minimum: 1,
+      description:
+        'Classifier-free guidance scale. Higher = more faithful to prompt.',
+      examples: [3, 5, 7.5],
+      maximum: 10,
+      type: 'number',
+      default: 5,
+      title: 'Guidance Scale',
+    },
+    seed: {
+      description: 'Random seed for reproducible generation.',
+      examples: [42, 12345],
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+    },
+    duration: {
+      minimum: 0.5,
+      description: 'Motion duration in seconds (0.5-12.0).',
+      examples: [3, 5, 10],
+      maximum: 12,
+      type: 'number',
+      default: 5,
+      title: 'Duration',
+    },
+  },
+  required: ['prompt'],
+  title: 'HYMotionInput',
 } as const
 
 export const HunyuanMotionFastOutputSchema = {
-  title: 'HYMotionOutput',
-  required: ['seed'],
+  'x-fal-order-properties': ['fbx_file', 'motion_json', 'seed'],
   type: 'object',
   properties: {
-    motion_json: {
-      description: 'Generated motion data as JSON.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    seed: {
+      description: 'Seed used for generation.',
+      examples: [42],
+      type: 'integer',
+      title: 'Seed',
     },
     fbx_file: {
       description: 'Generated FBX animation file.',
@@ -3229,14 +3230,13 @@ export const HunyuanMotionFastOutputSchema = {
       ],
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
-    seed: {
-      title: 'Seed',
-      type: 'integer',
-      description: 'Seed used for generation.',
-      examples: [42],
+    motion_json: {
+      description: 'Generated motion data as JSON.',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
   },
-  'x-fal-order-properties': ['fbx_file', 'motion_json', 'seed'],
+  required: ['seed'],
+  title: 'HYMotionOutput',
   $defs: {
     File: {
       title: 'File',
@@ -3279,54 +3279,6 @@ export const HunyuanMotionFastOutputSchema = {
 } as const
 
 export const HunyuanMotionInputSchema = {
-  title: 'HYMotionInput',
-  required: ['prompt'],
-  type: 'object',
-  properties: {
-    output_format: {
-      title: 'Output Format',
-      enum: ['fbx', 'dict'],
-      type: 'string',
-      description:
-        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
-      default: 'fbx',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Random seed for reproducible generation.',
-      examples: [42, 12345],
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      minimum: 1,
-      type: 'number',
-      description:
-        'Classifier-free guidance scale. Higher = more faithful to prompt.',
-      examples: [3, 5, 7.5],
-      default: 5,
-      maximum: 10,
-    },
-    prompt: {
-      title: 'Prompt',
-      type: 'string',
-      description: 'Text prompt describing the motion to generate.',
-      examples: [
-        'A person is running then takes a big leap.',
-        'Someone waves hello with their right hand.',
-        'A dancer performs a spinning pirouette.',
-      ],
-    },
-    duration: {
-      title: 'Duration',
-      minimum: 0.5,
-      type: 'number',
-      description: 'Motion duration in seconds (0.5-12.0).',
-      examples: [3, 5, 10],
-      default: 5,
-      maximum: 12,
-    },
-  },
   'x-fal-order-properties': [
     'prompt',
     'seed',
@@ -3334,16 +3286,65 @@ export const HunyuanMotionInputSchema = {
     'guidance_scale',
     'output_format',
   ],
+  type: 'object',
+  properties: {
+    prompt: {
+      description: 'Text prompt describing the motion to generate.',
+      examples: [
+        'A person is running then takes a big leap.',
+        'Someone waves hello with their right hand.',
+        'A dancer performs a spinning pirouette.',
+      ],
+      type: 'string',
+      title: 'Prompt',
+    },
+    output_format: {
+      enum: ['fbx', 'dict'],
+      description:
+        "Output format: 'fbx' for animation files, 'dict' for raw JSON.",
+      type: 'string',
+      default: 'fbx',
+      title: 'Output Format',
+    },
+    guidance_scale: {
+      minimum: 1,
+      description:
+        'Classifier-free guidance scale. Higher = more faithful to prompt.',
+      examples: [3, 5, 7.5],
+      maximum: 10,
+      type: 'number',
+      default: 5,
+      title: 'Guidance Scale',
+    },
+    seed: {
+      description: 'Random seed for reproducible generation.',
+      examples: [42, 12345],
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+    },
+    duration: {
+      minimum: 0.5,
+      description: 'Motion duration in seconds (0.5-12.0).',
+      examples: [3, 5, 10],
+      maximum: 12,
+      type: 'number',
+      default: 5,
+      title: 'Duration',
+    },
+  },
+  required: ['prompt'],
+  title: 'HYMotionInput',
 } as const
 
 export const HunyuanMotionOutputSchema = {
-  title: 'HYMotionOutput',
-  required: ['seed'],
+  'x-fal-order-properties': ['fbx_file', 'motion_json', 'seed'],
   type: 'object',
   properties: {
-    motion_json: {
-      description: 'Generated motion data as JSON.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    seed: {
+      description: 'Seed used for generation.',
+      examples: [42],
+      type: 'integer',
+      title: 'Seed',
     },
     fbx_file: {
       description: 'Generated FBX animation file.',
@@ -3354,14 +3355,13 @@ export const HunyuanMotionOutputSchema = {
       ],
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
-    seed: {
-      title: 'Seed',
-      type: 'integer',
-      description: 'Seed used for generation.',
-      examples: [42],
+    motion_json: {
+      description: 'Generated motion data as JSON.',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
   },
-  'x-fal-order-properties': ['fbx_file', 'motion_json', 'seed'],
+  required: ['seed'],
+  title: 'HYMotionOutput',
   $defs: {
     File: {
       title: 'File',
@@ -3404,43 +3404,42 @@ export const HunyuanMotionOutputSchema = {
 } as const
 
 export const Hunyuan_worldImageToWorldInputSchema = {
+  required: ['image_url', 'labels_fg1', 'labels_fg2', 'classes'],
   properties: {
     labels_fg1: {
       description: 'Labels for the first foreground object.',
-      examples: ['tree, grass, sky'],
-      title: 'Labels Fg1',
       type: 'string',
-    },
-    export_drc: {
-      default: false,
-      description: 'Whether to export DRC (Dynamic Resource Configuration).',
-      title: 'Export Drc',
-      type: 'boolean',
+      title: 'Labels Fg1',
+      examples: ['tree, grass, sky'],
     },
     classes: {
       description: 'Classes to use for the world generation.',
-      examples: ['nature, landscape'],
-      title: 'Classes',
       type: 'string',
+      title: 'Classes',
+      examples: ['nature, landscape'],
+    },
+    export_drc: {
+      default: false,
+      type: 'boolean',
+      description: 'Whether to export DRC (Dynamic Resource Configuration).',
+      title: 'Export Drc',
     },
     image_url: {
       description: 'The URL of the image to convert to a world.',
+      type: 'string',
+      title: 'Image Url',
       examples: [
         'https://v3.fal.media/files/penguin/_4oXlxt85dr0WY2o0I894_output.png',
       ],
-      title: 'Image Url',
-      type: 'string',
       'x-fal-file-input': true,
     },
     labels_fg2: {
       description: 'Labels for the second foreground object.',
-      examples: ['mountain, water'],
-      title: 'Labels Fg2',
       type: 'string',
+      title: 'Labels Fg2',
+      examples: ['mountain, water'],
     },
   },
-  required: ['image_url', 'labels_fg1', 'labels_fg2', 'classes'],
-  title: 'ImageToWorldRequest',
   'x-fal-order-properties': [
     'image_url',
     'labels_fg1',
@@ -3449,16 +3448,17 @@ export const Hunyuan_worldImageToWorldInputSchema = {
     'export_drc',
   ],
   type: 'object',
+  title: 'ImageToWorldRequest',
 } as const
 
 export const Hunyuan_worldImageToWorldOutputSchema = {
-  properties: {
-    world_file: { description: 'The generated world.', $ref: '#/$defs/File' },
-  },
   required: ['world_file'],
-  title: 'ImageToWorldResponse',
+  properties: {
+    world_file: { $ref: '#/$defs/File', description: 'The generated world.' },
+  },
   'x-fal-order-properties': ['world_file'],
   type: 'object',
+  title: 'ImageToWorldResponse',
   $defs: {
     File: {
       title: 'File',
@@ -3502,104 +3502,104 @@ export const Hunyuan_worldImageToWorldOutputSchema = {
 
 export const Hyper3dRodinInputSchema = {
   properties: {
-    tier: {
-      default: 'Regular',
-      title: 'Tier',
-      description:
-        'Tier of generation. For Rodin Sketch, set to Sketch. For Rodin Regular, set to Regular.',
-      enum: ['Regular', 'Sketch'],
-      type: 'string',
-    },
-    geometry_file_format: {
-      default: 'glb',
-      title: 'Geometry File Format',
-      description:
-        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
-      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
-      type: 'string',
-    },
-    TAPose: {
-      default: false,
-      title: 'T/A Pose',
-      description:
-        'When generating the human-like model, this parameter control the generation result to T/A Pose.',
-      type: 'boolean',
-    },
-    seed: {
-      anyOf: [
-        { type: 'integer', maximum: 65535, minimum: 0 },
-        { type: 'null' },
-      ],
-      title: 'Seed',
-      description:
-        'Seed value for randomization, ranging from 0 to 65535. Optional.',
-    },
-    use_hyper: {
-      default: false,
-      title: 'Use Hyper',
-      description:
-        'Whether to export the model using hyper mode. Default is false.',
-      type: 'boolean',
-    },
-    addons: {
-      anyOf: [{ const: 'HighPack', type: 'string' }, { type: 'null' }],
-      title: 'Addons',
-      description:
-        'Generation add-on features. Default is []. Possible values are HighPack. The HighPack option will provide 4K resolution textures instead of the default 1K, as well as models with high-poly. It will cost triple the billable units.',
-    },
     quality: {
-      default: 'medium',
-      title: 'Quality',
       description:
         'Generation quality. Possible values: high, medium, low, extra-low. Default is medium.',
+      default: 'medium',
       enum: ['high', 'medium', 'low', 'extra-low'],
+      title: 'Quality',
       type: 'string',
     },
-    material: {
-      default: 'PBR',
-      title: 'Material',
+    bbox_condition: {
       description:
-        'Material type. Possible values: PBR, Shaded. Default is PBR.',
-      examples: ['Shaded'],
-      enum: ['PBR', 'Shaded'],
-      type: 'string',
+        'An array that specifies the dimensions and scaling factor of the bounding box. Typically, this array contains 3 elements, Length(X-axis), Width(Y-axis) and Height(Z-axis).',
+      example: [100, 50, 150],
+      title: 'Bbox Condition',
+      anyOf: [{ items: { type: 'integer' }, type: 'array' }, { type: 'null' }],
     },
     condition_mode: {
-      default: 'concat',
-      title: 'Condition Mode',
       description:
         'For fuse mode, One or more images are required.It will generate a model by extracting and fusing features of objects from multiple images.For concat mode, need to upload multiple multi-view images of the same object and generate the model. (You can upload multi-view images in any order, regardless of the order of view.)',
+      default: 'concat',
       enum: ['fuse', 'concat'],
+      title: 'Condition Mode',
       type: 'string',
     },
     input_image_urls: {
-      title: 'Input Image Urls',
       description:
         'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Optional for Text-to-3D mode.',
-      examples: [
-        'https://storage.googleapis.com/falserverless/model_tests/video_models/robot.png',
-      ],
+      type: 'array',
+      title: 'Input Image Urls',
       items: {
         _fal_ui_field: 'image',
         type: 'string',
         'x-fal-file-input': true,
       },
-      type: 'array',
+      examples: [
+        'https://storage.googleapis.com/falserverless/model_tests/video_models/robot.png',
+      ],
     },
-    bbox_condition: {
-      anyOf: [{ items: { type: 'integer' }, type: 'array' }, { type: 'null' }],
-      title: 'Bbox Condition',
+    use_hyper: {
       description:
-        'An array that specifies the dimensions and scaling factor of the bounding box. Typically, this array contains 3 elements, Length(X-axis), Width(Y-axis) and Height(Z-axis).',
-      example: [100, 50, 150],
+        'Whether to export the model using hyper mode. Default is false.',
+      default: false,
+      title: 'Use Hyper',
+      type: 'boolean',
+    },
+    addons: {
+      description:
+        'Generation add-on features. Default is []. Possible values are HighPack. The HighPack option will provide 4K resolution textures instead of the default 1K, as well as models with high-poly. It will cost triple the billable units.',
+      title: 'Addons',
+      anyOf: [{ const: 'HighPack', type: 'string' }, { type: 'null' }],
     },
     prompt: {
       default: '',
+      maxLength: 1024,
       title: 'Prompt',
       description:
         'A textual prompt to guide model generation. Required for Text-to-3D mode. Optional for Image-to-3D mode.',
+      type: 'string',
       examples: ['A futuristic robot with sleek metallic design.'],
-      maxLength: 1024,
+    },
+    material: {
+      description:
+        'Material type. Possible values: PBR, Shaded. Default is PBR.',
+      default: 'PBR',
+      enum: ['PBR', 'Shaded'],
+      title: 'Material',
+      type: 'string',
+      examples: ['Shaded'],
+    },
+    TAPose: {
+      description:
+        'When generating the human-like model, this parameter control the generation result to T/A Pose.',
+      default: false,
+      title: 'T/A Pose',
+      type: 'boolean',
+    },
+    seed: {
+      description:
+        'Seed value for randomization, ranging from 0 to 65535. Optional.',
+      title: 'Seed',
+      anyOf: [
+        { maximum: 65535, minimum: 0, type: 'integer' },
+        { type: 'null' },
+      ],
+    },
+    tier: {
+      description:
+        'Tier of generation. For Rodin Sketch, set to Sketch. For Rodin Regular, set to Regular.',
+      default: 'Regular',
+      enum: ['Regular', 'Sketch'],
+      title: 'Tier',
+      type: 'string',
+    },
+    geometry_file_format: {
+      description:
+        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
+      default: 'glb',
+      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
+      title: 'Geometry File Format',
       type: 'string',
     },
   },
@@ -3623,31 +3623,31 @@ export const Hyper3dRodinInputSchema = {
 
 export const Hyper3dRodinOutputSchema = {
   properties: {
+    seed: {
+      description: 'Seed value used for generation.',
+      title: 'Seed',
+      type: 'integer',
+    },
     model_mesh: {
       description: 'Generated 3D object file.',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3.fal.media/files/koala/VlX4JqNI8F9HO2ETp_B7t_base_basic_pbr.glb',
         },
       ],
-      $ref: '#/$defs/File',
     },
     textures: {
-      title: 'Textures',
       description: 'Generated textures for the 3D object.',
+      title: 'Textures',
       items: { $ref: '#/$defs/Image' },
       type: 'array',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Seed value used for generation.',
-      type: 'integer',
     },
   },
   title: 'ObjectOutput',
   'x-fal-order-properties': ['model_mesh', 'seed', 'textures'],
-  required: ['model_mesh', 'seed', 'textures'],
   type: 'object',
+  required: ['model_mesh', 'seed', 'textures'],
   $defs: {
     File: {
       title: 'File',
@@ -3687,46 +3687,47 @@ export const Hyper3dRodinOutputSchema = {
       ],
     },
     Image: {
+      required: ['url'],
       properties: {
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
         file_size: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'File Size',
-          description: 'The size of the file in bytes.',
           examples: [4404019],
-        },
-        url: {
-          title: 'Url',
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-        },
-        file_name: {
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-        },
-        width: {
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Width',
-          description: 'The width of the image in pixels.',
-          examples: [1024],
+          description: 'The size of the file in bytes.',
         },
         height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'Height',
-          description: 'The height of the image in pixels.',
           examples: [1024],
+          description: 'The height of the image in pixels.',
         },
-        content_type: {
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_name: {
           anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          examples: [1024],
+          description: 'The width of the image in pixels.',
         },
       },
       title: 'Image',
-      description: 'Represents an image file.',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -3735,19 +3736,104 @@ export const Hyper3dRodinOutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
-      type: 'object',
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Hyper3dRodinV25InputSchema = {
   properties: {
+    preview_render: {
+      description:
+        'Generate a preview render image of the 3D model along with the model files.',
+      default: false,
+      title: 'Preview Render',
+      type: 'boolean',
+    },
+    bbox_condition: {
+      description:
+        'This is a controlnet that controls the maximum sized of the generated model.',
+      anyOf: [{ $ref: '#/$defs/RodinGen25BbboxField' }, { type: 'null' }],
+    },
+    hd_texture: {
+      description:
+        'Enables enhanced texture post-processing for higher visual fidelity.',
+      default: false,
+      title: 'Hd Texture',
+      type: 'boolean',
+    },
+    addons: {
+      description:
+        'Optional add-ons. Single values are accepted as a shorthand for a list with one item.',
+      anyOf: [{ $ref: '#/$defs/RodinGen25Addons' }, { type: 'null' }],
+    },
+    is_micro: {
+      description:
+        'Generate finer micro-scale geometric detail. Only effective with `tier="Gen-2.5-Extreme-High"`.',
+      default: false,
+      title: 'Is Micro',
+      type: 'boolean',
+    },
+    enable_creative_mode: {
+      description:
+        'If enabled, the generation will have enhanced generative robustness while ensuring output consistency. This corresponds to `geometry_instruct_mode` being equal to `creative` on the Hyper3D API.',
+      default: false,
+      title: 'Enable Creative Mode',
+      type: 'boolean',
+    },
+    material: {
+      description:
+        'Material type. PBR: physically-based materials with realistic lighting. Shaded: baked lighting with no PBR maps. All: both PBR and Shaded variants. None: geometry only with no textures.',
+      default: 'All',
+      enum: ['PBR', 'Shaded', 'All', 'None'],
+      title: 'Material',
+      type: 'string',
+    },
+    texture_mode: {
+      description:
+        'Texture generation quality. When unset, the API picks a default appropriate for the tier.',
+      title: 'Texture Mode',
+      anyOf: [
+        {
+          enum: ['legacy', 'extreme-low', 'low', 'medium', 'high'],
+          type: 'string',
+        },
+        { type: 'null' },
+      ],
+    },
+    tier: {
+      description:
+        'Generation tier. Higher tiers produce more detailed meshes but cost more. Extreme-High enables the highest-detail mode and bills at double the base rate. See more info in the [documentation](https://developer.hyper3d.ai/api-specification/rodin-gen2.5#use-gen-2.5-generation-with-following-gen-2.5-tiers).',
+      default: 'Gen-2.5-High',
+      enum: [
+        'Gen-2.5-Minimum',
+        'Gen-2.5-Extreme-Low',
+        'Gen-2.5-Low',
+        'Gen-2.5-Medium',
+        'Gen-2.5-High',
+        'Gen-2.5-Extreme-High',
+      ],
+      title: 'Tier',
+      type: 'string',
+    },
+    use_original_alpha: {
+      description:
+        'When enabled, preserves the transparency channel from input images during 3D generation.',
+      default: false,
+      title: 'Use Original Alpha',
+      type: 'boolean',
+    },
     image_urls: {
       description:
         'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Up to 5 images allowed.',
-      type: 'array',
       maxItems: 5,
+      minItems: 1,
+      type: 'array',
+      items: {
+        _fal_ui_field: 'image',
+        type: 'string',
+        'x-fal-file-input': true,
+      },
       title: 'Image Urls',
       examples: [
         [
@@ -3756,116 +3842,31 @@ export const Hyper3dRodinV25InputSchema = {
           'https://v3.fal.media/files/penguin/X21qtlVMazAtljzRCJD2__image.png',
         ],
       ],
-      items: {
-        _fal_ui_field: 'image',
-        type: 'string',
-        'x-fal-file-input': true,
-      },
-      minItems: 1,
     },
-    tier: {
-      default: 'Gen-2.5-Medium',
-      title: 'Tier',
+    prompt: {
       description:
-        'Generation tier. Higher tiers produce more detailed meshes but cost more. Extreme-High enables the highest-detail mode and bills at double the base rate. See more info in the [documentation](https://developer.hyper3d.ai/api-specification/rodin-gen2.5#use-gen-2.5-generation-with-following-gen-2.5-tiers).',
-      enum: [
-        'Gen-2.5-Extreme-Low',
-        'Gen-2.5-Low',
-        'Gen-2.5-Medium',
-        'Gen-2.5-High',
-        'Gen-2.5-Extreme-High',
-      ],
+        'A textual prompt to guide model generation. Optional for Image-to-3D mode - if empty, the model auto-generates a prompt from the images.',
+      default: '',
+      maxLength: 1024,
+      title: 'Prompt',
       type: 'string',
-    },
-    geometry_file_format: {
-      default: 'glb',
-      title: 'Geometry File Format',
-      description:
-        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
-      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
-      type: 'string',
-    },
-    is_micro: {
-      default: false,
-      title: 'Is Micro',
-      description:
-        'Generate finer micro-scale geometric detail. Only effective with `tier="Gen-2.5-Extreme-High"`.',
-      type: 'boolean',
-    },
-    geometry_instruct_mode: {
-      default: 'faithful',
-      title: 'Geometry Instruct Mode',
-      description:
-        'Faithful mode follows the input closely; creative mode permits more variation. Only effective in the Medium and High tiers.',
-      enum: ['faithful', 'creative'],
-      type: 'string',
-    },
-    TAPose: {
-      default: false,
-      title: 'T/A Pose',
-      description:
-        'Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.',
-      type: 'boolean',
-    },
-    use_original_alpha: {
-      default: false,
-      title: 'Use Original Alpha',
-      description:
-        'When enabled, preserves the transparency channel from input images during 3D generation.',
-      type: 'boolean',
-    },
-    preview_render: {
-      default: false,
-      title: 'Preview Render',
-      description:
-        'Generate a preview render image of the 3D model along with the model files.',
-      type: 'boolean',
-    },
-    texture_mode: {
-      anyOf: [
-        {
-          enum: ['legacy', 'extreme-low', 'low', 'medium', 'high'],
-          type: 'string',
-        },
-        { type: 'null' },
-      ],
-      title: 'Texture Mode',
-      description:
-        'Texture generation quality. When unset, the API picks a default appropriate for the tier.',
-    },
-    material: {
-      default: 'All',
-      title: 'Material',
-      description:
-        'Material type. PBR: physically-based materials with realistic lighting. Shaded: baked lighting with no PBR maps. All: both PBR and Shaded variants. None: geometry only with no textures.',
-      enum: ['PBR', 'Shaded', 'All', 'None'],
-      type: 'string',
-    },
-    bbox_condition: {
-      anyOf: [
-        { maxItems: 3, type: 'array', items: { type: 'integer' }, minItems: 3 },
-        { type: 'null' },
-      ],
-      title: 'Bbox Condition',
-      description:
-        'An array that specifies the bounding box dimensions [width, height, length]. Must be exactly three positive integers.',
-      example: [100, 50, 150],
+      examples: ['A futuristic robot with sleek metallic design.'],
     },
     seed: {
-      anyOf: [
-        { type: 'integer', maximum: 65535, minimum: 0 },
-        { type: 'null' },
-      ],
-      title: 'Seed',
       description:
         'Seed value for randomization, ranging from 0 to 65535. Optional.',
+      title: 'Seed',
+      anyOf: [
+        { maximum: 65535, minimum: 0, type: 'integer' },
+        { type: 'null' },
+      ],
     },
     quality_mesh_option: {
-      default: '18K Quad',
-      title: 'Quality Mesh Option',
       description:
         'Combined quality and mesh type selection. Quad = smooth surfaces, Triangle = detailed geometry. Maps to `mesh_mode` (Quad/Raw) and `quality_override` (face count) on the Hyper3D API. Valid face counts depend on the selected tier. Up to 1M Triangle is supported for tiers Extreme-Low, Low, and Medium. Up to 2M Triangle (as low as 20K Triangle) is supported for tiers High and Extreme-High.',
+      default: 'Auto',
       enum: [
+        'Auto',
         '4K Quad',
         '8K Quad',
         '18K Quad',
@@ -3874,51 +3875,35 @@ export const Hyper3dRodinV25InputSchema = {
         '200K Quad',
         '2K Triangle',
         '20K Triangle',
+        '50K Triangle',
         '150K Triangle',
         '500K Triangle',
         '1M Triangle',
         '2M Triangle',
       ],
+      title: 'Quality Mesh Option',
       type: 'string',
     },
-    hd_texture: {
+    TAPose: {
+      description:
+        'Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.',
       default: false,
-      title: 'Hd Texture',
-      description:
-        'Enables enhanced texture post-processing for higher visual fidelity.',
+      title: 'T/A Pose',
       type: 'boolean',
-    },
-    addons: {
-      anyOf: [
-        { items: { const: 'HighPack', type: 'string' }, type: 'array' },
-        { type: 'null' },
-      ],
-      title: 'Addons',
-      description:
-        'Optional add-ons. Possible values are `HighPack`. HighPack provides 4K resolution textures and high-poly geometry, instead of default 2K. If in `quality_mesh_option` Quad is selected, the number of faces will be ~16 times of the number of faces selected in the quality part. Single values are accepted as a shorthand for a list with one item.',
     },
     texture_delight: {
-      default: false,
-      title: 'Texture Delight',
       description:
         'Removes baked lighting/highlights from the generated textures.',
+      default: false,
+      title: 'Texture Delight',
       type: 'boolean',
     },
-    is_symmetric: {
-      default: 'unknown',
-      title: 'Is Symmetric',
+    geometry_file_format: {
       description:
-        'Symmetry mode for the generated mesh. `symmetric` forces left-right symmetry; `balanced` favors symmetry without enforcing it; `asymmetric` allows freely asymmetric geometry; `unknown` lets the model decide based on the inputs.',
-      enum: ['symmetric', 'balanced', 'asymmetric', 'unknown'],
-      type: 'string',
-    },
-    prompt: {
-      default: '',
-      title: 'Prompt',
-      description:
-        'A textual prompt to guide model generation. Optional for Image-to-3D mode - if empty, the model auto-generates a prompt from the images.',
-      examples: ['A futuristic robot with sleek metallic design.'],
-      maxLength: 1024,
+        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
+      default: 'glb',
+      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
+      title: 'Geometry File Format',
       type: 'string',
     },
   },
@@ -3933,10 +3918,9 @@ export const Hyper3dRodinV25InputSchema = {
     'material',
     'quality_mesh_option',
     'texture_mode',
-    'geometry_instruct_mode',
+    'enable_creative_mode',
     'hd_texture',
     'texture_delight',
-    'is_symmetric',
     'is_micro',
     'TAPose',
     'bbox_condition',
@@ -3944,42 +3928,92 @@ export const Hyper3dRodinV25InputSchema = {
     'preview_render',
   ],
   type: 'object',
+  $defs: {
+    RodinGen25Addons: {
+      properties: {
+        high_pack: {
+          description:
+            'Selecting HighPack generates 4K resolution texture instead of the default 2K. In Quad mode, the number of faces becomes ~16× the count set in the quality parameter.',
+          default: false,
+          title: 'High Pack',
+          type: 'boolean',
+        },
+      },
+      title: 'RodinGen25Addons',
+      'x-fal-order-properties': ['high_pack'],
+      type: 'object',
+    },
+    RodinGen25BbboxField: {
+      properties: {
+        length: {
+          description:
+            'Length (z axis) dimension for the bounding box constraint.',
+          default: 100,
+          title: 'Length',
+          maximum: 2048,
+          minimum: 1,
+          type: 'integer',
+        },
+        height: {
+          description:
+            'Height (y axis) dimension for the bounding box constraint.',
+          default: 100,
+          title: 'Height',
+          maximum: 2048,
+          minimum: 1,
+          type: 'integer',
+        },
+        width: {
+          description:
+            'Width (x axis) dimension for the bounding box constraint.',
+          default: 100,
+          title: 'Width',
+          maximum: 2048,
+          minimum: 1,
+          type: 'integer',
+        },
+      },
+      title: 'RodinGen25BbboxField',
+      'x-fal-order-properties': ['width', 'height', 'length'],
+      type: 'object',
+    },
+  },
 } as const
 
 export const Hyper3dRodinV25OutputSchema = {
   properties: {
+    model_meshes: {
+      description:
+        'Additional generated 3D object files returned by Hyper3D besides model_mesh.',
+      title: 'Model Meshes',
+      items: { $ref: '#/$defs/File' },
+      type: 'array',
+    },
+    seed: {
+      description: 'Seed value used for generation.',
+      title: 'Seed',
+      type: 'integer',
+    },
     model_mesh: {
       description: 'Generated 3D object file.',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/base_basic_shaded.glb',
         },
       ],
-      $ref: '#/$defs/File',
     },
     textures: {
-      title: 'Textures',
       description: 'Generated textures for the 3D object.',
+      title: 'Textures',
       items: { $ref: '#/$defs/Image' },
-      type: 'array',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Seed value used for generation.',
-      type: 'integer',
-    },
-    model_meshes: {
-      title: 'Model Meshes',
-      description:
-        'Additional generated 3D object files returned by Hyper3D besides model_mesh.',
-      items: { $ref: '#/$defs/File' },
       type: 'array',
     },
   },
   title: 'ObjectOutputv2',
   'x-fal-order-properties': ['model_mesh', 'model_meshes', 'seed', 'textures'],
-  required: ['model_mesh', 'seed', 'textures'],
   type: 'object',
+  required: ['model_mesh', 'seed', 'textures'],
   $defs: {
     File: {
       title: 'File',
@@ -4019,46 +4053,47 @@ export const Hyper3dRodinV25OutputSchema = {
       ],
     },
     Image: {
+      required: ['url'],
       properties: {
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
         file_size: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'File Size',
-          description: 'The size of the file in bytes.',
           examples: [4404019],
-        },
-        url: {
-          title: 'Url',
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-        },
-        file_name: {
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-        },
-        width: {
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Width',
-          description: 'The width of the image in pixels.',
-          examples: [1024],
+          description: 'The size of the file in bytes.',
         },
         height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'Height',
-          description: 'The height of the image in pixels.',
           examples: [1024],
+          description: 'The height of the image in pixels.',
         },
-        content_type: {
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_name: {
           anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          examples: [1024],
+          description: 'The width of the image in pixels.',
         },
       },
       title: 'Image',
-      description: 'Represents an image file.',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -4067,59 +4102,86 @@ export const Hyper3dRodinV25OutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
-      type: 'object',
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Hyper3dRodinV25TextTo3dInputSchema = {
   properties: {
-    tier: {
-      default: 'Gen-2.5-Medium',
-      title: 'Tier',
-      description:
-        'Generation tier. Higher tiers produce more detailed meshes but cost more. Extreme-High enables the highest-detail mode and bills at double the base rate. See more info in the [documentation](https://developer.hyper3d.ai/api-specification/rodin-gen2.5#use-gen-2.5-generation-with-following-gen-2.5-tiers).',
-      enum: [
-        'Gen-2.5-Extreme-Low',
-        'Gen-2.5-Low',
-        'Gen-2.5-Medium',
-        'Gen-2.5-High',
-        'Gen-2.5-Extreme-High',
-      ],
-      type: 'string',
-    },
-    geometry_file_format: {
-      default: 'glb',
-      title: 'Geometry File Format',
-      description:
-        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
-      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
-      type: 'string',
-    },
-    is_micro: {
-      default: false,
-      title: 'Is Micro',
-      description:
-        'Generate finer micro-scale geometric detail. Only effective with `tier="Gen-2.5-Extreme-High"`.',
-      type: 'boolean',
-    },
-    geometry_instruct_mode: {
-      default: 'faithful',
-      title: 'Geometry Instruct Mode',
-      description:
-        'Faithful mode follows the prompt closely; creative mode permits more variation. Only effective in the Medium and High tiers.',
-      enum: ['faithful', 'creative'],
-      type: 'string',
-    },
     TAPose: {
-      default: false,
-      title: 'T/A Pose',
       description:
         'Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.',
+      default: false,
+      title: 'T/A Pose',
       type: 'boolean',
     },
+    bbox_condition: {
+      description:
+        'This is a controlnet that controls the maximum sized of the generated model.',
+      anyOf: [{ $ref: '#/$defs/RodinGen25BbboxField' }, { type: 'null' }],
+    },
+    hd_texture: {
+      description:
+        'Enables enhanced texture post-processing for higher visual fidelity.',
+      default: false,
+      title: 'Hd Texture',
+      type: 'boolean',
+    },
+    texture_delight: {
+      description:
+        'Removes baked lighting/highlights from the generated textures.',
+      default: false,
+      title: 'Texture Delight',
+      type: 'boolean',
+    },
+    seed: {
+      description:
+        'Seed value for randomization, ranging from 0 to 65535. Optional.',
+      title: 'Seed',
+      anyOf: [
+        { maximum: 65535, minimum: 0, type: 'integer' },
+        { type: 'null' },
+      ],
+    },
+    addons: {
+      description: 'Optional add-ons',
+      anyOf: [{ $ref: '#/$defs/RodinGen25Addons' }, { type: 'null' }],
+    },
+    prompt: {
+      description:
+        'A textual prompt to guide model generation. Required for Text-to-3D mode.',
+      maxLength: 1024,
+      title: 'Prompt',
+      type: 'string',
+      examples: ['A futuristic robot with sleek metallic design.'],
+    },
+    is_micro: {
+      description:
+        'Generate finer micro-scale geometric detail. Only effective with `tier="Gen-2.5-Extreme-High"`.',
+      default: false,
+      title: 'Is Micro',
+      type: 'boolean',
+    },
+    enable_creative_mode: {
+      description:
+        'If enabled, the generation will have enhanced generative robustness while ensuring output consistency. This corresponds to `geometry_instruct_mode` being equal to `creative` on the Hyper3D API.',
+      default: false,
+      title: 'Enable Creative Mode',
+      type: 'boolean',
+    },
+    material: {
+      description:
+        'Material type. PBR: physically-based materials with realistic lighting. Shaded: baked lighting with no PBR maps. All: both PBR and Shaded variants. None: geometry only with no textures.',
+      default: 'All',
+      enum: ['PBR', 'Shaded', 'All', 'None'],
+      title: 'Material',
+      type: 'string',
+    },
     texture_mode: {
+      description:
+        'Texture generation quality. When unset, the API picks a default appropriate for the tier.',
+      title: 'Texture Mode',
       anyOf: [
         {
           enum: ['legacy', 'extreme-low', 'low', 'medium', 'high'],
@@ -4127,43 +4189,13 @@ export const Hyper3dRodinV25TextTo3dInputSchema = {
         },
         { type: 'null' },
       ],
-      title: 'Texture Mode',
-      description:
-        'Texture generation quality. When unset, the API picks a default appropriate for the tier.',
-    },
-    material: {
-      default: 'All',
-      title: 'Material',
-      description:
-        'Material type. PBR: physically-based materials with realistic lighting. Shaded: baked lighting with no PBR maps. All: both PBR and Shaded variants. None: geometry only with no textures.',
-      enum: ['PBR', 'Shaded', 'All', 'None'],
-      type: 'string',
-    },
-    bbox_condition: {
-      anyOf: [
-        { maxItems: 3, type: 'array', items: { type: 'integer' }, minItems: 3 },
-        { type: 'null' },
-      ],
-      title: 'Bbox Condition',
-      description:
-        'An array that specifies the bounding box dimensions [width, height, length]. Must be exactly three positive integers.',
-      example: [100, 50, 150],
-    },
-    seed: {
-      anyOf: [
-        { type: 'integer', maximum: 65535, minimum: 0 },
-        { type: 'null' },
-      ],
-      title: 'Seed',
-      description:
-        'Seed value for randomization, ranging from 0 to 65535. Optional.',
     },
     quality_mesh_option: {
-      default: '18K Quad',
-      title: 'Quality Mesh Option',
       description:
         'Combined quality and mesh type selection. Quad = smooth surfaces, Triangle = detailed geometry. Maps to `mesh_mode` (Quad/Raw) and `quality_override` (face count) on the Hyper3D API. Valid face counts depend on the selected tier. Up to 1M Triangle is supported for tiers Extreme-Low, Low, and Medium. Up to 2M Triangle (as low as 20K Triangle) is supported for tiers High and Extreme-High.',
+      default: 'Auto',
       enum: [
+        'Auto',
         '4K Quad',
         '8K Quad',
         '18K Quad',
@@ -4172,50 +4204,36 @@ export const Hyper3dRodinV25TextTo3dInputSchema = {
         '200K Quad',
         '2K Triangle',
         '20K Triangle',
+        '50K Triangle',
         '150K Triangle',
         '500K Triangle',
         '1M Triangle',
         '2M Triangle',
       ],
+      title: 'Quality Mesh Option',
       type: 'string',
     },
-    hd_texture: {
-      default: false,
-      title: 'Hd Texture',
+    tier: {
       description:
-        'Enables enhanced texture post-processing for higher visual fidelity.',
-      type: 'boolean',
-    },
-    addons: {
-      anyOf: [
-        { items: { const: 'HighPack', type: 'string' }, type: 'array' },
-        { type: 'null' },
+        'Generation tier. Higher tiers produce more detailed meshes but cost more. Extreme-High enables the highest-detail mode and bills at double the base rate. See more info in the [documentation](https://developer.hyper3d.ai/api-specification/rodin-gen2.5#use-gen-2.5-generation-with-following-gen-2.5-tiers).',
+      default: 'Gen-2.5-High',
+      enum: [
+        'Gen-2.5-Minimum',
+        'Gen-2.5-Extreme-Low',
+        'Gen-2.5-Low',
+        'Gen-2.5-Medium',
+        'Gen-2.5-High',
+        'Gen-2.5-Extreme-High',
       ],
-      title: 'Addons',
-      description:
-        'Optional add-ons. Possible values are `HighPack`. HighPack provides 4K resolution textures and high-poly geometry, instead of default 2K. If in `quality_mesh_option` Quad is selected, the number of faces will be ~16 times of the number of faces selected in the quality part. Single values are accepted as a shorthand for a list with one item.',
-    },
-    texture_delight: {
-      default: false,
-      title: 'Texture Delight',
-      description:
-        'Removes baked lighting/highlights from the generated textures.',
-      type: 'boolean',
-    },
-    is_symmetric: {
-      default: 'unknown',
-      title: 'Is Symmetric',
-      description:
-        'Symmetry mode for the generated mesh. `symmetric` forces left-right symmetry; `balanced` favors symmetry without enforcing it; `asymmetric` allows freely asymmetric geometry; `unknown` lets the model decide based on the inputs.',
-      enum: ['symmetric', 'balanced', 'asymmetric', 'unknown'],
+      title: 'Tier',
       type: 'string',
     },
-    prompt: {
-      title: 'Prompt',
+    geometry_file_format: {
       description:
-        'A textual prompt to guide model generation. Required for Text-to-3D mode.',
-      examples: ['A futuristic robot with sleek metallic design.'],
-      maxLength: 1024,
+        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
+      default: 'glb',
+      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
+      title: 'Geometry File Format',
       type: 'string',
     },
   },
@@ -4228,53 +4246,102 @@ export const Hyper3dRodinV25TextTo3dInputSchema = {
     'material',
     'quality_mesh_option',
     'texture_mode',
-    'geometry_instruct_mode',
+    'enable_creative_mode',
     'hd_texture',
     'texture_delight',
-    'is_symmetric',
     'is_micro',
     'TAPose',
     'bbox_condition',
     'addons',
   ],
-  required: ['prompt'],
   type: 'object',
+  required: ['prompt'],
+  $defs: {
+    RodinGen25Addons: {
+      properties: {
+        high_pack: {
+          description:
+            'Selecting HighPack generates 4K resolution texture instead of the default 2K. In Quad mode, the number of faces becomes ~16× the count set in the quality parameter.',
+          default: false,
+          title: 'High Pack',
+          type: 'boolean',
+        },
+      },
+      title: 'RodinGen25Addons',
+      'x-fal-order-properties': ['high_pack'],
+      type: 'object',
+    },
+    RodinGen25BbboxField: {
+      properties: {
+        length: {
+          description:
+            'Length (z axis) dimension for the bounding box constraint.',
+          default: 100,
+          title: 'Length',
+          maximum: 2048,
+          minimum: 1,
+          type: 'integer',
+        },
+        height: {
+          description:
+            'Height (y axis) dimension for the bounding box constraint.',
+          default: 100,
+          title: 'Height',
+          maximum: 2048,
+          minimum: 1,
+          type: 'integer',
+        },
+        width: {
+          description:
+            'Width (x axis) dimension for the bounding box constraint.',
+          default: 100,
+          title: 'Width',
+          maximum: 2048,
+          minimum: 1,
+          type: 'integer',
+        },
+      },
+      title: 'RodinGen25BbboxField',
+      'x-fal-order-properties': ['width', 'height', 'length'],
+      type: 'object',
+    },
+  },
 } as const
 
 export const Hyper3dRodinV25TextTo3dOutputSchema = {
   properties: {
+    model_meshes: {
+      description:
+        'Additional generated 3D object files returned by Hyper3D besides model_mesh.',
+      title: 'Model Meshes',
+      items: { $ref: '#/$defs/File' },
+      type: 'array',
+    },
+    seed: {
+      description: 'Seed value used for generation.',
+      title: 'Seed',
+      type: 'integer',
+    },
     model_mesh: {
       description: 'Generated 3D object file.',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/base_basic_shaded.glb',
         },
       ],
-      $ref: '#/$defs/File',
     },
     textures: {
-      title: 'Textures',
       description: 'Generated textures for the 3D object.',
+      title: 'Textures',
       items: { $ref: '#/$defs/Image' },
-      type: 'array',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Seed value used for generation.',
-      type: 'integer',
-    },
-    model_meshes: {
-      title: 'Model Meshes',
-      description:
-        'Additional generated 3D object files returned by Hyper3D besides model_mesh.',
-      items: { $ref: '#/$defs/File' },
       type: 'array',
     },
   },
   title: 'ObjectOutputv2',
   'x-fal-order-properties': ['model_mesh', 'model_meshes', 'seed', 'textures'],
-  required: ['model_mesh', 'seed', 'textures'],
   type: 'object',
+  required: ['model_mesh', 'seed', 'textures'],
   $defs: {
     File: {
       title: 'File',
@@ -4314,46 +4381,47 @@ export const Hyper3dRodinV25TextTo3dOutputSchema = {
       ],
     },
     Image: {
+      required: ['url'],
       properties: {
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
         file_size: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'File Size',
-          description: 'The size of the file in bytes.',
           examples: [4404019],
-        },
-        url: {
-          title: 'Url',
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-        },
-        file_name: {
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-        },
-        width: {
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Width',
-          description: 'The width of the image in pixels.',
-          examples: [1024],
+          description: 'The size of the file in bytes.',
         },
         height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'Height',
-          description: 'The height of the image in pixels.',
           examples: [1024],
+          description: 'The height of the image in pixels.',
         },
-        content_type: {
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_name: {
           anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          examples: [1024],
+          description: 'The width of the image in pixels.',
         },
       },
       title: 'Image',
-      description: 'Represents an image file.',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -4362,34 +4430,70 @@ export const Hyper3dRodinV25TextTo3dOutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
-      type: 'object',
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Hyper3dRodinV2InputSchema = {
   properties: {
-    geometry_file_format: {
-      default: 'glb',
-      title: 'Geometry File Format',
+    seed: {
       description:
-        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
-      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
-      type: 'string',
+        'Seed value for randomization, ranging from 0 to 65535. Optional.',
+      title: 'Seed',
+      anyOf: [
+        { maximum: 65535, minimum: 0, type: 'integer' },
+        { type: 'null' },
+      ],
     },
-    TAPose: {
-      default: false,
-      title: 'T/A Pose',
+    bbox_condition: {
       description:
-        'Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.',
+        'An array that specifies the bounding box dimensions [width, height, length].',
+      example: [100, 50, 150],
+      title: 'Bbox Condition',
+      anyOf: [{ items: { type: 'integer' }, type: 'array' }, { type: 'null' }],
+    },
+    preview_render: {
+      description:
+        'Generate a preview render image of the 3D model along with the model files.',
+      default: false,
+      title: 'Preview Render',
       type: 'boolean',
     },
+    use_original_alpha: {
+      description:
+        'When enabled, preserves the transparency channel from input images during 3D generation.',
+      default: false,
+      title: 'Use Original Alpha',
+      type: 'boolean',
+    },
+    addons: {
+      description:
+        'The HighPack option will provide 4K resolution textures instead of the default 1K, as well as models with high-poly. It will cost **triple the billable units**.',
+      title: 'Addons',
+      anyOf: [{ const: 'HighPack', type: 'string' }, { type: 'null' }],
+    },
+    prompt: {
+      default: '',
+      maxLength: 1024,
+      title: 'Prompt',
+      description:
+        'A textual prompt to guide model generation. Optional for Image-to-3D mode - if empty, AI will generate a prompt based on your images.',
+      type: 'string',
+      examples: ['A futuristic robot with sleek metallic design.'],
+    },
+    material: {
+      description:
+        'Material type. PBR: Physically-based materials with realistic lighting. Shaded: Simple materials with baked lighting. All: Both types included.',
+      default: 'All',
+      enum: ['PBR', 'Shaded', 'All'],
+      title: 'Material',
+      type: 'string',
+    },
     quality_mesh_option: {
-      default: '500K Triangle',
-      title: 'Quality Mesh Option',
       description:
         "Combined quality and mesh type selection. Quad = smooth surfaces, Triangle = detailed geometry. These corresponds to `mesh_mode` (if the option contains 'Triangle', mesh_mode is 'Raw', otherwise 'Quad') and `quality_override` (the numeric part of the option) parameters in Hyper3D API.",
+      default: '500K Triangle',
       enum: [
         '4K Quad',
         '8K Quad',
@@ -4400,41 +4504,26 @@ export const Hyper3dRodinV2InputSchema = {
         '150K Triangle',
         '500K Triangle',
       ],
+      title: 'Quality Mesh Option',
       type: 'string',
     },
-    seed: {
-      anyOf: [
-        { type: 'integer', maximum: 65535, minimum: 0 },
-        { type: 'null' },
-      ],
-      title: 'Seed',
+    TAPose: {
       description:
-        'Seed value for randomization, ranging from 0 to 65535. Optional.',
-    },
-    addons: {
-      anyOf: [{ const: 'HighPack', type: 'string' }, { type: 'null' }],
-      title: 'Addons',
-      description:
-        'The HighPack option will provide 4K resolution textures instead of the default 1K, as well as models with high-poly. It will cost **triple the billable units**.',
-    },
-    use_original_alpha: {
+        'Generate characters in T-pose or A-pose format, making them easier to rig and animate in 3D software.',
       default: false,
-      title: 'Use Original Alpha',
-      description:
-        'When enabled, preserves the transparency channel from input images during 3D generation.',
-      type: 'boolean',
-    },
-    preview_render: {
-      default: false,
-      title: 'Preview Render',
-      description:
-        'Generate a preview render image of the 3D model along with the model files.',
+      title: 'T/A Pose',
       type: 'boolean',
     },
     input_image_urls: {
-      title: 'Input Image Urls',
       description:
         'URL of images to use while generating the 3D model. Required for Image-to-3D mode. Up to 5 images allowed.',
+      type: 'array',
+      title: 'Input Image Urls',
+      items: {
+        _fal_ui_field: 'image',
+        type: 'string',
+        'x-fal-file-input': true,
+      },
       examples: [
         [
           'https://v3.fal.media/files/panda/l7mQrG8plbB42lBNqVjm0_image.png',
@@ -4442,35 +4531,13 @@ export const Hyper3dRodinV2InputSchema = {
           'https://v3.fal.media/files/penguin/X21qtlVMazAtljzRCJD2__image.png',
         ],
       ],
-      items: {
-        _fal_ui_field: 'image',
-        type: 'string',
-        'x-fal-file-input': true,
-      },
-      type: 'array',
     },
-    material: {
-      default: 'All',
-      title: 'Material',
+    geometry_file_format: {
       description:
-        'Material type. PBR: Physically-based materials with realistic lighting. Shaded: Simple materials with baked lighting. All: Both types included.',
-      enum: ['PBR', 'Shaded', 'All'],
-      type: 'string',
-    },
-    bbox_condition: {
-      anyOf: [{ items: { type: 'integer' }, type: 'array' }, { type: 'null' }],
-      title: 'Bbox Condition',
-      description:
-        'An array that specifies the bounding box dimensions [width, height, length].',
-      example: [100, 50, 150],
-    },
-    prompt: {
-      default: '',
-      title: 'Prompt',
-      description:
-        'A textual prompt to guide model generation. Optional for Image-to-3D mode - if empty, AI will generate a prompt based on your images.',
-      examples: ['A futuristic robot with sleek metallic design.'],
-      maxLength: 1024,
+        'Format of the geometry file. Possible values: glb, usdz, fbx, obj, stl. Default is glb.',
+      default: 'glb',
+      enum: ['glb', 'usdz', 'fbx', 'obj', 'stl'],
+      title: 'Geometry File Format',
       type: 'string',
     },
   },
@@ -4493,38 +4560,38 @@ export const Hyper3dRodinV2InputSchema = {
 
 export const Hyper3dRodinV2OutputSchema = {
   properties: {
+    model_meshes: {
+      description:
+        'Additional generated 3D object files returned by Hyper3D besides model_mesh.',
+      title: 'Model Meshes',
+      items: { $ref: '#/$defs/File' },
+      type: 'array',
+    },
+    seed: {
+      description: 'Seed value used for generation.',
+      title: 'Seed',
+      type: 'integer',
+    },
     model_mesh: {
       description: 'Generated 3D object file.',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/model_tests/video_models/base_basic_shaded.glb',
         },
       ],
-      $ref: '#/$defs/File',
     },
     textures: {
-      title: 'Textures',
       description: 'Generated textures for the 3D object.',
+      title: 'Textures',
       items: { $ref: '#/$defs/Image' },
-      type: 'array',
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Seed value used for generation.',
-      type: 'integer',
-    },
-    model_meshes: {
-      title: 'Model Meshes',
-      description:
-        'Additional generated 3D object files returned by Hyper3D besides model_mesh.',
-      items: { $ref: '#/$defs/File' },
       type: 'array',
     },
   },
   title: 'ObjectOutputv2',
   'x-fal-order-properties': ['model_mesh', 'model_meshes', 'seed', 'textures'],
-  required: ['model_mesh', 'seed', 'textures'],
   type: 'object',
+  required: ['model_mesh', 'seed', 'textures'],
   $defs: {
     File: {
       title: 'File',
@@ -4564,46 +4631,47 @@ export const Hyper3dRodinV2OutputSchema = {
       ],
     },
     Image: {
+      required: ['url'],
       properties: {
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
         file_size: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'File Size',
-          description: 'The size of the file in bytes.',
           examples: [4404019],
-        },
-        url: {
-          title: 'Url',
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-        },
-        file_name: {
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-        },
-        width: {
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Width',
-          description: 'The width of the image in pixels.',
-          examples: [1024],
+          description: 'The size of the file in bytes.',
         },
         height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'Height',
-          description: 'The height of the image in pixels.',
           examples: [1024],
+          description: 'The height of the image in pixels.',
         },
-        content_type: {
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_name: {
           anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          examples: [1024],
+          description: 'The width of the image in pixels.',
         },
       },
       title: 'Image',
-      description: 'Represents an image file.',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -4612,53 +4680,53 @@ export const Hyper3dRodinV2OutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
-      type: 'object',
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const ImageSchema = {
+  required: ['url'],
   properties: {
+    content_type: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Content Type',
+      examples: ['image/png'],
+      description: 'The mime type of the file.',
+    },
     file_size: {
       anyOf: [{ type: 'integer' }, { type: 'null' }],
       title: 'File Size',
-      description: 'The size of the file in bytes.',
       examples: [4404019],
-    },
-    url: {
-      title: 'Url',
-      description: 'The URL where the file can be downloaded from.',
-      type: 'string',
-    },
-    file_name: {
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'File Name',
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-      examples: ['z9RV14K95DvU.png'],
-    },
-    width: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Width',
-      description: 'The width of the image in pixels.',
-      examples: [1024],
+      description: 'The size of the file in bytes.',
     },
     height: {
       anyOf: [{ type: 'integer' }, { type: 'null' }],
       title: 'Height',
-      description: 'The height of the image in pixels.',
       examples: [1024],
+      description: 'The height of the image in pixels.',
     },
-    content_type: {
+    url: {
+      title: 'Url',
+      type: 'string',
+      description: 'The URL where the file can be downloaded from.',
+    },
+    file_name: {
       anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Content Type',
-      description: 'The mime type of the file.',
-      examples: ['image/png'],
+      title: 'File Name',
+      examples: ['z9RV14K95DvU.png'],
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+    },
+    width: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Width',
+      examples: [1024],
+      description: 'The width of the image in pixels.',
     },
   },
   title: 'Image',
-  description: 'Represents an image file.',
+  type: 'object',
   'x-fal-order-properties': [
     'url',
     'content_type',
@@ -4667,8 +4735,7 @@ export const ImageSchema = {
     'width',
     'height',
   ],
-  required: ['url'],
-  type: 'object',
+  description: 'Represents an image file.',
 } as const
 
 export const MeshyRiggingInputSchema = {
@@ -7966,35 +8033,35 @@ export const ModelUrlsSchema = {
 } as const
 
 export const ModelUrlsType2Schema = {
-  type: 'object',
+  'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
   properties: {
-    texture: {
-      description: 'Texture image for the 3D model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    usdz: {
-      description: 'USDZ format 3D model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    obj: {
-      description: 'OBJ format 3D model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
     glb: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
       description: 'GLB format 3D model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    mtl: {
-      description: 'MTL material file for OBJ model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
     fbx: {
-      description: 'FBX format 3D model',
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'FBX format 3D model',
+    },
+    obj: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'OBJ format 3D model',
+    },
+    mtl: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'MTL material file for OBJ model',
+    },
+    texture: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Texture image for the 3D model',
+    },
+    usdz: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'USDZ format 3D model',
     },
   },
   title: 'ModelUrls',
-  'x-fal-order-properties': ['glb', 'fbx', 'obj', 'mtl', 'texture', 'usdz'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -8037,17 +8104,10 @@ export const ModelUrlsType2Schema = {
 } as const
 
 export const ModelUrlsType3Schema = {
-  type: 'object',
+  'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
   title: 'ModelUrls',
+  type: 'object',
   properties: {
-    base_model: {
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      description: 'Base (untextured) model',
-    },
-    glb: {
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      description: 'GLB format 3D model',
-    },
     pbr_model: {
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
       description: 'PBR-textured model',
@@ -8056,8 +8116,15 @@ export const ModelUrlsType3Schema = {
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
       description: 'FBX format 3D model',
     },
+    base_model: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Base (untextured) model',
+    },
+    glb: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'GLB format 3D model',
+    },
   },
-  'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
   description: '3D model download URLs',
   $defs: {
     File: {
@@ -8101,27 +8168,27 @@ export const ModelUrlsType3Schema = {
 } as const
 
 export const ModelUrlsType4Schema = {
+  title: 'ModelUrls',
   type: 'object',
+  'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
   properties: {
-    fbx: {
-      description: 'FBX format 3D model',
+    obj: {
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'OBJ format 3D model',
+    },
+    fbx: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'FBX format 3D model',
     },
     usdz: {
-      description: 'USDZ format 3D model',
       anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'USDZ format 3D model',
     },
     glb: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
       description: 'GLB format 3D model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-    },
-    obj: {
-      description: 'OBJ format 3D model',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
     },
   },
-  title: 'ModelUrls',
-  'x-fal-order-properties': ['glb', 'fbx', 'obj', 'usdz'],
   $defs: {
     File: {
       title: 'File',
@@ -8164,141 +8231,22 @@ export const ModelUrlsType4Schema = {
 } as const
 
 export const P1ImageTo3dInputSchema = {
-  description:
-    'Input for Image to 3D generation using the P1 model.\n\nP1 is optimized for clean low-poly mesh generation in ~2 seconds.\nIt supports a restricted parameter set compared to H3.1/v2.5.',
-  type: 'object',
-  properties: {
-    image_url: {
-      examples: [
-        'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
-      ],
-      type: 'string',
-      title: 'Image Url',
-      description: 'URL of the input image for 3D model creation.',
-      'x-fal-file-input': true,
-    },
-    face_limit: {
-      title: 'Face Limit',
-      anyOf: [
-        { minimum: 48, type: 'integer', maximum: 20000 },
-        { type: 'null' },
-      ],
-      description:
-        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
-    },
-    texture: {
-      default: true,
-      type: 'boolean',
-      title: 'Texture',
-      description: 'Whether to generate textures for the model.',
-    },
-    model_seed: {
-      title: 'Model Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Seed for geometry generation reproducibility.',
-    },
-  },
-  title: 'P1ImageTo3DInput',
   'x-fal-order-properties': [
     'image_url',
     'face_limit',
     'texture',
     'model_seed',
   ],
+  title: 'P1ImageTo3DInput',
   required: ['image_url'],
-} as const
-
-export const P1ImageTo3dOutputSchema = {
-  description: 'Output for Tripo3D generation',
   type: 'object',
   properties: {
-    model_mesh: {
-      $ref: '#/$defs/File',
-      description:
-        'Generated 3D model file. May be GLB or FBX depending on Tripo output.',
+    texture: {
+      title: 'Texture',
+      type: 'boolean',
+      default: true,
+      description: 'Whether to generate textures for the model.',
     },
-    rendered_image: {
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      description: 'Preview render of the generated 3D model.',
-    },
-    model_urls: {
-      $ref: '#/$defs/ModelUrlsType3',
-      description: 'URLs for different 3D model variants.',
-    },
-  },
-  title: 'Tripo3DOutput',
-  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
-  required: ['model_mesh', 'model_urls'],
-  $defs: {
-    File: {
-      title: 'File',
-      required: ['url'],
-      type: 'object',
-      properties: {
-        file_name: {
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        content_type: {
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          title: 'File Size',
-          description: 'The size of the file in bytes.',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        url: {
-          title: 'Url',
-          type: 'string',
-          description: 'The URL where the file can be downloaded from.',
-        },
-      },
-      'x-fal-order-properties': [
-        'url',
-        'content_type',
-        'file_name',
-        'file_size',
-      ],
-    },
-    ModelUrlsType3: {
-      type: 'object',
-      title: 'ModelUrls',
-      properties: {
-        base_model: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'Base (untextured) model',
-        },
-        glb: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'GLB format 3D model',
-        },
-        pbr_model: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'PBR-textured model',
-        },
-        fbx: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'FBX format 3D model',
-        },
-      },
-      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
-      description: '3D model download URLs',
-    },
-  },
-} as const
-
-export const P1TextTo3dInputSchema = {
-  description:
-    'Input for Text to 3D generation using the P1 model.\n\nP1 is optimized for clean low-poly mesh generation in ~2 seconds.\nIt supports a restricted parameter set compared to H3.1/v2.5.',
-  type: 'object',
-  properties: {
     model_seed: {
       title: 'Model Seed',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
@@ -8313,28 +8261,24 @@ export const P1TextTo3dInputSchema = {
       description:
         'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
     },
-    texture: {
-      default: true,
-      type: 'boolean',
-      title: 'Texture',
-      description: 'Whether to generate textures for the model.',
-    },
-    prompt: {
-      examples: ['A simple wooden chair'],
+    image_url: {
+      description: 'URL of the input image for 3D model creation.',
+      title: 'Image Url',
       type: 'string',
-      title: 'Prompt',
-      maxLength: 1024,
-      description:
-        'Text description of the 3D object to generate. Maximum 1024 characters.',
+      examples: [
+        'https://v3b.fal.media/files/b/zebra/3osHJDI8IZ2wl6sGtEUeB_image.png',
+      ],
+      'x-fal-file-input': true,
     },
   },
-  title: 'P1TextTo3DInput',
-  'x-fal-order-properties': ['prompt', 'face_limit', 'texture', 'model_seed'],
-  required: ['prompt'],
+  description:
+    'Input for Image to 3D generation using the P1 model.\n\nP1 is optimized for clean low-poly mesh generation in ~2 seconds.\nIt supports a restricted parameter set compared to H3.1/v2.5.',
 } as const
 
-export const P1TextTo3dOutputSchema = {
-  description: 'Output for Tripo3D generation',
+export const P1ImageTo3dOutputSchema = {
+  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
+  title: 'Tripo3DOutput',
+  required: ['model_mesh', 'model_urls'],
   type: 'object',
   properties: {
     model_mesh: {
@@ -8351,9 +8295,7 @@ export const P1TextTo3dOutputSchema = {
       description: 'URLs for different 3D model variants.',
     },
   },
-  title: 'Tripo3DOutput',
-  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
-  required: ['model_mesh', 'model_urls'],
+  description: 'Output for Tripo3D generation',
   $defs: {
     File: {
       title: 'File',
@@ -8393,17 +8335,10 @@ export const P1TextTo3dOutputSchema = {
       ],
     },
     ModelUrlsType3: {
-      type: 'object',
+      'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
       title: 'ModelUrls',
+      type: 'object',
       properties: {
-        base_model: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'Base (untextured) model',
-        },
-        glb: {
-          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-          description: 'GLB format 3D model',
-        },
         pbr_model: {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'PBR-textured model',
@@ -8412,15 +8347,147 @@ export const P1TextTo3dOutputSchema = {
           anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
           description: 'FBX format 3D model',
         },
+        base_model: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Base (untextured) model',
+        },
+        glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'GLB format 3D model',
+        },
       },
+      description: '3D model download URLs',
+    },
+  },
+} as const
+
+export const P1TextTo3dInputSchema = {
+  'x-fal-order-properties': ['prompt', 'face_limit', 'texture', 'model_seed'],
+  title: 'P1TextTo3DInput',
+  required: ['prompt'],
+  type: 'object',
+  properties: {
+    texture: {
+      title: 'Texture',
+      type: 'boolean',
+      default: true,
+      description: 'Whether to generate textures for the model.',
+    },
+    model_seed: {
+      title: 'Model Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Seed for geometry generation reproducibility.',
+    },
+    face_limit: {
+      title: 'Face Limit',
+      anyOf: [
+        { minimum: 48, type: 'integer', maximum: 20000 },
+        { type: 'null' },
+      ],
+      description:
+        'Target number of faces for the generated mesh. If not set, the model adaptively determines the count.',
+    },
+    prompt: {
+      maxLength: 1024,
+      description:
+        'Text description of the 3D object to generate. Maximum 1024 characters.',
+      title: 'Prompt',
+      type: 'string',
+      examples: ['A simple wooden chair'],
+    },
+  },
+  description:
+    'Input for Text to 3D generation using the P1 model.\n\nP1 is optimized for clean low-poly mesh generation in ~2 seconds.\nIt supports a restricted parameter set compared to H3.1/v2.5.',
+} as const
+
+export const P1TextTo3dOutputSchema = {
+  'x-fal-order-properties': ['model_mesh', 'model_urls', 'rendered_image'],
+  title: 'Tripo3DOutput',
+  required: ['model_mesh', 'model_urls'],
+  type: 'object',
+  properties: {
+    model_mesh: {
+      $ref: '#/$defs/File',
+      description:
+        'Generated 3D model file. May be GLB or FBX depending on Tripo output.',
+    },
+    rendered_image: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Preview render of the generated 3D model.',
+    },
+    model_urls: {
+      $ref: '#/$defs/ModelUrlsType3',
+      description: 'URLs for different 3D model variants.',
+    },
+  },
+  description: 'Output for Tripo3D generation',
+  $defs: {
+    File: {
+      title: 'File',
+      required: ['url'],
+      type: 'object',
+      properties: {
+        file_name: {
+          title: 'File Name',
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          examples: ['z9RV14K95DvU.png'],
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+        content_type: {
+          title: 'Content Type',
+          description: 'The mime type of the file.',
+          examples: ['image/png'],
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+        },
+        file_size: {
+          title: 'File Size',
+          description: 'The size of the file in bytes.',
+          examples: [4404019],
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+      },
+      'x-fal-order-properties': [
+        'url',
+        'content_type',
+        'file_name',
+        'file_size',
+      ],
+    },
+    ModelUrlsType3: {
       'x-fal-order-properties': ['glb', 'fbx', 'base_model', 'pbr_model'],
+      title: 'ModelUrls',
+      type: 'object',
+      properties: {
+        pbr_model: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'PBR-textured model',
+        },
+        fbx: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'FBX format 3D model',
+        },
+        base_model: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'Base (untextured) model',
+        },
+        glb: {
+          anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+          description: 'GLB format 3D model',
+        },
+      },
       description: '3D model download URLs',
     },
   },
 } as const
 
 export const Pixal3dInputSchema = {
-  title: 'InputModel',
+  type: 'object',
   'x-fal-order-properties': [
     'image_url',
     'seed',
@@ -8443,204 +8510,204 @@ export const Pixal3dInputSchema = {
     'texture_size',
     'remesh',
   ],
-  type: 'object',
   required: ['image_url'],
   properties: {
+    remesh: {
+      type: 'boolean',
+      description:
+        'Rebuild the mesh topology for cleaner triangles. Slower but usually produces better results for downstream use.',
+      default: true,
+      title: 'Remesh',
+    },
+    tex_slat_guidance_strength: {
+      minimum: 0,
+      description:
+        'How closely the texture follows the input image colors. Higher values produce more vivid but potentially oversaturated textures.',
+      type: 'number',
+      maximum: 10,
+      default: 1,
+      title: 'Tex Slat Guidance Strength',
+    },
+    tex_slat_guidance_rescale: {
+      minimum: 0,
+      description:
+        'Dampens artifacts from high guidance in the texture stage. Increase if textures look noisy or have color banding.',
+      type: 'number',
+      maximum: 1,
+      default: 0,
+      title: 'Tex Slat Guidance Rescale',
+    },
+    shape_slat_guidance_strength: {
+      minimum: 0,
+      description:
+        'How closely the detailed geometry follows the input image. Higher values add more detail but may introduce noise.',
+      type: 'number',
+      maximum: 10,
+      default: 7.5,
+      title: 'Shape Slat Guidance Strength',
+    },
+    ss_rescale_t: {
+      minimum: 1,
+      description:
+        'Controls noise schedule sharpness for structure generation. Higher values produce sharper transitions.',
+      type: 'number',
+      maximum: 6,
+      default: 5,
+      title: 'Ss Rescale T',
+    },
+    max_num_tokens: {
+      minimum: 4096,
+      description:
+        'Maximum number of HR tokens used by the cascaded shape sampler. Higher values allow finer geometry; lower values reduce memory and time.',
+      type: 'integer',
+      maximum: 131072,
+      default: 49152,
+      title: 'Max Num Tokens',
+    },
+    ss_sampling_steps: {
+      minimum: 1,
+      description:
+        'Number of denoising steps for the initial structure. More steps = slower but potentially higher quality.',
+      type: 'integer',
+      maximum: 50,
+      default: 12,
+      title: 'Ss Sampling Steps',
+    },
+    tex_slat_sampling_steps: {
+      minimum: 1,
+      description:
+        'Number of denoising steps for texture generation. More steps = slower but potentially cleaner textures.',
+      type: 'integer',
+      maximum: 50,
+      default: 12,
+      title: 'Tex Slat Sampling Steps',
+    },
+    texture_size: {
+      type: 'integer',
+      description:
+        'Resolution of the texture image baked onto the mesh. Higher values capture finer surface details but produce larger files.',
+      default: 2048,
+      enum: [1024, 2048, 4096],
+      title: 'Texture Size',
+    },
+    mesh_scale: {
+      minimum: 0.1,
+      description:
+        'Scale factor applied to the inferred mesh. Affects the camera distance estimation used by the model.',
+      type: 'number',
+      maximum: 4,
+      default: 1,
+      title: 'Mesh Scale',
+    },
+    shape_slat_rescale_t: {
+      minimum: 1,
+      description:
+        'Controls noise schedule sharpness for shape refinement. Higher values produce sharper geometric details.',
+      type: 'number',
+      maximum: 6,
+      default: 3,
+      title: 'Shape Slat Rescale T',
+    },
+    shape_slat_sampling_steps: {
+      minimum: 1,
+      description:
+        'Number of denoising steps for shape refinement. More steps = slower but potentially smoother geometry.',
+      type: 'integer',
+      maximum: 50,
+      default: 12,
+      title: 'Shape Slat Sampling Steps',
+    },
+    tex_slat_rescale_t: {
+      minimum: 1,
+      description:
+        'Controls noise schedule sharpness for texture generation. Higher values produce sharper texture details.',
+      type: 'number',
+      maximum: 6,
+      default: 3,
+      title: 'Tex Slat Rescale T',
+    },
+    ss_guidance_rescale: {
+      minimum: 0,
+      description:
+        'Dampens artifacts from high guidance in stage 1. Lower values allow stronger guidance effects, higher values stabilize the output.',
+      type: 'number',
+      maximum: 1,
+      default: 0.7,
+      title: 'Ss Guidance Rescale',
+    },
     seed: {
       anyOf: [{ type: 'integer' }, { type: 'null' }],
       description: 'Random seed for reproducibility',
       title: 'Seed',
     },
-    tex_slat_guidance_strength: {
-      type: 'number',
-      minimum: 0,
-      default: 1,
-      description:
-        'How closely the texture follows the input image colors. Higher values produce more vivid but potentially oversaturated textures.',
-      maximum: 10,
-      title: 'Tex Slat Guidance Strength',
-    },
-    max_num_tokens: {
-      type: 'integer',
-      minimum: 4096,
-      default: 49152,
-      description:
-        'Maximum number of HR tokens used by the cascaded shape sampler. Higher values allow finer geometry; lower values reduce memory and time.',
-      maximum: 131072,
-      title: 'Max Num Tokens',
-    },
-    shape_slat_sampling_steps: {
-      type: 'integer',
-      minimum: 1,
-      default: 12,
-      description:
-        'Number of denoising steps for shape refinement. More steps = slower but potentially smoother geometry.',
-      maximum: 50,
-      title: 'Shape Slat Sampling Steps',
-    },
-    ss_rescale_t: {
-      type: 'number',
-      minimum: 1,
-      default: 5,
-      description:
-        'Controls noise schedule sharpness for structure generation. Higher values produce sharper transitions.',
-      maximum: 6,
-      title: 'Ss Rescale T',
-    },
-    tex_slat_sampling_steps: {
-      type: 'integer',
-      minimum: 1,
-      default: 12,
-      description:
-        'Number of denoising steps for texture generation. More steps = slower but potentially cleaner textures.',
-      maximum: 50,
-      title: 'Tex Slat Sampling Steps',
-    },
-    image_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/dog.png',
-      ],
-      type: 'string',
-      description: 'URL of the input image to convert to 3D',
-      title: 'Image Url',
-      'x-fal-file-input': true,
-    },
-    decimation_target: {
-      type: 'integer',
-      minimum: 5000,
-      default: 200000,
-      description:
-        'Target number of vertices in the final mesh. Lower values produce smaller files but less detail.',
-      maximum: 2000000,
-      title: 'Decimation Target',
-    },
-    shape_slat_guidance_strength: {
-      type: 'number',
-      minimum: 0,
-      default: 7.5,
-      description:
-        'How closely the detailed geometry follows the input image. Higher values add more detail but may introduce noise.',
-      maximum: 10,
-      title: 'Shape Slat Guidance Strength',
-    },
-    texture_size: {
-      type: 'integer',
-      default: 2048,
-      description:
-        'Resolution of the texture image baked onto the mesh. Higher values capture finer surface details but produce larger files.',
-      enum: [1024, 2048, 4096],
-      title: 'Texture Size',
-    },
-    remesh: {
-      type: 'boolean',
-      default: true,
-      description:
-        'Rebuild the mesh topology for cleaner triangles. Slower but usually produces better results for downstream use.',
-      title: 'Remesh',
-    },
-    shape_slat_rescale_t: {
-      type: 'number',
-      minimum: 1,
-      default: 3,
-      description:
-        'Controls noise schedule sharpness for shape refinement. Higher values produce sharper geometric details.',
-      maximum: 6,
-      title: 'Shape Slat Rescale T',
-    },
     resolution: {
       type: 'integer',
-      default: 1024,
       description: 'Output resolution; higher is slower but more detailed',
+      default: 1024,
       enum: [1024, 1536],
       title: 'Resolution',
     },
-    shape_slat_guidance_rescale: {
-      type: 'number',
-      minimum: 0,
-      default: 0.5,
-      description:
-        'Dampens artifacts from high guidance in the shape stage. Increase if you see noisy geometry.',
-      maximum: 1,
-      title: 'Shape Slat Guidance Rescale',
-    },
-    tex_slat_rescale_t: {
-      type: 'number',
-      minimum: 1,
-      default: 3,
-      description:
-        'Controls noise schedule sharpness for texture generation. Higher values produce sharper texture details.',
-      maximum: 6,
-      title: 'Tex Slat Rescale T',
-    },
     ss_guidance_strength: {
-      type: 'number',
       minimum: 0,
-      default: 7.5,
       description:
         'How closely the initial 3D structure follows the input image. Higher values produce more faithful but potentially noisier results.',
+      type: 'number',
       maximum: 10,
+      default: 7.5,
       title: 'Ss Guidance Strength',
     },
-    mesh_scale: {
-      type: 'number',
-      minimum: 0.1,
-      default: 1,
+    decimation_target: {
+      minimum: 5000,
       description:
-        'Scale factor applied to the inferred mesh. Affects the camera distance estimation used by the model.',
-      maximum: 4,
-      title: 'Mesh Scale',
-    },
-    ss_sampling_steps: {
+        'Target number of vertices in the final mesh. Lower values produce smaller files but less detail.',
       type: 'integer',
-      minimum: 1,
-      default: 12,
-      description:
-        'Number of denoising steps for the initial structure. More steps = slower but potentially higher quality.',
-      maximum: 50,
-      title: 'Ss Sampling Steps',
+      maximum: 2000000,
+      default: 200000,
+      title: 'Decimation Target',
     },
-    tex_slat_guidance_rescale: {
-      type: 'number',
+    shape_slat_guidance_rescale: {
       minimum: 0,
-      default: 0,
       description:
-        'Dampens artifacts from high guidance in the texture stage. Increase if textures look noisy or have color banding.',
+        'Dampens artifacts from high guidance in the shape stage. Increase if you see noisy geometry.',
+      type: 'number',
       maximum: 1,
-      title: 'Tex Slat Guidance Rescale',
+      default: 0.5,
+      title: 'Shape Slat Guidance Rescale',
     },
-    ss_guidance_rescale: {
-      type: 'number',
-      minimum: 0,
-      default: 0.7,
-      description:
-        'Dampens artifacts from high guidance in stage 1. Lower values allow stronger guidance effects, higher values stabilize the output.',
-      maximum: 1,
-      title: 'Ss Guidance Rescale',
+    image_url: {
+      type: 'string',
+      description: 'URL of the input image to convert to 3D',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/dog.png',
+      ],
+      title: 'Image Url',
+      'x-fal-file-input': true,
     },
   },
+  title: 'InputModel',
 } as const
 
 export const Pixal3dOutputSchema = {
-  title: 'ObjectOutput',
-  'x-fal-order-properties': ['model_glb', 'seed'],
   type: 'object',
+  'x-fal-order-properties': ['model_glb', 'seed'],
   required: ['model_glb', 'seed'],
   properties: {
-    seed: {
-      type: 'integer',
-      description: 'The actual seed used',
-      title: 'Seed',
-    },
     model_glb: {
+      description: 'Generated 3D GLB file',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a86b61d/DNmTkiWHUQ8k-rG6aussB_trellis2_68d6300f70f34d23b69a912b5fe60487.glb',
         },
       ],
-      description: 'Generated 3D GLB file',
-      $ref: '#/$defs/File',
+    },
+    seed: {
+      type: 'integer',
+      description: 'The actual seed used',
+      title: 'Seed',
     },
   },
+  title: 'ObjectOutput',
   $defs: {
     File: {
       title: 'File',
@@ -8683,32 +8750,32 @@ export const Pixal3dOutputSchema = {
 } as const
 
 export const PointPromptBaseSchema = {
-  type: 'object',
+  title: 'PointPromptBase',
+  'x-fal-order-properties': ['x', 'y', 'label', 'object_id'],
   properties: {
-    x: {
-      title: 'X',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'X Coordinate of the prompt',
-    },
     y: {
       title: 'Y',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
       description: 'Y Coordinate of the prompt',
-    },
-    object_id: {
-      title: 'Object Id',
       anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Optional object identifier. Prompts sharing an object id refine the same object.',
+    },
+    x: {
+      title: 'X',
+      description: 'X Coordinate of the prompt',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
     label: {
       title: 'Label',
-      anyOf: [{ type: 'integer', enum: [0, 1] }, { type: 'null' }],
       description: '1 for foreground, 0 for background',
+      anyOf: [{ enum: [0, 1], type: 'integer' }, { type: 'null' }],
+    },
+    object_id: {
+      title: 'Object Id',
+      description:
+        'Optional object identifier. Prompts sharing an object id refine the same object.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
     },
   },
-  title: 'PointPromptBase',
-  'x-fal-order-properties': ['x', 'y', 'label', 'object_id'],
+  type: 'object',
 } as const
 
 export const QueueStatusSchema = {
@@ -8736,210 +8803,8 @@ export const QueueStatusSchema = {
 
 export const Reconviagen05InputSchema = {
   required: ['image_urls'],
-  properties: {
-    multi_image_strategy: {
-      enum: [
-        'average_right',
-        'weighted_average',
-        'sequential',
-        'average',
-        'adaptive_guidance_weight',
-        'fixed_guidance_rescale',
-      ],
-      description:
-        "Strategy for combining multi-view conditioning. 'adaptive_guidance_weight' works best in most cases. Only used when more than one image is provided.",
-      type: 'string',
-      title: 'Multi Image Strategy',
-      default: 'adaptive_guidance_weight',
-    },
-    ss_source: {
-      enum: ['direct', 'mesh', 'mvtrellis2'],
-      description:
-        "Sparse structure source. 'mesh' gives best quality, 'direct' is fastest, 'mvtrellis2' uses multi-view TRELLIS.2.",
-      type: 'string',
-      title: 'Sparse Structure Source',
-      default: 'mesh',
-    },
-    shape_slat_guidance_strength: {
-      description: 'How closely the detailed geometry follows the input.',
-      maximum: 10,
-      type: 'number',
-      minimum: 0,
-      title: 'Shape SLat Guidance Strength',
-      default: 7.5,
-    },
-    texture_size: {
-      enum: [1024, 2048, 4096],
-      description: 'Resolution of the texture image baked onto the mesh.',
-      type: 'integer',
-      title: 'Texture Size',
-      default: 2048,
-    },
-    shape_slat_sampling_steps: {
-      description: 'Number of denoising steps for shape refinement.',
-      maximum: 50,
-      type: 'integer',
-      minimum: 1,
-      title: 'Shape SLat Sampling Steps',
-      default: 12,
-    },
-    tex_slat_rescale_t: {
-      description: 'Controls noise schedule sharpness for texture generation.',
-      maximum: 6,
-      type: 'number',
-      minimum: 1,
-      title: 'Texture SLat Rescale T',
-      default: 3,
-    },
-    ss_guidance_strength: {
-      description:
-        'How closely the initial 3D structure follows the input. Higher values produce more faithful but potentially noisier results.',
-      maximum: 10,
-      type: 'number',
-      minimum: 0,
-      title: 'Sparse Structure Guidance Strength',
-      default: 7.5,
-    },
-    tex_slat_guidance_strength: {
-      description: 'How closely the texture follows the input colors.',
-      maximum: 10,
-      type: 'number',
-      minimum: 0,
-      title: 'Texture SLat Guidance Strength',
-      default: 1,
-    },
-    ss_guidance_rescale: {
-      description: 'Dampens artifacts from high guidance in stage 1.',
-      maximum: 1,
-      type: 'number',
-      minimum: 0,
-      title: 'Sparse Structure Guidance Rescale',
-      default: 0.7,
-    },
-    slat_guidance_rescale: {
-      description:
-        "Guidance rescale for SLat stage (only used when ss_source='mesh').",
-      maximum: 1,
-      type: 'number',
-      minimum: 0,
-      title: 'SLat Guidance Rescale',
-      default: 0.5,
-    },
-    ss_rescale_t: {
-      description:
-        'Controls noise schedule sharpness for structure generation.',
-      maximum: 6,
-      type: 'number',
-      minimum: 1,
-      title: 'Sparse Structure Rescale T',
-      default: 5,
-    },
-    shape_slat_rescale_t: {
-      description: 'Controls noise schedule sharpness for shape refinement.',
-      maximum: 6,
-      type: 'number',
-      minimum: 1,
-      title: 'Shape SLat Rescale T',
-      default: 3,
-    },
-    slat_sampling_steps: {
-      description:
-        "Sampling steps for SLat stage (only used when ss_source='mesh').",
-      maximum: 50,
-      type: 'integer',
-      minimum: 1,
-      title: 'SLat Sampling Steps',
-      default: 12,
-    },
-    ss_sampling_steps: {
-      description: 'Number of denoising steps for the initial structure.',
-      maximum: 50,
-      type: 'integer',
-      minimum: 1,
-      title: 'Sparse Structure Sampling Steps',
-      default: 12,
-    },
-    seed: {
-      description: 'Random seed for reproducibility',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-    },
-    tex_slat_sampling_steps: {
-      description: 'Number of denoising steps for texture generation.',
-      maximum: 50,
-      type: 'integer',
-      minimum: 1,
-      title: 'Texture SLat Sampling Steps',
-      default: 12,
-    },
-    shape_slat_guidance_rescale: {
-      description: 'Dampens artifacts from high guidance in the shape stage.',
-      maximum: 1,
-      type: 'number',
-      minimum: 0,
-      title: 'Shape SLat Guidance Rescale',
-      default: 0.5,
-    },
-    image_urls: {
-      items: { type: 'string', 'x-fal-file-input': true },
-      description:
-        'One or more views of the same object. Multiple views yield higher-quality 3D reconstruction.',
-      minItems: 1,
-      examples: [
-        [
-          'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
-          'https://storage.googleapis.com/falserverless/model_tests/video_models/back.png',
-          'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
-        ],
-      ],
-      type: 'array',
-      title: 'Image URLs',
-      maxItems: 16,
-    },
-    slat_rescale_t: {
-      description:
-        "Rescale T for SLat stage (only used when ss_source='mesh').",
-      maximum: 6,
-      type: 'number',
-      minimum: 1,
-      title: 'SLat Rescale T',
-      default: 3,
-    },
-    resolution: {
-      enum: [512, 1024, 1536],
-      description: 'Output resolution; higher is slower but more detailed',
-      type: 'integer',
-      title: 'Resolution',
-      default: 1024,
-    },
-    decimation_target: {
-      description: 'Target number of vertices in the final mesh.',
-      maximum: 2000000,
-      type: 'integer',
-      minimum: 5000,
-      title: 'Decimation Target',
-      default: 500000,
-    },
-    slat_guidance_strength: {
-      description:
-        "Guidance strength for SLat stage (only used when ss_source='mesh').",
-      maximum: 10,
-      type: 'number',
-      minimum: 0,
-      title: 'SLat Guidance Strength',
-      default: 7.5,
-    },
-    tex_slat_guidance_rescale: {
-      description: 'Dampens artifacts from high guidance in the texture stage.',
-      maximum: 1,
-      type: 'number',
-      minimum: 0,
-      title: 'Texture SLat Guidance Rescale',
-      default: 0,
-    },
-  },
-  type: 'object',
   title: 'ImageInput',
+  type: 'object',
   'x-fal-order-properties': [
     'seed',
     'resolution',
@@ -8965,29 +8830,231 @@ export const Reconviagen05InputSchema = {
     'image_urls',
     'multi_image_strategy',
   ],
+  properties: {
+    resolution: {
+      title: 'Resolution',
+      enum: [512, 1024, 1536],
+      type: 'integer',
+      default: 1024,
+      description: 'Output resolution; higher is slower but more detailed',
+    },
+    slat_guidance_strength: {
+      title: 'SLat Guidance Strength',
+      minimum: 0,
+      type: 'number',
+      default: 7.5,
+      maximum: 10,
+      description:
+        "Guidance strength for SLat stage (only used when ss_source='mesh').",
+    },
+    multi_image_strategy: {
+      title: 'Multi Image Strategy',
+      enum: [
+        'average_right',
+        'weighted_average',
+        'sequential',
+        'average',
+        'adaptive_guidance_weight',
+        'fixed_guidance_rescale',
+      ],
+      type: 'string',
+      default: 'adaptive_guidance_weight',
+      description:
+        "Strategy for combining multi-view conditioning. 'adaptive_guidance_weight' works best in most cases. Only used when more than one image is provided.",
+    },
+    slat_guidance_rescale: {
+      title: 'SLat Guidance Rescale',
+      minimum: 0,
+      type: 'number',
+      default: 0.5,
+      maximum: 1,
+      description:
+        "Guidance rescale for SLat stage (only used when ss_source='mesh').",
+    },
+    seed: {
+      title: 'Seed',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      description: 'Random seed for reproducibility',
+    },
+    tex_slat_guidance_strength: {
+      title: 'Texture SLat Guidance Strength',
+      minimum: 0,
+      type: 'number',
+      default: 1,
+      maximum: 10,
+      description: 'How closely the texture follows the input colors.',
+    },
+    slat_rescale_t: {
+      title: 'SLat Rescale T',
+      minimum: 1,
+      type: 'number',
+      default: 3,
+      maximum: 6,
+      description:
+        "Rescale T for SLat stage (only used when ss_source='mesh').",
+    },
+    image_urls: {
+      description:
+        'One or more views of the same object. Multiple views yield higher-quality 3D reconstruction.',
+      examples: [
+        [
+          'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
+          'https://storage.googleapis.com/falserverless/model_tests/video_models/back.png',
+          'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
+        ],
+      ],
+      minItems: 1,
+      maxItems: 16,
+      type: 'array',
+      title: 'Image URLs',
+      items: { type: 'string', 'x-fal-file-input': true },
+    },
+    shape_slat_guidance_rescale: {
+      title: 'Shape SLat Guidance Rescale',
+      minimum: 0,
+      type: 'number',
+      default: 0.5,
+      maximum: 1,
+      description: 'Dampens artifacts from high guidance in the shape stage.',
+    },
+    tex_slat_guidance_rescale: {
+      title: 'Texture SLat Guidance Rescale',
+      minimum: 0,
+      type: 'number',
+      default: 0,
+      maximum: 1,
+      description: 'Dampens artifacts from high guidance in the texture stage.',
+    },
+    decimation_target: {
+      title: 'Decimation Target',
+      minimum: 5000,
+      type: 'integer',
+      default: 500000,
+      maximum: 2000000,
+      description: 'Target number of vertices in the final mesh.',
+    },
+    shape_slat_guidance_strength: {
+      title: 'Shape SLat Guidance Strength',
+      minimum: 0,
+      type: 'number',
+      default: 7.5,
+      maximum: 10,
+      description: 'How closely the detailed geometry follows the input.',
+    },
+    ss_guidance_rescale: {
+      title: 'Sparse Structure Guidance Rescale',
+      minimum: 0,
+      type: 'number',
+      default: 0.7,
+      maximum: 1,
+      description: 'Dampens artifacts from high guidance in stage 1.',
+    },
+    tex_slat_rescale_t: {
+      title: 'Texture SLat Rescale T',
+      minimum: 1,
+      type: 'number',
+      default: 3,
+      maximum: 6,
+      description: 'Controls noise schedule sharpness for texture generation.',
+    },
+    shape_slat_rescale_t: {
+      title: 'Shape SLat Rescale T',
+      minimum: 1,
+      type: 'number',
+      default: 3,
+      maximum: 6,
+      description: 'Controls noise schedule sharpness for shape refinement.',
+    },
+    slat_sampling_steps: {
+      title: 'SLat Sampling Steps',
+      minimum: 1,
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+      description:
+        "Sampling steps for SLat stage (only used when ss_source='mesh').",
+    },
+    texture_size: {
+      title: 'Texture Size',
+      enum: [1024, 2048, 4096],
+      type: 'integer',
+      default: 2048,
+      description: 'Resolution of the texture image baked onto the mesh.',
+    },
+    ss_rescale_t: {
+      title: 'Sparse Structure Rescale T',
+      minimum: 1,
+      type: 'number',
+      default: 5,
+      maximum: 6,
+      description:
+        'Controls noise schedule sharpness for structure generation.',
+    },
+    shape_slat_sampling_steps: {
+      title: 'Shape SLat Sampling Steps',
+      minimum: 1,
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+      description: 'Number of denoising steps for shape refinement.',
+    },
+    tex_slat_sampling_steps: {
+      title: 'Texture SLat Sampling Steps',
+      minimum: 1,
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+      description: 'Number of denoising steps for texture generation.',
+    },
+    ss_guidance_strength: {
+      title: 'Sparse Structure Guidance Strength',
+      minimum: 0,
+      type: 'number',
+      default: 7.5,
+      maximum: 10,
+      description:
+        'How closely the initial 3D structure follows the input. Higher values produce more faithful but potentially noisier results.',
+    },
+    ss_source: {
+      title: 'Sparse Structure Source',
+      enum: ['direct', 'mesh', 'mvtrellis2'],
+      type: 'string',
+      default: 'mesh',
+      description:
+        "Sparse structure source. 'mesh' gives best quality, 'direct' is fastest, 'mvtrellis2' uses multi-view TRELLIS.2.",
+    },
+    ss_sampling_steps: {
+      title: 'Sparse Structure Sampling Steps',
+      minimum: 1,
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+      description: 'Number of denoising steps for the initial structure.',
+    },
+  },
 } as const
 
 export const Reconviagen05OutputSchema = {
   required: ['model_glb', 'seed'],
+  title: 'ObjectOutput',
+  type: 'object',
+  'x-fal-order-properties': ['model_glb', 'seed'],
   properties: {
+    seed: {
+      title: 'Seed',
+      type: 'integer',
+      description: 'Seed used for generation.',
+    },
     model_glb: {
-      description: 'Generated 3D GLB file with PBR materials',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a951b66/qp0eJhESNtvkFHVd8q9M2_reconviagen_6a9848519c2d43a69dcce8c00a8803b2.glb',
         },
       ],
       $ref: '#/$defs/File',
-    },
-    seed: {
-      description: 'Seed used for generation.',
-      type: 'integer',
-      title: 'Seed',
+      description: 'Generated 3D GLB file with PBR materials',
     },
   },
-  type: 'object',
-  title: 'ObjectOutput',
-  'x-fal-order-properties': ['model_glb', 'seed'],
   $defs: {
     File: {
       title: 'File',
@@ -9029,43 +9096,55 @@ export const Reconviagen05OutputSchema = {
   },
 } as const
 
-export const SAM3DBodyAlignmentInfoSchema = {
-  description: 'Per-person alignment metadata.',
-  title: 'SAM3DBodyAlignmentInfo',
-  type: 'object',
+export const RodinGen25AddonsSchema = {
   properties: {
-    scale_factor: {
-      type: 'number',
-      title: 'Scale Factor',
-      description: 'Scale factor applied for alignment',
-    },
-    cropped_vertices_count: {
-      type: 'integer',
-      title: 'Cropped Vertices Count',
-      description: 'Number of cropped vertices',
-    },
-    translation: {
-      type: 'array',
-      title: 'Translation',
-      items: { type: 'number' },
-      description: 'Translation [tx, ty, tz]',
-    },
-    person_id: {
-      type: 'integer',
-      title: 'Person Id',
-      description: 'Index of the person',
-    },
-    focal_length: {
-      type: 'number',
-      title: 'Focal Length',
-      description: 'Focal length used',
-    },
-    target_points_count: {
-      type: 'integer',
-      title: 'Target Points Count',
-      description: 'Number of target points for alignment',
+    high_pack: {
+      description:
+        'Selecting HighPack generates 4K resolution texture instead of the default 2K. In Quad mode, the number of faces becomes ~16× the count set in the quality parameter.',
+      default: false,
+      title: 'High Pack',
+      type: 'boolean',
     },
   },
+  title: 'RodinGen25Addons',
+  'x-fal-order-properties': ['high_pack'],
+  type: 'object',
+} as const
+
+export const RodinGen25BbboxFieldSchema = {
+  properties: {
+    length: {
+      description: 'Length (z axis) dimension for the bounding box constraint.',
+      default: 100,
+      title: 'Length',
+      maximum: 2048,
+      minimum: 1,
+      type: 'integer',
+    },
+    height: {
+      description: 'Height (y axis) dimension for the bounding box constraint.',
+      default: 100,
+      title: 'Height',
+      maximum: 2048,
+      minimum: 1,
+      type: 'integer',
+    },
+    width: {
+      description: 'Width (x axis) dimension for the bounding box constraint.',
+      default: 100,
+      title: 'Width',
+      maximum: 2048,
+      minimum: 1,
+      type: 'integer',
+    },
+  },
+  title: 'RodinGen25BbboxField',
+  'x-fal-order-properties': ['width', 'height', 'length'],
+  type: 'object',
+} as const
+
+export const SAM3DBodyAlignmentInfoSchema = {
+  title: 'SAM3DBodyAlignmentInfo',
   'x-fal-order-properties': [
     'person_id',
     'scale_factor',
@@ -9074,6 +9153,39 @@ export const SAM3DBodyAlignmentInfoSchema = {
     'target_points_count',
     'cropped_vertices_count',
   ],
+  properties: {
+    target_points_count: {
+      title: 'Target Points Count',
+      description: 'Number of target points for alignment',
+      type: 'integer',
+    },
+    scale_factor: {
+      title: 'Scale Factor',
+      description: 'Scale factor applied for alignment',
+      type: 'number',
+    },
+    cropped_vertices_count: {
+      title: 'Cropped Vertices Count',
+      description: 'Number of cropped vertices',
+      type: 'integer',
+    },
+    translation: {
+      title: 'Translation',
+      items: { type: 'number' },
+      description: 'Translation [tx, ty, tz]',
+      type: 'array',
+    },
+    person_id: {
+      title: 'Person Id',
+      description: 'Index of the person',
+      type: 'integer',
+    },
+    focal_length: {
+      title: 'Focal Length',
+      description: 'Focal length used',
+      type: 'number',
+    },
+  },
   required: [
     'person_id',
     'scale_factor',
@@ -9082,168 +9194,39 @@ export const SAM3DBodyAlignmentInfoSchema = {
     'target_points_count',
     'cropped_vertices_count',
   ],
+  type: 'object',
+  description: 'Per-person alignment metadata.',
 } as const
 
 export const SAM3DBodyMetadataSchema = {
-  description: 'Metadata for body reconstruction output.',
   title: 'SAM3DBodyMetadata',
-  type: 'object',
+  'x-fal-order-properties': ['num_people', 'people', 'keypoint_names'],
   properties: {
     people: {
-      type: 'array',
       title: 'People',
       items: { $ref: '#/$defs/SAM3DBodyPersonMetadata' },
       description: 'Per-person metadata',
+      type: 'array',
     },
     num_people: {
-      type: 'integer',
       title: 'Num People',
       description: 'Number of people detected',
+      type: 'integer',
     },
     keypoint_names: {
-      type: 'array',
       title: 'Keypoint Names',
       items: { type: 'string' },
       description:
         "Ordered names of the 70 MHR keypoints returned by this endpoint. Index `i` in this list corresponds to index `i` in every person's `keypoints_2d` and `keypoints_3d` arrays. Sourced from facebookresearch/sam-3d-body `mhr70.py`.",
+      type: 'array',
     },
   },
-  'x-fal-order-properties': ['num_people', 'people', 'keypoint_names'],
   required: ['num_people', 'people'],
+  type: 'object',
+  description: 'Metadata for body reconstruction output.',
   $defs: {
     SAM3DBodyPersonMetadata: {
-      description:
-        'Per-person metadata for body reconstruction.\n\nThe 70 MHR keypoints follow the ordering in `SAM3D_BODY_MHR70_KEYPOINT_NAMES`\n(also exposed at the top level of `SAM3DBodyMetadata.keypoint_names`). The\nMHR parameter fields (`shape_params`, `body_pose_params`, ...) mirror the\noutputs of the upstream `SAM3DBodyEstimator.process_one_image` for\nclient-side pose manipulation, inverse linear-blend skinning, and canonical\nmesh reconstruction. They are only populated when `include_mhr_params=True`.',
       title: 'SAM3DBodyPersonMetadata',
-      type: 'object',
-      properties: {
-        bbox: {
-          type: 'array',
-          title: 'Bbox',
-          items: { type: 'number' },
-          description: 'Bounding box [x_min, y_min, x_max, y_max]',
-        },
-        global_rot: {
-          title: 'Global Rot',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Global root rotation produced by MHR. Shape matches the upstream tensor (axis-angle [3] or rotation matrix [3, 3]).',
-        },
-        expr_params: {
-          title: 'Expr Params',
-          anyOf: [
-            { type: 'array', items: { type: 'number' } },
-            { type: 'null' },
-          ],
-          description: 'MHR facial-expression parameters.',
-        },
-        focal_length: {
-          type: 'number',
-          title: 'Focal Length',
-          description: 'Estimated focal length',
-        },
-        pred_cam_t: {
-          type: 'array',
-          title: 'Pred Cam T',
-          items: { type: 'number' },
-          description: 'Predicted camera translation [tx, ty, tz]',
-        },
-        pred_joint_coords: {
-          title: 'Pred Joint Coords',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            'Skeleton joint positions in world space [[x, y, z], ...]. One row per MHR joint.',
-        },
-        scale_params: {
-          title: 'Scale Params',
-          anyOf: [
-            { type: 'array', items: { type: 'number' } },
-            { type: 'null' },
-          ],
-          description: 'MHR scale parameters (isotropic or per-axis).',
-        },
-        hand_pose_params: {
-          title: 'Hand Pose Params',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            'Per-joint hand pose parameters (axis-angle form) from the MHR model.',
-        },
-        mhr_model_params: {
-          title: 'Mhr Model Params',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Packed MHR parameter vector (concatenated shape/pose/expression/scale). Shape is forwarded as-is from the upstream model.',
-        },
-        person_id: {
-          type: 'integer',
-          title: 'Person Id',
-          description: 'Index of the person in the scene',
-        },
-        keypoints_2d: {
-          type: 'array',
-          title: 'Keypoints 2D',
-          items: { type: 'array', items: { type: 'number' } },
-          description:
-            '2D keypoints [[x, y], ...] - 70 MHR body keypoints in image coordinates. See `SAM3DBodyMetadata.keypoint_names` for the ordered name of each index.',
-        },
-        keypoints_3d: {
-          title: 'Keypoints 3D',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            '3D keypoints [[x, y, z], ...] - 70 MHR body keypoints in camera space. Ordering matches `keypoints_2d` / `SAM3DBodyMetadata.keypoint_names`.',
-        },
-        shape_params: {
-          title: 'Shape Params',
-          anyOf: [
-            { type: 'array', items: { type: 'number' } },
-            { type: 'null' },
-          ],
-          description:
-            'MHR identity (β) shape parameters. Enables local canonical-pose mesh reconstruction when combined with the MHR model.',
-        },
-        pred_global_rots: {
-          title: 'Pred Global Rots',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Per-joint global rotations (world-space), typically [N_joints, 3, 3] rotation matrices. Needed for inverse linear-blend skinning / un-posing clients.',
-        },
-        body_pose_params: {
-          title: 'Body Pose Params',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            'Per-joint body pose parameters (axis-angle form) from the MHR model.',
-        },
-        pred_pose_raw: {
-          title: 'Pred Pose Raw',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Raw pose transforms produced by the MHR decoder (pre-FK), forwarded as-is from the upstream model.',
-        },
-      },
       'x-fal-order-properties': [
         'person_id',
         'bbox',
@@ -9262,6 +9245,134 @@ export const SAM3DBodyMetadataSchema = {
         'mhr_model_params',
         'pred_pose_raw',
       ],
+      properties: {
+        scale_params: {
+          title: 'Scale Params',
+          description: 'MHR scale parameters (isotropic or per-axis).',
+          anyOf: [
+            { items: { type: 'number' }, type: 'array' },
+            { type: 'null' },
+          ],
+        },
+        hand_pose_params: {
+          title: 'Hand Pose Params',
+          description:
+            'Per-joint hand pose parameters (axis-angle form) from the MHR model.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        pred_joint_coords: {
+          title: 'Pred Joint Coords',
+          description:
+            'Skeleton joint positions in world space [[x, y, z], ...]. One row per MHR joint.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        person_id: {
+          title: 'Person Id',
+          description: 'Index of the person in the scene',
+          type: 'integer',
+        },
+        mhr_model_params: {
+          title: 'Mhr Model Params',
+          description:
+            'Packed MHR parameter vector (concatenated shape/pose/expression/scale). Shape is forwarded as-is from the upstream model.',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        body_pose_params: {
+          title: 'Body Pose Params',
+          description:
+            'Per-joint body pose parameters (axis-angle form) from the MHR model.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        bbox: {
+          title: 'Bbox',
+          items: { type: 'number' },
+          description: 'Bounding box [x_min, y_min, x_max, y_max]',
+          type: 'array',
+        },
+        keypoints_2d: {
+          title: 'Keypoints 2D',
+          items: { items: { type: 'number' }, type: 'array' },
+          description:
+            '2D keypoints [[x, y], ...] - 70 MHR body keypoints in image coordinates. See `SAM3DBodyMetadata.keypoint_names` for the ordered name of each index.',
+          type: 'array',
+        },
+        pred_global_rots: {
+          title: 'Pred Global Rots',
+          description:
+            'Per-joint global rotations (world-space), typically [N_joints, 3, 3] rotation matrices. Needed for inverse linear-blend skinning / un-posing clients.',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        pred_cam_t: {
+          title: 'Pred Cam T',
+          items: { type: 'number' },
+          description: 'Predicted camera translation [tx, ty, tz]',
+          type: 'array',
+        },
+        expr_params: {
+          title: 'Expr Params',
+          description: 'MHR facial-expression parameters.',
+          anyOf: [
+            { items: { type: 'number' }, type: 'array' },
+            { type: 'null' },
+          ],
+        },
+        keypoints_3d: {
+          title: 'Keypoints 3D',
+          description:
+            '3D keypoints [[x, y, z], ...] - 70 MHR body keypoints in camera space. Ordering matches `keypoints_2d` / `SAM3DBodyMetadata.keypoint_names`.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        global_rot: {
+          title: 'Global Rot',
+          description:
+            'Global root rotation produced by MHR. Shape matches the upstream tensor (axis-angle [3] or rotation matrix [3, 3]).',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        shape_params: {
+          title: 'Shape Params',
+          description:
+            'MHR identity (β) shape parameters. Enables local canonical-pose mesh reconstruction when combined with the MHR model.',
+          anyOf: [
+            { items: { type: 'number' }, type: 'array' },
+            { type: 'null' },
+          ],
+        },
+        pred_pose_raw: {
+          title: 'Pred Pose Raw',
+          description:
+            'Raw pose transforms produced by the MHR decoder (pre-FK), forwarded as-is from the upstream model.',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        focal_length: {
+          title: 'Focal Length',
+          description: 'Estimated focal length',
+          type: 'number',
+        },
+      },
       required: [
         'person_id',
         'bbox',
@@ -9269,122 +9380,15 @@ export const SAM3DBodyMetadataSchema = {
         'pred_cam_t',
         'keypoints_2d',
       ],
+      type: 'object',
+      description:
+        'Per-person metadata for body reconstruction.\n\nThe 70 MHR keypoints follow the ordering in `SAM3D_BODY_MHR70_KEYPOINT_NAMES`\n(also exposed at the top level of `SAM3DBodyMetadata.keypoint_names`). The\nMHR parameter fields (`shape_params`, `body_pose_params`, ...) mirror the\noutputs of the upstream `SAM3DBodyEstimator.process_one_image` for\nclient-side pose manipulation, inverse linear-blend skinning, and canonical\nmesh reconstruction. They are only populated when `include_mhr_params=True`.',
     },
   },
 } as const
 
 export const SAM3DBodyPersonMetadataSchema = {
-  description:
-    'Per-person metadata for body reconstruction.\n\nThe 70 MHR keypoints follow the ordering in `SAM3D_BODY_MHR70_KEYPOINT_NAMES`\n(also exposed at the top level of `SAM3DBodyMetadata.keypoint_names`). The\nMHR parameter fields (`shape_params`, `body_pose_params`, ...) mirror the\noutputs of the upstream `SAM3DBodyEstimator.process_one_image` for\nclient-side pose manipulation, inverse linear-blend skinning, and canonical\nmesh reconstruction. They are only populated when `include_mhr_params=True`.',
   title: 'SAM3DBodyPersonMetadata',
-  type: 'object',
-  properties: {
-    bbox: {
-      type: 'array',
-      title: 'Bbox',
-      items: { type: 'number' },
-      description: 'Bounding box [x_min, y_min, x_max, y_max]',
-    },
-    global_rot: {
-      title: 'Global Rot',
-      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-      description:
-        'Global root rotation produced by MHR. Shape matches the upstream tensor (axis-angle [3] or rotation matrix [3, 3]).',
-    },
-    expr_params: {
-      title: 'Expr Params',
-      anyOf: [{ type: 'array', items: { type: 'number' } }, { type: 'null' }],
-      description: 'MHR facial-expression parameters.',
-    },
-    focal_length: {
-      type: 'number',
-      title: 'Focal Length',
-      description: 'Estimated focal length',
-    },
-    pred_cam_t: {
-      type: 'array',
-      title: 'Pred Cam T',
-      items: { type: 'number' },
-      description: 'Predicted camera translation [tx, ty, tz]',
-    },
-    pred_joint_coords: {
-      title: 'Pred Joint Coords',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description:
-        'Skeleton joint positions in world space [[x, y, z], ...]. One row per MHR joint.',
-    },
-    scale_params: {
-      title: 'Scale Params',
-      anyOf: [{ type: 'array', items: { type: 'number' } }, { type: 'null' }],
-      description: 'MHR scale parameters (isotropic or per-axis).',
-    },
-    hand_pose_params: {
-      title: 'Hand Pose Params',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description:
-        'Per-joint hand pose parameters (axis-angle form) from the MHR model.',
-    },
-    mhr_model_params: {
-      title: 'Mhr Model Params',
-      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-      description:
-        'Packed MHR parameter vector (concatenated shape/pose/expression/scale). Shape is forwarded as-is from the upstream model.',
-    },
-    person_id: {
-      type: 'integer',
-      title: 'Person Id',
-      description: 'Index of the person in the scene',
-    },
-    keypoints_2d: {
-      type: 'array',
-      title: 'Keypoints 2D',
-      items: { type: 'array', items: { type: 'number' } },
-      description:
-        '2D keypoints [[x, y], ...] - 70 MHR body keypoints in image coordinates. See `SAM3DBodyMetadata.keypoint_names` for the ordered name of each index.',
-    },
-    keypoints_3d: {
-      title: 'Keypoints 3D',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description:
-        '3D keypoints [[x, y, z], ...] - 70 MHR body keypoints in camera space. Ordering matches `keypoints_2d` / `SAM3DBodyMetadata.keypoint_names`.',
-    },
-    shape_params: {
-      title: 'Shape Params',
-      anyOf: [{ type: 'array', items: { type: 'number' } }, { type: 'null' }],
-      description:
-        'MHR identity (β) shape parameters. Enables local canonical-pose mesh reconstruction when combined with the MHR model.',
-    },
-    pred_global_rots: {
-      title: 'Pred Global Rots',
-      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-      description:
-        'Per-joint global rotations (world-space), typically [N_joints, 3, 3] rotation matrices. Needed for inverse linear-blend skinning / un-posing clients.',
-    },
-    body_pose_params: {
-      title: 'Body Pose Params',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description:
-        'Per-joint body pose parameters (axis-angle form) from the MHR model.',
-    },
-    pred_pose_raw: {
-      title: 'Pred Pose Raw',
-      anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-      description:
-        'Raw pose transforms produced by the MHR decoder (pre-FK), forwarded as-is from the upstream model.',
-    },
-  },
   'x-fal-order-properties': [
     'person_id',
     'bbox',
@@ -9403,52 +9407,121 @@ export const SAM3DBodyPersonMetadataSchema = {
     'mhr_model_params',
     'pred_pose_raw',
   ],
+  properties: {
+    scale_params: {
+      title: 'Scale Params',
+      description: 'MHR scale parameters (isotropic or per-axis).',
+      anyOf: [{ items: { type: 'number' }, type: 'array' }, { type: 'null' }],
+    },
+    hand_pose_params: {
+      title: 'Hand Pose Params',
+      description:
+        'Per-joint hand pose parameters (axis-angle form) from the MHR model.',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    pred_joint_coords: {
+      title: 'Pred Joint Coords',
+      description:
+        'Skeleton joint positions in world space [[x, y, z], ...]. One row per MHR joint.',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    person_id: {
+      title: 'Person Id',
+      description: 'Index of the person in the scene',
+      type: 'integer',
+    },
+    mhr_model_params: {
+      title: 'Mhr Model Params',
+      description:
+        'Packed MHR parameter vector (concatenated shape/pose/expression/scale). Shape is forwarded as-is from the upstream model.',
+      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+    },
+    body_pose_params: {
+      title: 'Body Pose Params',
+      description:
+        'Per-joint body pose parameters (axis-angle form) from the MHR model.',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    bbox: {
+      title: 'Bbox',
+      items: { type: 'number' },
+      description: 'Bounding box [x_min, y_min, x_max, y_max]',
+      type: 'array',
+    },
+    keypoints_2d: {
+      title: 'Keypoints 2D',
+      items: { items: { type: 'number' }, type: 'array' },
+      description:
+        '2D keypoints [[x, y], ...] - 70 MHR body keypoints in image coordinates. See `SAM3DBodyMetadata.keypoint_names` for the ordered name of each index.',
+      type: 'array',
+    },
+    pred_global_rots: {
+      title: 'Pred Global Rots',
+      description:
+        'Per-joint global rotations (world-space), typically [N_joints, 3, 3] rotation matrices. Needed for inverse linear-blend skinning / un-posing clients.',
+      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+    },
+    pred_cam_t: {
+      title: 'Pred Cam T',
+      items: { type: 'number' },
+      description: 'Predicted camera translation [tx, ty, tz]',
+      type: 'array',
+    },
+    expr_params: {
+      title: 'Expr Params',
+      description: 'MHR facial-expression parameters.',
+      anyOf: [{ items: { type: 'number' }, type: 'array' }, { type: 'null' }],
+    },
+    keypoints_3d: {
+      title: 'Keypoints 3D',
+      description:
+        '3D keypoints [[x, y, z], ...] - 70 MHR body keypoints in camera space. Ordering matches `keypoints_2d` / `SAM3DBodyMetadata.keypoint_names`.',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    global_rot: {
+      title: 'Global Rot',
+      description:
+        'Global root rotation produced by MHR. Shape matches the upstream tensor (axis-angle [3] or rotation matrix [3, 3]).',
+      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+    },
+    shape_params: {
+      title: 'Shape Params',
+      description:
+        'MHR identity (β) shape parameters. Enables local canonical-pose mesh reconstruction when combined with the MHR model.',
+      anyOf: [{ items: { type: 'number' }, type: 'array' }, { type: 'null' }],
+    },
+    pred_pose_raw: {
+      title: 'Pred Pose Raw',
+      description:
+        'Raw pose transforms produced by the MHR decoder (pre-FK), forwarded as-is from the upstream model.',
+      anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+    },
+    focal_length: {
+      title: 'Focal Length',
+      description: 'Estimated focal length',
+      type: 'number',
+    },
+  },
   required: ['person_id', 'bbox', 'focal_length', 'pred_cam_t', 'keypoints_2d'],
+  type: 'object',
+  description:
+    'Per-person metadata for body reconstruction.\n\nThe 70 MHR keypoints follow the ordering in `SAM3D_BODY_MHR70_KEYPOINT_NAMES`\n(also exposed at the top level of `SAM3DBodyMetadata.keypoint_names`). The\nMHR parameter fields (`shape_params`, `body_pose_params`, ...) mirror the\noutputs of the upstream `SAM3DBodyEstimator.process_one_image` for\nclient-side pose manipulation, inverse linear-blend skinning, and canonical\nmesh reconstruction. They are only populated when `include_mhr_params=True`.',
 } as const
 
 export const SAM3DObjectMetadataSchema = {
-  description: 'Per-object metadata for 3D reconstruction.',
   title: 'SAM3DObjectMetadata',
-  type: 'object',
-  properties: {
-    translation: {
-      title: 'Translation',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description: 'Translation [tx, ty, tz]',
-    },
-    rotation: {
-      title: 'Rotation',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description: 'Rotation quaternion [x, y, z, w]',
-    },
-    camera_pose: {
-      title: 'Camera Pose',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description: 'Camera pose matrix',
-    },
-    object_index: {
-      type: 'integer',
-      title: 'Object Index',
-      description: 'Index of the object in the scene',
-    },
-    scale: {
-      title: 'Scale',
-      anyOf: [
-        { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-        { type: 'null' },
-      ],
-      description: 'Scale factors [sx, sy, sz]',
-    },
-  },
   'x-fal-order-properties': [
     'object_index',
     'scale',
@@ -9456,43 +9529,51 @@ export const SAM3DObjectMetadataSchema = {
     'translation',
     'camera_pose',
   ],
+  properties: {
+    translation: {
+      title: 'Translation',
+      description: 'Translation [tx, ty, tz]',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    object_index: {
+      title: 'Object Index',
+      description: 'Index of the object in the scene',
+      type: 'integer',
+    },
+    camera_pose: {
+      title: 'Camera Pose',
+      description: 'Camera pose matrix',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    scale: {
+      title: 'Scale',
+      description: 'Scale factors [sx, sy, sz]',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    rotation: {
+      title: 'Rotation',
+      description: 'Rotation quaternion [x, y, z, w]',
+      anyOf: [
+        { items: { items: { type: 'number' }, type: 'array' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+  },
   required: ['object_index'],
+  type: 'object',
+  description: 'Per-object metadata for 3D reconstruction.',
 } as const
 
 export const Sam33dAlignInputSchema = {
-  type: 'object',
-  properties: {
-    body_mask_url: {
-      title: 'Body Mask Url',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      description:
-        'URL of the human mask image. If not provided, uses full image.',
-    },
-    image_url: {
-      type: 'string',
-      title: 'Image Url',
-      description: 'URL of the original image used for MoGe depth estimation',
-      'x-fal-file-input': true,
-    },
-    body_mesh_url: {
-      type: 'string',
-      title: 'Body Mesh Url',
-      description: 'URL of the SAM-3D Body mesh file (.ply or .glb) to align',
-      'x-fal-file-input': true,
-    },
-    focal_length: {
-      title: 'Focal Length',
-      anyOf: [{ type: 'number' }, { type: 'null' }],
-      description:
-        'Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe.',
-    },
-    object_mesh_url: {
-      title: 'Object Mesh Url',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      description:
-        'Optional URL of SAM-3D Object mesh (.glb) to create combined scene',
-    },
-  },
   title: 'SAM3DAlignmentInput',
   'x-fal-order-properties': [
     'image_url',
@@ -9501,34 +9582,43 @@ export const Sam33dAlignInputSchema = {
     'object_mesh_url',
     'focal_length',
   ],
+  properties: {
+    body_mesh_url: {
+      title: 'Body Mesh Url',
+      description: 'URL of the SAM-3D Body mesh file (.ply or .glb) to align',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    object_mesh_url: {
+      title: 'Object Mesh Url',
+      description:
+        'Optional URL of SAM-3D Object mesh (.glb) to create combined scene',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    image_url: {
+      title: 'Image Url',
+      description: 'URL of the original image used for MoGe depth estimation',
+      type: 'string',
+      'x-fal-file-input': true,
+    },
+    body_mask_url: {
+      title: 'Body Mask Url',
+      description:
+        'URL of the human mask image. If not provided, uses full image.',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    focal_length: {
+      title: 'Focal Length',
+      description:
+        'Focal length from SAM-3D Body metadata. If not provided, estimated from MoGe.',
+      anyOf: [{ type: 'number' }, { type: 'null' }],
+    },
+  },
   required: ['image_url', 'body_mesh_url'],
+  type: 'object',
 } as const
 
 export const Sam33dAlignOutputSchema = {
-  type: 'object',
-  properties: {
-    metadata: {
-      $ref: '#/$defs/SAM3DBodyAlignmentInfo',
-      description: 'Alignment info (scale, translation, etc.)',
-    },
-    visualization: {
-      $ref: '#/$defs/File',
-      description: 'Visualization of aligned mesh overlaid on input image',
-    },
-    body_mesh_ply: {
-      $ref: '#/$defs/File',
-      description: 'Aligned body mesh in PLY format',
-    },
-    scene_glb: {
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      description:
-        'Combined scene with body + object meshes in GLB format (only when object_mesh_url provided)',
-    },
-    model_glb: {
-      $ref: '#/$defs/File',
-      description: 'Aligned body mesh in GLB format (for 3D preview)',
-    },
-  },
   title: 'SAM3DAlignmentOutput',
   'x-fal-order-properties': [
     'body_mesh_ply',
@@ -9537,7 +9627,31 @@ export const Sam33dAlignOutputSchema = {
     'metadata',
     'scene_glb',
   ],
+  properties: {
+    scene_glb: {
+      description:
+        'Combined scene with body + object meshes in GLB format (only when object_mesh_url provided)',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+    body_mesh_ply: {
+      description: 'Aligned body mesh in PLY format',
+      $ref: '#/$defs/File',
+    },
+    metadata: {
+      description: 'Alignment info (scale, translation, etc.)',
+      $ref: '#/$defs/SAM3DBodyAlignmentInfo',
+    },
+    model_glb: {
+      description: 'Aligned body mesh in GLB format (for 3D preview)',
+      $ref: '#/$defs/File',
+    },
+    visualization: {
+      description: 'Visualization of aligned mesh overlaid on input image',
+      $ref: '#/$defs/File',
+    },
+  },
   required: ['body_mesh_ply', 'model_glb', 'visualization', 'metadata'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -9577,42 +9691,7 @@ export const Sam33dAlignOutputSchema = {
       ],
     },
     SAM3DBodyAlignmentInfo: {
-      description: 'Per-person alignment metadata.',
       title: 'SAM3DBodyAlignmentInfo',
-      type: 'object',
-      properties: {
-        scale_factor: {
-          type: 'number',
-          title: 'Scale Factor',
-          description: 'Scale factor applied for alignment',
-        },
-        cropped_vertices_count: {
-          type: 'integer',
-          title: 'Cropped Vertices Count',
-          description: 'Number of cropped vertices',
-        },
-        translation: {
-          type: 'array',
-          title: 'Translation',
-          items: { type: 'number' },
-          description: 'Translation [tx, ty, tz]',
-        },
-        person_id: {
-          type: 'integer',
-          title: 'Person Id',
-          description: 'Index of the person',
-        },
-        focal_length: {
-          type: 'number',
-          title: 'Focal Length',
-          description: 'Focal length used',
-        },
-        target_points_count: {
-          type: 'integer',
-          title: 'Target Points Count',
-          description: 'Number of target points for alignment',
-        },
-      },
       'x-fal-order-properties': [
         'person_id',
         'scale_factor',
@@ -9621,6 +9700,39 @@ export const Sam33dAlignOutputSchema = {
         'target_points_count',
         'cropped_vertices_count',
       ],
+      properties: {
+        target_points_count: {
+          title: 'Target Points Count',
+          description: 'Number of target points for alignment',
+          type: 'integer',
+        },
+        scale_factor: {
+          title: 'Scale Factor',
+          description: 'Scale factor applied for alignment',
+          type: 'number',
+        },
+        cropped_vertices_count: {
+          title: 'Cropped Vertices Count',
+          description: 'Number of cropped vertices',
+          type: 'integer',
+        },
+        translation: {
+          title: 'Translation',
+          items: { type: 'number' },
+          description: 'Translation [tx, ty, tz]',
+          type: 'array',
+        },
+        person_id: {
+          title: 'Person Id',
+          description: 'Index of the person',
+          type: 'integer',
+        },
+        focal_length: {
+          title: 'Focal Length',
+          description: 'Focal length used',
+          type: 'number',
+        },
+      },
       required: [
         'person_id',
         'scale_factor',
@@ -9629,49 +9741,13 @@ export const Sam33dAlignOutputSchema = {
         'target_points_count',
         'cropped_vertices_count',
       ],
+      type: 'object',
+      description: 'Per-person alignment metadata.',
     },
   },
 } as const
 
 export const Sam33dBodyInputSchema = {
-  type: 'object',
-  properties: {
-    include_mhr_params: {
-      default: true,
-      type: 'boolean',
-      title: 'Include Mhr Params',
-      description:
-        'Include the full MHR (Meta Human Representation) parameter set per person in the response metadata (shape, pose, expression, global rotations, joint coordinates, packed model params, raw pose). Set to `false` to return a leaner metadata block with only keypoints and camera parameters.',
-    },
-    image_url: {
-      description: 'URL of the image containing humans',
-      type: 'string',
-      title: 'Image Url',
-      examples: [
-        'https://v3b.fal.media/files/b/0a8439f8/E8gEXWsl2C-Euo4dGayzi_An_zyCCnSaytVklh_99sSYt4Z4Hh5e3s7VnNlx5JfN5KuC0j_bnq1AP9JfRoAmOQz5TP0DdCYMk4796Gloe5no1vvpoqhD-p3kE.jpeg',
-      ],
-      'x-fal-file-input': true,
-    },
-    export_meshes: {
-      default: true,
-      type: 'boolean',
-      title: 'Export Meshes',
-      description: 'Export individual mesh files (.ply) per person',
-    },
-    include_3d_keypoints: {
-      default: true,
-      type: 'boolean',
-      title: 'Include 3D Keypoints',
-      description:
-        'Include 3D keypoint markers (spheres) in the GLB mesh for visualization',
-    },
-    mask_url: {
-      title: 'Mask Url',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      description:
-        'Optional URL of a binary mask image (white=person, black=background). When provided, skips auto human detection and uses this mask instead. Bbox is auto-computed from the mask.',
-    },
-  },
   title: 'SAM3DBodyInput',
   'x-fal-order-properties': [
     'image_url',
@@ -9680,40 +9756,48 @@ export const Sam33dBodyInputSchema = {
     'include_3d_keypoints',
     'include_mhr_params',
   ],
+  properties: {
+    include_mhr_params: {
+      title: 'Include Mhr Params',
+      description:
+        'Include the full MHR (Meta Human Representation) parameter set per person in the response metadata (shape, pose, expression, global rotations, joint coordinates, packed model params, raw pose). Set to `false` to return a leaner metadata block with only keypoints and camera parameters.',
+      type: 'boolean',
+      default: true,
+    },
+    export_meshes: {
+      title: 'Export Meshes',
+      description: 'Export individual mesh files (.ply) per person',
+      type: 'boolean',
+      default: true,
+    },
+    include_3d_keypoints: {
+      title: 'Include 3D Keypoints',
+      description:
+        'Include 3D keypoint markers (spheres) in the GLB mesh for visualization',
+      type: 'boolean',
+      default: true,
+    },
+    image_url: {
+      title: 'Image Url',
+      description: 'URL of the image containing humans',
+      type: 'string',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8439f8/E8gEXWsl2C-Euo4dGayzi_An_zyCCnSaytVklh_99sSYt4Z4Hh5e3s7VnNlx5JfN5KuC0j_bnq1AP9JfRoAmOQz5TP0DdCYMk4796Gloe5no1vvpoqhD-p3kE.jpeg',
+      ],
+      'x-fal-file-input': true,
+    },
+    mask_url: {
+      title: 'Mask Url',
+      description:
+        'Optional URL of a binary mask image (white=person, black=background). When provided, skips auto human detection and uses this mask instead. Bbox is auto-computed from the mask.',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+  },
   required: ['image_url'],
+  type: 'object',
 } as const
 
 export const Sam33dBodyOutputSchema = {
-  type: 'object',
-  properties: {
-    metadata: {
-      $ref: '#/$defs/SAM3DBodyMetadata',
-      description:
-        'Structured metadata including keypoints and camera parameters',
-    },
-    visualization: {
-      $ref: '#/$defs/File',
-      description:
-        'Combined visualization image (original + keypoints + mesh + side view)',
-    },
-    meshes: {
-      title: 'Meshes',
-      anyOf: [
-        { type: 'array', items: { $ref: '#/$defs/File' } },
-        { type: 'null' },
-      ],
-      description:
-        'Individual mesh files (.ply), one per detected person (when export_meshes=True)',
-    },
-    model_glb: {
-      description:
-        '3D body mesh in GLB format with optional 3D keypoint markers',
-      $ref: '#/$defs/File',
-      examples: [
-        'https://v3b.fal.media/files/b/0a8439f9/5LVt3C2YesqnQzg-CxPpu_combined_bodies.glb',
-      ],
-    },
-  },
   title: 'SAM3DBodyOutput',
   'x-fal-order-properties': [
     'model_glb',
@@ -9721,7 +9805,37 @@ export const Sam33dBodyOutputSchema = {
     'meshes',
     'metadata',
   ],
+  properties: {
+    meshes: {
+      title: 'Meshes',
+      description:
+        'Individual mesh files (.ply), one per detected person (when export_meshes=True)',
+      anyOf: [
+        { items: { $ref: '#/$defs/File' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    metadata: {
+      description:
+        'Structured metadata including keypoints and camera parameters',
+      $ref: '#/$defs/SAM3DBodyMetadata',
+    },
+    model_glb: {
+      description:
+        '3D body mesh in GLB format with optional 3D keypoint markers',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8439f9/5LVt3C2YesqnQzg-CxPpu_combined_bodies.glb',
+      ],
+      $ref: '#/$defs/File',
+    },
+    visualization: {
+      description:
+        'Combined visualization image (original + keypoints + mesh + side view)',
+      $ref: '#/$defs/File',
+    },
+  },
   required: ['model_glb', 'visualization', 'metadata'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -9761,165 +9875,34 @@ export const Sam33dBodyOutputSchema = {
       ],
     },
     SAM3DBodyMetadata: {
-      description: 'Metadata for body reconstruction output.',
       title: 'SAM3DBodyMetadata',
-      type: 'object',
+      'x-fal-order-properties': ['num_people', 'people', 'keypoint_names'],
       properties: {
         people: {
-          type: 'array',
           title: 'People',
           items: { $ref: '#/$defs/SAM3DBodyPersonMetadata' },
           description: 'Per-person metadata',
+          type: 'array',
         },
         num_people: {
-          type: 'integer',
           title: 'Num People',
           description: 'Number of people detected',
+          type: 'integer',
         },
         keypoint_names: {
-          type: 'array',
           title: 'Keypoint Names',
           items: { type: 'string' },
           description:
             "Ordered names of the 70 MHR keypoints returned by this endpoint. Index `i` in this list corresponds to index `i` in every person's `keypoints_2d` and `keypoints_3d` arrays. Sourced from facebookresearch/sam-3d-body `mhr70.py`.",
+          type: 'array',
         },
       },
-      'x-fal-order-properties': ['num_people', 'people', 'keypoint_names'],
       required: ['num_people', 'people'],
+      type: 'object',
+      description: 'Metadata for body reconstruction output.',
     },
     SAM3DBodyPersonMetadata: {
-      description:
-        'Per-person metadata for body reconstruction.\n\nThe 70 MHR keypoints follow the ordering in `SAM3D_BODY_MHR70_KEYPOINT_NAMES`\n(also exposed at the top level of `SAM3DBodyMetadata.keypoint_names`). The\nMHR parameter fields (`shape_params`, `body_pose_params`, ...) mirror the\noutputs of the upstream `SAM3DBodyEstimator.process_one_image` for\nclient-side pose manipulation, inverse linear-blend skinning, and canonical\nmesh reconstruction. They are only populated when `include_mhr_params=True`.',
       title: 'SAM3DBodyPersonMetadata',
-      type: 'object',
-      properties: {
-        bbox: {
-          type: 'array',
-          title: 'Bbox',
-          items: { type: 'number' },
-          description: 'Bounding box [x_min, y_min, x_max, y_max]',
-        },
-        global_rot: {
-          title: 'Global Rot',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Global root rotation produced by MHR. Shape matches the upstream tensor (axis-angle [3] or rotation matrix [3, 3]).',
-        },
-        expr_params: {
-          title: 'Expr Params',
-          anyOf: [
-            { type: 'array', items: { type: 'number' } },
-            { type: 'null' },
-          ],
-          description: 'MHR facial-expression parameters.',
-        },
-        focal_length: {
-          type: 'number',
-          title: 'Focal Length',
-          description: 'Estimated focal length',
-        },
-        pred_cam_t: {
-          type: 'array',
-          title: 'Pred Cam T',
-          items: { type: 'number' },
-          description: 'Predicted camera translation [tx, ty, tz]',
-        },
-        pred_joint_coords: {
-          title: 'Pred Joint Coords',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            'Skeleton joint positions in world space [[x, y, z], ...]. One row per MHR joint.',
-        },
-        scale_params: {
-          title: 'Scale Params',
-          anyOf: [
-            { type: 'array', items: { type: 'number' } },
-            { type: 'null' },
-          ],
-          description: 'MHR scale parameters (isotropic or per-axis).',
-        },
-        hand_pose_params: {
-          title: 'Hand Pose Params',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            'Per-joint hand pose parameters (axis-angle form) from the MHR model.',
-        },
-        mhr_model_params: {
-          title: 'Mhr Model Params',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Packed MHR parameter vector (concatenated shape/pose/expression/scale). Shape is forwarded as-is from the upstream model.',
-        },
-        person_id: {
-          type: 'integer',
-          title: 'Person Id',
-          description: 'Index of the person in the scene',
-        },
-        keypoints_2d: {
-          type: 'array',
-          title: 'Keypoints 2D',
-          items: { type: 'array', items: { type: 'number' } },
-          description:
-            '2D keypoints [[x, y], ...] - 70 MHR body keypoints in image coordinates. See `SAM3DBodyMetadata.keypoint_names` for the ordered name of each index.',
-        },
-        keypoints_3d: {
-          title: 'Keypoints 3D',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            '3D keypoints [[x, y, z], ...] - 70 MHR body keypoints in camera space. Ordering matches `keypoints_2d` / `SAM3DBodyMetadata.keypoint_names`.',
-        },
-        shape_params: {
-          title: 'Shape Params',
-          anyOf: [
-            { type: 'array', items: { type: 'number' } },
-            { type: 'null' },
-          ],
-          description:
-            'MHR identity (β) shape parameters. Enables local canonical-pose mesh reconstruction when combined with the MHR model.',
-        },
-        pred_global_rots: {
-          title: 'Pred Global Rots',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Per-joint global rotations (world-space), typically [N_joints, 3, 3] rotation matrices. Needed for inverse linear-blend skinning / un-posing clients.',
-        },
-        body_pose_params: {
-          title: 'Body Pose Params',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description:
-            'Per-joint body pose parameters (axis-angle form) from the MHR model.',
-        },
-        pred_pose_raw: {
-          title: 'Pred Pose Raw',
-          anyOf: [{ type: 'array', items: {} }, { type: 'null' }],
-          description:
-            'Raw pose transforms produced by the MHR decoder (pre-FK), forwarded as-is from the upstream model.',
-        },
-      },
       'x-fal-order-properties': [
         'person_id',
         'bbox',
@@ -9938,6 +9921,134 @@ export const Sam33dBodyOutputSchema = {
         'mhr_model_params',
         'pred_pose_raw',
       ],
+      properties: {
+        scale_params: {
+          title: 'Scale Params',
+          description: 'MHR scale parameters (isotropic or per-axis).',
+          anyOf: [
+            { items: { type: 'number' }, type: 'array' },
+            { type: 'null' },
+          ],
+        },
+        hand_pose_params: {
+          title: 'Hand Pose Params',
+          description:
+            'Per-joint hand pose parameters (axis-angle form) from the MHR model.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        pred_joint_coords: {
+          title: 'Pred Joint Coords',
+          description:
+            'Skeleton joint positions in world space [[x, y, z], ...]. One row per MHR joint.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        person_id: {
+          title: 'Person Id',
+          description: 'Index of the person in the scene',
+          type: 'integer',
+        },
+        mhr_model_params: {
+          title: 'Mhr Model Params',
+          description:
+            'Packed MHR parameter vector (concatenated shape/pose/expression/scale). Shape is forwarded as-is from the upstream model.',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        body_pose_params: {
+          title: 'Body Pose Params',
+          description:
+            'Per-joint body pose parameters (axis-angle form) from the MHR model.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        bbox: {
+          title: 'Bbox',
+          items: { type: 'number' },
+          description: 'Bounding box [x_min, y_min, x_max, y_max]',
+          type: 'array',
+        },
+        keypoints_2d: {
+          title: 'Keypoints 2D',
+          items: { items: { type: 'number' }, type: 'array' },
+          description:
+            '2D keypoints [[x, y], ...] - 70 MHR body keypoints in image coordinates. See `SAM3DBodyMetadata.keypoint_names` for the ordered name of each index.',
+          type: 'array',
+        },
+        pred_global_rots: {
+          title: 'Pred Global Rots',
+          description:
+            'Per-joint global rotations (world-space), typically [N_joints, 3, 3] rotation matrices. Needed for inverse linear-blend skinning / un-posing clients.',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        pred_cam_t: {
+          title: 'Pred Cam T',
+          items: { type: 'number' },
+          description: 'Predicted camera translation [tx, ty, tz]',
+          type: 'array',
+        },
+        expr_params: {
+          title: 'Expr Params',
+          description: 'MHR facial-expression parameters.',
+          anyOf: [
+            { items: { type: 'number' }, type: 'array' },
+            { type: 'null' },
+          ],
+        },
+        keypoints_3d: {
+          title: 'Keypoints 3D',
+          description:
+            '3D keypoints [[x, y, z], ...] - 70 MHR body keypoints in camera space. Ordering matches `keypoints_2d` / `SAM3DBodyMetadata.keypoint_names`.',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        global_rot: {
+          title: 'Global Rot',
+          description:
+            'Global root rotation produced by MHR. Shape matches the upstream tensor (axis-angle [3] or rotation matrix [3, 3]).',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        shape_params: {
+          title: 'Shape Params',
+          description:
+            'MHR identity (β) shape parameters. Enables local canonical-pose mesh reconstruction when combined with the MHR model.',
+          anyOf: [
+            { items: { type: 'number' }, type: 'array' },
+            { type: 'null' },
+          ],
+        },
+        pred_pose_raw: {
+          title: 'Pred Pose Raw',
+          description:
+            'Raw pose transforms produced by the MHR decoder (pre-FK), forwarded as-is from the upstream model.',
+          anyOf: [{ items: {}, type: 'array' }, { type: 'null' }],
+        },
+        focal_length: {
+          title: 'Focal Length',
+          description: 'Estimated focal length',
+          type: 'number',
+        },
+      },
       required: [
         'person_id',
         'bbox',
@@ -9945,76 +10056,14 @@ export const Sam33dBodyOutputSchema = {
         'pred_cam_t',
         'keypoints_2d',
       ],
+      type: 'object',
+      description:
+        'Per-person metadata for body reconstruction.\n\nThe 70 MHR keypoints follow the ordering in `SAM3D_BODY_MHR70_KEYPOINT_NAMES`\n(also exposed at the top level of `SAM3DBodyMetadata.keypoint_names`). The\nMHR parameter fields (`shape_params`, `body_pose_params`, ...) mirror the\noutputs of the upstream `SAM3DBodyEstimator.process_one_image` for\nclient-side pose manipulation, inverse linear-blend skinning, and canonical\nmesh reconstruction. They are only populated when `include_mhr_params=True`.',
     },
   },
 } as const
 
 export const Sam33dObjectsInputSchema = {
-  type: 'object',
-  properties: {
-    box_prompts: {
-      default: [],
-      type: 'array',
-      title: 'Box Prompts',
-      items: { $ref: '#/$defs/BoxPromptBase' },
-      description:
-        'Box prompts for auto-segmentation when no masks provided. Multiple boxes supported - each produces a separate object mask for 3D reconstruction.',
-    },
-    mask_urls: {
-      type: 'array',
-      title: 'Mask Urls',
-      items: { type: 'string', 'x-fal-file-input': true },
-      description:
-        'Optional list of mask URLs (one per object). If not provided, use prompt/point_prompts/box_prompts to auto-segment, or entire image will be used.',
-    },
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'Random seed for reproducibility',
-    },
-    export_textured_glb: {
-      default: false,
-      type: 'boolean',
-      title: 'Export Textured Glb',
-      description:
-        'If True, exports GLB with baked texture and UVs instead of vertex colors.',
-    },
-    image_url: {
-      description: 'URL of the image to reconstruct in 3D',
-      type: 'string',
-      title: 'Image Url',
-      examples: [
-        'https://v3b.fal.media/files/b/0a8439e5/TyAmfW5w_sqRXRzWVBGsW_car.jpeg',
-      ],
-      'x-fal-file-input': true,
-    },
-    pointmap_url: {
-      title: 'Pointmap Url',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      description:
-        'Optional URL to external pointmap/depth data (NPY or NPZ format) for improved 3D reconstruction depth estimation',
-    },
-    detection_threshold: {
-      title: 'Detection Threshold',
-      anyOf: [{ minimum: 0.1, type: 'number', maximum: 1 }, { type: 'null' }],
-      description:
-        "Detection confidence threshold (0.1-1.0). Lower = more detections but less precise. If not set, uses the model's default.",
-    },
-    point_prompts: {
-      default: [],
-      type: 'array',
-      title: 'Point Prompts',
-      items: { $ref: '#/$defs/PointPromptBase' },
-      description: 'Point prompts for auto-segmentation when no masks provided',
-    },
-    prompt: {
-      default: 'car',
-      title: 'Prompt',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      description:
-        "Text prompt for auto-segmentation when no masks provided (e.g., 'chair', 'lamp')",
-    },
-  },
   title: 'SAM3DObjectInput',
   'x-fal-order-properties': [
     'image_url',
@@ -10027,38 +10076,74 @@ export const Sam33dObjectsInputSchema = {
     'detection_threshold',
     'export_textured_glb',
   ],
+  properties: {
+    image_url: {
+      title: 'Image Url',
+      description: 'URL of the image to reconstruct in 3D',
+      type: 'string',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8439e5/TyAmfW5w_sqRXRzWVBGsW_car.jpeg',
+      ],
+      'x-fal-file-input': true,
+    },
+    export_textured_glb: {
+      title: 'Export Textured Glb',
+      description:
+        'If True, exports GLB with baked texture and UVs instead of vertex colors.',
+      type: 'boolean',
+      default: false,
+    },
+    pointmap_url: {
+      title: 'Pointmap Url',
+      description:
+        'Optional URL to external pointmap/depth data (NPY or NPZ format) for improved 3D reconstruction depth estimation',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    detection_threshold: {
+      title: 'Detection Threshold',
+      description:
+        "Detection confidence threshold (0.1-1.0). Lower = more detections but less precise. If not set, uses the model's default.",
+      anyOf: [{ minimum: 0.1, type: 'number', maximum: 1 }, { type: 'null' }],
+    },
+    mask_urls: {
+      title: 'Mask Urls',
+      items: { type: 'string', 'x-fal-file-input': true },
+      description:
+        'Optional list of mask URLs (one per object). If not provided, use prompt/point_prompts/box_prompts to auto-segment, or entire image will be used.',
+      type: 'array',
+    },
+    point_prompts: {
+      title: 'Point Prompts',
+      items: { $ref: '#/$defs/PointPromptBase' },
+      description: 'Point prompts for auto-segmentation when no masks provided',
+      type: 'array',
+      default: [],
+    },
+    prompt: {
+      title: 'Prompt',
+      description:
+        "Text prompt for auto-segmentation when no masks provided (e.g., 'chair', 'lamp')",
+      default: 'car',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+    },
+    box_prompts: {
+      title: 'Box Prompts',
+      items: { $ref: '#/$defs/BoxPromptBase' },
+      description:
+        'Box prompts for auto-segmentation when no masks provided. Multiple boxes supported - each produces a separate object mask for 3D reconstruction.',
+      type: 'array',
+      default: [],
+    },
+    seed: {
+      title: 'Seed',
+      description: 'Random seed for reproducibility',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+  },
   required: ['image_url'],
+  type: 'object',
   $defs: {
     BoxPromptBase: {
-      type: 'object',
-      properties: {
-        x_min: {
-          title: 'X Min',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'X Min Coordinate of the box',
-        },
-        y_max: {
-          title: 'Y Max',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'Y Max Coordinate of the box',
-        },
-        x_max: {
-          title: 'X Max',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'X Max Coordinate of the box',
-        },
-        y_min: {
-          title: 'Y Min',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'Y Min Coordinate of the box',
-        },
-        object_id: {
-          title: 'Object Id',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description:
-            'Optional object identifier. Boxes sharing an object id refine the same object.',
-        },
-      },
       title: 'BoxPromptBase',
       'x-fal-order-properties': [
         'x_min',
@@ -10067,85 +10152,68 @@ export const Sam33dObjectsInputSchema = {
         'y_max',
         'object_id',
       ],
-    },
-    PointPromptBase: {
-      type: 'object',
       properties: {
-        x: {
-          title: 'X',
+        y_min: {
+          title: 'Y Min',
+          description: 'Y Min Coordinate of the box',
           anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'X Coordinate of the prompt',
         },
-        y: {
-          title: 'Y',
+        y_max: {
+          title: 'Y Max',
+          description: 'Y Max Coordinate of the box',
           anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'Y Coordinate of the prompt',
+        },
+        x_max: {
+          title: 'X Max',
+          description: 'X Max Coordinate of the box',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+        x_min: {
+          title: 'X Min',
+          description: 'X Min Coordinate of the box',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         object_id: {
           title: 'Object Id',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
           description:
-            'Optional object identifier. Prompts sharing an object id refine the same object.',
+            'Optional object identifier. Boxes sharing an object id refine the same object.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+      },
+      type: 'object',
+    },
+    PointPromptBase: {
+      title: 'PointPromptBase',
+      'x-fal-order-properties': ['x', 'y', 'label', 'object_id'],
+      properties: {
+        y: {
+          title: 'Y',
+          description: 'Y Coordinate of the prompt',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+        },
+        x: {
+          title: 'X',
+          description: 'X Coordinate of the prompt',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
         label: {
           title: 'Label',
-          anyOf: [{ type: 'integer', enum: [0, 1] }, { type: 'null' }],
           description: '1 for foreground, 0 for background',
+          anyOf: [{ enum: [0, 1], type: 'integer' }, { type: 'null' }],
+        },
+        object_id: {
+          title: 'Object Id',
+          description:
+            'Optional object identifier. Prompts sharing an object id refine the same object.',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
         },
       },
-      title: 'PointPromptBase',
-      'x-fal-order-properties': ['x', 'y', 'label', 'object_id'],
+      type: 'object',
     },
   },
 } as const
 
 export const Sam33dObjectsOutputSchema = {
-  type: 'object',
-  properties: {
-    gaussian_splat: {
-      $ref: '#/$defs/File',
-      description:
-        'Gaussian splat file (.ply) - combined scene splat for multi-object, single splat otherwise',
-    },
-    individual_glbs: {
-      title: 'Individual Glbs',
-      anyOf: [
-        {
-          type: 'array',
-          items: { anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }] },
-        },
-        { type: 'null' },
-      ],
-      description:
-        'Individual GLB mesh files per object (only for multi-object scenes)',
-    },
-    model_glb: {
-      default:
-        'https://v3b.fal.media/files/b/0a8439e7/mqHMt17hzqDaqVMF7q0dB_combined_scene.glb',
-      $ref: '#/$defs/File',
-      description:
-        '3D mesh in GLB format - combined scene for multi-object, single mesh otherwise',
-    },
-    individual_splats: {
-      title: 'Individual Splats',
-      anyOf: [
-        { type: 'array', items: { $ref: '#/$defs/File' } },
-        { type: 'null' },
-      ],
-      description:
-        'Individual Gaussian splat files per object (only for multi-object scenes)',
-    },
-    metadata: {
-      type: 'array',
-      title: 'Metadata',
-      items: { $ref: '#/$defs/SAM3DObjectMetadata' },
-      description: 'Per-object metadata (rotation/translation/scale)',
-    },
-    artifacts_zip: {
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
-      description: 'Zip bundle containing all artifacts and metadata',
-    },
-  },
   title: 'SAM3DObjectOutput',
   'x-fal-order-properties': [
     'gaussian_splat',
@@ -10155,7 +10223,53 @@ export const Sam33dObjectsOutputSchema = {
     'individual_glbs',
     'artifacts_zip',
   ],
+  properties: {
+    gaussian_splat: {
+      description:
+        'Gaussian splat file (.ply) - combined scene splat for multi-object, single splat otherwise',
+      $ref: '#/$defs/File',
+    },
+    individual_glbs: {
+      title: 'Individual Glbs',
+      description:
+        'Individual GLB mesh files per object (only for multi-object scenes)',
+      anyOf: [
+        {
+          items: { anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }] },
+          type: 'array',
+        },
+        { type: 'null' },
+      ],
+    },
+    metadata: {
+      title: 'Metadata',
+      items: { $ref: '#/$defs/SAM3DObjectMetadata' },
+      description: 'Per-object metadata (rotation/translation/scale)',
+      type: 'array',
+    },
+    individual_splats: {
+      title: 'Individual Splats',
+      description:
+        'Individual Gaussian splat files per object (only for multi-object scenes)',
+      anyOf: [
+        { items: { $ref: '#/$defs/File' }, type: 'array' },
+        { type: 'null' },
+      ],
+    },
+    model_glb: {
+      description:
+        '3D mesh in GLB format - combined scene for multi-object, single mesh otherwise',
+      $ref: '#/$defs/File',
+      default:
+        'https://v3b.fal.media/files/b/0a8439e7/mqHMt17hzqDaqVMF7q0dB_combined_scene.glb',
+    },
+    artifacts_zip: {
+      description: 'Zip bundle containing all artifacts and metadata',
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    },
+  },
   required: ['gaussian_splat', 'metadata'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -10195,60 +10309,7 @@ export const Sam33dObjectsOutputSchema = {
       ],
     },
     SAM3DObjectMetadata: {
-      description: 'Per-object metadata for 3D reconstruction.',
       title: 'SAM3DObjectMetadata',
-      type: 'object',
-      properties: {
-        translation: {
-          title: 'Translation',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description: 'Translation [tx, ty, tz]',
-        },
-        rotation: {
-          title: 'Rotation',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description: 'Rotation quaternion [x, y, z, w]',
-        },
-        camera_pose: {
-          title: 'Camera Pose',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description: 'Camera pose matrix',
-        },
-        object_index: {
-          type: 'integer',
-          title: 'Object Index',
-          description: 'Index of the object in the scene',
-        },
-        scale: {
-          title: 'Scale',
-          anyOf: [
-            {
-              type: 'array',
-              items: { type: 'array', items: { type: 'number' } },
-            },
-            { type: 'null' },
-          ],
-          description: 'Scale factors [sx, sy, sz]',
-        },
-      },
       'x-fal-order-properties': [
         'object_index',
         'scale',
@@ -10256,7 +10317,60 @@ export const Sam33dObjectsOutputSchema = {
         'translation',
         'camera_pose',
       ],
+      properties: {
+        translation: {
+          title: 'Translation',
+          description: 'Translation [tx, ty, tz]',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        object_index: {
+          title: 'Object Index',
+          description: 'Index of the object in the scene',
+          type: 'integer',
+        },
+        camera_pose: {
+          title: 'Camera Pose',
+          description: 'Camera pose matrix',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        scale: {
+          title: 'Scale',
+          description: 'Scale factors [sx, sy, sz]',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+        rotation: {
+          title: 'Rotation',
+          description: 'Rotation quaternion [x, y, z, w]',
+          anyOf: [
+            {
+              items: { items: { type: 'number' }, type: 'array' },
+              type: 'array',
+            },
+            { type: 'null' },
+          ],
+        },
+      },
       required: ['object_index'],
+      type: 'object',
+      description: 'Per-object metadata for 3D reconstruction.',
     },
   },
 } as const
@@ -10324,269 +10438,7 @@ export const TextureFilesSchema = {
 } as const
 
 export const Trellis2InputSchema = {
-  properties: {
-    remesh: {
-      type: 'boolean',
-      title: 'Remesh',
-      default: true,
-      description:
-        'Rebuild the mesh topology for cleaner triangles. Slower but usually produces better results for downstream use (animation, 3D printing, etc).',
-    },
-    resolution: {
-      type: 'integer',
-      enum: [512, 1024, 1536],
-      title: 'Resolution',
-      default: 1024,
-      description: 'Output resolution; higher is slower but more detailed',
-    },
-    ss_guidance_strength: {
-      type: 'number',
-      title: 'Ss Guidance Strength',
-      maximum: 10,
-      minimum: 0,
-      description:
-        'How closely the initial 3D structure follows the input image. Higher values produce more faithful but potentially noisier results.',
-      default: 7.5,
-    },
-    shape_slat_sampling_steps: {
-      type: 'integer',
-      title: 'Shape Slat Sampling Steps',
-      maximum: 50,
-      minimum: 1,
-      description:
-        'Number of denoising steps for shape refinement. More steps = slower but potentially smoother geometry.',
-      default: 12,
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Random seed for reproducibility',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    uv_unwrap_global_iterations: {
-      type: 'integer',
-      title: 'Uv Unwrap Global Iterations',
-      maximum: 10,
-      minimum: 1,
-      description:
-        'Number of global clustering passes during UV chart computation. More passes produce more balanced charts.',
-      default: 1,
-    },
-    remesh_band: {
-      type: 'number',
-      title: 'Remesh Band',
-      maximum: 4,
-      minimum: 0,
-      description:
-        'Controls how far remeshing can move vertices from the original surface. Higher values allow more smoothing but may lose fine details.',
-      default: 1,
-    },
-    uv_unwrap_smooth_strength: {
-      type: 'number',
-      title: 'Uv Unwrap Smooth Strength',
-      maximum: 10,
-      minimum: 0,
-      description:
-        'Smoothing strength applied to UV chart boundaries. Higher values reduce visible seams but may introduce UV distortion.',
-      default: 1,
-    },
-    decimation_target: {
-      type: 'integer',
-      title: 'Decimation Target',
-      maximum: 2000000,
-      minimum: 5000,
-      description:
-        'Target number of vertices in the final mesh. Lower values produce smaller files but less detail. 500k is good for most uses, reduce to 20k-50k for web/mobile.',
-      default: 500000,
-    },
-    ss_guidance_interval_end: {
-      type: 'number',
-      title: 'Ss Guidance Interval End',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance ends for stage 1 (sparse structure). Must be >= ss_guidance_interval_start.',
-      default: 1,
-    },
-    tex_slat_guidance_rescale: {
-      type: 'number',
-      title: 'Tex Slat Guidance Rescale',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Dampens artifacts from high guidance in the texture stage. Increase if textures look noisy or have color banding.',
-      default: 0,
-    },
-    remesh_project: {
-      type: 'number',
-      title: 'Remesh Project',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'How much to project remeshed vertices back onto the original surface. 0 = no projection (smoother), 1 = full projection (preserves detail).',
-      default: 0,
-    },
-    shape_slat_rescale_t: {
-      type: 'number',
-      title: 'Shape Slat Rescale T',
-      maximum: 6,
-      minimum: 1,
-      description:
-        'Controls noise schedule sharpness for shape refinement. Higher values produce sharper geometric details.',
-      default: 3,
-    },
-    texture_size: {
-      type: 'integer',
-      enum: [1024, 2048, 4096],
-      title: 'Texture Size',
-      default: 2048,
-      description:
-        'Resolution of the texture image baked onto the mesh. Higher values capture finer surface details but produce larger files.',
-    },
-    ss_sampling_steps: {
-      type: 'integer',
-      title: 'Ss Sampling Steps',
-      maximum: 50,
-      minimum: 1,
-      description:
-        'Number of denoising steps for the initial structure. More steps = slower but potentially higher quality.',
-      default: 12,
-    },
-    image_url: {
-      type: 'string',
-      title: 'Image Url',
-      examples: [
-        'https://v3b.fal.media/files/b/0a86b60d/xkpao5B0uxmH0tmJm0HVL_2fe35ce1-fe44-475b-b582-6846a149537c.png',
-      ],
-      description: 'URL of the input image to convert to 3D',
-      'x-fal-file-input': true,
-    },
-    ss_rescale_t: {
-      type: 'number',
-      title: 'Ss Rescale T',
-      maximum: 6,
-      minimum: 1,
-      description:
-        'Controls noise schedule sharpness for structure generation. Higher values produce sharper transitions.',
-      default: 5,
-    },
-    shape_slat_guidance_interval_start: {
-      type: 'number',
-      title: 'Shape Slat Guidance Interval Start',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance starts for stage 2 (shape refinement). Guidance is only applied between interval_start and interval_end.',
-      default: 0.6,
-    },
-    tex_slat_guidance_interval_end: {
-      type: 'number',
-      title: 'Tex Slat Guidance Interval End',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance ends for stage 3 (texture). Must be >= tex_slat_guidance_interval_start.',
-      default: 0.9,
-    },
-    tex_slat_rescale_t: {
-      type: 'number',
-      title: 'Tex Slat Rescale T',
-      maximum: 6,
-      minimum: 1,
-      description:
-        'Controls noise schedule sharpness for texture generation. Higher values produce sharper texture details.',
-      default: 3,
-    },
-    uv_unwrap_angle_threshold_deg: {
-      type: 'number',
-      title: 'Uv Unwrap Angle Threshold Deg',
-      maximum: 180,
-      minimum: 0,
-      description:
-        'Maximum angle (in degrees) between adjacent face normals allowed within a single UV chart. Lower values produce more charts with less distortion; higher values produce fewer, larger charts with potentially more stretching.',
-      default: 90,
-    },
-    tex_slat_guidance_interval_start: {
-      type: 'number',
-      title: 'Tex Slat Guidance Interval Start',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance starts for stage 3 (texture). Guidance is only applied between interval_start and interval_end.',
-      default: 0.6,
-    },
-    shape_slat_guidance_rescale: {
-      type: 'number',
-      title: 'Shape Slat Guidance Rescale',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Dampens artifacts from high guidance in the shape stage. Increase if you see noisy geometry.',
-      default: 0.5,
-    },
-    shape_slat_guidance_interval_end: {
-      type: 'number',
-      title: 'Shape Slat Guidance Interval End',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance ends for stage 2 (shape refinement). Must be >= shape_slat_guidance_interval_start.',
-      default: 1,
-    },
-    shape_slat_guidance_strength: {
-      type: 'number',
-      title: 'Shape Slat Guidance Strength',
-      maximum: 10,
-      minimum: 0,
-      description:
-        'How closely the detailed geometry follows the input image. Higher values add more detail but may introduce noise.',
-      default: 7.5,
-    },
-    ss_guidance_rescale: {
-      type: 'number',
-      title: 'Ss Guidance Rescale',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Dampens artifacts from high guidance in stage 1. Lower values allow stronger guidance effects, higher values stabilize the output.',
-      default: 0.7,
-    },
-    tex_slat_sampling_steps: {
-      type: 'integer',
-      title: 'Tex Slat Sampling Steps',
-      maximum: 50,
-      minimum: 1,
-      description:
-        'Number of denoising steps for texture generation. More steps = slower but potentially cleaner textures.',
-      default: 12,
-    },
-    uv_unwrap_refine_iterations: {
-      type: 'integer',
-      title: 'Uv Unwrap Refine Iterations',
-      maximum: 10,
-      minimum: 0,
-      description:
-        'Number of local refinement passes during UV chart computation. Higher values produce cleaner chart boundaries at the cost of additional UV-unwrap time.',
-      default: 0,
-    },
-    ss_guidance_interval_start: {
-      type: 'number',
-      title: 'Ss Guidance Interval Start',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance starts for stage 1 (sparse structure). Guidance is only applied between interval_start and interval_end; outside this window the model runs unguided. Lower values apply guidance earlier.',
-      default: 0.6,
-    },
-    tex_slat_guidance_strength: {
-      type: 'number',
-      title: 'Tex Slat Guidance Strength',
-      maximum: 10,
-      minimum: 0,
-      description:
-        'How closely the texture follows the input image colors. Higher values produce more vivid but potentially oversaturated textures.',
-      default: 1,
-    },
-  },
+  type: 'object',
   'x-fal-order-properties': [
     'seed',
     'resolution',
@@ -10619,27 +10471,289 @@ export const Trellis2InputSchema = {
     'uv_unwrap_smooth_strength',
     'image_url',
   ],
-  title: 'SingleImageInputModel',
-  type: 'object',
   required: ['image_url'],
+  title: 'SingleImageInputModel',
+  properties: {
+    tex_slat_guidance_strength: {
+      type: 'number',
+      description:
+        'How closely the texture follows the input image colors. Higher values produce more vivid but potentially oversaturated textures.',
+      default: 1,
+      maximum: 10,
+      minimum: 0,
+      title: 'Tex Slat Guidance Strength',
+    },
+    shape_slat_guidance_strength: {
+      type: 'number',
+      description:
+        'How closely the detailed geometry follows the input image. Higher values add more detail but may introduce noise.',
+      default: 7.5,
+      maximum: 10,
+      minimum: 0,
+      title: 'Shape Slat Guidance Strength',
+    },
+    ss_sampling_steps: {
+      type: 'integer',
+      description:
+        'Number of denoising steps for the initial structure. More steps = slower but potentially higher quality.',
+      default: 12,
+      maximum: 50,
+      minimum: 1,
+      title: 'Ss Sampling Steps',
+    },
+    tex_slat_sampling_steps: {
+      type: 'integer',
+      description:
+        'Number of denoising steps for texture generation. More steps = slower but potentially cleaner textures.',
+      default: 12,
+      maximum: 50,
+      minimum: 1,
+      title: 'Tex Slat Sampling Steps',
+    },
+    shape_slat_rescale_t: {
+      type: 'number',
+      description:
+        'Controls noise schedule sharpness for shape refinement. Higher values produce sharper geometric details.',
+      default: 3,
+      maximum: 6,
+      minimum: 1,
+      title: 'Shape Slat Rescale T',
+    },
+    shape_slat_sampling_steps: {
+      type: 'integer',
+      description:
+        'Number of denoising steps for shape refinement. More steps = slower but potentially smoother geometry.',
+      default: 12,
+      maximum: 50,
+      minimum: 1,
+      title: 'Shape Slat Sampling Steps',
+    },
+    ss_guidance_interval_start: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance starts for stage 1 (sparse structure). Guidance is only applied between interval_start and interval_end; outside this window the model runs unguided. Lower values apply guidance earlier.',
+      default: 0.6,
+      maximum: 1,
+      minimum: 0,
+      title: 'Ss Guidance Interval Start',
+    },
+    remesh_project: {
+      type: 'number',
+      description:
+        'How much to project remeshed vertices back onto the original surface. 0 = no projection (smoother), 1 = full projection (preserves detail).',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      title: 'Remesh Project',
+    },
+    seed: {
+      description: 'Random seed for reproducibility',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+    },
+    remesh_band: {
+      type: 'number',
+      description:
+        'Controls how far remeshing can move vertices from the original surface. Higher values allow more smoothing but may lose fine details.',
+      default: 1,
+      maximum: 4,
+      minimum: 0,
+      title: 'Remesh Band',
+    },
+    uv_unwrap_angle_threshold_deg: {
+      type: 'number',
+      description:
+        'Maximum angle (in degrees) between adjacent face normals allowed within a single UV chart. Lower values produce more charts with less distortion; higher values produce fewer, larger charts with potentially more stretching.',
+      default: 90,
+      maximum: 180,
+      minimum: 0,
+      title: 'Uv Unwrap Angle Threshold Deg',
+    },
+    decimation_target: {
+      type: 'integer',
+      description:
+        'Target number of vertices in the final mesh. Lower values produce smaller files but less detail. 500k is good for most uses, reduce to 20k-50k for web/mobile.',
+      default: 500000,
+      maximum: 2000000,
+      minimum: 5000,
+      title: 'Decimation Target',
+    },
+    shape_slat_guidance_interval_end: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance ends for stage 2 (shape refinement). Must be >= shape_slat_guidance_interval_start.',
+      default: 1,
+      maximum: 1,
+      minimum: 0,
+      title: 'Shape Slat Guidance Interval End',
+    },
+    tex_slat_rescale_t: {
+      type: 'number',
+      description:
+        'Controls noise schedule sharpness for texture generation. Higher values produce sharper texture details.',
+      default: 3,
+      maximum: 6,
+      minimum: 1,
+      title: 'Tex Slat Rescale T',
+    },
+    shape_slat_guidance_interval_start: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance starts for stage 2 (shape refinement). Guidance is only applied between interval_start and interval_end.',
+      default: 0.6,
+      maximum: 1,
+      minimum: 0,
+      title: 'Shape Slat Guidance Interval Start',
+    },
+    tex_slat_guidance_interval_start: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance starts for stage 3 (texture). Guidance is only applied between interval_start and interval_end.',
+      default: 0.6,
+      maximum: 1,
+      minimum: 0,
+      title: 'Tex Slat Guidance Interval Start',
+    },
+    image_url: {
+      type: 'string',
+      description: 'URL of the input image to convert to 3D',
+      examples: [
+        'https://v3b.fal.media/files/b/0a86b60d/xkpao5B0uxmH0tmJm0HVL_2fe35ce1-fe44-475b-b582-6846a149537c.png',
+      ],
+      title: 'Image Url',
+      'x-fal-file-input': true,
+    },
+    remesh: {
+      type: 'boolean',
+      description:
+        'Rebuild the mesh topology for cleaner triangles. Slower but usually produces better results for downstream use (animation, 3D printing, etc).',
+      default: true,
+      title: 'Remesh',
+    },
+    ss_guidance_interval_end: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance ends for stage 1 (sparse structure). Must be >= ss_guidance_interval_start.',
+      default: 1,
+      maximum: 1,
+      minimum: 0,
+      title: 'Ss Guidance Interval End',
+    },
+    tex_slat_guidance_rescale: {
+      type: 'number',
+      description:
+        'Dampens artifacts from high guidance in the texture stage. Increase if textures look noisy or have color banding.',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      title: 'Tex Slat Guidance Rescale',
+    },
+    uv_unwrap_refine_iterations: {
+      type: 'integer',
+      description:
+        'Number of local refinement passes during UV chart computation. Higher values produce cleaner chart boundaries at the cost of additional UV-unwrap time.',
+      default: 0,
+      maximum: 10,
+      minimum: 0,
+      title: 'Uv Unwrap Refine Iterations',
+    },
+    ss_rescale_t: {
+      type: 'number',
+      description:
+        'Controls noise schedule sharpness for structure generation. Higher values produce sharper transitions.',
+      default: 5,
+      maximum: 6,
+      minimum: 1,
+      title: 'Ss Rescale T',
+    },
+    tex_slat_guidance_interval_end: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance ends for stage 3 (texture). Must be >= tex_slat_guidance_interval_start.',
+      default: 0.9,
+      maximum: 1,
+      minimum: 0,
+      title: 'Tex Slat Guidance Interval End',
+    },
+    texture_size: {
+      type: 'integer',
+      description:
+        'Resolution of the texture image baked onto the mesh. Higher values capture finer surface details but produce larger files.',
+      default: 2048,
+      enum: [1024, 2048, 4096],
+      title: 'Texture Size',
+    },
+    uv_unwrap_smooth_strength: {
+      type: 'number',
+      description:
+        'Smoothing strength applied to UV chart boundaries. Higher values reduce visible seams but may introduce UV distortion.',
+      default: 1,
+      maximum: 10,
+      minimum: 0,
+      title: 'Uv Unwrap Smooth Strength',
+    },
+    ss_guidance_rescale: {
+      type: 'number',
+      description:
+        'Dampens artifacts from high guidance in stage 1. Lower values allow stronger guidance effects, higher values stabilize the output.',
+      default: 0.7,
+      maximum: 1,
+      minimum: 0,
+      title: 'Ss Guidance Rescale',
+    },
+    resolution: {
+      type: 'integer',
+      description: 'Output resolution; higher is slower but more detailed',
+      default: 1024,
+      enum: [512, 1024, 1536],
+      title: 'Resolution',
+    },
+    ss_guidance_strength: {
+      type: 'number',
+      description:
+        'How closely the initial 3D structure follows the input image. Higher values produce more faithful but potentially noisier results.',
+      default: 7.5,
+      maximum: 10,
+      minimum: 0,
+      title: 'Ss Guidance Strength',
+    },
+    uv_unwrap_global_iterations: {
+      type: 'integer',
+      description:
+        'Number of global clustering passes during UV chart computation. More passes produce more balanced charts.',
+      default: 1,
+      maximum: 10,
+      minimum: 1,
+      title: 'Uv Unwrap Global Iterations',
+    },
+    shape_slat_guidance_rescale: {
+      type: 'number',
+      description:
+        'Dampens artifacts from high guidance in the shape stage. Increase if you see noisy geometry.',
+      default: 0.5,
+      maximum: 1,
+      minimum: 0,
+      title: 'Shape Slat Guidance Rescale',
+    },
+  },
 } as const
 
 export const Trellis2OutputSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['model_glb'],
+  required: ['model_glb'],
+  title: 'ObjectOutput',
   properties: {
     model_glb: {
+      description: 'Generated 3D GLB file',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a86b61d/DNmTkiWHUQ8k-rG6aussB_trellis2_68d6300f70f34d23b69a912b5fe60487.glb',
         },
       ],
-      $ref: '#/$defs/File',
-      description: 'Generated 3D GLB file',
     },
   },
-  'x-fal-order-properties': ['model_glb'],
-  title: 'ObjectOutput',
-  type: 'object',
-  required: ['model_glb'],
   $defs: {
     File: {
       title: 'File',
@@ -10682,102 +10796,7 @@ export const Trellis2OutputSchema = {
 } as const
 
 export const Trellis2RetextureInputSchema = {
-  properties: {
-    tex_slat_guidance_interval_end: {
-      type: 'number',
-      title: 'Tex Slat Guidance Interval End',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance ends for the texture stage. Must be >= tex_slat_guidance_interval_start.',
-      default: 0.9,
-    },
-    tex_slat_rescale_t: {
-      type: 'number',
-      title: 'Tex Slat Rescale T',
-      maximum: 6,
-      minimum: 1,
-      description:
-        'Controls noise schedule sharpness for texture generation. Higher values produce sharper texture details.',
-      default: 3,
-    },
-    tex_slat_sampling_steps: {
-      type: 'integer',
-      title: 'Tex Slat Sampling Steps',
-      maximum: 50,
-      minimum: 1,
-      description:
-        'Number of denoising steps for texture generation. More steps = slower but potentially cleaner textures.',
-      default: 12,
-    },
-    resolution: {
-      type: 'integer',
-      enum: [512, 1024],
-      title: 'Resolution',
-      default: 1024,
-      description:
-        'Internal resolution for texture generation. Higher produces finer texture details but is slower.',
-    },
-    tex_slat_guidance_rescale: {
-      type: 'number',
-      title: 'Tex Slat Guidance Rescale',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Dampens artifacts from high guidance in the texture stage. Increase if textures look noisy or have color banding.',
-      default: 0,
-    },
-    seed: {
-      title: 'Seed',
-      description: 'Random seed for reproducibility',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    tex_slat_guidance_interval_start: {
-      type: 'number',
-      title: 'Tex Slat Guidance Interval Start',
-      maximum: 1,
-      minimum: 0,
-      description:
-        'Fraction of the denoising process at which classifier-free guidance starts for the texture stage. Guidance is only applied between interval_start and interval_end.',
-      default: 0.6,
-    },
-    texture_size: {
-      type: 'integer',
-      enum: [1024, 2048, 4096],
-      title: 'Texture Size',
-      default: 2048,
-      description:
-        'Resolution of the texture image baked onto the mesh. Higher values capture finer surface details but produce larger files.',
-    },
-    tex_slat_guidance_strength: {
-      type: 'number',
-      title: 'Tex Slat Guidance Strength',
-      maximum: 10,
-      minimum: 0,
-      description:
-        'How closely the texture follows the input image colors. Higher values produce more vivid but potentially oversaturated textures.',
-      default: 1,
-    },
-    image_url: {
-      type: 'string',
-      title: 'Image Url',
-      examples: [
-        'https://v3b.fal.media/files/b/0a86b60d/xkpao5B0uxmH0tmJm0HVL_2fe35ce1-fe44-475b-b582-6846a149537c.png',
-      ],
-      description: 'URL of the reference image for texturing',
-      'x-fal-file-input': true,
-    },
-    mesh_url: {
-      type: 'string',
-      title: 'Mesh Url',
-      examples: [
-        'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ClearCoatCarPaint/glTF-Binary/ClearCoatCarPaint.glb',
-      ],
-      description:
-        'URL of the untextured 3D mesh to retexture. Supports GLB, OBJ, PLY, and STL formats.',
-      'x-fal-file-input': true,
-    },
-  },
+  type: 'object',
   'x-fal-order-properties': [
     'image_url',
     'mesh_url',
@@ -10791,27 +10810,122 @@ export const Trellis2RetextureInputSchema = {
     'tex_slat_rescale_t',
     'texture_size',
   ],
-  title: 'RetextureInputModel',
-  type: 'object',
   required: ['image_url', 'mesh_url'],
+  title: 'RetextureInputModel',
+  properties: {
+    tex_slat_rescale_t: {
+      type: 'number',
+      description:
+        'Controls noise schedule sharpness for texture generation. Higher values produce sharper texture details.',
+      default: 3,
+      maximum: 6,
+      minimum: 1,
+      title: 'Tex Slat Rescale T',
+    },
+    tex_slat_guidance_strength: {
+      type: 'number',
+      description:
+        'How closely the texture follows the input image colors. Higher values produce more vivid but potentially oversaturated textures.',
+      default: 1,
+      maximum: 10,
+      minimum: 0,
+      title: 'Tex Slat Guidance Strength',
+    },
+    tex_slat_guidance_rescale: {
+      type: 'number',
+      description:
+        'Dampens artifacts from high guidance in the texture stage. Increase if textures look noisy or have color banding.',
+      default: 0,
+      maximum: 1,
+      minimum: 0,
+      title: 'Tex Slat Guidance Rescale',
+    },
+    seed: {
+      description: 'Random seed for reproducibility',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+    },
+    mesh_url: {
+      type: 'string',
+      description:
+        'URL of the untextured 3D mesh to retexture. Supports GLB, OBJ, PLY, and STL formats.',
+      examples: [
+        'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/ClearCoatCarPaint/glTF-Binary/ClearCoatCarPaint.glb',
+      ],
+      title: 'Mesh Url',
+      'x-fal-file-input': true,
+    },
+    resolution: {
+      type: 'integer',
+      description:
+        'Internal resolution for texture generation. Higher produces finer texture details but is slower.',
+      default: 1024,
+      enum: [512, 1024],
+      title: 'Resolution',
+    },
+    tex_slat_guidance_interval_end: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance ends for the texture stage. Must be >= tex_slat_guidance_interval_start.',
+      default: 0.9,
+      maximum: 1,
+      minimum: 0,
+      title: 'Tex Slat Guidance Interval End',
+    },
+    tex_slat_sampling_steps: {
+      type: 'integer',
+      description:
+        'Number of denoising steps for texture generation. More steps = slower but potentially cleaner textures.',
+      default: 12,
+      maximum: 50,
+      minimum: 1,
+      title: 'Tex Slat Sampling Steps',
+    },
+    image_url: {
+      type: 'string',
+      description: 'URL of the reference image for texturing',
+      examples: [
+        'https://v3b.fal.media/files/b/0a86b60d/xkpao5B0uxmH0tmJm0HVL_2fe35ce1-fe44-475b-b582-6846a149537c.png',
+      ],
+      title: 'Image Url',
+      'x-fal-file-input': true,
+    },
+    tex_slat_guidance_interval_start: {
+      type: 'number',
+      description:
+        'Fraction of the denoising process at which classifier-free guidance starts for the texture stage. Guidance is only applied between interval_start and interval_end.',
+      default: 0.6,
+      maximum: 1,
+      minimum: 0,
+      title: 'Tex Slat Guidance Interval Start',
+    },
+    texture_size: {
+      type: 'integer',
+      description:
+        'Resolution of the texture image baked onto the mesh. Higher values capture finer surface details but produce larger files.',
+      default: 2048,
+      enum: [1024, 2048, 4096],
+      title: 'Texture Size',
+    },
+  },
 } as const
 
 export const Trellis2RetextureOutputSchema = {
+  type: 'object',
+  'x-fal-order-properties': ['model_glb'],
+  required: ['model_glb'],
+  title: 'ObjectOutput',
   properties: {
     model_glb: {
+      description: 'Generated 3D GLB file',
+      $ref: '#/$defs/File',
       examples: [
         {
           url: 'https://v3b.fal.media/files/b/0a86b61d/DNmTkiWHUQ8k-rG6aussB_trellis2_68d6300f70f34d23b69a912b5fe60487.glb',
         },
       ],
-      $ref: '#/$defs/File',
-      description: 'Generated 3D GLB file',
     },
   },
-  'x-fal-order-properties': ['model_glb'],
-  title: 'ObjectOutput',
-  type: 'object',
-  required: ['model_glb'],
   $defs: {
     File: {
       title: 'File',
@@ -10854,70 +10968,7 @@ export const Trellis2RetextureOutputSchema = {
 } as const
 
 export const TrellisInputSchema = {
-  properties: {
-    slat_sampling_steps: {
-      default: 12,
-      type: 'integer',
-      title: 'Slat Sampling Steps',
-      minimum: 1,
-      description: 'Sampling steps for structured latent generation',
-      maximum: 50,
-    },
-    image_url: {
-      type: 'string',
-      title: 'Image Url',
-      examples: [
-        'https://storage.googleapis.com/falserverless/web-examples/rodin3d/warriorwoman.png',
-      ],
-      description: 'URL of the input image to convert to 3D',
-      'x-fal-file-input': true,
-    },
-    slat_guidance_strength: {
-      default: 3,
-      type: 'number',
-      title: 'Slat Guidance Strength',
-      minimum: 0,
-      description: 'Guidance strength for structured latent generation',
-      maximum: 10,
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description: 'Random seed for reproducibility',
-    },
-    ss_sampling_steps: {
-      default: 12,
-      type: 'integer',
-      title: 'Ss Sampling Steps',
-      minimum: 1,
-      description: 'Sampling steps for sparse structure generation',
-      maximum: 50,
-    },
-    mesh_simplify: {
-      default: 0.95,
-      type: 'number',
-      title: 'Mesh Simplify',
-      minimum: 0.9,
-      description: 'Mesh simplification factor',
-      maximum: 0.98,
-    },
-    texture_size: {
-      default: 1024,
-      type: 'integer',
-      title: 'Texture Size',
-      description: 'Texture resolution',
-      enum: [512, 1024, 2048],
-    },
-    ss_guidance_strength: {
-      default: 7.5,
-      type: 'number',
-      title: 'Ss Guidance Strength',
-      minimum: 0,
-      description: 'Guidance strength for sparse structure generation',
-      maximum: 10,
-    },
-  },
-  type: 'object',
+  title: 'InputModel',
   'x-fal-order-properties': [
     'image_url',
     'seed',
@@ -10928,86 +10979,75 @@ export const TrellisInputSchema = {
     'mesh_simplify',
     'texture_size',
   ],
+  properties: {
+    ss_sampling_steps: {
+      minimum: 1,
+      title: 'Ss Sampling Steps',
+      description: 'Sampling steps for sparse structure generation',
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+    },
+    image_url: {
+      title: 'Image Url',
+      description: 'URL of the input image to convert to 3D',
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/web-examples/rodin3d/warriorwoman.png',
+      ],
+      'x-fal-file-input': true,
+    },
+    ss_guidance_strength: {
+      minimum: 0,
+      title: 'Ss Guidance Strength',
+      description: 'Guidance strength for sparse structure generation',
+      type: 'number',
+      default: 7.5,
+      maximum: 10,
+    },
+    slat_guidance_strength: {
+      minimum: 0,
+      title: 'Slat Guidance Strength',
+      description: 'Guidance strength for structured latent generation',
+      type: 'number',
+      default: 3,
+      maximum: 10,
+    },
+    texture_size: {
+      title: 'Texture Size',
+      enum: [512, 1024, 2048],
+      description: 'Texture resolution',
+      type: 'integer',
+      default: 1024,
+    },
+    mesh_simplify: {
+      minimum: 0.9,
+      title: 'Mesh Simplify',
+      description: 'Mesh simplification factor',
+      type: 'number',
+      default: 0.95,
+      maximum: 0.98,
+    },
+    slat_sampling_steps: {
+      minimum: 1,
+      title: 'Slat Sampling Steps',
+      description: 'Sampling steps for structured latent generation',
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+    },
+    seed: {
+      title: 'Seed',
+      description: 'Random seed for reproducibility',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+  },
   required: ['image_url'],
-  title: 'InputModel',
+  type: 'object',
 } as const
 
 export const TrellisMultiInputSchema = {
-  properties: {
-    slat_sampling_steps: {
-      default: 12,
-      type: 'integer',
-      title: 'Slat Sampling Steps',
-      minimum: 1,
-      description: 'Sampling steps for structured latent generation',
-      maximum: 50,
-    },
-    multiimage_algo: {
-      default: 'stochastic',
-      type: 'string',
-      title: 'Multiimage Algo',
-      description: 'Algorithm for multi-image generation',
-      enum: ['stochastic', 'multidiffusion'],
-    },
-    slat_guidance_strength: {
-      default: 3,
-      type: 'number',
-      title: 'Slat Guidance Strength',
-      minimum: 0,
-      description: 'Guidance strength for structured latent generation',
-      maximum: 10,
-    },
-    seed: {
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      title: 'Seed',
-      description: 'Random seed for reproducibility',
-    },
-    ss_sampling_steps: {
-      default: 12,
-      type: 'integer',
-      title: 'Ss Sampling Steps',
-      minimum: 1,
-      description: 'Sampling steps for sparse structure generation',
-      maximum: 50,
-    },
-    mesh_simplify: {
-      default: 0.95,
-      type: 'number',
-      title: 'Mesh Simplify',
-      minimum: 0.9,
-      description: 'Mesh simplification factor',
-      maximum: 0.98,
-    },
-    texture_size: {
-      default: 1024,
-      type: 'integer',
-      title: 'Texture Size',
-      description: 'Texture resolution',
-      enum: [512, 1024, 2048],
-    },
-    image_urls: {
-      type: 'array',
-      title: 'Image Urls',
-      examples: [
-        [
-          'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
-          'https://storage.googleapis.com/falserverless/model_tests/video_models/back.png',
-          'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
-        ],
-      ],
-      description: 'List of URLs of input images to convert to 3D',
-      items: { type: 'string', 'x-fal-file-input': true },
-    },
-    ss_guidance_strength: {
-      default: 7.5,
-      type: 'number',
-      title: 'Ss Guidance Strength',
-      minimum: 0,
-      description: 'Guidance strength for sparse structure generation',
-      maximum: 10,
-    },
-  },
-  type: 'object',
+  title: 'MultiImageInputModel',
   'x-fal-order-properties': [
     'image_urls',
     'seed',
@@ -11019,24 +11059,98 @@ export const TrellisMultiInputSchema = {
     'texture_size',
     'multiimage_algo',
   ],
+  properties: {
+    image_urls: {
+      title: 'Image Urls',
+      items: { type: 'string', 'x-fal-file-input': true },
+      description: 'List of URLs of input images to convert to 3D',
+      type: 'array',
+      examples: [
+        [
+          'https://storage.googleapis.com/falserverless/model_tests/video_models/front.png',
+          'https://storage.googleapis.com/falserverless/model_tests/video_models/back.png',
+          'https://storage.googleapis.com/falserverless/model_tests/video_models/left.png',
+        ],
+      ],
+    },
+    ss_sampling_steps: {
+      minimum: 1,
+      title: 'Ss Sampling Steps',
+      description: 'Sampling steps for sparse structure generation',
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+    },
+    ss_guidance_strength: {
+      minimum: 0,
+      title: 'Ss Guidance Strength',
+      description: 'Guidance strength for sparse structure generation',
+      type: 'number',
+      default: 7.5,
+      maximum: 10,
+    },
+    slat_guidance_strength: {
+      minimum: 0,
+      title: 'Slat Guidance Strength',
+      description: 'Guidance strength for structured latent generation',
+      type: 'number',
+      default: 3,
+      maximum: 10,
+    },
+    texture_size: {
+      title: 'Texture Size',
+      enum: [512, 1024, 2048],
+      description: 'Texture resolution',
+      type: 'integer',
+      default: 1024,
+    },
+    multiimage_algo: {
+      title: 'Multiimage Algo',
+      enum: ['stochastic', 'multidiffusion'],
+      description: 'Algorithm for multi-image generation',
+      type: 'string',
+      default: 'stochastic',
+    },
+    mesh_simplify: {
+      minimum: 0.9,
+      title: 'Mesh Simplify',
+      description: 'Mesh simplification factor',
+      type: 'number',
+      default: 0.95,
+      maximum: 0.98,
+    },
+    slat_sampling_steps: {
+      minimum: 1,
+      title: 'Slat Sampling Steps',
+      description: 'Sampling steps for structured latent generation',
+      type: 'integer',
+      default: 12,
+      maximum: 50,
+    },
+    seed: {
+      title: 'Seed',
+      description: 'Random seed for reproducibility',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+    },
+  },
   required: ['image_urls'],
-  title: 'MultiImageInputModel',
+  type: 'object',
 } as const
 
 export const TrellisMultiOutputSchema = {
-  properties: {
-    timings: {
-      type: 'object',
-      additionalProperties: { type: 'number' },
-      title: 'Timings',
-      description: 'Processing timings',
-    },
-    model_mesh: { $ref: '#/$defs/File', description: 'Generated 3D mesh file' },
-  },
-  type: 'object',
-  'x-fal-order-properties': ['model_mesh', 'timings'],
-  required: ['model_mesh', 'timings'],
   title: 'ObjectOutput',
+  'x-fal-order-properties': ['model_mesh', 'timings'],
+  properties: {
+    model_mesh: { description: 'Generated 3D mesh file', $ref: '#/$defs/File' },
+    timings: {
+      title: 'Timings',
+      additionalProperties: { type: 'number' },
+      description: 'Processing timings',
+      type: 'object',
+    },
+  },
+  required: ['model_mesh', 'timings'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -11079,19 +11193,19 @@ export const TrellisMultiOutputSchema = {
 } as const
 
 export const TrellisOutputSchema = {
-  properties: {
-    timings: {
-      type: 'object',
-      additionalProperties: { type: 'number' },
-      title: 'Timings',
-      description: 'Processing timings',
-    },
-    model_mesh: { $ref: '#/$defs/File', description: 'Generated 3D mesh file' },
-  },
-  type: 'object',
-  'x-fal-order-properties': ['model_mesh', 'timings'],
-  required: ['model_mesh', 'timings'],
   title: 'ObjectOutput',
+  'x-fal-order-properties': ['model_mesh', 'timings'],
+  properties: {
+    model_mesh: { description: 'Generated 3D mesh file', $ref: '#/$defs/File' },
+    timings: {
+      title: 'Timings',
+      additionalProperties: { type: 'number' },
+      description: 'Processing timings',
+      type: 'object',
+    },
+  },
+  required: ['model_mesh', 'timings'],
+  type: 'object',
   $defs: {
     File: {
       title: 'File',
@@ -11582,52 +11696,14 @@ export const TripoV25MultiviewTo3dOutputSchema = {
 } as const
 
 export const TriposplatInputSchema = {
+  required: ['image_url'],
   properties: {
-    seed: {
-      title: 'Seed',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description:
-        'Random seed for reproducibility. If None, a random seed is generated.',
-    },
-    num_inference_steps: {
-      title: 'Num Inference Steps',
-      minimum: 1,
-      type: 'integer',
-      default: 20,
-      maximum: 50,
-      description:
-        'Number of flow-matching sampler steps. More steps improve fidelity with a roughly linear runtime cost.',
-    },
-    enable_safety_checker: {
-      title: 'Enable Safety Checker',
-      type: 'boolean',
-      default: true,
-      description: 'Enable safety checking of the input image.',
-    },
     output_format: {
+      default: 'ply',
       title: 'Output Format',
       type: 'string',
       enum: ['ply', 'splat'],
-      default: 'ply',
       description: 'File format for the generated Gaussian splat.',
-    },
-    num_gaussians: {
-      title: 'Num Gaussians',
-      minimum: 32768,
-      type: 'integer',
-      default: 262144,
-      maximum: 262144,
-      description:
-        'Target number of Gaussians in the output splat. Higher means more detail but larger files and slower rendering. Rounded to the nearest multiple of 32 internally.',
-    },
-    guidance_scale: {
-      title: 'Guidance Scale',
-      minimum: 0,
-      type: 'number',
-      default: 3,
-      maximum: 10,
-      description:
-        'Classifier-free guidance strength. Values at or below 1.0 disable guidance; higher values increase detail and adherence to the input image, but too high can oversaturate colors.',
     },
     image_url: {
       title: 'Image Url',
@@ -11639,6 +11715,45 @@ export const TriposplatInputSchema = {
       description:
         'URL of the input image to convert into a 3D Gaussian splat.',
       'x-fal-file-input': true,
+    },
+    num_gaussians: {
+      default: 262144,
+      minimum: 32768,
+      type: 'integer',
+      title: 'Num Gaussians',
+      maximum: 262144,
+      description:
+        'Target number of Gaussians in the output splat. Higher means more detail but larger files and slower rendering. Rounded to the nearest multiple of 32 internally.',
+    },
+    enable_safety_checker: {
+      default: true,
+      title: 'Enable Safety Checker',
+      type: 'boolean',
+      description: 'Enable safety checking of the input image.',
+    },
+    seed: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Seed',
+      description:
+        'Random seed for reproducibility. If None, a random seed is generated.',
+    },
+    guidance_scale: {
+      default: 3,
+      minimum: 0,
+      type: 'number',
+      title: 'Guidance Scale',
+      maximum: 10,
+      description:
+        'Classifier-free guidance strength. Values at or below 1.0 disable guidance; higher values increase detail and adherence to the input image, but too high can oversaturate colors.',
+    },
+    num_inference_steps: {
+      default: 20,
+      minimum: 1,
+      type: 'integer',
+      title: 'Num Inference Steps',
+      maximum: 50,
+      description:
+        'Number of flow-matching sampler steps. More steps improve fidelity with a roughly linear runtime cost.',
     },
   },
   title: 'TripoSplatInput',
@@ -11652,47 +11767,46 @@ export const TriposplatInputSchema = {
     'seed',
     'enable_safety_checker',
   ],
-  required: ['image_url'],
 } as const
 
 export const TriposplatOutputSchema = {
-  properties: {
-    model_mesh: {
-      $ref: '#/$defs/File',
-      description: 'Generated 3D Gaussian splat file (.ply or .splat).',
-    },
-    num_gaussians: {
-      title: 'Num Gaussians',
-      type: 'integer',
-      description: 'The actual number of Gaussians produced.',
-    },
-    timings: {
-      title: 'Timings',
-      additionalProperties: { type: 'number' },
-      type: 'object',
-      description: 'Per-stage timings in seconds.',
-    },
-    preprocessed_image: {
-      $ref: '#/$defs/Image',
-      description:
-        'The background-removed RGB composite the model actually saw, rendered on a black background.',
-    },
-    seed: {
-      title: 'Seed',
-      type: 'integer',
-      description: 'The seed used for generation.',
-    },
-  },
-  title: 'TripoSplatOutput',
-  type: 'object',
-  'x-fal-order-properties': [
+  required: [
     'model_mesh',
     'preprocessed_image',
     'num_gaussians',
     'seed',
     'timings',
   ],
-  required: [
+  properties: {
+    seed: {
+      title: 'Seed',
+      type: 'integer',
+      description: 'The seed used for generation.',
+    },
+    num_gaussians: {
+      title: 'Num Gaussians',
+      type: 'integer',
+      description: 'The actual number of Gaussians produced.',
+    },
+    model_mesh: {
+      $ref: '#/$defs/File',
+      description: 'Generated 3D Gaussian splat file (.ply or .splat).',
+    },
+    preprocessed_image: {
+      $ref: '#/$defs/Image',
+      description:
+        'The background-removed RGB composite the model actually saw, rendered on a black background.',
+    },
+    timings: {
+      additionalProperties: { type: 'number' },
+      title: 'Timings',
+      type: 'object',
+      description: 'Per-stage timings in seconds.',
+    },
+  },
+  title: 'TripoSplatOutput',
+  type: 'object',
+  'x-fal-order-properties': [
     'model_mesh',
     'preprocessed_image',
     'num_gaussians',
@@ -11738,46 +11852,47 @@ export const TriposplatOutputSchema = {
       ],
     },
     Image: {
+      required: ['url'],
       properties: {
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
         file_size: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'File Size',
-          description: 'The size of the file in bytes.',
           examples: [4404019],
-        },
-        url: {
-          title: 'Url',
-          description: 'The URL where the file can be downloaded from.',
-          type: 'string',
-        },
-        file_name: {
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'File Name',
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          examples: ['z9RV14K95DvU.png'],
-        },
-        width: {
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          title: 'Width',
-          description: 'The width of the image in pixels.',
-          examples: [1024],
+          description: 'The size of the file in bytes.',
         },
         height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           title: 'Height',
-          description: 'The height of the image in pixels.',
           examples: [1024],
+          description: 'The height of the image in pixels.',
         },
-        content_type: {
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_name: {
           anyOf: [{ type: 'string' }, { type: 'null' }],
-          title: 'Content Type',
-          description: 'The mime type of the file.',
-          examples: ['image/png'],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          examples: [1024],
+          description: 'The width of the image in pixels.',
         },
       },
       title: 'Image',
-      description: 'Represents an image file.',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -11786,46 +11901,22 @@ export const TriposplatOutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
-      type: 'object',
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const TriposrInputSchema = {
+  required: ['image_url'],
   properties: {
     output_format: {
-      enum: ['glb', 'obj'],
       default: 'glb',
-      description: 'Output format for the 3D model.',
       title: 'Output Format',
       type: 'string',
-    },
-    mc_resolution: {
-      maximum: 1024,
-      description:
-        'Resolution of the marching cubes. Above 512 is not recommended.',
-      minimum: 32,
-      title: 'Mc Resolution',
-      default: 256,
-      type: 'integer',
-    },
-    foreground_ratio: {
-      maximum: 1,
-      description: 'Ratio of the foreground image to the original image.',
-      minimum: 0.5,
-      title: 'Foreground Ratio',
-      default: 0.9,
-      type: 'number',
-    },
-    do_remove_background: {
-      default: true,
-      description: 'Whether to remove the background from the input image.',
-      title: 'Do Remove Background',
-      type: 'boolean',
+      enum: ['glb', 'obj'],
+      description: 'Output format for the 3D model.',
     },
     image_url: {
-      description: 'Path for the image file to be processed.',
       examples: [
         'https://raw.githubusercontent.com/VAST-AI-Research/TripoSR/ea034e12a428fa848684a3f9f267b2042d298ca6/examples/hamburger.png',
         'https://raw.githubusercontent.com/VAST-AI-Research/TripoSR/ea034e12a428fa848684a3f9f267b2042d298ca6/examples/poly_fox.png',
@@ -11841,13 +11932,37 @@ export const TriposrInputSchema = {
         'https://raw.githubusercontent.com/VAST-AI-Research/TripoSR/ea034e12a428fa848684a3f9f267b2042d298ca6/examples/police_woman.png',
         'https://raw.githubusercontent.com/VAST-AI-Research/TripoSR/ea034e12a428fa848684a3f9f267b2042d298ca6/examples/captured_p.png',
       ],
-      title: 'Image Url',
       type: 'string',
+      title: 'Image Url',
+      description: 'Path for the image file to be processed.',
       'x-fal-file-input': true,
     },
+    foreground_ratio: {
+      default: 0.9,
+      title: 'Foreground Ratio',
+      type: 'number',
+      minimum: 0.5,
+      maximum: 1,
+      description: 'Ratio of the foreground image to the original image.',
+    },
+    do_remove_background: {
+      default: true,
+      title: 'Do Remove Background',
+      type: 'boolean',
+      description: 'Whether to remove the background from the input image.',
+    },
+    mc_resolution: {
+      default: 256,
+      title: 'Mc Resolution',
+      type: 'integer',
+      minimum: 32,
+      maximum: 1024,
+      description:
+        'Resolution of the marching cubes. Above 512 is not recommended.',
+    },
   },
-  required: ['image_url'],
   title: 'TripoSRInput',
+  type: 'object',
   'x-fal-order-properties': [
     'image_url',
     'output_format',
@@ -11855,30 +11970,29 @@ export const TriposrInputSchema = {
     'foreground_ratio',
     'mc_resolution',
   ],
-  type: 'object',
 } as const
 
 export const TriposrOutputSchema = {
+  required: ['model_mesh', 'timings'],
   properties: {
-    timings: {
-      description: 'Inference timings.',
-      title: 'Timings',
-      additionalProperties: { type: 'number' },
-      type: 'object',
+    remeshing_dir: {
+      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+      description: 'Directory containing textures for the remeshed model.',
     },
     model_mesh: {
-      description: 'Generated 3D object file.',
       $ref: '#/$defs/File',
+      description: 'Generated 3D object file.',
     },
-    remeshing_dir: {
-      description: 'Directory containing textures for the remeshed model.',
-      anyOf: [{ $ref: '#/$defs/File' }, { type: 'null' }],
+    timings: {
+      additionalProperties: { type: 'number' },
+      title: 'Timings',
+      type: 'object',
+      description: 'Inference timings.',
     },
   },
-  required: ['model_mesh', 'timings'],
   title: 'ObjectOutput',
-  'x-fal-order-properties': ['model_mesh', 'timings', 'remeshing_dir'],
   type: 'object',
+  'x-fal-order-properties': ['model_mesh', 'timings', 'remeshing_dir'],
   $defs: {
     File: {
       title: 'File',

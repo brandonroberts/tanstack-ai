@@ -144,6 +144,8 @@ import {
   zMusicGeneratorOutput,
   zNemotron3NanoOmniAudioInput,
   zNemotron3NanoOmniAudioOutput,
+  zNemotronAsrMultilingualAsrInput,
+  zNemotronAsrMultilingualAsrOutput,
   zOrpheusTtsInput,
   zOrpheusTtsOutput,
   zQwen3TtsCloneVoice06bInput,
@@ -782,6 +784,10 @@ export const falAudioEndpointZodMap: {
     readonly input: typeof zNemotron3NanoOmniAudioInput
     readonly output: typeof zNemotron3NanoOmniAudioOutput
   }
+  readonly 'nvidia/nemotron-asr-multilingual/asr': {
+    readonly input: typeof zNemotronAsrMultilingualAsrInput
+    readonly output: typeof zNemotronAsrMultilingualAsrOutput
+  }
   readonly 'resemble-ai/chatterboxhd/speech-to-speech': {
     readonly input: typeof zChatterboxhdSpeechToSpeechInput
     readonly output: typeof zChatterboxhdSpeechToSpeechOutput
@@ -1250,6 +1256,10 @@ export const falAudioEndpointZodMap: {
   'nvidia/nemotron-3-nano-omni/audio': {
     input: zNemotron3NanoOmniAudioInput,
     output: zNemotron3NanoOmniAudioOutput,
+  },
+  'nvidia/nemotron-asr-multilingual/asr': {
+    input: zNemotronAsrMultilingualAsrInput,
+    output: zNemotronAsrMultilingualAsrOutput,
   },
   'resemble-ai/chatterboxhd/speech-to-speech': {
     input: zChatterboxhdSpeechToSpeechInput,

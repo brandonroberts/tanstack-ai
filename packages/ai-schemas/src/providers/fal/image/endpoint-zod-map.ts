@@ -2,6 +2,14 @@
 // Generated via scripts/generate-endpoint-maps.ts
 
 import {
+  zAgentUni1V1EditInput,
+  zAgentUni1V1EditOutput,
+  zAgentUni1V1MaxEditInput,
+  zAgentUni1V1MaxEditOutput,
+  zAgentUni1V1MaxInput,
+  zAgentUni1V1MaxOutput,
+  zAgentUni1V1TextToImageInput,
+  zAgentUni1V1TextToImageOutput,
   zAuraFlowInput,
   zAuraFlowOutput,
   zAuraSrInput,
@@ -14,6 +22,8 @@ import {
   zBagelOutput,
   zBenV2ImageInput,
   zBenV2ImageOutput,
+  zBerniniREditImageInput,
+  zBerniniREditImageOutput,
   zBirefnetInput,
   zBirefnetOutput,
   zBirefnetV2Input,
@@ -436,6 +446,8 @@ import {
   zGemini3ProImagePreviewEditOutput,
   zGemini3ProImagePreviewInput,
   zGemini3ProImagePreviewOutput,
+  zGenfillV2Input,
+  zGenfillV2Output,
   zGhiblifyInput,
   zGhiblifyOutput,
   zGlmImageImageToImageInput,
@@ -956,8 +968,6 @@ import {
   zRecraftV4TextToVectorOutput,
   zRecraftVectorizeInput,
   zRecraftVectorizeOutput,
-  zReimagine32Input,
-  zReimagine32Output,
   zRembgEnhanceInput,
   zRembgEnhanceOutput,
   zReplaceBackgroundInput,
@@ -1035,6 +1045,8 @@ import {
   zV2MediumTurboTextToImageInput,
   zV2MediumTurboTextToImageOutput,
   zV4Input,
+  zV4LoraInput,
+  zV4LoraOutput,
   zV4Output,
   zVecglypherImageToSvgInput,
   zVecglypherImageToSvgOutput,
@@ -1164,9 +1176,9 @@ export const falImageEndpointZodMap: {
     readonly input: typeof zFiboGenerateInput
     readonly output: typeof zFiboGenerateOutput
   }
-  readonly 'bria/reimagine/3.2': {
-    readonly input: typeof zReimagine32Input
-    readonly output: typeof zReimagine32Output
+  readonly 'bria/genfill/v2': {
+    readonly input: typeof zGenfillV2Input
+    readonly output: typeof zGenfillV2Output
   }
   readonly 'bria/replace-background': {
     readonly input: typeof zReplaceBackgroundInput
@@ -1199,6 +1211,10 @@ export const falImageEndpointZodMap: {
   readonly 'fal-ai/ben/v2/image': {
     readonly input: typeof zBenV2ImageInput
     readonly output: typeof zBenV2ImageOutput
+  }
+  readonly 'fal-ai/bernini-r/edit-image': {
+    readonly input: typeof zBerniniREditImageInput
+    readonly output: typeof zBerniniREditImageOutput
   }
   readonly 'fal-ai/birefnet': {
     readonly input: typeof zBirefnetInput
@@ -3168,6 +3184,10 @@ export const falImageEndpointZodMap: {
     readonly input: typeof zV4Input
     readonly output: typeof zV4Output
   }
+  readonly 'ideogram/v4/lora': {
+    readonly input: typeof zV4LoraInput
+    readonly output: typeof zV4LoraOutput
+  }
   readonly 'imagineart/imagineart-1.5-preview/text-to-image': {
     readonly input: typeof zImagineart15PreviewTextToImageInput
     readonly output: typeof zImagineart15PreviewTextToImageOutput
@@ -3195,6 +3215,22 @@ export const falImageEndpointZodMap: {
   readonly 'krea/v2/medium/turbo/text-to-image': {
     readonly input: typeof zV2MediumTurboTextToImageInput
     readonly output: typeof zV2MediumTurboTextToImageOutput
+  }
+  readonly 'luma/agent/uni-1/v1/edit': {
+    readonly input: typeof zAgentUni1V1EditInput
+    readonly output: typeof zAgentUni1V1EditOutput
+  }
+  readonly 'luma/agent/uni-1/v1/max': {
+    readonly input: typeof zAgentUni1V1MaxInput
+    readonly output: typeof zAgentUni1V1MaxOutput
+  }
+  readonly 'luma/agent/uni-1/v1/max/edit': {
+    readonly input: typeof zAgentUni1V1MaxEditInput
+    readonly output: typeof zAgentUni1V1MaxEditOutput
+  }
+  readonly 'luma/agent/uni-1/v1/text-to-image': {
+    readonly input: typeof zAgentUni1V1TextToImageInput
+    readonly output: typeof zAgentUni1V1TextToImageOutput
   }
   readonly 'microsoft/mai-image-2.5': {
     readonly input: typeof zMaiImage25Input
@@ -3345,10 +3381,7 @@ export const falImageEndpointZodMap: {
     input: zFiboGenerateInput,
     output: zFiboGenerateOutput,
   },
-  'bria/reimagine/3.2': {
-    input: zReimagine32Input,
-    output: zReimagine32Output,
-  },
+  'bria/genfill/v2': { input: zGenfillV2Input, output: zGenfillV2Output },
   'bria/replace-background': {
     input: zReplaceBackgroundInput,
     output: zReplaceBackgroundOutput,
@@ -3366,6 +3399,10 @@ export const falImageEndpointZodMap: {
   'fal-ai/bagel': { input: zBagelInput, output: zBagelOutput },
   'fal-ai/bagel/edit': { input: zBagelEditInput, output: zBagelEditOutput },
   'fal-ai/ben/v2/image': { input: zBenV2ImageInput, output: zBenV2ImageOutput },
+  'fal-ai/bernini-r/edit-image': {
+    input: zBerniniREditImageInput,
+    output: zBerniniREditImageOutput,
+  },
   'fal-ai/birefnet': { input: zBirefnetInput, output: zBirefnetOutput },
   'fal-ai/birefnet/v2': { input: zBirefnetV2Input, output: zBirefnetV2Output },
   'fal-ai/bitdance': { input: zBitdanceInput, output: zBitdanceOutput },
@@ -5106,6 +5143,7 @@ export const falImageEndpointZodMap: {
     output: zZImageTurboTilingLoraOutput,
   },
   'ideogram/v4': { input: zV4Input, output: zV4Output },
+  'ideogram/v4/lora': { input: zV4LoraInput, output: zV4LoraOutput },
   'imagineart/imagineart-1.5-preview/text-to-image': {
     input: zImagineart15PreviewTextToImageInput,
     output: zImagineart15PreviewTextToImageOutput,
@@ -5133,6 +5171,22 @@ export const falImageEndpointZodMap: {
   'krea/v2/medium/turbo/text-to-image': {
     input: zV2MediumTurboTextToImageInput,
     output: zV2MediumTurboTextToImageOutput,
+  },
+  'luma/agent/uni-1/v1/edit': {
+    input: zAgentUni1V1EditInput,
+    output: zAgentUni1V1EditOutput,
+  },
+  'luma/agent/uni-1/v1/max': {
+    input: zAgentUni1V1MaxInput,
+    output: zAgentUni1V1MaxOutput,
+  },
+  'luma/agent/uni-1/v1/max/edit': {
+    input: zAgentUni1V1MaxEditInput,
+    output: zAgentUni1V1MaxEditOutput,
+  },
+  'luma/agent/uni-1/v1/text-to-image': {
+    input: zAgentUni1V1TextToImageInput,
+    output: zAgentUni1V1TextToImageOutput,
   },
   'microsoft/mai-image-2.5': {
     input: zMaiImage25Input,

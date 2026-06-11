@@ -20,6 +20,13 @@ export const zBadRequestResponse = z.object({
   user_id: z.string().nullish(),
 })
 
+export const zContentPartAudio = z.object({
+  audio_url: z.object({
+    url: z.string(),
+  }),
+  type: z.enum(['audio_url']),
+})
+
 export const zContentPartImage = z.object({
   image_url: z.object({
     url: z.string(),
@@ -27,11 +34,27 @@ export const zContentPartImage = z.object({
   type: z.enum(['image_url']),
 })
 
+export const zContentPartVideo = z.object({
+  type: z.enum(['video_url']),
+  video_url: z.object({
+    url: z.string(),
+  }),
+})
+
 export const zFrameImage = zContentPartImage.and(
   z.object({
     frame_type: z.enum(['first_frame', 'last_frame']),
   }),
 )
+
+/**
+ * A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).
+ */
+export const zInputReference = z.discriminatedUnion('type', [
+  zContentPartImage.extend({ type: z.literal('image_url') }),
+  zContentPartAudio.extend({ type: z.literal('audio_url') }),
+  zContentPartVideo.extend({ type: z.literal('video_url') }),
+])
 
 /**
  * Error data for InternalServerResponse
@@ -121,6 +144,7 @@ export const zProviderOptions = z.object({
   crucible: z.record(z.string(), z.unknown()).optional(),
   crusoe: z.record(z.string(), z.unknown()).optional(),
   darkbloom: z.record(z.string(), z.unknown()).optional(),
+  decart: z.record(z.string(), z.unknown()).optional(),
   deepinfra: z.record(z.string(), z.unknown()).optional(),
   deepseek: z.record(z.string(), z.unknown()).optional(),
   dekallm: z.record(z.string(), z.unknown()).optional(),
@@ -200,6 +224,7 @@ export const zProviderOptions = z.object({
   ubicloud: z.record(z.string(), z.unknown()).optional(),
   upstage: z.record(z.string(), z.unknown()).optional(),
   venice: z.record(z.string(), z.unknown()).optional(),
+  wafer: z.record(z.string(), z.unknown()).optional(),
   wandb: z.record(z.string(), z.unknown()).optional(),
   xai: z.record(z.string(), z.unknown()).optional(),
   xiaomi: z.record(z.string(), z.unknown()).optional(),
@@ -250,7 +275,7 @@ export const zVideoGenerationRequest = z.object({
   duration: z.int().gte(1).optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.string(),
   prompt: z.string(),
   provider: z
@@ -272,7 +297,7 @@ export const zVideoGenerationRequestAlibabaWan26 = z.object({
   duration: z.union([z.literal(5), z.literal(10)]).optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['alibaba/wan-2.6']),
   prompt: z.string(),
   provider: z
@@ -306,7 +331,7 @@ export const zVideoGenerationRequestAlibabaWan27 = z.object({
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['alibaba/wan-2.7']),
   prompt: z.string(),
   provider: z
@@ -355,7 +380,7 @@ export const zVideoGenerationRequestBytedanceSeedance15Pro = z.object({
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['bytedance/seedance-1-5-pro']),
   prompt: z.string(),
   provider: z
@@ -418,7 +443,7 @@ export const zVideoGenerationRequestBytedanceSeedance20 = z.object({
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['bytedance/seedance-2.0']),
   prompt: z.string(),
   provider: z
@@ -479,7 +504,7 @@ export const zVideoGenerationRequestBytedanceSeedance20Fast = z.object({
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['bytedance/seedance-2.0-fast']),
   prompt: z.string(),
   provider: z
@@ -517,7 +542,7 @@ export const zVideoGenerationRequestGoogleVeo31 = z.object({
   duration: z.union([z.literal(4), z.literal(6), z.literal(8)]).optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['google/veo-3.1']),
   prompt: z.string(),
   provider: z
@@ -548,7 +573,7 @@ export const zVideoGenerationRequestGoogleVeo31Fast = z.object({
   duration: z.union([z.literal(4), z.literal(6), z.literal(8)]).optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['google/veo-3.1-fast']),
   prompt: z.string(),
   provider: z
@@ -579,7 +604,7 @@ export const zVideoGenerationRequestGoogleVeo31Lite = z.object({
   duration: z.union([z.literal(8), z.literal(4), z.literal(6)]).optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['google/veo-3.1-lite']),
   prompt: z.string(),
   provider: z
@@ -617,7 +642,7 @@ export const zVideoGenerationRequestKwaivgiKlingV30Pro = z.object({
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['kwaivgi/kling-v3.0-pro']),
   prompt: z.string(),
   provider: z
@@ -654,7 +679,7 @@ export const zVideoGenerationRequestKwaivgiKlingV30Std = z.object({
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['kwaivgi/kling-v3.0-std']),
   prompt: z.string(),
   provider: z
@@ -675,7 +700,7 @@ export const zVideoGenerationRequestKwaivgiKlingVideoO1 = z.object({
   duration: z.union([z.literal(5), z.literal(10)]).optional(),
   frame_images: z.array(zFrameImage).optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['kwaivgi/kling-video-o1']),
   prompt: z.string(),
   provider: z
@@ -695,7 +720,7 @@ export const zVideoGenerationRequestMinimaxHailuo23 = z.object({
   callback_url: z.url().optional(),
   duration: z.union([z.literal(6), z.literal(10)]).optional(),
   frame_images: z.array(zFrameImage).optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['minimax/hailuo-2.3']),
   prompt: z.string(),
   provider: z
@@ -723,7 +748,7 @@ export const zVideoGenerationRequestOpenaiSora2Pro = z.object({
     ])
     .optional(),
   generate_audio: z.boolean().optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['openai/sora-2-pro']),
   prompt: z.string(),
   provider: z
@@ -763,7 +788,7 @@ export const zVideoGenerationRequestXAiGrokImagineVideo = z.object({
     ])
     .optional(),
   frame_images: z.array(zFrameImage).optional(),
-  input_references: z.array(zContentPartImage).optional(),
+  input_references: z.array(zInputReference).optional(),
   model: z.enum(['x-ai/grok-imagine-video']),
   prompt: z.string(),
   provider: z

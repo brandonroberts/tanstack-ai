@@ -3,31 +3,71 @@
 import * as z from 'zod'
 
 /**
+ * RayImageToVideoRequest
+ */
+export const zAgentRayV32ImageToVideoInput = z.object({
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  loop: z.boolean().optional().default(false),
+  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
+  hdr: z.boolean().optional().default(false),
+  reference_image_urls: z
+    .union([z.array(z.string()).max(4), z.unknown()])
+    .optional(),
+  duration: z.string().optional().default('5s'),
+  exr_export: z.boolean().optional().default(false),
+  prompt: z.string().min(1).max(6000),
+  image_url: z.string().min(1),
+  aspect_ratio: z
+    .enum(['3:4', '4:3', '1:1', '9:16', '16:9', '21:9'])
+    .optional()
+    .default('16:9'),
+})
+
+/**
+ * RayTextToVideoRequest
+ */
+export const zAgentRayV32TextToVideoInput = z.object({
+  loop: z.boolean().optional().default(false),
+  reference_image_urls: z
+    .union([z.array(z.string()).max(4), z.unknown()])
+    .optional(),
+  hdr: z.boolean().optional().default(false),
+  duration: z.enum(['5s', '10s']).optional().default('5s'),
+  exr_export: z.boolean().optional().default(false),
+  prompt: z.string().min(1).max(6000),
+  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
+  aspect_ratio: z
+    .enum(['3:4', '4:3', '1:1', '9:16', '16:9', '21:9'])
+    .optional()
+    .default('16:9'),
+})
+
+/**
  * AvatarMultiAudioPersonRequest
  */
 export const zAiAvatarMultiInput = z.object({
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
+  use_only_first_audio: z.boolean().optional().default(false),
+  num_frames: z.int().gte(41).lte(241).optional().default(181),
+  seed: z.int().gte(0).lte(4294967295).optional().default(81),
+  first_audio_url: z.string(),
+  image_url: z.string(),
+  prompt: z.string(),
+  second_audio_url: z.union([z.string(), z.unknown()]).optional(),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
-  first_audio_url: z.string(),
-  image_url: z.string(),
-  seed: z.int().gte(0).lte(4294967295).optional().default(81),
-  prompt: z.string(),
-  num_frames: z.int().gte(41).lte(241).optional().default(181),
-  use_only_first_audio: z.boolean().optional().default(false),
-  second_audio_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * AvatarMultiTextRequest
  */
 export const zAiAvatarMultiTextInput = z.object({
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
+  second_text_input: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
+  num_frames: z.int().gte(41).lte(241).optional().default(191),
+  seed: z.int().gte(0).lte(4294967295).optional().default(81),
   voice2: z
     .enum([
       'Aria',
@@ -53,10 +93,8 @@ export const zAiAvatarMultiTextInput = z.object({
     ])
     .optional()
     .default('Roger'),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
-  second_text_input: z.string(),
-  seed: z.int().gte(0).lte(4294967295).optional().default(81),
   image_url: z.string(),
+  prompt: z.string(),
   voice1: z
     .enum([
       'Aria',
@@ -82,9 +120,11 @@ export const zAiAvatarMultiTextInput = z.object({
     ])
     .optional()
     .default('Sarah'),
-  prompt: z.string(),
-  num_frames: z.int().gte(41).lte(241).optional().default(191),
   first_text_input: z.string(),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
 })
 
 /**
@@ -96,9 +136,11 @@ export const zAiAvatarSingleTextInput = z.object({
     .optional()
     .default('regular'),
   resolution: z.enum(['480p', '720p']).optional().default('480p'),
+  num_frames: z.int().gte(41).lte(241).optional().default(136),
   seed: z.int().gte(0).lte(4294967295).optional().default(42),
-  image_url: z.string(),
   text_input: z.string(),
+  image_url: z.string(),
+  prompt: z.string(),
   voice: z.enum([
     'Aria',
     'Roger',
@@ -121,35 +163,41 @@ export const zAiAvatarSingleTextInput = z.object({
     'Lily',
     'Bill',
   ]),
-  prompt: z.string(),
-  num_frames: z.int().gte(41).lte(241).optional().default(136),
 })
 
 /**
  * AMTInterpolationInput
  */
 export const zAmtInterpolationInput = z.object({
-  video_url: z.string(),
   output_fps: z.int().optional().default(24),
   recursive_interpolation_passes: z.int().optional().default(2),
+  video_url: z.string(),
+})
+
+/**
+ * AnswerOutput
+ */
+export const zAnswerOutput = z.object({
+  sdp: z.string(),
+  type: z.string(),
 })
 
 /**
  * CaptionInput
  */
 export const zAutoCaptionInput = z.object({
-  txt_font: z.string().optional().default('Standard'),
+  stroke_width: z.int().optional().default(1),
+  video_url: z.string(),
   txt_color: z.string().optional().default('white'),
-  left_align: z.union([z.string(), z.number()]).optional(),
+  txt_font: z.string().optional().default('Standard'),
   text_case: z
     .enum(['default', 'upper', 'lower'])
     .optional()
     .default('default'),
-  top_align: z.union([z.string(), z.number()]).optional(),
   refresh_interval: z.number().gte(0.5).lte(3).optional().default(1.5),
   font_size: z.int().optional().default(24),
-  stroke_width: z.int().optional().default(1),
-  video_url: z.string(),
+  top_align: z.union([z.string(), z.number()]).optional(),
+  left_align: z.union([z.string(), z.number()]).optional(),
 })
 
 /**
@@ -360,15 +408,15 @@ export const zAvatarVBackground = z.object({
  * Watermark configuration for Avatar V videos.
  */
 export const zAvatarVWatermark = z.object({
-  scale: z.union([z.number().lte(2), z.unknown()]).optional(),
-  image_url: z.string(),
-  opacity: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   placement: z
     .union([
       z.enum(['top-left', 'top-right', 'bottom-left', 'bottom-right']),
       z.unknown(),
     ])
     .optional(),
+  opacity: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  scale: z.union([z.number().lte(2), z.unknown()]).optional(),
+  image_url: z.string(),
 })
 
 /**
@@ -376,15 +424,101 @@ export const zAvatarVWatermark = z.object({
  */
 export const zBenV2VideoInput = z.object({
   video_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   background_color: z.union([z.tuple([]), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   output_format: z.enum(['mp4', 'webm']).optional().default('mp4'),
+})
+
+/**
+ * EditVideoInput
+ */
+export const zBerniniREditVideoInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  max_image_size: z.int().gte(256).lte(1280).optional().default(848),
+  num_frames: z.int().gte(5).lte(121).optional().default(81),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  frames_per_second: z.int().gte(4).lte(30).optional().default(16),
+  prompt: z.string(),
+  video_url: z.string(),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * ReferenceEditVideoInput
+ */
+export const zBerniniRReferenceEditVideoInput = z.object({
+  reference_image_urls: z.array(z.string()).min(1).max(5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(5).lte(121).optional().default(81),
+  max_image_size: z.int().gte(256).lte(1280).optional().default(848),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  frames_per_second: z.int().gte(4).lte(30).optional().default(16),
+  prompt: z.string(),
+  video_url: z.string(),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * ReferenceToVideoInput
+ */
+export const zBerniniRReferenceToVideoInput = z.object({
+  reference_image_urls: z.array(z.string()).min(1).max(5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(5).lte(121).optional().default(81),
+  max_image_size: z.int().gte(256).lte(1280).optional().default(848),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  frames_per_second: z.int().gte(4).lte(30).optional().default(16),
+  prompt: z.string(),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * TextToVideoInput
+ */
+export const zBerniniRTextToVideoInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  max_image_size: z.int().gte(256).lte(1280).optional().default(848),
+  num_frames: z.int().gte(5).lte(121).optional().default(81),
+  acceleration: z.enum(['none', 'regular']).optional().default('none'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  frames_per_second: z.int().gte(4).lte(30).optional().default(16),
+  prompt: z.string(),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * VideoInputV2
  */
 export const zBirefnetV2VideoInput = z.object({
+  refine_foreground: z.boolean().optional().default(true),
+  output_mask: z.boolean().optional().default(false),
+  sync_mode: z.boolean().optional().default(false),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  operating_resolution: z
+    .enum(['1024x1024', '2048x2048', '2304x2304'])
+    .optional()
+    .default('1024x1024'),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  video_url: z.string(),
   model: z
     .enum([
       'General Use (Light)',
@@ -396,37 +530,17 @@ export const zBirefnetV2VideoInput = z.object({
     ])
     .optional()
     .default('General Use (Light)'),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  operating_resolution: z
-    .enum(['1024x1024', '2048x2048', '2304x2304'])
-    .optional()
-    .default('1024x1024'),
-  sync_mode: z.boolean().optional().default(false),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  video_url: z.string(),
-  output_mask: z.boolean().optional().default(false),
-  refine_foreground: z.boolean().optional().default(true),
 })
 
 /**
  * BoxPrompt
  */
 export const zBoxPrompt = z.object({
-  x_min: z.union([z.int(), z.unknown()]).optional(),
-  y_max: z.union([z.int(), z.unknown()]).optional(),
-  frame_index: z.union([z.int(), z.unknown()]).optional(),
-  x_max: z.union([z.int(), z.unknown()]).optional(),
   y_min: z.union([z.int(), z.unknown()]).optional(),
+  y_max: z.union([z.int(), z.unknown()]).optional(),
+  x_max: z.union([z.int(), z.unknown()]).optional(),
+  frame_index: z.union([z.int(), z.unknown()]).optional(),
+  x_min: z.union([z.int(), z.unknown()]).optional(),
   object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -434,10 +548,10 @@ export const zBoxPrompt = z.object({
  * BoxPromptBase
  */
 export const zBoxPromptBase = z.object({
-  x_min: z.union([z.int(), z.unknown()]).optional(),
+  y_min: z.union([z.int(), z.unknown()]).optional(),
   y_max: z.union([z.int(), z.unknown()]).optional(),
   x_max: z.union([z.int(), z.unknown()]).optional(),
-  y_min: z.union([z.int(), z.unknown()]).optional(),
+  x_min: z.union([z.int(), z.unknown()]).optional(),
   object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -445,11 +559,11 @@ export const zBoxPromptBase = z.object({
  * BoxPrompt
  */
 export const zBoxPromptType2 = z.object({
-  x_max: z.int().optional().default(0),
-  y_min: z.int().optional().default(0),
-  x_min: z.int().optional().default(0),
   frame_index: z.int().optional().default(0),
   y_max: z.int().optional().default(0),
+  x_min: z.int().optional().default(0),
+  y_min: z.int().optional().default(0),
+  x_max: z.int().optional().default(0),
 })
 
 /**
@@ -558,10 +672,10 @@ export const zBytedanceOmnihumanInput = z.object({
  */
 export const zBytedanceOmnihumanV15Input = z.object({
   image_url: z.string(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
+  turbo_mode: z.boolean().optional().default(false),
   audio_url: z.string(),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
-  turbo_mode: z.boolean().optional().default(false),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   mask_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -578,11 +692,11 @@ export const zBytedanceSeedanceV15ProImageToVideoInput = z.object({
   camera_fixed: z.boolean().optional().default(false),
   image_url: z.string(),
   prompt: z.string(),
-  generate_audio: z.boolean().optional().default(true),
   duration: z
     .enum(['4', '5', '6', '7', '8', '9', '10', '11', '12'])
     .optional()
     .default('5'),
+  generate_audio: z.boolean().optional().default(true),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
 })
@@ -599,11 +713,11 @@ export const zBytedanceSeedanceV15ProTextToVideoInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
   camera_fixed: z.boolean().optional().default(false),
   prompt: z.string(),
-  generate_audio: z.boolean().optional().default(true),
   duration: z
     .enum(['4', '5', '6', '7', '8', '9', '10', '11', '12'])
     .optional()
     .default('5'),
+  generate_audio: z.boolean().optional().default(true),
   enable_safety_checker: z.boolean().optional().default(true),
 })
 
@@ -694,19 +808,19 @@ export const zBytedanceSeedanceV1ProTextToVideoInput = z.object({
  * UpscaleInput
  */
 export const zBytedanceUpscalerUpscaleVideoInput = z.object({
-  video_url: z.string(),
-  scale_ratio: z.union([z.number().gte(1.1).lte(10), z.unknown()]).optional(),
-  target_resolution: z.enum(['1080p', '2k', '4k']).optional().default('1080p'),
-  fidelity: z.enum(['high', 'medium']).optional().default('high'),
   target_fps: z.enum(['30fps', '60fps']).optional().default('30fps'),
-  enhancement_tier: z
-    .enum(['fast', 'standard', 'pro'])
-    .optional()
-    .default('standard'),
+  target_resolution: z.enum(['1080p', '2k', '4k']).optional().default('1080p'),
   enhancement_preset: z
     .enum(['general', 'ugc', 'short_series', 'aigc', 'old_film'])
     .optional()
     .default('general'),
+  video_url: z.string(),
+  scale_ratio: z.union([z.number().gte(1.1).lte(10), z.unknown()]).optional(),
+  fidelity: z.enum(['high', 'medium']).optional().default('high'),
+  enhancement_tier: z
+    .enum(['fast', 'standard', 'pro'])
+    .optional()
+    .default('standard'),
 })
 
 /**
@@ -2026,31 +2140,32 @@ export const zCharacter = z.object({
  * ControlFoleyVideoInput
  */
 export const zControlfoleyInput = z.object({
-  reference_audio_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_inference_steps: z.int().gte(4).lte(100).optional().default(25),
-  negative_prompt: z.string().optional().default(''),
+  reference_audio_url: z.union([z.string(), z.unknown()]).optional(),
   mask_away_clip: z.boolean().optional().default(false),
-  video_url: z.string(),
+  prompt: z.string().optional().default(''),
   duration: z.number().gte(1).lte(30).optional().default(8),
   guidance_scale: z.number().gte(0).lte(20).optional().default(4.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().optional().default(''),
+  video_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
  * DistilledTextToVideoInput
  */
 export const zCosmosPredict25DistilledTextToVideoInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_frames: z.int().gte(9).lte(93).optional().default(93),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
   negative_prompt: z
     .string()
     .optional()
@@ -2058,7 +2173,6 @@ export const zCosmosPredict25DistilledTextToVideoInput = z.object({
       'The video captures a series of frames showing ugly scenes, static with no motion, motion blur, over-saturation, shaky footage, low resolution, grainy texture, pixelated images, poorly lit areas, underexposed and overexposed scenes, poor color balance, washed out colors, choppy sequences, jerky movements, low frame rate, artifacting, color banding, unnatural transitions, outdated special effects, fake elements, unconvincing visuals, poorly edited content, jump cuts, visual noise, and flickering. Overall, the video is of poor quality.',
     ),
   num_inference_steps: z.int().gte(1).lte(20).optional().default(10),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
 })
 
@@ -2066,8 +2180,10 @@ export const zCosmosPredict25DistilledTextToVideoInput = z.object({
  * ImageToVideoInput
  */
 export const zCosmosPredict25ImageToVideoInput = z.object({
-  image_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_frames: z.int().gte(9).lte(93).optional().default(93),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(7),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
@@ -2076,7 +2192,6 @@ export const zCosmosPredict25ImageToVideoInput = z.object({
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   negative_prompt: z
     .string()
     .optional()
@@ -2084,25 +2199,26 @@ export const zCosmosPredict25ImageToVideoInput = z.object({
       'The video captures a series of frames showing ugly scenes, static with no motion, motion blur, over-saturation, shaky footage, low resolution, grainy texture, pixelated images, poorly lit areas, underexposed and overexposed scenes, poor color balance, washed out colors, choppy sequences, jerky movements, low frame rate, artifacting, color banding, unnatural transitions, outdated special effects, fake elements, unconvincing visuals, poorly edited content, jump cuts, visual noise, and flickering. Overall, the video is of poor quality.',
     ),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(35),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
   prompt: z.string(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(7),
 })
 
 /**
  * TextToVideoInput
  */
 export const zCosmosPredict25TextToVideoInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(9).lte(93).optional().default(93),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(7),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  num_frames: z.int().gte(9).lte(93).optional().default(93),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   negative_prompt: z
     .string()
     .optional()
@@ -2110,50 +2226,48 @@ export const zCosmosPredict25TextToVideoInput = z.object({
       'The video captures a series of frames showing ugly scenes, static with no motion, motion blur, over-saturation, shaky footage, low resolution, grainy texture, pixelated images, poorly lit areas, underexposed and overexposed scenes, poor color balance, washed out colors, choppy sequences, jerky movements, low frame rate, artifacting, color banding, unnatural transitions, outdated special effects, fake elements, unconvincing visuals, poorly edited content, jump cuts, visual noise, and flickering. Overall, the video is of poor quality.',
     ),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(35),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(7),
 })
 
 /**
  * VideoToVideoInput
  */
 export const zCosmosPredict25VideoToVideoInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(9).lte(93).optional().default(93),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(7),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  num_frames: z.int().gte(9).lte(93).optional().default(93),
-  video_url: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'The video captures a series of frames showing ugly scenes, static with no motion, motion blur, over-saturation, shaky footage, low resolution, grainy texture, pixelated images, poorly lit areas, underexposed and overexposed scenes, poor color balance, washed out colors, choppy sequences, jerky movements, low frame rate, artifacting, color banding, unnatural transitions, outdated special effects, fake elements, unconvincing visuals, poorly edited content, jump cuts, visual noise, and flickering. Overall, the video is of poor quality.',
     ),
+  video_url: z.string(),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(35),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(7),
 })
 
 /**
  * AuroraInputModel
  */
 export const zCreatifyAuroraInput = z.object({
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   image_url: z.string(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  audio_url: z.string(),
   guidance_scale: z.union([z.number().gte(0).lte(5), z.unknown()]).optional(),
   audio_guidance_scale: z
     .union([z.number().gte(0).lte(5), z.unknown()])
     .optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  audio_url: z.string(),
 })
 
 /**
@@ -2168,9 +2282,10 @@ export const zCrystalVideoUpscalerInput = z.object({
  * DaVinciMagiHumanInput
  */
 export const zDavinciMagihumanInput = z.object({
-  image_url: z.string(),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z.int().gte(1).lte(30).optional().default(5),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_inference_steps: z
     .union([z.int().gte(1).lte(50), z.unknown()])
     .optional(),
@@ -2178,10 +2293,9 @@ export const zDavinciMagihumanInput = z.object({
     .enum(['256p', '540p', '720p', '1080p'])
     .optional()
     .default('256p'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string().min(1),
-  enable_safety_checker: z.boolean().optional().default(true),
   guidance_scale: z.number().gte(0).lte(20).optional().default(5),
+  image_url: z.string(),
 })
 
 /**
@@ -2190,18 +2304,18 @@ export const zDavinciMagihumanInput = z.object({
  * Input schema for video depth estimation.
  */
 export const zDepthAnythingVideoInput = z.object({
+  include_raw_depths: z.boolean().optional().default(false),
+  video_url: z.string(),
   side_by_side: z.boolean().optional().default(false),
-  colormap: z
-    .enum(['grayscale', 'turbo', 'inferno', 'magma', 'viridis'])
-    .optional()
-    .default('grayscale'),
   model: z
     .enum(['VDA-Small', 'VDA-Base', 'VDA-Large'])
     .optional()
     .default('VDA-Large'),
-  include_raw_depths: z.boolean().optional().default(false),
+  colormap: z
+    .enum(['grayscale', 'turbo', 'inferno', 'magma', 'viridis'])
+    .optional()
+    .default('grayscale'),
   output_fps: z.union([z.number(), z.unknown()]).optional(),
-  video_url: z.string(),
   max_frames: z.union([z.int(), z.unknown()]).optional(),
   resolution: z
     .enum(['auto', '360p', '480p', '720p', '1080p'])
@@ -2213,7 +2327,6 @@ export const zDepthAnythingVideoInput = z.object({
  * DWPoseVideoInput
  */
 export const zDwposeVideoInput = z.object({
-  video_url: z.string(),
   draw_mode: z
     .enum([
       'full-pose',
@@ -2226,67 +2339,68 @@ export const zDwposeVideoInput = z.object({
     ])
     .optional()
     .default('body-pose'),
+  video_url: z.string(),
 })
 
 /**
  * EchoMimicRequest
  */
 export const zEchomimicV3Input = z.object({
+  prompt: z.string(),
   audio_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4.5),
   image_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
   audio_guidance_scale: z.number().gte(0).lte(10).optional().default(2.5),
   num_frames_per_generation: z.int().gte(49).lte(161).optional().default(121),
-  negative_prompt: z.string().optional().default(''),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * EdittoInput
  */
 export const zEdittoInput = z.object({
-  shift: z.number().gte(1).lte(15).optional().default(5),
+  enable_safety_checker: z.boolean().optional().default(false),
+  prompt: z.string(),
+  resolution: z
+    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  return_frames_zip: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
+    .optional()
+    .default('auto'),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  match_input_num_frames: z.boolean().optional().default(false),
+  shift: z.number().gte(1).lte(15).optional().default(5),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  sync_mode: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  match_input_frames_per_second: z.boolean().optional().default(false),
   temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(false),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  sync_mode: z.boolean().optional().default(false),
-  video_url: z.string(),
-  prompt: z.string(),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
-  match_input_frames_per_second: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  match_input_num_frames: z.boolean().optional().default(false),
   enable_auto_downsample: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  resolution: z
-    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
-    .optional()
-    .default('auto'),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
+  video_url: z.string(),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
   num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
 })
 
@@ -2294,26 +2408,34 @@ export const zEdittoInput = z.object({
  * DubbingRequest
  */
 export const zElevenlabsDubbingInput = z.object({
-  video_url: z.union([z.string(), z.unknown()]).optional(),
-  highest_resolution: z.boolean().optional().default(true),
-  num_speakers: z.union([z.int().gte(1).lte(50), z.unknown()]).optional(),
-  target_lang: z.string(),
   audio_url: z.union([z.string(), z.unknown()]).optional(),
   source_lang: z.union([z.string(), z.unknown()]).optional(),
+  num_speakers: z.union([z.int().gte(1).lte(50), z.unknown()]).optional(),
+  highest_resolution: z.boolean().optional().default(true),
+  video_url: z.union([z.string(), z.unknown()]).optional(),
+  target_lang: z.string(),
+})
+
+/**
+ * ErrorOutput
+ */
+export const zErrorOutput = z.object({
+  error: z.string(),
+  type: z.string(),
 })
 
 /**
  * ExtendVideoConditioningInput
  */
 export const zExtendVideoConditioningInput = z.object({
-  start_frame_num: z.int().gte(0).lte(1440).optional().default(0),
   video_url: z.string(),
-  target_fps: z.int().gte(1).lte(60).optional().default(24),
+  limit_num_frames: z.boolean().optional().default(false),
   reverse_video: z.boolean().optional().default(false),
+  start_frame_num: z.int().gte(0).lte(1440).optional().default(0),
   max_num_frames: z.int().gte(1).lte(1441).optional().default(1441),
   resample_fps: z.boolean().optional().default(false),
-  limit_num_frames: z.boolean().optional().default(false),
   strength: z.number().gte(0).lte(1).optional().default(1),
+  target_fps: z.int().gte(1).lte(60).optional().default(24),
 })
 
 /**
@@ -2350,26 +2472,23 @@ export const zFabric10TextInput = z.object({
 export const zFastAnimatediffTurboVideoToVideoInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(0).lte(20).optional().default(2),
-  video_url: z.string(),
   first_n_seconds: z.int().gte(2).lte(4).optional().default(3),
+  video_url: z.string(),
   negative_prompt: z
     .string()
     .optional()
     .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(12),
-  fps: z.int().gte(1).lte(16).optional().default(8),
-  strength: z.number().gte(0).lte(1).optional().default(0.7),
   prompt: z.string(),
+  fps: z.int().gte(1).lte(16).optional().default(8),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(12),
+  strength: z.number().gte(0).lte(1).optional().default(0.7),
 })
 
 /**
  * AnimateDiffV2VInput
  */
 export const zFastAnimatediffVideoToVideoInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  video_url: z.string(),
-  first_n_seconds: z.int().gte(2).lte(4).optional().default(3),
   motions: z
     .array(
       z.enum([
@@ -2382,26 +2501,29 @@ export const zFastAnimatediffVideoToVideoInput = z.object({
       ]),
     )
     .optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
+  first_n_seconds: z.int().gte(2).lte(4).optional().default(3),
+  video_url: z.string(),
   negative_prompt: z
     .string()
     .optional()
     .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
-  fps: z.int().gte(1).lte(16).optional().default(8),
-  strength: z.number().gte(0).lte(1).optional().default(0.7),
   prompt: z.string(),
+  fps: z.int().gte(1).lte(16).optional().default(8),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
+  strength: z.number().gte(0).lte(1).optional().default(0.7),
 })
 
 /**
  * FastSVDImageInput
  */
 export const zFastSvdLcmInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  cond_aug: z.number().gte(0).lte(10).optional().default(0.02),
-  steps: z.int().gte(1).lte(20).optional().default(4),
-  image_url: z.string(),
   motion_bucket_id: z.int().gte(1).lte(255).optional().default(127),
   fps: z.int().gte(1).lte(25).optional().default(10),
+  steps: z.int().gte(1).lte(20).optional().default(4),
+  cond_aug: z.number().gte(0).lte(10).optional().default(0.02),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -2427,32 +2549,48 @@ export const zFfmpegApiMergeAudioVideoInput = z.object({
 export const zFile = z.object({
   file_size: z.union([z.int(), z.unknown()]).optional(),
   file_name: z.union([z.string(), z.unknown()]).optional(),
-  url: z.string(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
+  url: z.string(),
+})
+
+/**
+ * VideoOutput
+ */
+export const zAgentRayV32ImageToVideoOutput = z.object({
+  exr_file: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
+})
+
+/**
+ * VideoOutput
+ */
+export const zAgentRayV32TextToVideoOutput = z.object({
+  exr_file: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
  * AvatarMultiAudioResponse
  */
 export const zAiAvatarMultiOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * AvatarMultiTextResponse
  */
 export const zAiAvatarMultiTextOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * AvatarSingleTextResponse
  */
 export const zAiAvatarSingleTextOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -2489,6 +2627,42 @@ export const zAvatarsTextToVideoOutput = z.object({
 export const zBenV2VideoOutput = z.object({
   seed: z.int(),
   video: zFile,
+})
+
+/**
+ * VideoOutput
+ */
+export const zBerniniREditVideoOutput = z.object({
+  video: zFile,
+  seed: z.int(),
+  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * VideoOutput
+ */
+export const zBerniniRReferenceEditVideoOutput = z.object({
+  video: zFile,
+  seed: z.int(),
+  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * VideoOutput
+ */
+export const zBerniniRReferenceToVideoOutput = z.object({
+  video: zFile,
+  seed: z.int(),
+  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * VideoOutput
+ */
+export const zBerniniRTextToVideoOutput = z.object({
+  video: zFile,
+  seed: z.int(),
+  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -2574,39 +2748,39 @@ export const zBytedanceUpscalerUpscaleVideoOutput = z.object({
  * Output
  */
 export const zCogvideox5bImageToVideoOutput = z.object({
-  video: zFile,
-  seed: z.int(),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  seed: z.int(),
+  video: zFile,
 })
 
 /**
  * Output
  */
 export const zCogvideox5bOutput = z.object({
-  video: zFile,
-  seed: z.int(),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  seed: z.int(),
+  video: zFile,
 })
 
 /**
  * Output
  */
 export const zCogvideox5bVideoToVideoOutput = z.object({
-  video: zFile,
-  seed: z.int(),
   timings: z.record(z.string(), z.number()),
   prompt: z.string(),
+  seed: z.int(),
+  video: zFile,
 })
 
 /**
  * ControlFoleyVideoOutput
  */
 export const zControlfoleyOutput = z.object({
-  audio: zFile,
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
+  audio: zFile,
 })
 
 /**
@@ -2623,8 +2797,8 @@ export const zDavinciMagihumanOutput = z.object({
  * Output schema for video depth estimation.
  */
 export const zDepthAnythingVideoOutput = z.object({
-  raw_depths: z.union([zFile, z.unknown()]).optional(),
   video: zFile,
+  raw_depths: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
@@ -2763,31 +2937,31 @@ export const zFileType2 = z.object({
  * FILMVideoInput
  */
 export const zFilmVideoInput = z.object({
-  use_calculated_fps: z.boolean().optional().default(true),
-  use_scene_detection: z.boolean().optional().default(false),
-  sync_mode: z.boolean().optional().default(false),
-  video_url: z.string(),
-  num_frames: z.int().gte(1).lte(4).optional().default(1),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  use_calculated_fps: z.boolean().optional().default(true),
+  video_url: z.string(),
+  fps: z.int().gte(1).lte(60).optional().default(8),
+  loop: z.boolean().optional().default(false),
+  num_frames: z.int().gte(1).lte(4).optional().default(1),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  loop: z.boolean().optional().default(false),
-  fps: z.int().gte(1).lte(60).optional().default(8),
+  sync_mode: z.boolean().optional().default(false),
+  use_scene_detection: z.boolean().optional().default(false),
 })
 
 /**
  * FlashHeadTextRequest
  */
 export const zFlashheadInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
   stability: z.number().gte(0).lte(1).optional().default(0.5),
   text: z.string(),
-  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   voice: z
     .enum([
       'Aria',
@@ -2819,10 +2993,10 @@ export const zFlashheadInput = z.object({
  * FlashHeadTextResponse
  */
 export const zFlashheadOutput = z.object({
-  seed: z.int(),
+  timings: z.record(z.string(), z.number()).optional(),
   duration: z.number(),
   video: zFile,
-  timings: z.record(z.string(), z.number()).optional(),
+  seed: z.int(),
 })
 
 /**
@@ -2830,38 +3004,35 @@ export const zFlashheadOutput = z.object({
  */
 export const zFlashtalkInput = z.object({
   audio_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * FlashTalkAudioResponse
  */
 export const zFlashtalkOutput = z.object({
-  video: zFile,
-  timings: z.record(z.string(), z.number()).optional(),
-  seed: z.int(),
   duration: z.number(),
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()).optional(),
+  video: zFile,
 })
 
 /**
  * FlashVSRPlusVideoInput
  */
 export const zFlashvsrUpscaleVideoInput = z.object({
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   video_url: z.string(),
   color_fix: z.boolean().optional().default(true),
+  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
   output_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  preserve_audio: z.boolean().optional().default(false),
-  acceleration: z
-    .enum(['regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   quality: z.int().gte(0).lte(100).optional().default(70),
+  sync_mode: z.boolean().optional().default(false),
+  preserve_audio: z.boolean().optional().default(false),
   output_format: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
@@ -2870,15 +3041,18 @@ export const zFlashvsrUpscaleVideoInput = z.object({
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  upscale_factor: z.number().gte(1).lte(4).optional().default(2),
+  acceleration: z
+    .enum(['regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
 })
 
 /**
  * FlashVSRPlusVideoOutput
  */
 export const zFlashvsrUpscaleVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -2893,49 +3067,49 @@ export const zFrame = z.object({
  */
 export const zAmtInterpolationFrameInterpolationInput = z.object({
   output_fps: z.int().optional().default(24),
-  frames: z.array(zFrame),
   recursive_interpolation_passes: z.int().optional().default(4),
+  frames: z.array(zFrame),
 })
 
 /**
  * FramePackF1Request
  */
 export const zFramepackF1Input = z.object({
+  num_frames: z.int().gte(30).lte(900).optional().default(180),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(0).lte(7).optional().default(1),
   image_url: z.string(),
   resolution: z.enum(['720p', '480p']).optional().default('480p'),
-  num_frames: z.int().gte(30).lte(900).optional().default(180),
   enable_safety_checker: z.boolean().optional().default(false),
   guidance_scale: z.number().gte(0).lte(32).optional().default(10),
-  prompt: z.string(),
-  cfg_scale: z.number().gte(0).lte(7).optional().default(1),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
  * FramePackF1Response
  */
 export const zFramepackF1Output = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
  * FramePackF2LFRequest
  */
 export const zFramepackFlf2vInput = z.object({
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['720p', '480p']).optional().default('480p'),
   num_frames: z.int().gte(30).lte(1800).optional().default(240),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(0).lte(7).optional().default(1),
+  strength: z.number().gte(0).lte(1).optional().default(0.8),
+  image_url: z.string(),
   guidance_scale: z.number().gte(0).lte(32).optional().default(10),
   enable_safety_checker: z.boolean().optional().default(false),
-  strength: z.number().gte(0).lte(1).optional().default(0.8),
-  prompt: z.string(),
-  cfg_scale: z.number().gte(0).lte(7).optional().default(1),
+  resolution: z.enum(['720p', '480p']).optional().default('480p'),
   negative_prompt: z.string().optional().default(''),
-  image_url: z.string(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
   end_image_url: z.string(),
 })
 
@@ -2943,88 +3117,88 @@ export const zFramepackFlf2vInput = z.object({
  * FramePackFLF2VResponse
  */
 export const zFramepackFlf2vOutput = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
  * FramePackRequest
  */
 export const zFramepackInput = z.object({
+  num_frames: z.int().gte(30).lte(900).optional().default(180),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(0).lte(7).optional().default(1),
   image_url: z.string(),
   resolution: z.enum(['720p', '480p']).optional().default('480p'),
-  num_frames: z.int().gte(30).lte(900).optional().default(180),
   enable_safety_checker: z.boolean().optional().default(false),
   guidance_scale: z.number().gte(0).lte(32).optional().default(10),
-  prompt: z.string(),
-  cfg_scale: z.number().gte(0).lte(7).optional().default(1),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
  * FramePackResponse
  */
 export const zFramepackOutput = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
  * XAIVideoEditInput
  */
 export const zGrokImagineVideoEditVideoInput = z.object({
-  prompt: z.string().max(4096),
   video_url: z.string(),
   resolution: z.enum(['auto', '480p', '720p']).optional().default('auto'),
+  prompt: z.string().max(4096),
 })
 
 /**
  * XAIVideoExtensionInput
  */
 export const zGrokImagineVideoExtendVideoInput = z.object({
-  prompt: z.string().max(4096),
   video_url: z.string(),
   duration: z.int().gte(2).lte(10).optional().default(6),
+  prompt: z.string().max(4096),
 })
 
 /**
  * XAIImageToVideoInput
  */
 export const zGrokImagineVideoImageToVideoInput = z.object({
-  image_url: z.string(),
-  prompt: z.string().max(4096),
-  duration: z.int().gte(1).lte(15).optional().default(6),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   aspect_ratio: z
     .union([
       z.enum(['auto', '16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16']),
       z.unknown(),
     ])
     .optional(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  prompt: z.string().max(4096),
+  duration: z.int().gte(1).lte(15).optional().default(6),
+  image_url: z.string(),
 })
 
 /**
  * XAIReferenceToVideoInput
  */
 export const zGrokImagineVideoReferenceToVideoInput = z.object({
+  reference_image_urls: z.array(z.string()).min(1).max(7),
+  duration: z.int().gte(1).lte(10).optional().default(8),
   prompt: z.string().max(4096),
   resolution: z.enum(['480p', '720p']).optional().default('480p'),
-  duration: z.int().gte(1).lte(10).optional().default(8),
   aspect_ratio: z
     .enum(['16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  reference_image_urls: z.array(z.string()).min(1).max(7),
 })
 
 /**
  * XAITextToVideoInput
  */
 export const zGrokImagineVideoTextToVideoInput = z.object({
-  prompt: z.string().max(4096),
   duration: z.int().gte(1).lte(15).optional().default(6),
+  prompt: z.string().max(4096),
   resolution: z.enum(['480p', '720p']).optional().default('720p'),
   aspect_ratio: z
     .enum(['16:9', '4:3', '3:2', '1:1', '2:3', '3:4', '9:16'])
@@ -3038,10 +3212,10 @@ export const zGrokImagineVideoTextToVideoInput = z.object({
  * ``grok-imagine-video-1.5-preview`` image-to-video (no ``aspect_ratio``).
  */
 export const zGrokImagineVideoV15ImageToVideoInput = z.object({
-  image_url: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   prompt: z.string().max(4096),
   duration: z.int().gte(1).lte(15).optional().default(6),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  image_url: z.string(),
 })
 
 /**
@@ -3050,7 +3224,6 @@ export const zGrokImagineVideoV15ImageToVideoInput = z.object({
  * Input for Happy Horse image-to-video generation (first frame only).
  */
 export const zHappyHorseImageToVideoInput = z.object({
-  image_url: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .union([
@@ -3072,6 +3245,7 @@ export const zHappyHorseImageToVideoInput = z.object({
     .default(5),
   prompt: z.union([z.string(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
+  image_url: z.string(),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
 })
 
@@ -3081,7 +3255,6 @@ export const zHappyHorseImageToVideoInput = z.object({
  * Input for Happy Horse reference-to-video generation (1-9 reference images).
  */
 export const zHappyHorseReferenceToVideoInput = z.object({
-  image_urls: z.array(z.string()),
   seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
@@ -3107,6 +3280,7 @@ export const zHappyHorseReferenceToVideoInput = z.object({
     .default(5),
   prompt: z.string().min(1),
   enable_safety_checker: z.boolean().optional().default(true),
+  image_urls: z.array(z.string()),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
 })
 
@@ -3116,9 +3290,11 @@ export const zHappyHorseReferenceToVideoInput = z.object({
  * Input for Happy Horse text-to-video generation.
  */
 export const zHappyHorseTextToVideoInput = z.object({
-  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
+    .optional()
+    .default('16:9'),
   duration: z
     .union([
       z.literal(3),
@@ -3138,10 +3314,8 @@ export const zHappyHorseTextToVideoInput = z.object({
     .optional()
     .default(5),
   prompt: z.string().min(1),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
-    .optional()
-    .default('16:9'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
 })
 
 /**
@@ -3150,12 +3324,12 @@ export const zHappyHorseTextToVideoInput = z.object({
  * Input for Happy Horse video-editing (source video + edit prompt).
  */
 export const zHappyHorseVideoEditInput = z.object({
-  reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  prompt: z.string().min(1),
-  audio_setting: z.enum(['auto', 'origin']).optional().default('auto'),
   video_url: z.string(),
+  reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  prompt: z.string().min(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_setting: z.enum(['auto', 'origin']).optional().default('auto'),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
 })
 
@@ -3177,8 +3351,16 @@ export const zHeygenAvatar4DigitalTwinOutput = z.object({
  * AvatarIVRequest
  */
 export const zHeygenAvatar4ImageToVideoInput = z.object({
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  background: zAvatarIvBackground.optional(),
+  resolution: z
+    .enum(['360p', '480p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '4:5', '5:4', '1:1', 'auto'])
+    .optional()
+    .default('16:9'),
+  caption: z.boolean().optional().default(false),
   voice: z
     .enum([
       'Warm Pro Narrator',
@@ -3285,19 +3467,11 @@ export const zHeygenAvatar4ImageToVideoInput = z.object({
       'Hope',
     ])
     .optional(),
-  resolution: z
-    .enum(['360p', '480p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
-  talking_style: z.enum(['stable', 'expressive']).optional().default('stable'),
   image_url: z.string(),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '4:5', '5:4', '1:1', 'auto'])
-    .optional()
-    .default('16:9'),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
   expression: z.union([z.string(), z.unknown()]).optional(),
-  caption: z.boolean().optional().default(false),
-  background: zAvatarIvBackground.optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  talking_style: z.enum(['stable', 'expressive']).optional().default('stable'),
 })
 
 /**
@@ -3325,9 +3499,13 @@ export const zHeygenAvatar4ImageToVideoOutput = z.object({
  * ineligible avatars.
  */
 export const zHeygenAvatar5DigitalTwinInput = z.object({
-  output_format: z.enum(['mp4', 'webm']).optional().default('mp4'),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  background: z.union([zAvatarVBackground, z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '4:5', '5:4', '1:1', 'auto'])
+    .optional()
+    .default('16:9'),
+  caption: z.boolean().optional().default(false),
   voice: z
     .enum([
       'Warm Pro Narrator',
@@ -3435,17 +3613,13 @@ export const zHeygenAvatar5DigitalTwinInput = z.object({
     ])
     .optional()
     .default('Warm Pro Narrator'),
-  resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  avatar: z.union([z.string(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '4:5', '5:4', '1:1', 'auto'])
-    .optional()
-    .default('16:9'),
-  watermark: z.union([zAvatarVWatermark, z.unknown()]).optional(),
-  caption: z.boolean().optional().default(false),
   remove_background: z.boolean().optional().default(false),
-  background: z.union([zAvatarVBackground, z.unknown()]).optional(),
+  watermark: z.union([zAvatarVWatermark, z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
   fit: z.enum(['contain', 'cover']).optional().default('cover'),
+  avatar: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  output_format: z.enum(['mp4', 'webm']).optional().default('mp4'),
 })
 
 /**
@@ -3465,9 +3639,9 @@ export const zHeygenAvatar5DigitalTwinOutput = z.object({
  */
 export const zHeygenV2TranslatePrecisionInput = z.object({
   enable_dynamic_duration: z.union([z.boolean(), z.unknown()]).optional(),
+  video_url: z.string(),
   translate_audio_only: z.union([z.boolean(), z.unknown()]).optional(),
   speaker_num: z.union([z.int(), z.unknown()]).optional(),
-  video_url: z.string(),
   output_language: z.enum([
     'English',
     'Spanish',
@@ -3664,9 +3838,9 @@ export const zHeygenV2TranslatePrecisionOutput = z.object({
  */
 export const zHeygenV2TranslateSpeedInput = z.object({
   enable_dynamic_duration: z.union([z.boolean(), z.unknown()]).optional(),
+  video_url: z.string(),
   translate_audio_only: z.union([z.boolean(), z.unknown()]).optional(),
   speaker_num: z.union([z.int(), z.unknown()]).optional(),
-  video_url: z.string(),
   output_language: z.enum([
     'English',
     'Spanish',
@@ -3869,14 +4043,14 @@ export const zHeygenV2VideoAgentOutput = z.object({
  * Base request for lip-syncing a video (mode is determined by the endpoint).
  */
 export const zHeygenV3LipsyncPrecisionInput = z.object({
-  title: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.string(),
-  video_url: z.string(),
-  start_time: z.union([z.number().gte(0), z.unknown()]).optional(),
   end_time: z.union([z.number().gte(0), z.unknown()]).optional(),
-  disable_music_track: z.boolean().optional().default(false),
   enable_dynamic_duration: z.boolean().optional().default(true),
+  video_url: z.string(),
+  audio_url: z.string(),
+  disable_music_track: z.boolean().optional().default(false),
+  title: z.union([z.string(), z.unknown()]).optional(),
   enable_speech_enhancement: z.boolean().optional().default(false),
+  start_time: z.union([z.number().gte(0), z.unknown()]).optional(),
   enable_caption: z.boolean().optional().default(false),
 })
 
@@ -3896,14 +4070,14 @@ export const zHeygenV3LipsyncPrecisionOutput = z.object({
  * Base request for lip-syncing a video (mode is determined by the endpoint).
  */
 export const zHeygenV3LipsyncSpeedInput = z.object({
-  title: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.string(),
-  video_url: z.string(),
-  start_time: z.union([z.number().gte(0), z.unknown()]).optional(),
   end_time: z.union([z.number().gte(0), z.unknown()]).optional(),
-  disable_music_track: z.boolean().optional().default(false),
   enable_dynamic_duration: z.boolean().optional().default(true),
+  video_url: z.string(),
+  audio_url: z.string(),
+  disable_music_track: z.boolean().optional().default(false),
+  title: z.union([z.string(), z.unknown()]).optional(),
   enable_speech_enhancement: z.boolean().optional().default(false),
+  start_time: z.union([z.number().gte(0), z.unknown()]).optional(),
   enable_caption: z.boolean().optional().default(false),
 })
 
@@ -3926,6 +4100,9 @@ export const zHeygenV3VideoAgentInput = z.object({
   orientation: z
     .union([z.enum(['landscape', 'portrait']), z.unknown()])
     .optional(),
+  style_id: z.union([z.string(), z.unknown()]).optional(),
+  incognito_mode: z.boolean().optional().default(false),
+  file_urls: z.union([z.array(z.string()).max(20), z.unknown()]).optional(),
   voice: z
     .enum([
       'auto',
@@ -4035,7 +4212,6 @@ export const zHeygenV3VideoAgentInput = z.object({
     .optional()
     .default('auto'),
   prompt: z.string().max(10000),
-  incognito_mode: z.boolean().optional().default(false),
   avatar: z
     .enum([
       'auto',
@@ -5328,8 +5504,6 @@ export const zHeygenV3VideoAgentInput = z.object({
     ])
     .optional()
     .default('auto'),
-  style_id: z.union([z.string(), z.unknown()]).optional(),
-  file_urls: z.union([z.array(z.string()).max(20), z.unknown()]).optional(),
 })
 
 /**
@@ -5345,12 +5519,12 @@ export const zHeygenV3VideoAgentOutput = z.object({
  * HunyuanFoleyRequest
  */
 export const zHunyuanVideoFoleyInput = z.object({
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4.5),
-  video_url: z.string(),
-  text_prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default('noisy, harsh'),
   num_inference_steps: z.int().gte(10).lte(100).optional().default(50),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4.5),
+  negative_prompt: z.string().optional().default('noisy, harsh'),
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  text_prompt: z.string(),
 })
 
 /**
@@ -5364,21 +5538,21 @@ export const zHunyuanVideoFoleyOutput = z.object({
  * HunyuanVideoRequest
  */
 export const zHunyuanVideoImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().max(1000),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  resolution: z.string().optional().default('720p'),
+  num_frames: z.string().optional().default('129'),
   i2v_stability: z.boolean().optional().default(false),
   image_url: z.string(),
-  num_frames: z.string().optional().default('129'),
+  resolution: z.string().optional().default('720p'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  prompt: z.string().max(1000),
 })
 
 /**
  * HunyuanI2VResponse
  */
 export const zHunyuanVideoImageToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -5394,8 +5568,8 @@ export const zHunyuanVideoImg2VidLoraInput = z.object({
  * Output
  */
 export const zHunyuanVideoImg2VidLoraOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -5423,15 +5597,15 @@ export const zHunyuanVideoOutput = z.object({
  * HunyuanVideo15I2VRequest
  */
 export const zHunyuanVideoV15ImageToVideoInput = z.object({
-  image_url: z.string(),
-  resolution: z.string().optional().default('480p'),
-  num_frames: z.int().gte(1).lte(121).optional().default(121),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  prompt: z.string(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
   negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  image_url: z.string(),
+  num_frames: z.int().gte(1).lte(121).optional().default(121),
+  resolution: z.string().optional().default('480p'),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
@@ -5446,14 +5620,14 @@ export const zHunyuanVideoV15ImageToVideoOutput = z.object({
  * HunyuanVideo15T2VRequest
  */
 export const zHunyuanVideoV15TextToVideoInput = z.object({
-  resolution: z.string().optional().default('480p'),
-  num_frames: z.int().gte(1).lte(121).optional().default(121),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  prompt: z.string(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
   negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  num_frames: z.int().gte(1).lte(121).optional().default(121),
+  resolution: z.string().optional().default('480p'),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
@@ -5488,11 +5662,36 @@ export const zHunyuanVideoVideoToVideoOutput = z.object({
 })
 
 /**
+ * IceCandidate
+ */
+export const zIceCandidate = z.object({
+  sdpMLineIndex: z.union([z.int(), z.unknown()]).optional(),
+  sdpMid: z.union([z.string(), z.unknown()]).optional(),
+  candidate: z.string(),
+})
+
+/**
+ * IceCandidateOutput
+ */
+export const zIceCandidateOutput = z.object({
+  type: z.string(),
+  candidate: z.union([zIceCandidate, z.unknown()]).optional(),
+})
+
+/**
+ * IceServersOutput
+ */
+export const zIceServersOutput = z.object({
+  iceservers: z.array(z.record(z.string(), z.unknown())),
+  type: z.string(),
+})
+
+/**
  * ImageConditioningInput
  */
 export const zImageConditioningInput = z.object({
-  strength: z.number().gte(0).lte(1).optional().default(1),
   image_url: z.string(),
+  strength: z.number().gte(0).lte(1).optional().default(1),
   start_frame_num: z.int().gte(0).lte(1440).optional().default(0),
 })
 
@@ -5508,12 +5707,12 @@ export const zImageConditioningInputType2 = z.object({
  * ImageFile
  */
 export const zImageFile = z.object({
-  file_size: z.union([z.int(), z.unknown()]).optional(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
-  width: z.union([z.int(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
-  height: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
+  width: z.union([z.int(), z.unknown()]).optional(),
+  height: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -5593,8 +5792,8 @@ export const zCosmos3SuperImageToVideoInput = z.object({
  * AnimateDiffT2VInput
  */
 export const zFastAnimatediffTextToVideoInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(1).lte(32).optional().default(16),
   motions: z
     .array(
       z.enum([
@@ -5607,6 +5806,7 @@ export const zFastAnimatediffTextToVideoInput = z.object({
       ]),
     )
     .optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   video_size: z
     .union([
       zImageSize,
@@ -5624,10 +5824,9 @@ export const zFastAnimatediffTextToVideoInput = z.object({
     .string()
     .optional()
     .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
-  fps: z.int().gte(1).lte(16).optional().default(8),
-  num_frames: z.int().gte(1).lte(32).optional().default(16),
   prompt: z.string(),
+  fps: z.int().gte(1).lte(16).optional().default(8),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(25),
 })
 
 /**
@@ -5635,6 +5834,7 @@ export const zFastAnimatediffTextToVideoInput = z.object({
  */
 export const zFastAnimatediffTurboTextToVideoInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(1).lte(32).optional().default(16),
   guidance_scale: z.number().gte(0).lte(20).optional().default(2),
   video_size: z
     .union([
@@ -5653,21 +5853,18 @@ export const zFastAnimatediffTurboTextToVideoInput = z.object({
     .string()
     .optional()
     .default('(bad quality, worst quality:1.2), ugly faces, bad anime'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(8),
-  fps: z.int().gte(1).lte(16).optional().default(8),
-  num_frames: z.int().gte(1).lte(32).optional().default(16),
   prompt: z.string(),
+  fps: z.int().gte(1).lte(16).optional().default(8),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(8),
 })
 
 /**
  * FastSVDTextInput
  */
 export const zFastSvdLcmTextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  cond_aug: z.number().gte(0).lte(10).optional().default(0.02),
-  steps: z.int().gte(1).lte(20).optional().default(4),
-  fps: z.int().gte(1).lte(25).optional().default(10),
   motion_bucket_id: z.int().gte(1).lte(255).optional().default(127),
+  fps: z.int().gte(1).lte(25).optional().default(10),
+  steps: z.int().gte(1).lte(20).optional().default(4),
   video_size: z
     .union([
       zImageSize,
@@ -5682,6 +5879,8 @@ export const zFastSvdLcmTextToVideoInput = z.object({
     ])
     .optional(),
   prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cond_aug: z.number().gte(0).lte(10).optional().default(0.02),
 })
 
 /**
@@ -5689,14 +5888,19 @@ export const zFastSvdLcmTextToVideoInput = z.object({
  */
 export const zFastSvdTextToVideoInput = z.object({
   prompt: z.string(),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'unrealistic, saturated, high contrast, big nose, painting, drawing, sketch, cartoon, anime, manga, render, CG, 3d, watermark, signature, label',
+    ),
   deep_cache: z
     .enum(['none', 'minimum', 'medium', 'high'])
     .optional()
     .default('none'),
-  fps: z.int().gte(1).lte(25).optional().default(10),
-  cond_aug: z.number().gte(0).lte(10).optional().default(0.02),
-  steps: z.int().gte(1).lte(100).optional().default(20),
   motion_bucket_id: z.int().gte(1).lte(255).optional().default(127),
+  steps: z.int().gte(1).lte(100).optional().default(20),
+  cond_aug: z.number().gte(0).lte(10).optional().default(0.02),
   video_size: z
     .union([
       zImageSize,
@@ -5710,13 +5914,8 @@ export const zFastSvdTextToVideoInput = z.object({
       ]),
     ])
     .optional(),
+  fps: z.int().gte(1).lte(25).optional().default(10),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'unrealistic, saturated, high contrast, big nose, painting, drawing, sketch, cartoon, anime, manga, render, CG, 3d, watermark, signature, label',
-    ),
 })
 
 /**
@@ -5745,31 +5944,36 @@ export const zFfmpegApiMergeVideosInput = z.object({
  * InfiniTalkSingleAudioRequest
  */
 export const zInfinitalkInput = z.object({
-  prompt: z.string(),
-  image_url: z.string(),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
+  num_frames: z.int().gte(41).lte(721).optional().default(145),
+  seed: z.int().gte(0).lte(4294967295).optional().default(42),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
+  prompt: z.string(),
+  image_url: z.string(),
   audio_url: z.string(),
-  num_frames: z.int().gte(41).lte(721).optional().default(145),
-  seed: z.int().gte(0).lte(4294967295).optional().default(42),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
 })
 
 /**
  * AvatarSingleAudioResponse
  */
 export const zInfinitalkOutput = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
  * InfiniTalkSingleTextRequest
  */
 export const zInfinitalkSingleTextInput = z.object({
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
+  num_frames: z.int().gte(41).lte(721).optional().default(145),
+  seed: z.int().gte(0).lte(4294967295).optional().default(42),
+  acceleration: z
+    .enum(['none', 'regular', 'high'])
+    .optional()
+    .default('regular'),
   voice: z.enum([
     'Aria',
     'Roger',
@@ -5792,47 +5996,42 @@ export const zInfinitalkSingleTextInput = z.object({
     'Lily',
     'Bill',
   ]),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
   text_input: z.string(),
-  seed: z.int().gte(0).lte(4294967295).optional().default(42),
   prompt: z.string(),
   image_url: z.string(),
-  acceleration: z
-    .enum(['none', 'regular', 'high'])
-    .optional()
-    .default('regular'),
-  num_frames: z.int().gte(41).lte(721).optional().default(145),
 })
 
 /**
  * AvatarSingleTextResponse
  */
 export const zInfinitalkSingleTextOutput = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
  * InfiniTalkVid2VidAudioRequest
  */
 export const zInfinitalkVideoToVideoInput = z.object({
+  num_frames: z.int().gte(41).lte(241).optional().default(145),
+  video_url: z.string(),
   seed: z.int().gte(0).lte(4294967295).optional().default(42),
   acceleration: z
     .enum(['none', 'regular', 'high'])
     .optional()
     .default('regular'),
-  resolution: z.enum(['480p', '720p']).optional().default('480p'),
-  video_url: z.string(),
-  audio_url: z.string(),
-  num_frames: z.int().gte(41).lte(241).optional().default(145),
   prompt: z.string(),
+  audio_url: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('480p'),
 })
 
 /**
  * InfinitalkVid2VidResponse
  */
 export const zInfinitalkVideoToVideoOutput = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
@@ -5841,15 +6040,15 @@ export const zInfinitalkVideoToVideoOutput = z.object({
  * Input model for text-to-video generation
  */
 export const zInfinityStarTextToVideoInput = z.object({
-  enhance_prompt: z.boolean().optional().default(true),
-  tau_video: z.number().gte(0.1).lte(1).optional().default(0.4),
-  negative_prompt: z.string().optional().default(''),
   aspect_ratio: z.enum(['16:9', '1:1', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(40).optional().default(7.5),
   use_apg: z.boolean().optional().default(true),
-  prompt: z.string(),
+  guidance_scale: z.number().gte(1).lte(40).optional().default(7.5),
+  negative_prompt: z.string().optional().default(''),
+  enhance_prompt: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(100).optional().default(50),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  tau_video: z.number().gte(0.1).lte(1).optional().default(0.4),
 })
 
 /**
@@ -5865,12 +6064,12 @@ export const zInfinityStarTextToVideoOutput = z.object({
  * KandinskyI2VRequest
  */
 export const zKandinsky5ProImageToVideoInput = z.object({
-  image_url: z.string(),
-  num_inference_steps: z.int().gte(1).lte(40).optional().default(28),
-  duration: z.string().optional().default('5s'),
-  prompt: z.string(),
-  acceleration: z.union([z.enum(['none', 'regular']), z.unknown()]).optional(),
   resolution: z.enum(['512P', '1024P']).optional().default('512P'),
+  image_url: z.string(),
+  prompt: z.string(),
+  duration: z.string().optional().default('5s'),
+  acceleration: z.union([z.enum(['none', 'regular']), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(40).optional().default(28),
 })
 
 /**
@@ -5884,12 +6083,12 @@ export const zKandinsky5ProImageToVideoOutput = z.object({
  * KandinskyT2VRequest
  */
 export const zKandinsky5ProTextToVideoInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
-  duration: z.string().optional().default('5s'),
-  aspect_ratio: z.enum(['3:2', '1:1', '2:3']).optional().default('3:2'),
-  prompt: z.string(),
   resolution: z.enum(['512P', '1024P']).optional().default('512P'),
+  prompt: z.string(),
+  duration: z.string().optional().default('5s'),
   acceleration: z.union([z.enum(['none', 'regular']), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(28),
+  aspect_ratio: z.enum(['3:2', '1:1', '2:3']).optional().default('3:2'),
 })
 
 /**
@@ -5904,9 +6103,9 @@ export const zKandinsky5ProTextToVideoOutput = z.object({
  */
 export const zKandinsky5TextToVideoDistillInput = z.object({
   prompt: z.string(),
-  duration: z.enum(['5s', '10s']).optional().default('5s'),
-  aspect_ratio: z.enum(['3:2', '1:1', '2:3']).optional().default('3:2'),
   resolution: z.string().optional().default('768x512'),
+  aspect_ratio: z.enum(['3:2', '1:1', '2:3']).optional().default('3:2'),
+  duration: z.enum(['5s', '10s']).optional().default('5s'),
 })
 
 /**
@@ -5921,10 +6120,10 @@ export const zKandinsky5TextToVideoDistillOutput = z.object({
  */
 export const zKandinsky5TextToVideoInput = z.object({
   prompt: z.string(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  resolution: z.string().optional().default('768x512'),
   duration: z.enum(['5s', '10s']).optional().default('5s'),
   aspect_ratio: z.enum(['3:2', '1:1', '2:3']).optional().default('3:2'),
-  resolution: z.string().optional().default('768x512'),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
 })
 
 /**
@@ -5949,26 +6148,26 @@ export const zKeyframe = z.object({
  * Configuration for a transition between two keyframes
  */
 export const zKeyframeTransition = z.object({
-  duration: z.int().gte(1).lte(25).optional().default(5),
   prompt: z.union([z.string(), z.unknown()]).optional(),
+  duration: z.int().gte(1).lte(25).optional().default(5),
 })
 
 /**
  * KlingV3ComboElementInput
  */
 export const zKlingV3ComboElementInput = z.object({
+  voice_id: z.union([z.string(), z.unknown()]).optional(),
+  frontal_image_url: z.union([z.string(), z.unknown()]).optional(),
   video_url: z.union([z.string(), z.unknown()]).optional(),
   reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  frontal_image_url: z.union([z.string(), z.unknown()]).optional(),
-  voice_id: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * KlingV3ImageElementInput
  */
 export const zKlingV3ImageElementInput = z.object({
-  reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   frontal_image_url: z.union([z.string(), z.unknown()]).optional(),
+  reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
 })
 
 /**
@@ -6002,8 +6201,8 @@ export const zKlingV3MultiPromptElement = z.object({
  * AIAvatarInput
  */
 export const zKlingVideoAiAvatarV2ProInput = z.object({
-  image_url: z.string(),
   prompt: z.string().optional().default('.'),
+  image_url: z.string(),
   audio_url: z.string(),
 })
 
@@ -6011,16 +6210,16 @@ export const zKlingVideoAiAvatarV2ProInput = z.object({
  * AIAvatarOutput
  */
 export const zKlingVideoAiAvatarV2ProOutput = z.object({
-  duration: z.number(),
   video: zFile,
+  duration: z.number(),
 })
 
 /**
  * AIAvatarInput
  */
 export const zKlingVideoAiAvatarV2StandardInput = z.object({
-  image_url: z.string(),
   prompt: z.string().optional().default('.'),
+  image_url: z.string(),
   audio_url: z.string(),
 })
 
@@ -6028,8 +6227,8 @@ export const zKlingVideoAiAvatarV2StandardInput = z.object({
  * AIAvatarOutput
  */
 export const zKlingVideoAiAvatarV2StandardOutput = z.object({
-  duration: z.number(),
   video: zFile,
+  duration: z.number(),
 })
 
 /**
@@ -6051,10 +6250,6 @@ export const zKlingVideoLipsyncAudioToVideoOutput = z.object({
  * LipsyncT2VRequest
  */
 export const zKlingVideoLipsyncTextToVideoInput = z.object({
-  voice_language: z.enum(['zh', 'en']).optional().default('en'),
-  voice_speed: z.number().gte(0.8).lte(2).optional().default(1),
-  video_url: z.string(),
-  text: z.string().max(120),
   voice_id: z.enum([
     'genshin_vindi2',
     'zhinen_xuesheng',
@@ -6103,6 +6298,10 @@ export const zKlingVideoLipsyncTextToVideoInput = z.object({
     'daopianyansang-v1',
     'mengwa-v1',
   ]),
+  text: z.string().max(120),
+  video_url: z.string(),
+  voice_language: z.enum(['zh', 'en']).optional().default('en'),
+  voice_speed: z.number().gte(0.8).lte(2).optional().default(1),
 })
 
 /**
@@ -6117,12 +6316,12 @@ export const zKlingVideoLipsyncTextToVideoOutput = z.object({
  */
 export const zKlingVideoO1ImageToVideoInput = z.object({
   prompt: z.string().max(2500),
+  start_image_url: z.string(),
   duration: z
     .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  start_image_url: z.string(),
 })
 
 /**
@@ -6146,12 +6345,12 @@ export const zKlingVideoO1ReferenceToVideoOutput = z.object({
  */
 export const zKlingVideoO1StandardImageToVideoInput = z.object({
   prompt: z.string().max(2500),
+  start_image_url: z.string(),
   duration: z
     .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  start_image_url: z.string(),
 })
 
 /**
@@ -6202,15 +6401,14 @@ export const zKlingVideoO1VideoToVideoReferenceOutput = z.object({
  * O3_4kImageToVideoInput
  */
 export const zKlingVideoO34kImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
+  generate_audio: z.boolean().optional().default(false),
+  image_url: z.string(),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
     .default('customize'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z
     .enum([
       '3',
@@ -6229,8 +6427,9 @@ export const zKlingVideoO34kImageToVideoInput = z.object({
     ])
     .optional()
     .default('5'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(false),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
 })
 
 /**
@@ -6244,17 +6443,20 @@ export const zKlingVideoO34kImageToVideoOutput = z.object({
  * O3_4kReferenceVideoI2VInput
  */
 export const zKlingVideoO34kReferenceToVideoInput = z.object({
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
   aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
     .default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
+    .optional(),
   start_image_url: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   generate_audio: z.boolean().optional().default(false),
   duration: z
     .enum([
@@ -6275,9 +6477,6 @@ export const zKlingVideoO34kReferenceToVideoInput = z.object({
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  elements: z
-    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -6291,12 +6490,9 @@ export const zKlingVideoO34kReferenceToVideoOutput = z.object({
  * O3_4kTextToVideoInput
  */
 export const zKlingVideoO34kTextToVideoInput = z.object({
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   generate_audio: z.boolean().optional().default(false),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
@@ -6319,6 +6515,9 @@ export const zKlingVideoO34kTextToVideoInput = z.object({
     ])
     .optional()
     .default('5'),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
 })
 
 /**
@@ -6334,15 +6533,14 @@ export const zKlingVideoO34kTextToVideoOutput = z.object({
  * O3ProImageToVideoInput
  */
 export const zKlingVideoO3ProImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
+  generate_audio: z.boolean().optional().default(false),
+  image_url: z.string(),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
     .default('customize'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z
     .enum([
       '3',
@@ -6361,8 +6559,9 @@ export const zKlingVideoO3ProImageToVideoInput = z.object({
     ])
     .optional()
     .default('5'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(false),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
 })
 
 /**
@@ -6376,17 +6575,20 @@ export const zKlingVideoO3ProImageToVideoOutput = z.object({
  * O3ProReferenceVideoI2VInput
  */
 export const zKlingVideoO3ProReferenceToVideoInput = z.object({
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
   aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
     .default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
+    .optional(),
   start_image_url: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   generate_audio: z.boolean().optional().default(false),
   duration: z
     .enum([
@@ -6407,9 +6609,6 @@ export const zKlingVideoO3ProReferenceToVideoInput = z.object({
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  elements: z
-    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -6423,12 +6622,9 @@ export const zKlingVideoO3ProReferenceToVideoOutput = z.object({
  * O3ProTextToVideoInput
  */
 export const zKlingVideoO3ProTextToVideoInput = z.object({
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   generate_audio: z.boolean().optional().default(false),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
@@ -6451,6 +6647,9 @@ export const zKlingVideoO3ProTextToVideoInput = z.object({
     ])
     .optional()
     .default('5'),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
 })
 
 /**
@@ -6468,12 +6667,12 @@ export const zKlingVideoO3ProTextToVideoOutput = z.object({
 export const zKlingVideoO3ProVideoToVideoEditInput = z.object({
   prompt: z.string().max(2500),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  keep_audio: z.boolean().optional().default(true),
   shot_type: z.string().optional().default('customize'),
-  video_url: z.string(),
+  keep_audio: z.boolean().optional().default(true),
   elements: z
     .union([z.array(zKlingV3ImageElementInput), z.unknown()])
     .optional(),
+  video_url: z.string(),
 })
 
 /**
@@ -6487,15 +6686,18 @@ export const zKlingVideoO3ProVideoToVideoEditOutput = z.object({
  * O3ProReferenceVideoV2VInput
  */
 export const zKlingVideoO3ProVideoToVideoReferenceInput = z.object({
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  keep_audio: z.boolean().optional().default(true),
+  prompt: z.string().max(2500),
   shot_type: z.string().optional().default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ImageElementInput), z.unknown()])
+    .optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  video_url: z.string(),
+  keep_audio: z.boolean().optional().default(true),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  prompt: z.string().max(2500),
-  video_url: z.string(),
   duration: z
     .union([
       z.enum([
@@ -6516,9 +6718,6 @@ export const zKlingVideoO3ProVideoToVideoReferenceInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  elements: z
-    .union([z.array(zKlingV3ImageElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -6532,15 +6731,14 @@ export const zKlingVideoO3ProVideoToVideoReferenceOutput = z.object({
  * O3StandardImageToVideoInput
  */
 export const zKlingVideoO3StandardImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
+  generate_audio: z.boolean().optional().default(false),
+  image_url: z.string(),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
     .default('customize'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z
     .enum([
       '3',
@@ -6559,8 +6757,9 @@ export const zKlingVideoO3StandardImageToVideoInput = z.object({
     ])
     .optional()
     .default('5'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(false),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
 })
 
 /**
@@ -6574,17 +6773,20 @@ export const zKlingVideoO3StandardImageToVideoOutput = z.object({
  * O3StandardReferenceVideoI2VInput
  */
 export const zKlingVideoO3StandardReferenceToVideoInput = z.object({
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
   aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
     .default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
+    .optional(),
   start_image_url: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   generate_audio: z.boolean().optional().default(false),
   duration: z
     .enum([
@@ -6605,9 +6807,6 @@ export const zKlingVideoO3StandardReferenceToVideoInput = z.object({
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  elements: z
-    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -6621,12 +6820,9 @@ export const zKlingVideoO3StandardReferenceToVideoOutput = z.object({
  * O3StandardTextToVideoInput
  */
 export const zKlingVideoO3StandardTextToVideoInput = z.object({
-  multi_prompt: z
-    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
-    .optional(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   generate_audio: z.boolean().optional().default(false),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   shot_type: z
     .enum(['customize', 'intelligent'])
     .optional()
@@ -6649,6 +6845,9 @@ export const zKlingVideoO3StandardTextToVideoInput = z.object({
     ])
     .optional()
     .default('5'),
+  multi_prompt: z
+    .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
+    .optional(),
 })
 
 /**
@@ -6666,12 +6865,12 @@ export const zKlingVideoO3StandardTextToVideoOutput = z.object({
 export const zKlingVideoO3StandardVideoToVideoEditInput = z.object({
   prompt: z.string().max(2500),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  keep_audio: z.boolean().optional().default(true),
   shot_type: z.string().optional().default('customize'),
-  video_url: z.string(),
+  keep_audio: z.boolean().optional().default(true),
   elements: z
     .union([z.array(zKlingV3ImageElementInput), z.unknown()])
     .optional(),
+  video_url: z.string(),
 })
 
 /**
@@ -6685,15 +6884,18 @@ export const zKlingVideoO3StandardVideoToVideoEditOutput = z.object({
  * O3StandardReferenceVideoV2VInput
  */
 export const zKlingVideoO3StandardVideoToVideoReferenceInput = z.object({
-  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  keep_audio: z.boolean().optional().default(true),
+  prompt: z.string().max(2500),
   shot_type: z.string().optional().default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ImageElementInput), z.unknown()])
+    .optional(),
+  image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  video_url: z.string(),
+  keep_audio: z.boolean().optional().default(true),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  prompt: z.string().max(2500),
-  video_url: z.string(),
   duration: z
     .union([
       z.enum([
@@ -6714,9 +6916,6 @@ export const zKlingVideoO3StandardVideoToVideoReferenceInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  elements: z
-    .union([z.array(zKlingV3ImageElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -6730,7 +6929,6 @@ export const zKlingVideoO3StandardVideoToVideoReferenceOutput = z.object({
  * VideoEffectsRequest
  */
 export const zKlingVideoV15ProEffectsInput = z.object({
-  duration: z.enum(['5', '10']).optional().default('5'),
   effect_scene: z.enum([
     'hug',
     'kiss',
@@ -6931,6 +7129,7 @@ export const zKlingVideoV15ProEffectsInput = z.object({
     'dark_wing',
     'emoji',
   ]),
+  duration: z.enum(['5', '10']).optional().default('5'),
   input_image_urls: z.array(z.string()).optional(),
 })
 
@@ -6953,7 +7152,6 @@ export const zKlingVideoV15ProImageToVideoOutput = z.object({
  */
 export const zKlingVideoV15ProTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -6961,6 +7159,7 @@ export const zKlingVideoV15ProTextToVideoInput = z.object({
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -6974,7 +7173,6 @@ export const zKlingVideoV15ProTextToVideoOutput = z.object({
  * VideoEffectsRequest
  */
 export const zKlingVideoV16ProEffectsInput = z.object({
-  duration: z.enum(['5', '10']).optional().default('5'),
   effect_scene: z.enum([
     'hug',
     'kiss',
@@ -7175,6 +7373,7 @@ export const zKlingVideoV16ProEffectsInput = z.object({
     'dark_wing',
     'emoji',
   ]),
+  duration: z.enum(['5', '10']).optional().default('5'),
   input_image_urls: z.array(z.string()).optional(),
 })
 
@@ -7190,14 +7389,14 @@ export const zKlingVideoV16ProEffectsOutput = z.object({
  */
 export const zKlingVideoV16ProElementsInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  input_image_urls: z.array(z.string()),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
-  input_image_urls: z.array(z.string()),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7211,10 +7410,10 @@ export const zKlingVideoV16ProElementsOutput = z.object({
  * ProImageToVideoRequest
  */
 export const zKlingVideoV16ProImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  image_url: z.string(),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   negative_prompt: z
     .string()
     .max(2500)
@@ -7236,7 +7435,6 @@ export const zKlingVideoV16ProImageToVideoOutput = z.object({
  */
 export const zKlingVideoV16ProTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -7244,6 +7442,7 @@ export const zKlingVideoV16ProTextToVideoInput = z.object({
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7257,7 +7456,6 @@ export const zKlingVideoV16ProTextToVideoOutput = z.object({
  * VideoEffectsRequest
  */
 export const zKlingVideoV16StandardEffectsInput = z.object({
-  duration: z.enum(['5', '10']).optional().default('5'),
   effect_scene: z.enum([
     'hug',
     'kiss',
@@ -7458,6 +7656,7 @@ export const zKlingVideoV16StandardEffectsInput = z.object({
     'dark_wing',
     'emoji',
   ]),
+  duration: z.enum(['5', '10']).optional().default('5'),
   input_image_urls: z.array(z.string()).optional(),
 })
 
@@ -7473,14 +7672,14 @@ export const zKlingVideoV16StandardEffectsOutput = z.object({
  */
 export const zKlingVideoV16StandardElementsInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  input_image_urls: z.array(z.string()),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
-  input_image_urls: z.array(z.string()),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7494,15 +7693,15 @@ export const zKlingVideoV16StandardElementsOutput = z.object({
  * ImageToVideoRequest
  */
 export const zKlingVideoV16StandardImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -7517,7 +7716,6 @@ export const zKlingVideoV16StandardImageToVideoOutput = z.object({
  */
 export const zKlingVideoV16StandardTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -7525,6 +7723,7 @@ export const zKlingVideoV16StandardTextToVideoInput = z.object({
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7538,8 +7737,8 @@ export const zKlingVideoV16StandardTextToVideoOutput = z.object({
  * AIAvatarInput
  */
 export const zKlingVideoV1ProAiAvatarInput = z.object({
-  image_url: z.string(),
   prompt: z.string().optional().default('.'),
+  image_url: z.string(),
   audio_url: z.string(),
 })
 
@@ -7547,16 +7746,16 @@ export const zKlingVideoV1ProAiAvatarInput = z.object({
  * AIAvatarOutput
  */
 export const zKlingVideoV1ProAiAvatarOutput = z.object({
-  duration: z.number(),
   video: zFile,
+  duration: z.number(),
 })
 
 /**
  * AIAvatarInput
  */
 export const zKlingVideoV1StandardAiAvatarInput = z.object({
-  image_url: z.string(),
   prompt: z.string().optional().default('.'),
+  image_url: z.string(),
   audio_url: z.string(),
 })
 
@@ -7564,15 +7763,14 @@ export const zKlingVideoV1StandardAiAvatarInput = z.object({
  * AIAvatarOutput
  */
 export const zKlingVideoV1StandardAiAvatarOutput = z.object({
-  duration: z.number(),
   video: zFile,
+  duration: z.number(),
 })
 
 /**
  * VideoEffectsRequest
  */
 export const zKlingVideoV1StandardEffectsInput = z.object({
-  duration: z.enum(['5', '10']).optional().default('5'),
   effect_scene: z.enum([
     'hug',
     'kiss',
@@ -7773,6 +7971,7 @@ export const zKlingVideoV1StandardEffectsInput = z.object({
     'dark_wing',
     'emoji',
   ]),
+  duration: z.enum(['5', '10']).optional().default('5'),
   input_image_urls: z.array(z.string()).optional(),
 })
 
@@ -7794,9 +7993,9 @@ export const zKlingVideoV1StandardImageToVideoOutput = z.object({
  * V1TextToVideoRequest
  */
 export const zKlingVideoV1StandardTextToVideoInput = z.object({
-  advanced_camera_control: z.union([zCameraControl, z.unknown()]).optional(),
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  advanced_camera_control: z.union([zCameraControl, z.unknown()]).optional(),
   camera_control: z
     .union([
       z.enum([
@@ -7808,13 +8007,13 @@ export const zKlingVideoV1StandardTextToVideoInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  duration: z.enum(['5', '10']).optional().default('5'),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7828,15 +8027,15 @@ export const zKlingVideoV1StandardTextToVideoOutput = z.object({
  * ImageToVideoV21MasterRequest
  */
 export const zKlingVideoV21MasterImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -7851,7 +8050,6 @@ export const zKlingVideoV21MasterImageToVideoOutput = z.object({
  */
 export const zKlingVideoV21MasterTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -7859,6 +8057,7 @@ export const zKlingVideoV21MasterTextToVideoInput = z.object({
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7872,8 +8071,8 @@ export const zKlingVideoV21MasterTextToVideoOutput = z.object({
  * ImageToVideoV21ProRequest
  */
 export const zKlingVideoV21ProImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
+  image_url: z.string(),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -7895,15 +8094,15 @@ export const zKlingVideoV21ProImageToVideoOutput = z.object({
  * ImageToVideoV21StandardRequest
  */
 export const zKlingVideoV21StandardImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -7917,8 +8116,8 @@ export const zKlingVideoV21StandardImageToVideoOutput = z.object({
  * ImageToVideoV25ProRequest
  */
 export const zKlingVideoV25TurboProImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
+  image_url: z.string(),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -7941,7 +8140,6 @@ export const zKlingVideoV25TurboProImageToVideoOutput = z.object({
  */
 export const zKlingVideoV25TurboProTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -7949,6 +8147,7 @@ export const zKlingVideoV25TurboProTextToVideoInput = z.object({
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -7962,15 +8161,15 @@ export const zKlingVideoV25TurboProTextToVideoOutput = z.object({
  * ImageToVideoV25StandardRequest
  */
 export const zKlingVideoV25TurboStandardImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -7984,16 +8183,16 @@ export const zKlingVideoV25TurboStandardImageToVideoOutput = z.object({
  * ImageToVideoV26ProRequest
  */
 export const zKlingVideoV26ProImageToVideoInput = z.object({
-  duration: z.enum(['5', '10']).optional().default('5'),
   prompt: z.string().max(2500),
-  start_image_url: z.string(),
   generate_audio: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  start_image_url: z.string(),
+  duration: z.enum(['5', '10']).optional().default('5'),
   voice_ids: z.union([z.array(z.string()), z.unknown()]).optional(),
 })
 
@@ -8010,8 +8209,8 @@ export const zKlingVideoV26ProImageToVideoOutput = z.object({
  * Request model for motion control video generation.
  */
 export const zKlingVideoV26ProMotionControlInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  image_url: z.string(),
   character_orientation: z.enum(['image', 'video']),
   video_url: z.string(),
   keep_original_sound: z.boolean().optional().default(true),
@@ -8031,15 +8230,15 @@ export const zKlingVideoV26ProMotionControlOutput = z.object({
  */
 export const zKlingVideoV26ProTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   generate_audio: z.boolean().optional().default(true),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -8055,8 +8254,8 @@ export const zKlingVideoV26ProTextToVideoOutput = z.object({
  * Request model for motion control video generation.
  */
 export const zKlingVideoV26StandardMotionControlInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  image_url: z.string(),
   character_orientation: z.enum(['image', 'video']),
   video_url: z.string(),
   keep_original_sound: z.boolean().optional().default(true),
@@ -8075,15 +8274,15 @@ export const zKlingVideoV26StandardMotionControlOutput = z.object({
  * ImageToVideoV2MasterRequest
  */
 export const zKlingVideoV2MasterImageToVideoInput = z.object({
-  image_url: z.string(),
   prompt: z.string().max(2500),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -8098,7 +8297,6 @@ export const zKlingVideoV2MasterImageToVideoOutput = z.object({
  */
 export const zKlingVideoV2MasterTextToVideoInput = z.object({
   prompt: z.string().max(2500),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   negative_prompt: z
     .string()
@@ -8106,6 +8304,7 @@ export const zKlingVideoV2MasterTextToVideoInput = z.object({
     .optional()
     .default('blur, distort, and low quality'),
   duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -8119,22 +8318,25 @@ export const zKlingVideoV2MasterTextToVideoOutput = z.object({
  * ImageToVideoV3_4kRequest
  */
 export const zKlingVideoV34kImageToVideoInput = z.object({
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  shot_type: z
+    .enum(['customize', 'intelligent'])
+    .optional()
+    .default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
+    .optional(),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   multi_prompt: z
     .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
     .optional(),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  start_image_url: z.string(),
+  generate_audio: z.boolean().optional().default(true),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  shot_type: z
-    .enum(['customize', 'intelligent'])
-    .optional()
-    .default('customize'),
-  start_image_url: z.string(),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
   duration: z
     .enum([
       '3',
@@ -8154,9 +8356,6 @@ export const zKlingVideoV34kImageToVideoInput = z.object({
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  elements: z
-    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -8170,22 +8369,22 @@ export const zKlingVideoV34kImageToVideoOutput = z.object({
  * TextToVideoV3_4kRequest
  */
 export const zKlingVideoV34kTextToVideoInput = z.object({
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  shot_type: z
+    .enum(['customize', 'intelligent'])
+    .optional()
+    .default('customize'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   multi_prompt: z
     .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
     .optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  generate_audio: z.boolean().optional().default(true),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  shot_type: z
-    .enum(['customize', 'intelligent'])
-    .optional()
-    .default('customize'),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   duration: z
     .enum([
       '3',
@@ -8217,22 +8416,25 @@ export const zKlingVideoV34kTextToVideoOutput = z.object({
  * ImageToVideoV3ProRequest
  */
 export const zKlingVideoV3ProImageToVideoInput = z.object({
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  shot_type: z
+    .enum(['customize', 'intelligent'])
+    .optional()
+    .default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
+    .optional(),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   multi_prompt: z
     .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
     .optional(),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  start_image_url: z.string(),
+  generate_audio: z.boolean().optional().default(true),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  shot_type: z
-    .enum(['customize', 'intelligent'])
-    .optional()
-    .default('customize'),
-  start_image_url: z.string(),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
   duration: z
     .enum([
       '3',
@@ -8252,9 +8454,6 @@ export const zKlingVideoV3ProImageToVideoInput = z.object({
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  elements: z
-    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -8268,14 +8467,14 @@ export const zKlingVideoV3ProImageToVideoOutput = z.object({
  * MotionControlV3ProRequest
  */
 export const zKlingVideoV3ProMotionControlInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  image_url: z.string(),
   character_orientation: z.enum(['image', 'video']),
   video_url: z.string(),
-  keep_original_sound: z.boolean().optional().default(true),
   elements: z
     .union([z.array(zKlingV3ImageElementInput), z.unknown()])
     .optional(),
+  keep_original_sound: z.boolean().optional().default(true),
 })
 
 /**
@@ -8289,22 +8488,22 @@ export const zKlingVideoV3ProMotionControlOutput = z.object({
  * TextToVideoV3ProRequest
  */
 export const zKlingVideoV3ProTextToVideoInput = z.object({
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  shot_type: z
+    .enum(['customize', 'intelligent'])
+    .optional()
+    .default('customize'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   multi_prompt: z
     .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
     .optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  generate_audio: z.boolean().optional().default(true),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  shot_type: z
-    .enum(['customize', 'intelligent'])
-    .optional()
-    .default('customize'),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   duration: z
     .enum([
       '3',
@@ -8336,22 +8535,25 @@ export const zKlingVideoV3ProTextToVideoOutput = z.object({
  * ImageToVideoV3StandardRequest
  */
 export const zKlingVideoV3StandardImageToVideoInput = z.object({
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  shot_type: z
+    .enum(['customize', 'intelligent'])
+    .optional()
+    .default('customize'),
+  elements: z
+    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
+    .optional(),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   multi_prompt: z
     .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
     .optional(),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  start_image_url: z.string(),
+  generate_audio: z.boolean().optional().default(true),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  shot_type: z
-    .enum(['customize', 'intelligent'])
-    .optional()
-    .default('customize'),
-  start_image_url: z.string(),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
   duration: z
     .enum([
       '3',
@@ -8371,9 +8573,6 @@ export const zKlingVideoV3StandardImageToVideoInput = z.object({
     .optional()
     .default('5'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  elements: z
-    .union([z.array(zKlingV3ComboElementInput), z.unknown()])
-    .optional(),
 })
 
 /**
@@ -8387,14 +8586,14 @@ export const zKlingVideoV3StandardImageToVideoOutput = z.object({
  * MotionControlV3StandardRequest
  */
 export const zKlingVideoV3StandardMotionControlInput = z.object({
-  image_url: z.string(),
   prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  image_url: z.string(),
   character_orientation: z.enum(['image', 'video']),
   video_url: z.string(),
-  keep_original_sound: z.boolean().optional().default(true),
   elements: z
     .union([z.array(zKlingV3ImageElementInput), z.unknown()])
     .optional(),
+  keep_original_sound: z.boolean().optional().default(true),
 })
 
 /**
@@ -8408,22 +8607,22 @@ export const zKlingVideoV3StandardMotionControlOutput = z.object({
  * TextToVideoV3StandardRequest
  */
 export const zKlingVideoV3StandardTextToVideoInput = z.object({
+  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
+  shot_type: z
+    .enum(['customize', 'intelligent'])
+    .optional()
+    .default('customize'),
+  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
   multi_prompt: z
     .union([z.array(zKlingV3MultiPromptElement), z.unknown()])
     .optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  generate_audio: z.boolean().optional().default(true),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
-  shot_type: z
-    .enum(['customize', 'intelligent'])
-    .optional()
-    .default('customize'),
-  prompt: z.union([z.string().max(2500), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   duration: z
     .enum([
       '3',
@@ -8455,9 +8654,9 @@ export const zKlingVideoV3StandardTextToVideoOutput = z.object({
  * TextToVideoInput
  */
 export const zKreaWan14bTextToVideoInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   num_frames: z.int().gte(18).lte(162).optional().default(78),
 })
 
@@ -8472,11 +8671,11 @@ export const zKreaWan14bTextToVideoOutput = z.object({
  * VideoToVideoInput
  */
 export const zKreaWan14bVideoToVideoInput = z.object({
-  enable_prompt_expansion: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
   video_url: z.string(),
   prompt: z.string(),
   strength: z.number().gte(0.01).lte(1).optional().default(0.85),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
@@ -8490,10 +8689,10 @@ export const zKreaWan14bVideoToVideoOutput = z.object({
  * Input
  */
 export const zLatentsyncInput = z.object({
-  audio_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(2).optional().default(1),
+  audio_url: z.string(),
   video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   loop_mode: z.union([z.enum(['pingpong', 'loop']), z.unknown()]).optional(),
 })
 
@@ -8508,9 +8707,9 @@ export const zLatentsyncOutput = z.object({
  * LightXOutput
  */
 export const zLightxRecameraOutput = z.object({
+  video: zFile,
   seed: z.int(),
   viz_video: z.union([zFile, z.unknown()]).optional(),
-  video: zFile,
   input_video: z.union([zFile, z.unknown()]).optional(),
 })
 
@@ -8518,9 +8717,9 @@ export const zLightxRecameraOutput = z.object({
  * LightXOutput
  */
 export const zLightxRelightOutput = z.object({
+  video: zFile,
   seed: z.int(),
   viz_video: z.union([zFile, z.unknown()]).optional(),
-  video: zFile,
   input_video: z.union([zFile, z.unknown()]).optional(),
 })
 
@@ -8543,34 +8742,34 @@ export const zLipsyncOutput = z.object({
  * LivePortraitInput
  */
 export const zLivePortraitInput = z.object({
-  image_url: z.string(),
-  flag_eye_retargeting: z.boolean().optional().default(false),
-  flag_pasteback: z.boolean().optional().default(true),
-  flag_lip_zero: z.boolean().optional().default(true),
-  flag_do_rot: z.boolean().optional().default(true),
-  dsize: z.int().optional().default(512),
-  batch_size: z.int().optional().default(32),
+  enable_safety_checker: z.boolean().optional().default(false),
+  pupil_x: z.number().gte(-45).lte(45).optional().default(0),
   flag_relative: z.boolean().optional().default(true),
+  woo: z.number().gte(-100).lte(100).optional().default(0),
+  vx_ratio: z.number().optional().default(0),
   smile: z.number().gte(-2).lte(2).optional().default(0),
   vy_ratio: z.number().optional().default(-0.125),
-  scale: z.number().optional().default(2.3),
-  rotate_roll: z.number().gte(-45).lte(45).optional().default(0),
   rotate_yaw: z.number().gte(-45).lte(45).optional().default(0),
-  eyebrow: z.number().gte(-30).lte(30).optional().default(0),
-  flag_do_crop: z.boolean().optional().default(true),
-  rotate_pitch: z.number().gte(-45).lte(45).optional().default(0),
-  pupil_x: z.number().gte(-45).lte(45).optional().default(0),
+  scale: z.number().optional().default(2.3),
+  aaa: z.number().gte(-200).lte(200).optional().default(0),
+  flag_do_rot: z.boolean().optional().default(true),
   video_url: z.string(),
   flag_stitching: z.boolean().optional().default(true),
-  blink: z.number().gte(-30).lte(30).optional().default(0),
-  aaa: z.number().gte(-200).lte(200).optional().default(0),
+  flag_lip_zero: z.boolean().optional().default(true),
   flag_lip_retargeting: z.boolean().optional().default(false),
   eee: z.number().gte(-40).lte(40).optional().default(0),
-  pupil_y: z.number().gte(-45).lte(45).optional().default(0),
+  dsize: z.int().optional().default(512),
+  rotate_pitch: z.number().gte(-45).lte(45).optional().default(0),
+  flag_pasteback: z.boolean().optional().default(true),
+  flag_do_crop: z.boolean().optional().default(true),
+  blink: z.number().gte(-30).lte(30).optional().default(0),
+  flag_eye_retargeting: z.boolean().optional().default(false),
+  image_url: z.string(),
+  eyebrow: z.number().gte(-30).lte(30).optional().default(0),
+  rotate_roll: z.number().gte(-45).lte(45).optional().default(0),
   wink: z.number().gte(0).lte(25).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
-  vx_ratio: z.number().optional().default(0),
-  woo: z.number().gte(-100).lte(100).optional().default(0),
+  batch_size: z.int().optional().default(32),
+  pupil_y: z.number().gte(-45).lte(45).optional().default(0),
 })
 
 /**
@@ -8586,18 +8785,7 @@ export const zLivePortraitOutput = z.object({
  * Request model for audio-to-video generation.
  */
 export const zLongcatSingleAvatarAudioToVideoInput = z.object({
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'A person is talking naturally with natural expressions and movements.',
-    ),
-  text_guidance_scale: z.number().gte(1).lte(10).optional().default(4),
-  num_segments: z.int().gte(1).lte(10).optional().default(1),
-  num_inference_steps: z.int().gte(10).lte(100).optional().default(50),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  audio_url: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   resolution: z.enum(['480p', '720p']).optional().default('480p'),
   negative_prompt: z
     .string()
@@ -8605,8 +8793,19 @@ export const zLongcatSingleAvatarAudioToVideoInput = z.object({
     .default(
       'Close-up, Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  text_guidance_scale: z.number().gte(1).lte(10).optional().default(4),
   audio_guidance_scale: z.number().gte(1).lte(10).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  audio_url: z.string(),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'A person is talking naturally with natural expressions and movements.',
+    ),
+  num_segments: z.int().gte(1).lte(10).optional().default(1),
+  num_inference_steps: z.int().gte(10).lte(100).optional().default(50),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -8615,8 +8814,8 @@ export const zLongcatSingleAvatarAudioToVideoInput = z.object({
  * Response model for audio-to-video generation (no reference image).
  */
 export const zLongcatSingleAvatarAudioToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -8625,19 +8824,7 @@ export const zLongcatSingleAvatarAudioToVideoOutput = z.object({
  * Request model for image+audio to video generation.
  */
 export const zLongcatSingleAvatarImageAudioToVideoInput = z.object({
-  prompt: z
-    .string()
-    .optional()
-    .default(
-      'A person is talking naturally with natural expressions and movements.',
-    ),
-  text_guidance_scale: z.number().gte(1).lte(10).optional().default(4),
-  num_segments: z.int().gte(1).lte(10).optional().default(1),
-  num_inference_steps: z.int().gte(10).lte(100).optional().default(50),
-  image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  audio_url: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   resolution: z.enum(['480p', '720p']).optional().default('480p'),
   negative_prompt: z
     .string()
@@ -8645,8 +8832,20 @@ export const zLongcatSingleAvatarImageAudioToVideoInput = z.object({
     .default(
       'Close-up, Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  text_guidance_scale: z.number().gte(1).lte(10).optional().default(4),
   audio_guidance_scale: z.number().gte(1).lte(10).optional().default(4),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  audio_url: z.string(),
+  prompt: z
+    .string()
+    .optional()
+    .default(
+      'A person is talking naturally with natural expressions and movements.',
+    ),
+  image_url: z.string(),
+  num_segments: z.int().gte(1).lte(10).optional().default(1),
+  num_inference_steps: z.int().gte(10).lte(100).optional().default(50),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -8655,117 +8854,117 @@ export const zLongcatSingleAvatarImageAudioToVideoInput = z.object({
  * Response model for image+audio to video generation.
  */
 export const zLongcatSingleAvatarImageAudioToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * LongCatImageToVideoRequest
  */
 export const zLongcatVideoDistilledImageToVideo480pInput = z.object({
-  fps: z.int().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  image_url: z.string(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
   sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(16).optional().default(12),
+  image_url: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   prompt: z
     .string()
     .optional()
     .default(
       "First-person view from the cockpit of a Formula 1 car. The driver's gloved hands firmly grip the intricate, carbon-fiber steering wheel adorned with numerous colorful buttons and a vibrant digital display showing race data. Beyond the windshield, a sun-drenched racetrack stretches ahead, lined with cheering spectators in the grandstands. Several rival cars are visible in the distance, creating a dynamic sense of competition. The sky above is a clear, brilliant blue, reflecting the exhilarating atmosphere of a high-speed race. high resolution 4k",
     ),
-  num_inference_steps: z.int().gte(2).lte(16).optional().default(12),
+  fps: z.int().gte(1).lte(60).optional().default(15),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * LongCatImageToVideoResponse
  */
 export const zLongcatVideoDistilledImageToVideo480pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCat720PImageToVideoRequest
  */
 export const zLongcatVideoDistilledImageToVideo720pInput = z.object({
-  fps: z.int().gte(1).lte(60).optional().default(30),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  image_url: z.string(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
   sync_mode: z.boolean().optional().default(false),
-  num_refine_inference_steps: z.int().gte(2).lte(16).optional().default(12),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(16).optional().default(12),
+  image_url: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  num_refine_inference_steps: z.int().gte(2).lte(16).optional().default(12),
   prompt: z
     .string()
     .optional()
     .default(
       "First-person view from the cockpit of a Formula 1 car. The driver's gloved hands firmly grip the intricate, carbon-fiber steering wheel adorned with numerous colorful buttons and a vibrant digital display showing race data. Beyond the windshield, a sun-drenched racetrack stretches ahead, lined with cheering spectators in the grandstands. Several rival cars are visible in the distance, creating a dynamic sense of competition. The sky above is a clear, brilliant blue, reflecting the exhilarating atmosphere of a high-speed race. high resolution 4k",
     ),
-  num_inference_steps: z.int().gte(2).lte(16).optional().default(12),
+  fps: z.int().gte(1).lte(60).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * LongCatImageToVideoResponse
  */
 export const zLongcatVideoDistilledImageToVideo720pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCatVideoRequest
  */
 export const zLongcatVideoDistilledTextToVideo480pInput = z.object({
-  fps: z.int().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
   sync_mode: z.boolean().optional().default(false),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   prompt: z.string(),
+  fps: z.int().gte(1).lte(60).optional().default(15),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(2).lte(16).optional().default(12),
 })
 
@@ -8773,36 +8972,36 @@ export const zLongcatVideoDistilledTextToVideo480pInput = z.object({
  * LongCatVideoResponse
  */
 export const zLongcatVideoDistilledTextToVideo480pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCat720PVideoRequest
  */
 export const zLongcatVideoDistilledTextToVideo720pInput = z.object({
-  fps: z.int().gte(1).lte(60).optional().default(30),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
   sync_mode: z.boolean().optional().default(false),
-  num_refine_inference_steps: z.int().gte(2).lte(16).optional().default(12),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  num_refine_inference_steps: z.int().gte(2).lte(16).optional().default(12),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   prompt: z.string(),
+  fps: z.int().gte(1).lte(60).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(2).lte(16).optional().default(12),
 })
 
@@ -8810,142 +9009,142 @@ export const zLongcatVideoDistilledTextToVideo720pInput = z.object({
  * LongCatVideoResponse
  */
 export const zLongcatVideoDistilledTextToVideo720pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCatCFGImageToVideoRequest
  */
 export const zLongcatVideoImageToVideo480pInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  fps: z.int().gte(1).lte(60).optional().default(15),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  image_url: z.string(),
   prompt: z
     .string()
     .optional()
     .default(
       "First-person view from the cockpit of a Formula 1 car. The driver's gloved hands firmly grip the intricate, carbon-fiber steering wheel adorned with numerous colorful buttons and a vibrant digital display showing race data. Beyond the windshield, a sun-drenched racetrack stretches ahead, lined with cheering spectators in the grandstands. Several rival cars are visible in the distance, creating a dynamic sense of competition. The sky above is a clear, brilliant blue, reflecting the exhilarating atmosphere of a high-speed race. high resolution 4k",
     ),
-  fps: z.int().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
 })
 
 /**
  * LongCatImageToVideoResponse
  */
 export const zLongcatVideoImageToVideo480pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCat720PCFGImageToVideoRequest
  */
 export const zLongcatVideoImageToVideo720pInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  fps: z.int().gte(1).lte(60).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  num_refine_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  image_url: z.string(),
   prompt: z
     .string()
     .optional()
     .default(
       "First-person view from the cockpit of a Formula 1 car. The driver's gloved hands firmly grip the intricate, carbon-fiber steering wheel adorned with numerous colorful buttons and a vibrant digital display showing race data. Beyond the windshield, a sun-drenched racetrack stretches ahead, lined with cheering spectators in the grandstands. Several rival cars are visible in the distance, creating a dynamic sense of competition. The sky above is a clear, brilliant blue, reflecting the exhilarating atmosphere of a high-speed race. high resolution 4k",
     ),
-  fps: z.int().gte(1).lte(60).optional().default(30),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  image_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  num_refine_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
 })
 
 /**
  * LongCatImageToVideoResponse
  */
 export const zLongcatVideoImageToVideo720pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCatCFGVideoRequest
  */
 export const zLongcatVideoTextToVideo480pInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  fps: z.int().gte(1).lte(60).optional().default(15),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   prompt: z.string(),
-  fps: z.int().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  sync_mode: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
   num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
 })
 
@@ -8953,44 +9152,44 @@ export const zLongcatVideoTextToVideo480pInput = z.object({
  * LongCatVideoResponse
  */
 export const zLongcatVideoTextToVideo480pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * LongCat720PCFGVideoRequest
  */
 export const zLongcatVideoTextToVideo720pInput = z.object({
+  sync_mode: z.boolean().optional().default(false),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  fps: z.int().gte(1).lte(60).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_frames: z.int().gte(17).lte(961).optional().default(162),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  num_refine_inference_steps: z.int().gte(8).lte(50).optional().default(40),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'Bright tones, overexposed, static, blurred details, subtitles, style, works, paintings, images, static, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  num_frames: z.int().gte(17).lte(961).optional().default(162),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   prompt: z.string(),
-  fps: z.int().gte(1).lte(60).optional().default(30),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  sync_mode: z.boolean().optional().default(false),
-  num_refine_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(4),
   num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
 })
 
@@ -8998,9 +9197,9 @@ export const zLongcatVideoTextToVideo720pInput = z.object({
  * LongCatVideoResponse
  */
 export const zLongcatVideoTextToVideo720pOutput = z.object({
-  video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
+  video: zFile,
 })
 
 /**
@@ -9010,8 +9209,8 @@ export const zLongcatVideoTextToVideo720pOutput = z.object({
  */
 export const zLoRaInput = z.object({
   weight_name: z.union([z.string(), z.unknown()]).optional(),
-  scale: z.number().gte(0).lte(4).optional().default(1),
   path: z.string(),
+  scale: z.number().gte(0).lte(4).optional().default(1),
 })
 
 /**
@@ -9023,9 +9222,9 @@ export const zLoRaInput = z.object({
  * applied from local disk with ComfyUI's built-in LoRA loader.
  */
 export const zLoRaInputType2 = z.object({
+  scale: z.number().gte(0).lte(2).optional().default(1),
   path: z.string().max(2048),
   transformer: z.enum(['high', 'low', 'both']).optional().default('both'),
-  scale: z.number().gte(0).lte(2).optional().default(1),
 })
 
 /**
@@ -9040,11 +9239,9 @@ export const zLoraWeight = z.object({
  * ImageToVideoInput
  */
 export const zCogvideox5bImageToVideoInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7),
-  use_rife: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
+  export_fps: z.int().gte(4).lte(32).optional().default(16),
   video_size: z
     .union([
       zImageSize,
@@ -9058,21 +9255,21 @@ export const zCogvideox5bImageToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  export_fps: z.int().gte(4).lte(32).optional().default(16),
   image_url: z.string(),
-  loras: z.array(zLoraWeight).optional().default([]),
+  use_rife: z.boolean().optional().default(true),
   prompt: z.string(),
+  loras: z.array(zLoraWeight).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7),
 })
 
 /**
  * BaseInput
  */
 export const zCogvideox5bInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7),
-  use_rife: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z.string().optional().default(''),
+  export_fps: z.int().gte(4).lte(32).optional().default(16),
   video_size: z
     .union([
       zImageSize,
@@ -9086,21 +9283,20 @@ export const zCogvideox5bInput = z.object({
       ]),
     ])
     .optional(),
-  export_fps: z.int().gte(4).lte(32).optional().default(16),
-  loras: z.array(zLoraWeight).optional().default([]),
+  use_rife: z.boolean().optional().default(true),
   prompt: z.string(),
+  loras: z.array(zLoraWeight).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7),
 })
 
 /**
  * VideoToVideoInput
  */
 export const zCogvideox5bVideoToVideoInput = z.object({
-  guidance_scale: z.number().gte(0).lte(20).optional().default(7),
-  use_rife: z.boolean().optional().default(true),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
-  prompt: z.string(),
   negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  export_fps: z.int().gte(4).lte(32).optional().default(16),
   video_size: z
     .union([
       zImageSize,
@@ -9114,19 +9310,22 @@ export const zCogvideox5bVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  export_fps: z.int().gte(4).lte(32).optional().default(16),
-  loras: z.array(zLoraWeight).optional().default([]),
   strength: z.number().gte(0.05).lte(1).optional().default(0.8),
+  use_rife: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_url: z.string(),
+  loras: z.array(zLoraWeight).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(7),
 })
 
 /**
  * LoRAWeight
  */
 export const zLoRaWeight = z.object({
+  weight_name: z.union([z.string(), z.unknown()]).optional(),
   scale: z.number().gte(0).lte(4).optional().default(1),
   path: z.string(),
-  weight_name: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -9142,9 +9341,9 @@ export const zLoraWeightType2 = z.object({
  * LoRAWeight
  */
 export const zLoRaWeightType2 = z.object({
-  path: z.string(),
   transformer: z.enum(['high', 'low', 'both']).optional().default('high'),
   weight_name: z.union([z.string(), z.unknown()]).optional(),
+  path: z.string(),
   scale: z.number().gte(0).lte(4).optional().default(1),
 })
 
@@ -9152,32 +9351,30 @@ export const zLoRaWeightType2 = z.object({
  * LTX2AudioToVideoInput
  */
 export const zLtx219bAudioToVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
-    .optional()
-    .default('none'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  preprocess_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  use_multiscale: z.boolean().optional().default(true),
   match_audio_length: z.boolean().optional().default(true),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  audio_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   video_size: z
     .union([
       zImageSize,
@@ -9192,67 +9389,66 @@ export const zLtx219bAudioToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  preprocess_audio: z.boolean().optional().default(true),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
+  sync_mode: z.boolean().optional().default(false),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRAAudioToVideoInput
  */
 export const zLtx219bAudioToVideoLoraInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
-    .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  preprocess_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  use_multiscale: z.boolean().optional().default(true),
   match_audio_length: z.boolean().optional().default(true),
-  loras: z.array(zLoRaInput),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  audio_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   video_size: z
     .union([
       zImageSize,
@@ -9267,65 +9463,71 @@ export const zLtx219bAudioToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  preprocess_audio: z.boolean().optional().default(true),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
+  sync_mode: z.boolean().optional().default(false),
+  loras: z.array(zLoRaInput),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2DistilledAudioToVideoInput
  */
 export const zLtx219bDistilledAudioToVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
+  use_multiscale: z.boolean().optional().default(true),
+  match_audio_length: z.boolean().optional().default(true),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  audio_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('none'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  preprocess_audio: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  negative_prompt: z
+    .string()
     .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_audio_length: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -9340,65 +9542,64 @@ export const zLtx219bDistilledAudioToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  preprocess_audio: z.boolean().optional().default(true),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  sync_mode: z.boolean().optional().default(false),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRADistilledAudioToVideoInput
  */
 export const zLtx219bDistilledAudioToVideoLoraInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
+  use_multiscale: z.boolean().optional().default(true),
+  match_audio_length: z.boolean().optional().default(true),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  audio_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  preprocess_audio: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  negative_prompt: z
+    .string()
     .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_audio_length: z.boolean().optional().default(true),
-  loras: z.array(zLoRaInput),
   video_size: z
     .union([
       zImageSize,
@@ -9413,65 +9614,37 @@ export const zLtx219bDistilledAudioToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  preprocess_audio: z.boolean().optional().default(true),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  sync_mode: z.boolean().optional().default(false),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  loras: z.array(zLoRaInput),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2DistilledExtendVideoInput
  */
 export const zLtx219bDistilledExtendVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
-    .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
-  match_input_fps: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -9486,42 +9659,95 @@ export const zLtx219bDistilledExtendVideoInput = z.object({
       ]),
     ])
     .optional(),
-  extend_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default('balanced'),
-  video_url: z.string(),
+    .default('X264 (.mp4)'),
+  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  match_input_fps: z.boolean().optional().default(true),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('none'),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  sync_mode: z.boolean().optional().default(false),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  video_url: z.string(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
     .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
+    .default('balanced'),
+  extend_direction: z
+    .enum(['forward', 'backward'])
     .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+    .default('forward'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRADistilledExtendVideoInput
  */
 export const zLtx219bDistilledExtendVideoLoraInput = z.object({
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  loras: z.array(zLoRaInput),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  match_input_fps: z.boolean().optional().default(true),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('none'),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -9535,20 +9761,11 @@ export const zLtx219bDistilledExtendVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
   sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  loras: z.array(zLoRaInput),
-  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
-  match_input_fps: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -9563,17 +9780,6 @@ export const zLtx219bDistilledExtendVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  extend_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
   video_url: z.string(),
   negative_prompt: z
     .string()
@@ -9581,24 +9787,51 @@ export const zLtx219bDistilledExtendVideoLoraInput = z.object({
     .default(
       'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  extend_direction: z
+    .enum(['forward', 'backward'])
     .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+    .default('forward'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2DistilledImageToVideoInput
  */
 export const zLtx219bDistilledImageToVideoInput = z.object({
+  interpolation_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('none'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -9612,20 +9845,11 @@ export const zLtx219bDistilledImageToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
     .optional()
-    .default('high'),
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  interpolation_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
   video_size: z
     .union([
       zImageSize,
@@ -9640,38 +9864,48 @@ export const zLtx219bDistilledImageToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  image_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRADistilledImageToVideoInput
  */
 export const zLtx219bDistilledImageToVideoLoraInput = z.object({
+  interpolation_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  loras: z.array(zLoRaInput),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('none'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -9685,21 +9919,11 @@ export const zLtx219bDistilledImageToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
     .optional()
-    .default('high'),
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  loras: z.array(zLoRaInput),
-  interpolation_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
   video_size: z
     .union([
       zImageSize,
@@ -9714,60 +9938,39 @@ export const zLtx219bDistilledImageToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  image_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2DistilledTextToVideoInput
  */
 export const zLtx219bDistilledTextToVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  prompt: z.string(),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -9781,58 +9984,58 @@ export const zLtx219bDistilledTextToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRADistilledTextToVideoInput
  */
 export const zLtx219bDistilledTextToVideoLoraInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  prompt: z.string(),
+  loras: z.array(zLoRaInput),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  loras: z.array(zLoRaInput),
+  generate_audio: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -9846,35 +10049,50 @@ export const zLtx219bDistilledTextToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2DistilledVideoToVideoInput
  */
 export const zLtx219bDistilledVideoToVideoInput = z.object({
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  ic_lora: z
+    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+    .optional()
+    .default('match_preprocessor'),
+  generate_audio: z.boolean().optional().default(true),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -9888,35 +10106,35 @@ export const zLtx219bDistilledVideoToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
     .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_input_fps: z.boolean().optional().default(true),
+    .default('balanced'),
+  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   preprocessor: z
     .enum(['depth', 'canny', 'pose', 'none'])
     .optional()
     .default('none'),
-  video_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  use_multiscale: z.boolean().optional().default(true),
+  prompt: z.string(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  match_input_fps: z.boolean().optional().default(true),
   acceleration: z
     .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('none'),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   match_video_length: z.boolean().optional().default(true),
-  ic_lora: z
-    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+  negative_prompt: z
+    .string()
     .optional()
-    .default('match_preprocessor'),
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   video_size: z
     .union([
       zImageSize,
@@ -9931,34 +10149,34 @@ export const zLtx219bDistilledVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  prompt: z.string(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  sync_mode: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRADistilledVideoToVideoInput
  */
 export const zLtx219bDistilledVideoToVideoLoraInput = z.object({
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  ic_lora: z
+    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+    .optional()
+    .default('match_preprocessor'),
+  generate_audio: z.boolean().optional().default(true),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -9972,36 +10190,35 @@ export const zLtx219bDistilledVideoToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
     .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  loras: z.array(zLoRaInput),
-  match_input_fps: z.boolean().optional().default(true),
+    .default('balanced'),
+  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   preprocessor: z
     .enum(['depth', 'canny', 'pose', 'none'])
     .optional()
     .default('none'),
-  video_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  use_multiscale: z.boolean().optional().default(true),
+  loras: z.array(zLoRaInput),
+  prompt: z.string(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   acceleration: z
     .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  match_video_length: z.boolean().optional().default(true),
-  ic_lora: z
-    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+  negative_prompt: z
+    .string()
     .optional()
-    .default('match_preprocessor'),
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  match_video_length: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
   video_size: z
     .union([
       zImageSize,
@@ -10016,61 +10233,17 @@ export const zLtx219bDistilledVideoToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  prompt: z.string(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  match_input_fps: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2ExtendVideoInput
  */
 export const zLtx219bExtendVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
-    .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
-  match_input_fps: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
   video_size: z
     .union([
       zImageSize,
@@ -10085,43 +10258,100 @@ export const zLtx219bExtendVideoInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  extend_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
   use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  video_url: z.string(),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  match_input_fps: z.boolean().optional().default(true),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  sync_mode: z.boolean().optional().default(false),
   acceleration: z
     .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  video_url: z.string(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  extend_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRAExtendVideoInput
  */
 export const zLtx219bExtendVideoLoraInput = z.object({
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  use_multiscale: z.boolean().optional().default(true),
+  loras: z.array(zLoRaInput),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  match_input_fps: z.boolean().optional().default(true),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -10135,21 +10365,11 @@ export const zLtx219bExtendVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
   sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  loras: z.array(zLoRaInput),
-  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
-  match_input_fps: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -10164,71 +10384,54 @@ export const zLtx219bExtendVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  extend_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
   video_url: z.string(),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
   acceleration: z
     .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  extend_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2ImageToVideoInput
  */
 export const zLtx219bImageToVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
-    .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
   interpolation_direction: z
     .enum(['forward', 'backward'])
     .optional()
     .default('forward'),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -10243,69 +10446,67 @@ export const zLtx219bImageToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
+  sync_mode: z.boolean().optional().default(false),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  image_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+    .default('high'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRAImageToVideoInput
  */
 export const zLtx219bImageToVideoLoraInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
-    .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  loras: z.array(zLoRaInput),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
   interpolation_direction: z
     .enum(['forward', 'backward'])
     .optional()
     .default('forward'),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.string(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  prompt: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  enable_safety_checker: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -10320,61 +10521,64 @@ export const zLtx219bImageToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
+  sync_mode: z.boolean().optional().default(false),
+  loras: z.array(zLoRaInput),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  image_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+    .default('high'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2TextToVideoInput
  */
 export const zLtx219bTextToVideoInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
+    .default('X264 (.mp4)'),
+  prompt: z.string(),
+  fps: z.number().gte(1).lte(60).optional().default(25),
   seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  generate_audio: z.boolean().optional().default(true),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
+  generate_audio: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -10388,60 +10592,60 @@ export const zLtx219bTextToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRATextToVideoInput
  */
 export const zLtx219bTextToVideoLoraInput = z.object({
-  camera_lora: z
-    .enum([
-      'dolly_in',
-      'dolly_out',
-      'dolly_left',
-      'dolly_right',
-      'jib_up',
-      'jib_down',
-      'static',
-      'none',
-    ])
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
+    .default('X264 (.mp4)'),
+  prompt: z.string(),
+  loras: z.array(zLoRaInput),
+  fps: z.number().gte(1).lte(60).optional().default(25),
   seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  generate_audio: z.boolean().optional().default(true),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  loras: z.array(zLoRaInput),
+  generate_audio: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -10455,36 +10659,52 @@ export const zLtx219bTextToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  use_multiscale: z.boolean().optional().default(true),
-  prompt: z.string(),
+  camera_lora: z
+    .enum([
+      'dolly_in',
+      'dolly_out',
+      'dolly_left',
+      'dolly_right',
+      'jib_up',
+      'jib_down',
+      'static',
+      'none',
+    ])
+    .optional()
+    .default('none'),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2VideoToVideoInput
  */
 export const zLtx219bVideoToVideoInput = z.object({
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  ic_lora: z
+    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+    .optional()
+    .default('match_preprocessor'),
+  generate_audio: z.boolean().optional().default(true),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -10498,37 +10718,31 @@ export const zLtx219bVideoToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
     .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_input_fps: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+    .default('balanced'),
+  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   preprocessor: z
     .enum(['depth', 'canny', 'pose', 'none'])
     .optional()
     .default('none'),
-  video_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  use_multiscale: z.boolean().optional().default(true),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   acceleration: z
     .enum(['none', 'regular', 'high', 'full'])
     .optional()
     .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  match_video_length: z.boolean().optional().default(true),
-  ic_lora: z
-    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+  negative_prompt: z
+    .string()
     .optional()
-    .default('match_preprocessor'),
+    .default(
+      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
+    ),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
   video_size: z
     .union([
       zImageSize,
@@ -10543,34 +10757,40 @@ export const zLtx219bVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
+  match_video_length: z.boolean().optional().default(true),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
-    ),
-  prompt: z.string(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  match_input_fps: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX2LoRAVideoToVideoInput
  */
 export const zLtx219bVideoToVideoLoraInput = z.object({
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(25),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  ic_lora: z
+    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
+    .optional()
+    .default('match_preprocessor'),
+  generate_audio: z.boolean().optional().default(true),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -10584,86 +10804,116 @@ export const zLtx219bVideoToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  generate_audio: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  loras: z.array(zLoRaInput),
-  match_input_fps: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  preprocessor: z
-    .enum(['depth', 'canny', 'pose', 'none'])
-    .optional()
-    .default('none'),
-  video_url: z.string(),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3),
-  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  match_video_length: z.boolean().optional().default(true),
-  ic_lora: z
-    .enum(['match_preprocessor', 'canny', 'depth', 'pose', 'detailer', 'none'])
-    .optional()
-    .default('match_preprocessor'),
-  video_size: z
-    .union([
-      zImageSize,
-      z.enum([
-        'auto',
-        'square_hd',
-        'square',
-        'portrait_4_3',
-        'portrait_16_9',
-        'landscape_4_3',
-        'landscape_16_9',
-      ]),
-    ])
-    .optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  use_multiscale: z.boolean().optional().default(true),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
+  ic_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  preprocessor: z
+    .enum(['depth', 'canny', 'pose', 'none'])
+    .optional()
+    .default('none'),
+  use_multiscale: z.boolean().optional().default(true),
+  loras: z.array(zLoRaInput),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'blurry, out of focus, overexposed, underexposed, low contrast, washed out colors, excessive noise, grainy texture, poor lighting, flickering, motion blur, distorted proportions, unnatural skin tones, deformed facial features, asymmetrical face, missing facial features, extra limbs, disfigured hands, wrong hand count, artifacts around text, inconsistent perspective, camera shake, incorrect depth of field, background too sharp, background clutter, distracting reflections, harsh shadows, inconsistent lighting direction, color banding, cartoonish rendering, 3D CGI look, unrealistic materials, uncanny valley effect, incorrect ethnicity, wrong gender, exaggerated expressions, wrong gaze direction, mismatched lip sync, silent or muted audio, distorted voice, robotic voice, echo, background noise, off-sync audio,incorrect dialogue, added dialogue, repetitive speech, jittery movement, awkward pauses, incorrect timing, unnatural transitions, inconsistent framing, tilted camera, flat lighting, inconsistent tone, cinematic oversaturation, stylized filters, or AI artifacts.',
     ),
-  prompt: z.string(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   video_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(25),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
-    .optional()
-    .default('X264 (.mp4)'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_size: z
+    .union([
+      zImageSize,
+      z.enum([
+        'auto',
+        'square_hd',
+        'square',
+        'portrait_4_3',
+        'portrait_16_9',
+        'landscape_4_3',
+        'landscape_16_9',
+      ]),
+    ])
+    .optional(),
+  match_video_length: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  match_input_fps: z.boolean().optional().default(true),
+  sync_mode: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
  * LTX23AudioToVideoInput
  */
 export const zLtx2322bAudioToVideoInput = z.object({
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
+  audio_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  match_audio_length: z.boolean().optional().default(true),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  preprocess_audio: z.boolean().optional().default(true),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -10678,15 +10928,10 @@ export const zLtx2322bAudioToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -10700,69 +10945,75 @@ export const zLtx2322bAudioToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  preprocess_audio: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.string(),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  match_audio_length: z.boolean().optional().default(true),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_url: z.string(),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
   audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23LoRAAudioToVideoInput
  */
 export const zLtx2322bAudioToVideoLoraInput = z.object({
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
+  audio_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  match_audio_length: z.boolean().optional().default(true),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  preprocess_audio: z.boolean().optional().default(true),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  loras: z.array(zLoRaInput),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -10777,15 +11028,10 @@ export const zLtx2322bAudioToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -10799,71 +11045,44 @@ export const zLtx2322bAudioToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  preprocess_audio: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.string(),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  match_audio_length: z.boolean().optional().default(true),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  loras: z.array(zLoRaInput),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_url: z.string(),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
   audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23DistilledAudioToVideoInput
  */
 export const zLtx2322bDistilledAudioToVideoInput = z.object({
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
+    .default('none'),
+  preprocess_audio: z.boolean().optional().default(true),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  audio_url: z.string(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -10878,43 +11097,14 @@ export const zLtx2322bDistilledAudioToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default(0.5),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  match_audio_length: z.boolean().optional().default(true),
+    .default('X264 (.mp4)'),
+  use_multiscale: z.boolean().optional().default(true),
   audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_url: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  match_audio_length: z.boolean().optional().default(true),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -10928,24 +11118,54 @@ export const zLtx2322bDistilledAudioToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  preprocess_audio: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23LoRADistilledAudioToVideoInput
  */
 export const zLtx2322bDistilledAudioToVideoLoraInput = z.object({
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
+    .default('none'),
+  preprocess_audio: z.boolean().optional().default(true),
+  loras: z.array(zLoRaInput),
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  audio_url: z.string(),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -10960,44 +11180,14 @@ export const zLtx2322bDistilledAudioToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default(0.5),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  match_audio_length: z.boolean().optional().default(true),
+    .default('X264 (.mp4)'),
+  use_multiscale: z.boolean().optional().default(true),
   audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  loras: z.array(zLoRaInput),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  audio_url: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
+  match_audio_length: z.boolean().optional().default(true),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11011,25 +11201,55 @@ export const zLtx2322bDistilledAudioToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  preprocess_audio: z.boolean().optional().default(true),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23DistilledImageToVideoInput
  */
 export const zLtx2322bDistilledImageToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
-  enable_safety_checker: z.boolean().optional().default(true),
+    .default('none'),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  interpolation_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
   image_url: z.string(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11044,43 +11264,13 @@ export const zLtx2322bDistilledImageToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  negative_prompt: z
-    .string()
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  interpolation_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
+    .default('X264 (.mp4)'),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11094,25 +11284,56 @@ export const zLtx2322bDistilledImageToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23LoRADistilledImageToVideoInput
  */
 export const zLtx2322bDistilledImageToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
-  enable_safety_checker: z.boolean().optional().default(true),
+    .default('none'),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  loras: z.array(zLoRaInput),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  interpolation_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
   image_url: z.string(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11127,44 +11348,13 @@ export const zLtx2322bDistilledImageToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  negative_prompt: z
-    .string()
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  interpolation_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  loras: z.array(zLoRaInput),
+    .default('X264 (.mp4)'),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11178,22 +11368,73 @@ export const zLtx2322bDistilledImageToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23DistilledReferenceVideoToVideoInput
  */
 export const zLtx2322bDistilledReferenceVideoToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  preprocessor: z
+    .enum(['depth', 'canny', 'pose', 'none'])
+    .optional()
+    .default('none'),
+  ic_lora_type: z
+    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
+    .optional()
+    .default('union'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('none'),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11208,17 +11449,9 @@ export const zLtx2322bDistilledReferenceVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11232,59 +11465,68 @@ export const zLtx2322bDistilledReferenceVideoToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  preprocessor: z
-    .enum(['depth', 'canny', 'pose', 'none'])
-    .optional()
-    .default('none'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  ic_lora_type: z
-    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
-    .optional()
-    .default('union'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  match_video_length: z.boolean().optional().default(true),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_input_fps: z.boolean().optional().default(true),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  video_url: z.string(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  sync_mode: z.boolean().optional().default(false),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23LoRADistilledReferenceVideoToVideoInput
  */
 export const zLtx2322bDistilledReferenceVideoToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  preprocessor: z
+    .enum(['depth', 'canny', 'pose', 'none'])
+    .optional()
+    .default('none'),
+  ic_lora_type: z
+    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
+    .optional()
+    .default('union'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('none'),
+  loras: z.array(zLoRaInput),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11299,17 +11541,9 @@ export const zLtx2322bDistilledReferenceVideoToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11323,61 +11557,43 @@ export const zLtx2322bDistilledReferenceVideoToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  preprocessor: z
-    .enum(['depth', 'canny', 'pose', 'none'])
-    .optional()
-    .default('none'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  ic_lora_type: z
-    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
-    .optional()
-    .default('union'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  match_video_length: z.boolean().optional().default(true),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_input_fps: z.boolean().optional().default(true),
-  loras: z.array(zLoRaInput),
-  video_url: z.string(),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23DistilledTextToVideoInput
  */
 export const zLtx2322bDistilledTextToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
+    .default('none'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11391,37 +11607,13 @@ export const zLtx2322bDistilledTextToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default(0.5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
+    .default('X264 (.mp4)'),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11435,23 +11627,48 @@ export const zLtx2322bDistilledTextToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23LoRADistilledTextToVideoInput
  */
 export const zLtx2322bDistilledTextToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
+    .default('none'),
+  loras: z.array(zLoRaInput),
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11465,38 +11682,13 @@ export const zLtx2322bDistilledTextToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
-    .default(0.5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  loras: z.array(zLoRaInput),
+    .default('X264 (.mp4)'),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11510,23 +11702,50 @@ export const zLtx2322bDistilledTextToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23DistilledVideoToVideoInput
  */
 export const zLtx2322bDistilledVideoToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
+    .default('none'),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11541,42 +11760,10 @@ export const zLtx2322bDistilledVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  match_video_length: z.boolean().optional().default(true),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
   audio_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  match_input_fps: z.boolean().optional().default(true),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  video_url: z.string(),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11590,23 +11777,56 @@ export const zLtx2322bDistilledVideoToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23LoRADistilledVideoToVideoInput
  */
 export const zLtx2322bDistilledVideoToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
-  video_output_type: z
-    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
     .optional()
-    .default('X264 (.mp4)'),
-  use_multiscale: z.boolean().optional().default(true),
+    .default('none'),
+  loras: z.array(zLoRaInput),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  video_url: z.string(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  prompt: z.string(),
   video_size: z
     .union([
       zImageSize,
@@ -11621,43 +11841,10 @@ export const zLtx2322bDistilledVideoToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  match_video_length: z.boolean().optional().default(true),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
   audio_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  match_input_fps: z.boolean().optional().default(true),
-  loras: z.array(zLoRaInput),
-  video_url: z.string(),
   num_frames: z.int().gte(9).lte(481).optional().default(121),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('none'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11671,24 +11858,88 @@ export const zLtx2322bDistilledVideoToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_output_type: z
+    .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
+    .optional()
+    .default('X264 (.mp4)'),
+  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
 })
 
 /**
  * LTX23ExtendVideoInput
  */
 export const zLtx2322bExtendVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  extend_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -11703,16 +11954,11 @@ export const zLtx2322bExtendVideoInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11726,72 +11972,78 @@ export const zLtx2322bExtendVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_input_fps: z.boolean().optional().default(true),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  video_url: z.string(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  extend_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23LoRAExtendVideoInput
  */
 export const zLtx2322bExtendVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  extend_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  loras: z.array(zLoRaInput),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -11806,18 +12058,11 @@ export const zLtx2322bExtendVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
   prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11831,71 +12076,75 @@ export const zLtx2322bExtendVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  num_context_frames: z.int().gte(0).lte(121).optional().default(25),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  match_input_fps: z.boolean().optional().default(true),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  loras: z.array(zLoRaInput),
-  video_url: z.string(),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  extend_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
   audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23ImageToVideoInput
  */
 export const zLtx2322bImageToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  interpolation_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -11910,19 +12159,11 @@ export const zLtx2322bImageToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  interpolation_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -11936,66 +12177,75 @@ export const zLtx2322bImageToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
   audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23LoRAImageToVideoInput
  */
 export const zLtx2322bImageToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
+    ),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  image_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  loras: z.array(zLoRaInput),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  interpolation_direction: z
+    .enum(['forward', 'backward'])
+    .optional()
+    .default('forward'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12010,19 +12260,11 @@ export const zLtx2322bImageToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  interpolation_direction: z
-    .enum(['forward', 'backward'])
-    .optional()
-    .default('forward'),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12036,67 +12278,76 @@ export const zLtx2322bImageToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
-    ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_strength: z.number().gte(0).lte(1).optional().default(1),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  loras: z.array(zLoRaInput),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
   audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  end_image_strength: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23ReferenceVideoToVideoInput
  */
 export const zLtx2322bReferenceVideoToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  preprocessor: z
+    .enum(['depth', 'canny', 'pose', 'none'])
+    .optional()
+    .default('none'),
+  ic_lora_type: z
+    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
+    .optional()
+    .default('union'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12111,16 +12362,11 @@ export const zLtx2322bReferenceVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12134,77 +12380,83 @@ export const zLtx2322bReferenceVideoToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  preprocessor: z
-    .enum(['depth', 'canny', 'pose', 'none'])
-    .optional()
-    .default('none'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  ic_lora_type: z
-    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
-    .optional()
-    .default('union'),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  match_video_length: z.boolean().optional().default(true),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  video_url: z.string(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_fps: z.boolean().optional().default(true),
-  sync_mode: z.boolean().optional().default(false),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23LoRAReferenceVideoToVideoInput
  */
 export const zLtx2322bReferenceVideoToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  preprocessor: z
+    .enum(['depth', 'canny', 'pose', 'none'])
+    .optional()
+    .default('none'),
+  ic_lora_type: z
+    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
+    .optional()
+    .default('union'),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(1),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  loras: z.array(zLoRaInput),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12219,16 +12471,11 @@ export const zLtx2322bReferenceVideoToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12242,77 +12489,68 @@ export const zLtx2322bReferenceVideoToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  preprocessor: z
-    .enum(['depth', 'canny', 'pose', 'none'])
-    .optional()
-    .default('none'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  video_strength: z.number().gte(0).lte(1).optional().default(1),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  ic_lora_type: z
-    .enum(['match_preprocessor', 'union', 'detailer', 'none'])
-    .optional()
-    .default('union'),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  match_video_length: z.boolean().optional().default(true),
-  audio_strength: z.number().gte(0).lte(1).optional().default(1),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  loras: z.array(zLoRaInput),
-  video_url: z.string(),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  sync_mode: z.boolean().optional().default(false),
-  match_input_fps: z.boolean().optional().default(true),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
 })
 
 /**
  * LTX23TextToVideoInput
  */
 export const zLtx2322bTextToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  enable_safety_checker: z.boolean().optional().default(true),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12326,16 +12564,11 @@ export const zLtx2322bTextToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12349,61 +12582,67 @@ export const zLtx2322bTextToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
 })
 
 /**
  * LTX23LoRATextToVideoInput
  */
 export const zLtx2322bTextToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  enable_safety_checker: z.boolean().optional().default(true),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  loras: z.array(zLoRaInput),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12417,16 +12656,11 @@ export const zLtx2322bTextToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12440,63 +12674,70 @@ export const zLtx2322bTextToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  loras: z.array(zLoRaInput),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
 })
 
 /**
  * LTX23VideoToVideoInput
  */
 export const zLtx2322bVideoToVideoInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(0.01),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12511,16 +12752,11 @@ export const zLtx2322bVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12534,66 +12770,72 @@ export const zLtx2322bVideoToVideoInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  match_video_length: z.boolean().optional().default(true),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  match_input_fps: z.boolean().optional().default(true),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  video_url: z.string(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
 })
 
 /**
  * LTX23LoRAVideoToVideoInput
  */
 export const zLtx2322bVideoToVideoLoraInput = z.object({
-  generate_audio: z.boolean().optional().default(true),
+  distill_lora_first_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.2),
+  use_restart_sampling: z.boolean().optional().default(false),
+  video_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  sync_mode: z.boolean().optional().default(false),
+  match_input_fps: z.boolean().optional().default(true),
+  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  camera_lora_scale: z.number().gte(0).lte(1).optional().default(1),
+  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
+  audio_strength: z.number().gte(0).lte(1).optional().default(0.01),
+  distill_lora_second_pass_scale: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.5),
+  acceleration: z
+    .enum(['none', 'regular', 'high', 'full'])
+    .optional()
+    .default('regular'),
+  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
+  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  loras: z.array(zLoRaInput),
+  fps: z.number().gte(1).lte(60).optional().default(24),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  scheduler: z
+    .enum(['ltx2', 'linear_quadratic', 'beta'])
+    .optional()
+    .default('ltx2'),
+  match_video_length: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   video_size: z
     .union([
       zImageSize,
@@ -12608,16 +12850,11 @@ export const zLtx2322bVideoToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  audio_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  scheduler: z
-    .enum(['ltx2', 'linear_quadratic', 'beta'])
-    .optional()
-    .default('ltx2'),
-  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
+  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  use_multiscale: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   camera_lora: z
     .enum([
       'dolly_in',
@@ -12631,63 +12868,25 @@ export const zLtx2322bVideoToVideoLoraInput = z.object({
     ])
     .optional()
     .default('none'),
-  prompt: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  fps: z.number().gte(1).lte(60).optional().default(24),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  use_multiscale: z.boolean().optional().default(true),
-  distill_lora_second_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.5),
+  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
+  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
+  video_strength: z.number().gte(0).lte(1).optional().default(0.01),
+  video_stg_scale: z.number().gte(0).lte(20).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'news broadcast, 3d animation, computer graphics, pc game, console game, video game, cartoon, childish, watermark, logo, text, on screen text, subtitles, titles, signature, slowmo, static',
     ),
-  gradient_estimation_gamma: z.number().gte(0).lte(10).optional().default(2),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(8).lte(50).optional().default(40),
-  audio_cfg_scale: z.number().gte(1).lte(20).optional().default(7),
-  match_video_length: z.boolean().optional().default(true),
-  video_rescaling_scale: z.number().gte(0).lte(1).optional().default(0.7),
-  audio_strength: z.number().gte(0).lte(1).optional().default(0.01),
-  match_input_fps: z.boolean().optional().default(true),
-  audio_stg_scale: z.number().gte(0).lte(20).optional().default(0),
-  loras: z.array(zLoRaInput),
-  video_url: z.string(),
-  acceleration: z
-    .enum(['none', 'regular', 'high', 'full'])
-    .optional()
-    .default('regular'),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  sync_mode: z.boolean().optional().default(false),
-  distill_lora_first_pass_scale: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.2),
-  use_restart_sampling: z.boolean().optional().default(false),
-  video_modality_scale: z.number().gte(0).lte(10).optional().default(3),
-  video_cfg_scale: z.number().gte(1).lte(20).optional().default(3),
-  audio_modality_scale: z.number().gte(0).lte(10).optional().default(3),
 })
 
 /**
  * LTXV23AudioToVideoRequest
  */
 export const zLtx23AudioToVideoInput = z.object({
-  audio_url: z.string(),
   aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
   prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
+  audio_url: z.string(),
   guidance_scale: z.union([z.number().gte(1).lte(50), z.unknown()]).optional(),
   image_url: z.union([z.string(), z.unknown()]).optional(),
 })
@@ -12697,21 +12896,20 @@ export const zLtx23AudioToVideoInput = z.object({
  */
 export const zLtx23ExtendVideoInput = z.object({
   video_url: z.string(),
-  prompt: z.union([z.string().max(5000), z.unknown()]).optional(),
-  context: z.union([z.number().gte(1).lte(20), z.unknown()]).optional(),
   mode: z.enum(['start', 'end']).optional().default('end'),
   duration: z.number().gte(1).lte(20).optional().default(5),
+  prompt: z.union([z.string().max(5000), z.unknown()]).optional(),
+  context: z.union([z.number().gte(1).lte(20), z.unknown()]).optional(),
 })
 
 /**
  * LTXV23ImageToVideoFastRequest
  */
 export const zLtx23ImageToVideoFastInput = z.object({
-  prompt: z.string().min(1).max(5000),
-  fps: z
-    .union([z.literal(24), z.literal(25), z.literal(48), z.literal(50)])
-    .optional()
-    .default(25),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
+  generate_audio: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
   duration: z
     .union([
       z.literal(6),
@@ -12725,31 +12923,32 @@ export const zLtx23ImageToVideoFastInput = z.object({
     ])
     .optional()
     .default(6),
+  prompt: z.string().min(1).max(5000),
+  fps: z
+    .union([z.literal(24), z.literal(25), z.literal(48), z.literal(50)])
+    .optional()
+    .default(25),
   image_url: z.string(),
-  generate_audio: z.boolean().optional().default(true),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * LTXV23ImageToVideoRequest
  */
 export const zLtx23ImageToVideoInput = z.object({
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
+  generate_audio: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
+  duration: z
+    .union([z.literal(6), z.literal(8), z.literal(10)])
+    .optional()
+    .default(6),
   prompt: z.string().min(1).max(5000),
   fps: z
     .union([z.literal(24), z.literal(25), z.literal(48), z.literal(50)])
     .optional()
     .default(25),
-  duration: z
-    .union([z.literal(6), z.literal(8), z.literal(10)])
-    .optional()
-    .default(6),
   image_url: z.string(),
-  generate_audio: z.boolean().optional().default(true),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -12762,14 +12961,33 @@ export const zLtx23ImageToVideoInput = z.object({
  * LoRA used by the official Lightricks T2V/I2V workflow.
  */
 export const zLtx23QualityAudioToVideoInput = z.object({
+  audio_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  match_audio_length: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
-  generate_audio: z.boolean().optional().default(true),
+  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   resolution: z
     .union([
       zImageSize,
@@ -12784,26 +13002,7 @@ export const zLtx23QualityAudioToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  match_audio_length: z.boolean().optional().default(true),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  audio_url: z.string(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
 })
 
 /**
@@ -12812,14 +13011,34 @@ export const zLtx23QualityAudioToVideoInput = z.object({
  * Audio-to-video + user-supplied LoRAs.
  */
 export const zLtx23QualityAudioToVideoLoraInput = z.object({
+  audio_url: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  match_audio_length: z.boolean().optional().default(true),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  loras: z.array(zLoRaInputType2).max(3),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
-  generate_audio: z.boolean().optional().default(true),
+  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   resolution: z
     .union([
       zImageSize,
@@ -12834,27 +13053,7 @@ export const zLtx23QualityAudioToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  match_audio_length: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  audio_url: z.string(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  loras: z.array(zLoRaInputType2).max(3),
 })
 
 /**
@@ -12887,13 +13086,30 @@ export const zLtx23QualityAudioToVideoOutput = z.object({
  * Backed by `LTX-2.3_ICLoRA_HDR_Distilled.json`.
  */
 export const zLtx23QualityHdrInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  video_url: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
   resolution: z
     .union([
       zImageSize,
@@ -12908,37 +13124,38 @@ export const zLtx23QualityHdrInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  generate_audio: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_url: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
 })
 
 /**
  * LTX23QualityLoRAHDRInput
  */
 export const zLtx23QualityHdrLoraInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  video_url: z.string(),
+  loras: z.array(zLoRaInputType2).max(3),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
   resolution: z
     .union([
       zImageSize,
@@ -12953,25 +13170,7 @@ export const zLtx23QualityHdrLoraInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  generate_audio: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_url: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  loras: z.array(zLoRaInputType2).max(3),
 })
 
 /**
@@ -12983,14 +13182,31 @@ export const zLtx23QualityHdrLoraInput = z.object({
  * with the image-input branch enabled.
  */
 export const zLtx23QualityImageToVideoInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
-  generate_audio: z.boolean().optional().default(true),
+  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  image_url: z.string(),
   resolution: z
     .union([
       zImageSize,
@@ -13005,24 +13221,7 @@ export const zLtx23QualityImageToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_url: z.string(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
 })
 
 /**
@@ -13031,14 +13230,32 @@ export const zLtx23QualityImageToVideoInput = z.object({
  * Image-to-video + user-supplied LoRAs.
  */
 export const zLtx23QualityImageToVideoLoraInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  loras: z.array(zLoRaInputType2).max(3),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
-  generate_audio: z.boolean().optional().default(true),
+  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  image_url: z.string(),
   resolution: z
     .union([
       zImageSize,
@@ -13053,25 +13270,7 @@ export const zLtx23QualityImageToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_url: z.string(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  image_strength: z.number().gte(0).lte(1).optional().default(0.7),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  loras: z.array(zLoRaInputType2).max(3),
 })
 
 /**
@@ -13104,13 +13303,33 @@ export const zLtx23QualityImageToVideoOutput = z.object({
  * Backed by `LTX-2.3_ICLoRA_Union_Control_Distilled.json`.
  */
 export const zLtx23QualityReferenceVideoToVideoInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_strength: z.number().gte(0).lte(1).optional().default(0.6),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  control_video_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  video_url: z.string(),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   resolution: z
     .union([
       zImageSize,
@@ -13125,39 +13344,42 @@ export const zLtx23QualityReferenceVideoToVideoInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  generate_audio: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_url: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
+  skip_control_preprocess: z.boolean().optional().default(false),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  video_strength: z.number().gte(0).lte(1).optional().default(0.6),
 })
 
 /**
  * LTX23QualityLoRAReferenceVideoToVideoInput
  */
 export const zLtx23QualityReferenceVideoToVideoLoraInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  video_strength: z.number().gte(0).lte(1).optional().default(0.6),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
+  control_video_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  video_url: z.string(),
+  loras: z.array(zLoRaInputType2).max(3),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   resolution: z
     .union([
       zImageSize,
@@ -13172,27 +13394,8 @@ export const zLtx23QualityReferenceVideoToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  generate_audio: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_url: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
+  skip_control_preprocess: z.boolean().optional().default(false),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  loras: z.array(zLoRaInputType2).max(3),
-  video_strength: z.number().gte(0).lte(1).optional().default(0.6),
 })
 
 /**
@@ -13226,9 +13429,19 @@ export const zLtx23QualityReferenceVideoToVideoOutput = z.object({
  * single-stage distilled inference at up to 1920x1080.
  */
 export const zLtx23QualityTextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
   generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default(
+      'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
+    ),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   resolution: z
     .union([
       zImageSize,
@@ -13242,27 +13455,17 @@ export const zLtx23QualityTextToVideoInput = z.object({
       ]),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
+  prompt: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  prompt: z.string(),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default(
-      'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
-    ),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
 })
 
 /**
@@ -13271,14 +13474,30 @@ export const zLtx23QualityTextToVideoInput = z.object({
  * Text-to-video + user-supplied LoRAs.
  */
 export const zLtx23QualityTextToVideoLoraInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  num_frames: z.int().gte(9).lte(481).optional().default(121),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  prompt: z.string(),
+  loras: z.array(zLoRaInputType2).max(3),
+  generate_audio: z.boolean().optional().default(true),
+  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'color distortion, overexposure, static, blurry details, subtitles, style, artwork, painting, frame, still, dim overall tone, worst quality, low quality, JPEG compression artifacts, ugly, mutilated, extra fingers, poorly drawn hands, poorly drawn face, deformed, disfigured, malformed limbs, fused fingers, motionless frame, cluttered background, three legs, crowded background, walking backwards',
     ),
-  generate_audio: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
   resolution: z
     .union([
       zImageSize,
@@ -13292,23 +13511,7 @@ export const zLtx23QualityTextToVideoLoraInput = z.object({
       ]),
     ])
     .optional(),
-  prompt: z.string(),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  num_frames: z.int().gte(9).lte(481).optional().default(121),
-  enable_safety_checker: z.boolean().optional().default(true),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  frames_per_second: z.number().gte(1).lte(60).optional().default(24),
   sync_mode: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(8).lte(30).optional().default(15),
-  guidance_scale: z.number().gte(1).lte(20).optional().default(1),
-  loras: z.array(zLoRaInputType2).max(3),
 })
 
 /**
@@ -13337,23 +13540,21 @@ export const zLtx23QualityTextToVideoOutput = z.object({
  * LTXV23RetakeVideoRequest
  */
 export const zLtx23RetakeVideoInput = z.object({
+  start_time: z.number().gte(0).lte(20).optional().default(0),
   video_url: z.string(),
+  duration: z.number().gte(2).lte(20).optional().default(5),
   prompt: z.string().min(1).max(5000),
   retake_mode: z
     .enum(['replace_audio', 'replace_video', 'replace_audio_and_video'])
     .optional()
     .default('replace_audio_and_video'),
-  start_time: z.number().gte(0).lte(20).optional().default(0),
-  duration: z.number().gte(2).lte(20).optional().default(5),
 })
 
 /**
  * LTXV23TextToVideoFastRequest
  */
 export const zLtx23TextToVideoFastInput = z.object({
-  prompt: z.string().min(1).max(5000),
   aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   duration: z
     .union([
       z.literal(6),
@@ -13367,6 +13568,8 @@ export const zLtx23TextToVideoFastInput = z.object({
     ])
     .optional()
     .default(6),
+  prompt: z.string().min(1).max(5000),
+  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   fps: z
     .union([z.literal(24), z.literal(25), z.literal(48), z.literal(50)])
     .optional()
@@ -13378,13 +13581,13 @@ export const zLtx23TextToVideoFastInput = z.object({
  * LTXV23TextToVideoRequest
  */
 export const zLtx23TextToVideoInput = z.object({
-  prompt: z.string().min(1).max(5000),
   aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   duration: z
     .union([z.literal(6), z.literal(8), z.literal(10)])
     .optional()
     .default(6),
+  prompt: z.string().min(1).max(5000),
+  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   fps: z
     .union([z.literal(24), z.literal(25), z.literal(48), z.literal(50)])
     .optional()
@@ -13396,19 +13599,19 @@ export const zLtx23TextToVideoInput = z.object({
  * LTXV20AudioToVideoRequest
  */
 export const zLtx2AudioToVideoInput = z.object({
-  prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
   audio_url: z.string(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
   guidance_scale: z.union([z.number().gte(1).lte(50), z.unknown()]).optional(),
+  prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
 })
 
 /**
  * LTXExtendVideoRequest
  */
 export const zLtx2ExtendVideoInput = z.object({
-  video_url: z.string(),
   context: z.union([z.number().gte(1).lte(20), z.unknown()]).optional(),
   duration: z.number().gte(1).lte(20).optional().default(5),
+  video_url: z.string(),
   mode: z.enum(['start', 'end']).optional().default('end'),
   prompt: z.union([z.string().max(5000), z.unknown()]).optional(),
 })
@@ -13417,11 +13620,6 @@ export const zLtx2ExtendVideoInput = z.object({
  * LTXV20ImageToVideoFastRequest
  */
 export const zLtx2ImageToVideoFastInput = z.object({
-  fps: z
-    .union([z.literal(25), z.literal(50)])
-    .optional()
-    .default(25),
-  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   generate_audio: z.boolean().optional().default(true),
   duration: z
     .union([
@@ -13437,49 +13635,50 @@ export const zLtx2ImageToVideoFastInput = z.object({
     .optional()
     .default(6),
   image_url: z.string(),
+  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   prompt: z.string().min(1).max(5000),
+  fps: z
+    .union([z.literal(25), z.literal(50)])
+    .optional()
+    .default(25),
 })
 
 /**
  * LTXV20ImageToVideoRequest
  */
 export const zLtx2ImageToVideoInput = z.object({
-  fps: z
-    .union([z.literal(25), z.literal(50)])
-    .optional()
-    .default(25),
-  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   generate_audio: z.boolean().optional().default(true),
   duration: z
     .union([z.literal(6), z.literal(8), z.literal(10)])
     .optional()
     .default(6),
   image_url: z.string(),
+  resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
   prompt: z.string().min(1).max(5000),
+  fps: z
+    .union([z.literal(25), z.literal(50)])
+    .optional()
+    .default(25),
 })
 
 /**
  * LTXRetakeVideoRequest
  */
 export const zLtx2RetakeVideoInput = z.object({
-  video_url: z.string(),
   duration: z.number().gte(2).lte(20).optional().default(5),
-  start_time: z.number().gte(0).lte(20).optional().default(0),
-  prompt: z.string().min(1).max(5000),
+  video_url: z.string(),
   retake_mode: z
     .enum(['replace_audio', 'replace_video', 'replace_audio_and_video'])
     .optional()
     .default('replace_audio_and_video'),
+  prompt: z.string().min(1).max(5000),
+  start_time: z.number().gte(0).lte(20).optional().default(0),
 })
 
 /**
  * LTXV20TextToVideoFastRequest
  */
 export const zLtx2TextToVideoFastInput = z.object({
-  fps: z
-    .union([z.literal(25), z.literal(50)])
-    .optional()
-    .default(25),
   generate_audio: z.boolean().optional().default(true),
   duration: z
     .union([
@@ -13494,105 +13693,109 @@ export const zLtx2TextToVideoFastInput = z.object({
     ])
     .optional()
     .default(6),
-  prompt: z.string().min(1).max(5000),
   resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
+  prompt: z.string().min(1).max(5000),
+  fps: z
+    .union([z.literal(25), z.literal(50)])
+    .optional()
+    .default(25),
 })
 
 /**
  * LTXV20TextToVideoRequest
  */
 export const zLtx2TextToVideoInput = z.object({
-  fps: z
-    .union([z.literal(25), z.literal(50)])
-    .optional()
-    .default(25),
   generate_audio: z.boolean().optional().default(true),
   duration: z
     .union([z.literal(6), z.literal(8), z.literal(10)])
     .optional()
     .default(6),
-  prompt: z.string().min(1).max(5000),
   resolution: z.enum(['1080p', '1440p', '2160p']).optional().default('1080p'),
+  prompt: z.string().min(1).max(5000),
+  fps: z
+    .union([z.literal(25), z.literal(50)])
+    .optional()
+    .default(25),
 })
 
 /**
  * DistilledExtendVideoInput
  */
 export const zLtxv13B098DistilledExtendInput = z.object({
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  reverse_video: z.boolean().optional().default(false),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  expand_prompt: z.boolean().optional().default(false),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
   loras: z.array(zLoRaWeight).optional().default([]),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
   temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  video: zExtendVideoConditioningInput,
-  first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
   frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  reverse_video: z.boolean().optional().default(false),
+  enable_detail_pass: z.boolean().optional().default(false),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  video: zExtendVideoConditioningInput,
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  expand_prompt: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
   aspect_ratio: z
     .enum(['9:16', '1:1', '16:9', 'auto'])
     .optional()
     .default('auto'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
  * ExtendVideoOutput
  */
 export const zLtxv13B098DistilledExtendOutput = z.object({
+  video: zFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zFile,
 })
 
 /**
  * DistilledImageToVideoInput
  */
 export const zLtxv13B098DistilledImageToVideoInput = z.object({
-  image_url: z.string(),
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  reverse_video: z.boolean().optional().default(false),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  expand_prompt: z.boolean().optional().default(false),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
   loras: z.array(zLoRaWeight).optional().default([]),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
   temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  reverse_video: z.boolean().optional().default(false),
+  enable_detail_pass: z.boolean().optional().default(false),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  image_url: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
   first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  expand_prompt: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
   aspect_ratio: z
     .enum(['9:16', '1:1', '16:9', 'auto'])
     .optional()
     .default('auto'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
  * ImageToVideoOutput
  */
 export const zLtxv13B098DistilledImageToVideoOutput = z.object({
+  video: zFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zFile,
 })
 
 /**
@@ -13601,75 +13804,75 @@ export const zLtxv13B098DistilledImageToVideoOutput = z.object({
  * Distilled model input
  */
 export const zLtxv13B098DistilledInput = z.object({
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  reverse_video: z.boolean().optional().default(false),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  expand_prompt: z.boolean().optional().default(false),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
   loras: z.array(zLoRaWeight).optional().default([]),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
   temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  reverse_video: z.boolean().optional().default(false),
+  enable_detail_pass: z.boolean().optional().default(false),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
   seed: z.union([z.int(), z.unknown()]).optional(),
   first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  expand_prompt: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['9:16', '1:1', '16:9']).optional().default('16:9'),
   negative_prompt: z
     .string()
     .optional()
     .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
-  aspect_ratio: z.enum(['9:16', '1:1', '16:9']).optional().default('16:9'),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
  * MultiConditioningVideoOutput
  */
 export const zLtxv13B098DistilledMulticonditioningOutput = z.object({
+  video: zFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zFile,
 })
 
 /**
  * TextToVideoOutput
  */
 export const zLtxv13B098DistilledOutput = z.object({
+  video: zFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zFile,
 })
 
 /**
  * DistilledExtendVideoInput
  */
 export const zLtxVideo13bDistilledExtendInput = z.object({
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  loras: z.array(zLoRaWeight).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
   video: zExtendVideoConditioningInput,
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(false),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  enable_detail_pass: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['9:16', '1:1', '16:9', 'auto'])
     .optional()
     .default('auto'),
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
   reverse_video: z.boolean().optional().default(false),
-  prompt: z.string(),
-  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
-  enable_safety_checker: z.boolean().optional().default(true),
-  expand_prompt: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
-  loras: z.array(zLoRaWeight).optional().default([]),
   first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
@@ -13677,39 +13880,39 @@ export const zLtxVideo13bDistilledExtendInput = z.object({
  */
 export const zLtxVideo13bDistilledExtendOutput = z.object({
   video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
 })
 
 /**
  * DistilledImageToVideoInput
  */
 export const zLtxVideo13bDistilledImageToVideoInput = z.object({
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  loras: z.array(zLoRaWeight).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  expand_prompt: z.boolean().optional().default(false),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  enable_detail_pass: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['9:16', '1:1', '16:9', 'auto'])
     .optional()
     .default('auto'),
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
   reverse_video: z.boolean().optional().default(false),
-  prompt: z.string(),
-  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  expand_prompt: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
-  loras: z.array(zLoRaWeight).optional().default([]),
   first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
@@ -13717,8 +13920,8 @@ export const zLtxVideo13bDistilledImageToVideoInput = z.object({
  */
 export const zLtxVideo13bDistilledImageToVideoOutput = z.object({
   video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
 })
 
 /**
@@ -13727,26 +13930,26 @@ export const zLtxVideo13bDistilledImageToVideoOutput = z.object({
  * Distilled model input
  */
 export const zLtxVideo13bDistilledInput = z.object({
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  loras: z.array(zLoRaWeight).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  expand_prompt: z.boolean().optional().default(false),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  enable_detail_pass: z.boolean().optional().default(false),
+  aspect_ratio: z.enum(['9:16', '1:1', '16:9']).optional().default('16:9'),
+  num_frames: z.int().gte(9).lte(1441).optional().default(121),
+  reverse_video: z.boolean().optional().default(false),
+  first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
   negative_prompt: z
     .string()
     .optional()
     .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  aspect_ratio: z.enum(['9:16', '1:1', '16:9']).optional().default('16:9'),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  num_frames: z.int().gte(9).lte(1441).optional().default(121),
-  reverse_video: z.boolean().optional().default(false),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  expand_prompt: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
-  loras: z.array(zLoRaWeight).optional().default([]),
-  first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
 })
 
 /**
@@ -13754,8 +13957,8 @@ export const zLtxVideo13bDistilledInput = z.object({
  */
 export const zLtxVideo13bDistilledMulticonditioningOutput = z.object({
   video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
 })
 
 /**
@@ -13763,8 +13966,8 @@ export const zLtxVideo13bDistilledMulticonditioningOutput = z.object({
  */
 export const zLtxVideo13bDistilledOutput = z.object({
   video: zFile,
-  prompt: z.string(),
   seed: z.int(),
+  prompt: z.string(),
 })
 
 /**
@@ -13772,16 +13975,16 @@ export const zLtxVideo13bDistilledOutput = z.object({
  */
 export const zLtxVideoImageToVideoInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
   guidance_scale: z.number().lte(10).optional().default(3),
-  image_url: z.string(),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
     ),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  image_url: z.string(),
 })
 
 /**
@@ -13797,15 +14000,15 @@ export const zLtxVideoImageToVideoOutput = z.object({
  */
 export const zLtxVideoInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
   guidance_scale: z.number().lte(10).optional().default(3),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'low quality, worst quality, deformed, distorted, disfigured, motion smear, motion artifacts, fused fingers, bad anatomy, weird hand, ugly',
     ),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
 })
 
 /**
@@ -13820,40 +14023,40 @@ export const zLtxVideoOutput = z.object({
  * ExtendVideoOutput
  */
 export const zLtxVideoV095ExtendOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * TextToVideoInput
  */
 export const zLtxVideoV095Input = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
   aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
+  prompt: z.string(),
+  expand_prompt: z.boolean().optional().default(true),
   resolution: z.enum(['480p', '720p']).optional().default('720p'),
   negative_prompt: z
     .string()
     .optional()
     .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
-  expand_prompt: z.boolean().optional().default(true),
 })
 
 /**
  * MulticonditioningVideoOutput
  */
 export const zLtxVideoV095MulticonditioningOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * TextToVideoOutput
  */
 export const zLtxVideoV095Output = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -13919,16 +14122,16 @@ export const zLucyRestyleOutput = z.object({
  * Ray2ImageToVideoRequest
  */
 export const zLumaDreamMachineRay2FlashImageToVideoInput = z.object({
-  loop: z.boolean().optional().default(false),
+  duration: z.enum(['5s', '9s']).optional().default('5s'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
   prompt: z.string().min(3).max(5000),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  loop: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
     .optional()
     .default('16:9'),
-  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
-  duration: z.enum(['5s', '9s']).optional().default('5s'),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -13942,22 +14145,22 @@ export const zLumaDreamMachineRay2FlashImageToVideoOutput = z.object({
  * Ray2TextToVideoRequest
  */
 export const zLumaDreamMachineRay2FlashInput = z.object({
+  duration: z.enum(['5s', '9s']).optional().default('5s'),
   loop: z.boolean().optional().default(false),
+  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
   prompt: z.string().min(3).max(5000),
   aspect_ratio: z
     .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
     .optional()
     .default('16:9'),
-  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
-  duration: z.enum(['5s', '9s']).optional().default('5s'),
 })
 
 /**
  * ModifyVideoRequest
  */
 export const zLumaDreamMachineRay2FlashModifyInput = z.object({
-  video_url: z.string(),
   prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
+  video_url: z.string(),
   mode: z
     .enum([
       'adhere_1',
@@ -13993,16 +14196,16 @@ export const zLumaDreamMachineRay2FlashOutput = z.object({
  * ReframeVideoRequest
  */
 export const zLumaDreamMachineRay2FlashReframeInput = z.object({
-  video_url: z.string(),
-  prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
   x_start: z.union([z.int(), z.unknown()]).optional(),
-  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
-  y_end: z.union([z.int(), z.unknown()]).optional(),
   x_end: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
+  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
   y_start: z.union([z.int(), z.unknown()]).optional(),
+  y_end: z.union([z.int(), z.unknown()]).optional(),
+  video_url: z.string(),
+  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
 })
 
 /**
@@ -14016,16 +14219,16 @@ export const zLumaDreamMachineRay2FlashReframeOutput = z.object({
  * Ray2ImageToVideoRequest
  */
 export const zLumaDreamMachineRay2ImageToVideoInput = z.object({
-  loop: z.boolean().optional().default(false),
+  duration: z.enum(['5s', '9s']).optional().default('5s'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
   prompt: z.string().min(3).max(5000),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  loop: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
     .optional()
     .default('16:9'),
-  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
-  duration: z.enum(['5s', '9s']).optional().default('5s'),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -14039,22 +14242,22 @@ export const zLumaDreamMachineRay2ImageToVideoOutput = z.object({
  * Ray2TextToVideoRequest
  */
 export const zLumaDreamMachineRay2Input = z.object({
+  duration: z.enum(['5s', '9s']).optional().default('5s'),
   loop: z.boolean().optional().default(false),
+  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
   prompt: z.string().min(3).max(5000),
   aspect_ratio: z
     .enum(['16:9', '9:16', '4:3', '3:4', '21:9', '9:21'])
     .optional()
     .default('16:9'),
-  resolution: z.enum(['540p', '720p', '1080p']).optional().default('540p'),
-  duration: z.enum(['5s', '9s']).optional().default('5s'),
 })
 
 /**
  * ModifyVideoRequest
  */
 export const zLumaDreamMachineRay2ModifyInput = z.object({
-  video_url: z.string(),
   prompt: z.union([z.string().min(3).max(5000), z.unknown()]).optional(),
+  video_url: z.string(),
   mode: z
     .enum([
       'adhere_1',
@@ -14090,16 +14293,16 @@ export const zLumaDreamMachineRay2Output = z.object({
  * ReframeVideoRequest
  */
 export const zLumaDreamMachineRay2ReframeInput = z.object({
-  video_url: z.string(),
-  prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
   x_start: z.union([z.int(), z.unknown()]).optional(),
-  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
-  y_end: z.union([z.int(), z.unknown()]).optional(),
   x_end: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  grid_position_y: z.union([z.int(), z.unknown()]).optional(),
+  grid_position_x: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.union([z.string().min(1).max(5000), z.unknown()]).optional(),
   y_start: z.union([z.int(), z.unknown()]).optional(),
+  y_end: z.union([z.int(), z.unknown()]).optional(),
+  video_url: z.string(),
+  aspect_ratio: z.enum(['1:1', '16:9', '9:16', '4:3', '3:4', '21:9', '9:21']),
 })
 
 /**
@@ -14113,23 +14316,23 @@ export const zLumaDreamMachineRay2ReframeOutput = z.object({
  * LynxInput
  */
 export const zLynxInput = z.object({
-  ip_scale: z.number().gte(0).lte(2).optional().default(1),
-  num_frames: z.int().gte(9).lte(81).optional().default(81),
-  image_url: z.string(),
-  guidance_scale_2: z.number().gte(0).lte(10).optional().default(2),
+  num_inference_steps: z.int().gte(1).lte(75).optional().default(50),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'Bright tones, overexposed, blurred background, static, subtitles, style, works, paintings, images, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, misshapen limbs, fused fingers, still picture, messy background, three legs, many people in the background, walking backwards',
     ),
-  num_inference_steps: z.int().gte(1).lte(75).optional().default(50),
-  strength: z.number().gte(0).lte(2).optional().default(1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
   aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  image_url: z.string(),
+  num_frames: z.int().gte(9).lte(81).optional().default(81),
+  ip_scale: z.number().gte(0).lte(2).optional().default(1),
   frames_per_second: z.int().gte(5).lte(30).optional().default(16),
+  guidance_scale_2: z.number().gte(0).lte(10).optional().default(2),
+  strength: z.number().gte(0).lte(2).optional().default(1),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(20).optional().default(5),
 })
 
@@ -14138,20 +14341,20 @@ export const zLynxInput = z.object({
  */
 export const zMagiDistilledExtendVideoInput = z.object({
   enable_safety_checker: z.boolean().optional().default(true),
-  start_frame: z.union([z.int().gte(0), z.unknown()]).optional(),
-  video_url: z.string(),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['480p', '720p']).optional().default('720p'),
   num_frames: z.union([z.int().gte(96).lte(192), z.unknown()]).optional(),
-  prompt: z.string(),
+  video_url: z.string(),
   num_inference_steps: z
     .union([z.literal(4), z.literal(8), z.literal(16), z.literal(32)])
     .optional()
     .default(16),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  start_frame: z.union([z.int().gte(0), z.unknown()]).optional(),
 })
 
 /**
@@ -14167,19 +14370,19 @@ export const zMagiDistilledExtendVideoOutput = z.object({
  */
 export const zMagiDistilledImageToVideoInput = z.object({
   enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_frames: z.union([z.int().gte(96).lte(192), z.unknown()]).optional(),
   resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  prompt: z.string(),
+  num_frames: z.union([z.int().gte(96).lte(192), z.unknown()]).optional(),
   num_inference_steps: z
     .union([z.literal(4), z.literal(8), z.literal(16), z.literal(32)])
     .optional()
     .default(16),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
 })
 
 /**
@@ -14194,6 +14397,7 @@ export const zMagiDistilledImageToVideoOutput = z.object({
  * MagiTextToVideoRequest
  */
 export const zMagiDistilledInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(true),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
@@ -14202,10 +14406,9 @@ export const zMagiDistilledInput = z.object({
     .union([z.literal(4), z.literal(8), z.literal(16), z.literal(32)])
     .optional()
     .default(16),
-  enable_safety_checker: z.boolean().optional().default(true),
   resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  num_frames: z.union([z.int().gte(96).lte(192), z.unknown()]).optional(),
   prompt: z.string(),
+  num_frames: z.union([z.int().gte(96).lte(192), z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -14304,10 +14507,10 @@ export const zMareyT2vOutput = z.object({
  * FastImageToVideoHailuo02Input
  */
 export const zMinimaxHailuo02FastImageToVideoInput = z.object({
-  duration: z.enum(['6', '10']).optional().default('6'),
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
+  duration: z.enum(['6', '10']).optional().default('6'),
 })
 
 /**
@@ -14322,8 +14525,8 @@ export const zMinimaxHailuo02FastImageToVideoOutput = z.object({
  */
 export const zMinimaxHailuo02ProImageToVideoInput = z.object({
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -14353,12 +14556,12 @@ export const zMinimaxHailuo02ProTextToVideoOutput = z.object({
  * StandardImageToVideoHailuo02Input
  */
 export const zMinimaxHailuo02StandardImageToVideoInput = z.object({
-  duration: z.enum(['6', '10']).optional().default('6'),
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
+  resolution: z.enum(['512P', '768P']).optional().default('768P'),
   image_url: z.string(),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  resolution: z.enum(['512P', '768P']).optional().default('768P'),
+  prompt_optimizer: z.boolean().optional().default(true),
+  duration: z.enum(['6', '10']).optional().default('6'),
 })
 
 /**
@@ -14372,9 +14575,9 @@ export const zMinimaxHailuo02StandardImageToVideoOutput = z.object({
  * StandardTextToVideoHailuo02Input
  */
 export const zMinimaxHailuo02StandardTextToVideoInput = z.object({
-  duration: z.enum(['6', '10']).optional().default('6'),
   prompt: z.string().min(1).max(2000),
   prompt_optimizer: z.boolean().optional().default(true),
+  duration: z.enum(['6', '10']).optional().default('6'),
 })
 
 /**
@@ -14389,8 +14592,8 @@ export const zMinimaxHailuo02StandardTextToVideoOutput = z.object({
  */
 export const zMinimaxHailuo23FastProImageToVideoInput = z.object({
   prompt: z.string().min(1).max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
 })
 
 /**
@@ -14404,10 +14607,10 @@ export const zMinimaxHailuo23FastProImageToVideoOutput = z.object({
  * StandardFastImageToVideoHailuo23Input
  */
 export const zMinimaxHailuo23FastStandardImageToVideoInput = z.object({
-  duration: z.enum(['6', '10']).optional().default('6'),
   prompt: z.string().min(1).max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
+  duration: z.enum(['6', '10']).optional().default('6'),
 })
 
 /**
@@ -14422,8 +14625,8 @@ export const zMinimaxHailuo23FastStandardImageToVideoOutput = z.object({
  */
 export const zMinimaxHailuo23ProImageToVideoInput = z.object({
   prompt: z.string().min(1).max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
 })
 
 /**
@@ -14452,10 +14655,10 @@ export const zMinimaxHailuo23ProTextToVideoOutput = z.object({
  * StandardImageToVideoHailuo23Input
  */
 export const zMinimaxHailuo23StandardImageToVideoInput = z.object({
-  duration: z.enum(['6', '10']).optional().default('6'),
   prompt: z.string().min(1).max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
+  duration: z.enum(['6', '10']).optional().default('6'),
 })
 
 /**
@@ -14469,9 +14672,9 @@ export const zMinimaxHailuo23StandardImageToVideoOutput = z.object({
  * StandardTextToVideoHailuo23Input
  */
 export const zMinimaxHailuo23StandardTextToVideoInput = z.object({
-  duration: z.enum(['6', '10']).optional().default('6'),
   prompt: z.string().min(1).max(2000),
   prompt_optimizer: z.boolean().optional().default(true),
+  duration: z.enum(['6', '10']).optional().default('6'),
 })
 
 /**
@@ -14486,8 +14689,8 @@ export const zMinimaxHailuo23StandardTextToVideoOutput = z.object({
  */
 export const zMinimaxVideo01DirectorImageToVideoInput = z.object({
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
 })
 
 /**
@@ -14517,8 +14720,8 @@ export const zMinimaxVideo01DirectorOutput = z.object({
  */
 export const zMinimaxVideo01ImageToVideoInput = z.object({
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
 })
 
 /**
@@ -14541,8 +14744,8 @@ export const zMinimaxVideo01Input = z.object({
  */
 export const zMinimaxVideo01LiveImageToVideoInput = z.object({
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
 })
 
 /**
@@ -14579,8 +14782,8 @@ export const zMinimaxVideo01Output = z.object({
  */
 export const zMinimaxVideo01SubjectReferenceInput = z.object({
   prompt: z.string().max(2000),
-  prompt_optimizer: z.boolean().optional().default(true),
   subject_reference_image_url: z.string(),
+  prompt_optimizer: z.boolean().optional().default(true),
 })
 
 /**
@@ -14594,14 +14797,14 @@ export const zMinimaxVideo01SubjectReferenceOutput = z.object({
  * BaseInput
  */
 export const zMmaudioV2Input = z.object({
-  video_url: z.string(),
-  mask_away_clip: z.boolean().optional().default(false),
-  duration: z.number().gte(1).lte(30).optional().default(8),
   num_steps: z.int().gte(4).lte(50).optional().default(25),
-  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
+  duration: z.number().gte(1).lte(30).optional().default(8),
+  video_url: z.string(),
   cfg_strength: z.number().gte(0).lte(20).optional().default(4.5),
-  prompt: z.string(),
   negative_prompt: z.string().optional().default(''),
+  prompt: z.string(),
+  mask_away_clip: z.boolean().optional().default(false),
+  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
 })
 
 /**
@@ -14630,8 +14833,8 @@ export const zMusetalkOutput = z.object({
  * OmniVideoElementInput
  */
 export const zOmniVideoElementInput = z.object({
-  reference_image_urls: z.array(z.string()).optional(),
   frontal_image_url: z.string(),
+  reference_image_urls: z.array(z.string()).optional(),
 })
 
 /**
@@ -14642,12 +14845,12 @@ export const zOmniVideoElementInput = z.object({
 export const zKlingVideoO1ReferenceToVideoInput = z.object({
   prompt: z.string().max(2500),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
   duration: z
     .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
     .optional()
     .default('5'),
-  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -14658,12 +14861,12 @@ export const zKlingVideoO1ReferenceToVideoInput = z.object({
 export const zKlingVideoO1StandardReferenceToVideoInput = z.object({
   prompt: z.string().max(2500),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
   duration: z
     .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
     .optional()
     .default('5'),
-  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
@@ -14674,9 +14877,9 @@ export const zKlingVideoO1StandardReferenceToVideoInput = z.object({
 export const zKlingVideoO1StandardVideoToVideoEditInput = z.object({
   prompt: z.string().max(2500),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  keep_audio: z.boolean().optional().default(false),
   video_url: z.string(),
   elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
+  keep_audio: z.boolean().optional().default(false),
 })
 
 /**
@@ -14686,18 +14889,18 @@ export const zKlingVideoO1StandardVideoToVideoEditInput = z.object({
  */
 export const zKlingVideoO1StandardVideoToVideoReferenceInput = z.object({
   prompt: z.string().max(2500),
+  keep_audio: z.boolean().optional().default(false),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   video_url: z.string(),
-  duration: z
-    .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
-    .optional()
-    .default('5'),
+  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  keep_audio: z.boolean().optional().default(false),
-  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
+  duration: z
+    .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
+    .optional()
+    .default('5'),
 })
 
 /**
@@ -14708,9 +14911,9 @@ export const zKlingVideoO1StandardVideoToVideoReferenceInput = z.object({
 export const zKlingVideoO1VideoToVideoEditInput = z.object({
   prompt: z.string().max(2500),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  keep_audio: z.boolean().optional().default(false),
   video_url: z.string(),
   elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
+  keep_audio: z.boolean().optional().default(false),
 })
 
 /**
@@ -14720,32 +14923,32 @@ export const zKlingVideoO1VideoToVideoEditInput = z.object({
  */
 export const zKlingVideoO1VideoToVideoReferenceInput = z.object({
   prompt: z.string().max(2500),
+  keep_audio: z.boolean().optional().default(false),
   image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
   video_url: z.string(),
-  duration: z
-    .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
-    .optional()
-    .default('5'),
+  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  keep_audio: z.boolean().optional().default(false),
-  elements: z.union([z.array(zOmniVideoElementInput), z.unknown()]).optional(),
+  duration: z
+    .enum(['3', '4', '5', '6', '7', '8', '9', '10'])
+    .optional()
+    .default('5'),
 })
 
 /**
  * OneToALLAnimationRequest
  */
 export const zOneToAllAnimation13bInput = z.object({
-  image_url: z.string(),
+  image_guidance_scale: z.number().gte(1).lte(10).optional().default(2),
   video_url: z.string(),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   negative_prompt: z.string(),
   pose_guidance_scale: z.number().gte(1).lte(10).optional().default(1.5),
+  image_url: z.string(),
   num_inference_steps: z.int().gte(2).lte(30).optional().default(30),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   prompt: z.string(),
-  image_guidance_scale: z.number().gte(1).lte(10).optional().default(2),
 })
 
 /**
@@ -14759,14 +14962,14 @@ export const zOneToAllAnimation13bOutput = z.object({
  * OneToALLAnimationRequest
  */
 export const zOneToAllAnimation14bInput = z.object({
-  image_url: z.string(),
+  image_guidance_scale: z.number().gte(1).lte(10).optional().default(2),
   video_url: z.string(),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   negative_prompt: z.string(),
   pose_guidance_scale: z.number().gte(1).lte(10).optional().default(1.5),
+  image_url: z.string(),
   num_inference_steps: z.int().gte(2).lte(30).optional().default(30),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   prompt: z.string(),
-  image_guidance_scale: z.number().gte(1).lte(10).optional().default(2),
 })
 
 /**
@@ -14780,26 +14983,26 @@ export const zOneToAllAnimation14bOutput = z.object({
  * OviI2VRequest
  */
 export const zOviImageToVideoInput = z.object({
+  prompt: z.string(),
   image_url: z.string(),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('jitter, bad hands, blur, distortion'),
   audio_negative_prompt: z
     .string()
     .optional()
     .default('robotic, muffled, echo, distorted'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
-  prompt: z.string(),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('jitter, bad hands, blur, distortion'),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
 })
 
 /**
  * OviI2VResponse
  */
 export const zOviImageToVideoOutput = z.object({
-  video: z.union([zFile, z.unknown()]).optional(),
   seed: z.int(),
+  video: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
@@ -14807,15 +15010,6 @@ export const zOviImageToVideoOutput = z.object({
  */
 export const zOviInput = z.object({
   prompt: z.string(),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('jitter, bad hands, blur, distortion'),
-  audio_negative_prompt: z
-    .string()
-    .optional()
-    .default('robotic, muffled, echo, distorted'),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
   resolution: z
     .enum([
       '512x992',
@@ -14828,15 +15022,24 @@ export const zOviInput = z.object({
     ])
     .optional()
     .default('992x512'),
+  audio_negative_prompt: z
+    .string()
+    .optional()
+    .default('robotic, muffled, echo, distorted'),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('jitter, bad hands, blur, distortion'),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
 })
 
 /**
  * OviT2VResponse
  */
 export const zOviOutput = z.object({
-  video: z.union([zFile, z.unknown()]).optional(),
   seed: z.int(),
+  video: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
@@ -14846,6 +15049,7 @@ export const zOviOutput = z.object({
  */
 export const zPikaV15PikaffectsInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   image_url: z.string(),
   pikaffect: z.enum([
     'Cake-ify',
@@ -14865,7 +15069,6 @@ export const zPikaV15PikaffectsInput = z.object({
     'Ta-da',
     'Tear',
   ]),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -14882,10 +15085,10 @@ export const zPikaV15PikaffectsOutput = z.object({
  * ImageToVideov21Input
  */
 export const zPikaV21ImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
-  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  image_url: z.string(),
   duration: z.int().optional().default(5),
   negative_prompt: z.string().optional().default(''),
 })
@@ -14901,14 +15104,14 @@ export const zPikaV21ImageToVideoOutput = z.object({
  * TextToVideov21Input
  */
 export const zPikaV21TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  duration: z.int().optional().default(5),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
-  duration: z.int().optional().default(5),
   negative_prompt: z.string().optional().default(''),
 })
 
@@ -14925,10 +15128,10 @@ export const zPikaV21TextToVideoOutput = z.object({
  * Request model for Pika 2.2 image-to-video generation
  */
 export const zPikaV22ImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
-  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  image_url: z.string(),
   duration: z
     .union([z.literal(5), z.literal(10)])
     .optional()
@@ -14949,11 +15152,11 @@ export const zPikaV22ImageToVideoOutput = z.object({
  * Pika22KeyframesToVideoRequest
  */
 export const zPikaV22PikaframesInput = z.object({
-  transitions: z.array(zKeyframeTransition).optional(),
-  image_urls: z.array(z.string()),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.union([z.string(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  transitions: z.array(zKeyframeTransition).optional(),
   negative_prompt: z.string().optional().default(''),
 })
 
@@ -14973,22 +15176,22 @@ export const zPikaV22PikaframesOutput = z.object({
  */
 export const zPikaV22PikascenesInput = z.object({
   seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
+  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  duration: z
+    .union([z.literal(5), z.literal(10)])
+    .optional()
+    .default(5),
+  prompt: z.string(),
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
+    .optional()
+    .default('16:9'),
   ingredients_mode: z
     .enum(['precise', 'creative'])
     .optional()
     .default('precise'),
   negative_prompt: z.string().optional().default('ugly, bad, terrible'),
-  image_urls: z.array(z.string()),
-  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
-    .optional()
-    .default('16:9'),
-  prompt: z.string(),
-  duration: z
-    .union([z.literal(5), z.literal(10)])
-    .optional()
-    .default(5),
 })
 
 /**
@@ -15006,17 +15209,17 @@ export const zPikaV22PikascenesOutput = z.object({
  * Request model for Pika 2.2 text-to-video generation
  */
 export const zPikaV22TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['1080p', '720p']).optional().default('720p'),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
-    .optional()
-    .default('16:9'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
   duration: z
     .union([z.literal(5), z.literal(10)])
     .optional()
     .default(5),
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
+    .optional()
+    .default('16:9'),
   negative_prompt: z.string().optional().default('ugly, bad, terrible'),
 })
 
@@ -15035,10 +15238,10 @@ export const zPikaV22TextToVideoOutput = z.object({
  * Request model for Pikadditions endpoint
  */
 export const zPikaV2PikadditionsInput = z.object({
+  image_url: z.string(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
   video_url: z.string(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -15055,10 +15258,10 @@ export const zPikaV2PikadditionsOutput = z.object({
  * ImageToVideoTurboInput
  */
 export const zPikaV2TurboImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
-  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  image_url: z.string(),
   duration: z.int().optional().default(5),
   negative_prompt: z.string().optional().default(''),
 })
@@ -15074,14 +15277,14 @@ export const zPikaV2TurboImageToVideoOutput = z.object({
  * TextToVideoTurboInput
  */
 export const zPikaV2TurboTextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string(),
+  duration: z.int().optional().default(5),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:5', '5:4', '3:2', '2:3'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
-  duration: z.int().optional().default(5),
   negative_prompt: z.string().optional().default(''),
 })
 
@@ -15096,15 +15299,15 @@ export const zPikaV2TurboTextToVideoOutput = z.object({
  * ImageToVideoRequestC1
  */
 export const zPixverseC1ImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
+  duration: z.int().gte(1).lte(15).optional().default(5),
   prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
   image_url: z.string(),
-  duration: z.int().gte(1).lte(15).optional().default(5),
+  generate_audio_switch: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15118,18 +15321,18 @@ export const zPixverseC1ImageToVideoOutput = z.object({
  * ReferenceToVideoRequestC1
  */
 export const zPixverseC1ReferenceToVideoInput = z.object({
-  image_references: z.array(zImageReference).min(1).max(7),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16', '2:3', '3:2', '21:9'])
     .optional()
     .default('16:9'),
+  duration: z.int().gte(1).lte(15).optional().default(5),
+  image_references: z.array(zImageReference).min(1).max(7),
   prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  duration: z.int().gte(1).lte(15).optional().default(5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   generate_audio_switch: z.boolean().optional().default(false),
 })
 
@@ -15144,7 +15347,7 @@ export const zPixverseC1ReferenceToVideoOutput = z.object({
  * TextToVideoRequestC1
  */
 export const zPixverseC1TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  duration: z.int().gte(1).lte(15).optional().default(5),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16', '2:3', '3:2', '21:9'])
     .optional()
@@ -15154,8 +15357,8 @@ export const zPixverseC1TextToVideoInput = z.object({
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   generate_audio_switch: z.boolean().optional().default(false),
-  duration: z.int().gte(1).lte(15).optional().default(5),
 })
 
 /**
@@ -15173,16 +15376,16 @@ export const zPixverseC1TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16', '2:3', '3:2', '21:9'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
   end_image_url: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
   duration: z.int().gte(1).lte(15).optional().default(5),
+  first_image_url: z.string(),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  first_image_url: z.string(),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -15196,22 +15399,22 @@ export const zPixverseC1TransitionOutput = z.object({
  * FastExtendRequest
  */
 export const zPixverseExtendFastInput = z.object({
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   model: z
     .enum(['v3.5', 'v4', 'v4.5', 'v5', 'v5.5', 'v5.6', 'v6'])
     .optional()
     .default('v4.5'),
-  negative_prompt: z.string().optional().default(''),
-  video_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
+  prompt: z.string(),
   resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -15225,26 +15428,26 @@ export const zPixverseExtendFastOutput = z.object({
  * ExtendRequest
  */
 export const zPixverseExtendInput = z.object({
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   model: z
     .enum(['v3.5', 'v4', 'v4.5', 'v5', 'v5.5', 'v5.6', 'v6'])
     .optional()
     .default('v4.5'),
-  negative_prompt: z.string().optional().default(''),
-  video_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
   duration: z.enum(['5', '8']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -15258,8 +15461,6 @@ export const zPixverseExtendOutput = z.object({
  * LipsyncRequest
  */
 export const zPixverseLipsyncInput = z.object({
-  video_url: z.string(),
-  text: z.union([z.string(), z.unknown()]).optional(),
   voice_id: z
     .enum([
       'Emily',
@@ -15280,6 +15481,8 @@ export const zPixverseLipsyncInput = z.object({
     ])
     .optional()
     .default('Auto'),
+  video_url: z.string(),
+  text: z.union([z.string(), z.unknown()]).optional(),
   audio_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -15294,9 +15497,9 @@ export const zPixverseLipsyncOutput = z.object({
  * SoundEffectRequest
  */
 export const zPixverseSoundEffectsInput = z.object({
-  video_url: z.string(),
   prompt: z.string().optional().default(''),
   original_sound_switch: z.boolean().optional().default(false),
+  video_url: z.string(),
 })
 
 /**
@@ -15310,13 +15513,13 @@ export const zPixverseSoundEffectsOutput = z.object({
  * SwapRequest
  */
 export const zPixverseSwapInput = z.object({
-  video_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
   resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
-  keyframe_id: z.int().gte(1).optional().default(1),
   original_sound_switch: z.boolean().optional().default(true),
+  video_url: z.string(),
   mode: z.enum(['person', 'object', 'background']).optional().default('person'),
+  image_url: z.string(),
+  keyframe_id: z.int().gte(1).optional().default(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15330,11 +15533,6 @@ export const zPixverseSwapOutput = z.object({
  * EffectInput
  */
 export const zPixverseV35EffectsInput = z.object({
-  image_url: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   effect: z.enum([
     'Kiss Me AI',
     'Kiss',
@@ -15428,6 +15626,37 @@ export const zPixverseV35EffectsInput = z.object({
     'Courtside Cam',
     'Pit Crew Moment',
     'K-Baseball Sprint',
+    'Toddler Doodle',
+    'Idol Ending',
+    'Apex Dance',
+    'OmniHero Forge',
+    'Palm Decode',
+    'The Age Ripple',
+    'My Future Is Limitless',
+    'Knee Slide',
+    'Epic Goal Save',
+    'Sideline Ball Boy',
+    'Cup Celebration',
+    'Victory Roar',
+    'Vuvuzela Fan',
+    'World Champion Lift',
+    'Tunnel to Captain',
+    'Liquid Soccer Morph',
+    'Jump Into Crowd 2',
+    'Golden Pitch Crasher',
+    'Stadium Fan Cam',
+    'Broadcast Moto GP',
+    'The Grotesque Clay',
+    'Rookie Star Card',
+    'The Final Hug',
+    'Sharp Post-Match Comment',
+    'Street Maverick',
+    'Pitch Legend',
+    'One Step At A Time',
+    'Birthday Mirror',
+    'Superstar Lobby',
+    'Final Battle Room',
+    'Top of the World',
     'Pixel World',
     'Mint in Box',
     'Hands up, Hand',
@@ -15436,8 +15665,13 @@ export const zPixverseV35EffectsInput = z.object({
     'Beam me up',
     'Suit Swagger',
   ]),
-  negative_prompt: z.string().optional().default(''),
   duration: z.enum(['5', '8']).optional().default('5'),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
 })
 
 /**
@@ -15451,17 +15685,17 @@ export const zPixverseV35EffectsOutput = z.object({
  * FastImageToVideoRequest
  */
 export const zPixverseV35ImageToVideoFastInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  image_url: z.string(),
   negative_prompt: z.string().optional().default(''),
-  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15475,21 +15709,21 @@ export const zPixverseV35ImageToVideoFastOutput = z.object({
  * ImageToVideoRequest
  */
 export const zPixverseV35ImageToVideoInput = z.object({
+  duration: z.enum(['5', '8']).optional().default('5'),
+  prompt: z.string(),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
-  image_url: z.string(),
   negative_prompt: z.string().optional().default(''),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15503,20 +15737,20 @@ export const zPixverseV35ImageToVideoOutput = z.object({
  * FastTextToVideoRequest
  */
 export const zPixverseV35TextToVideoFastInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
   prompt: z.string(),
+  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15530,16 +15764,12 @@ export const zPixverseV35TextToVideoFastOutput = z.object({
  * TextToVideoRequest
  */
 export const zPixverseV35TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
+  duration: z.enum(['5', '8']).optional().default('5'),
   prompt: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
@@ -15547,7 +15777,11 @@ export const zPixverseV35TextToVideoInput = z.object({
     ])
     .optional(),
   negative_prompt: z.string().optional().default(''),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
 })
 
 /**
@@ -15565,22 +15799,22 @@ export const zPixverseV35TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
+  end_image_url: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  end_image_url: z.string(),
-  negative_prompt: z.string().optional().default(''),
   seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z.enum(['5', '8']).optional().default('5'),
+  first_image_url: z.string(),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  first_image_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
@@ -15594,11 +15828,6 @@ export const zPixverseV35TransitionOutput = z.object({
  * EffectInput
  */
 export const zPixverseV45EffectsInput = z.object({
-  image_url: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   effect: z.enum([
     'Kiss Me AI',
     'Kiss',
@@ -15692,6 +15921,37 @@ export const zPixverseV45EffectsInput = z.object({
     'Courtside Cam',
     'Pit Crew Moment',
     'K-Baseball Sprint',
+    'Toddler Doodle',
+    'Idol Ending',
+    'Apex Dance',
+    'OmniHero Forge',
+    'Palm Decode',
+    'The Age Ripple',
+    'My Future Is Limitless',
+    'Knee Slide',
+    'Epic Goal Save',
+    'Sideline Ball Boy',
+    'Cup Celebration',
+    'Victory Roar',
+    'Vuvuzela Fan',
+    'World Champion Lift',
+    'Tunnel to Captain',
+    'Liquid Soccer Morph',
+    'Jump Into Crowd 2',
+    'Golden Pitch Crasher',
+    'Stadium Fan Cam',
+    'Broadcast Moto GP',
+    'The Grotesque Clay',
+    'Rookie Star Card',
+    'The Final Hug',
+    'Sharp Post-Match Comment',
+    'Street Maverick',
+    'Pitch Legend',
+    'One Step At A Time',
+    'Birthday Mirror',
+    'Superstar Lobby',
+    'Final Battle Room',
+    'Top of the World',
     'Pixel World',
     'Mint in Box',
     'Hands up, Hand',
@@ -15700,8 +15960,13 @@ export const zPixverseV45EffectsInput = z.object({
     'Beam me up',
     'Suit Swagger',
   ]),
-  negative_prompt: z.string().optional().default(''),
   duration: z.enum(['5', '8']).optional().default('5'),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
 })
 
 /**
@@ -15742,17 +16007,17 @@ export const zPixverseV45ImageToVideoFastInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  image_url: z.string(),
   negative_prompt: z.string().optional().default(''),
-  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15793,21 +16058,21 @@ export const zPixverseV45ImageToVideoInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
+  duration: z.enum(['5', '8']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
 })
 
 /**
@@ -15821,20 +16086,20 @@ export const zPixverseV45ImageToVideoOutput = z.object({
  * FastTextToVideoRequest
  */
 export const zPixverseV45TextToVideoFastInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
   prompt: z.string(),
+  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -15848,16 +16113,12 @@ export const zPixverseV45TextToVideoFastOutput = z.object({
  * TextToVideoRequest
  */
 export const zPixverseV45TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
+  duration: z.enum(['5', '8']).optional().default('5'),
   prompt: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
@@ -15865,7 +16126,11 @@ export const zPixverseV45TextToVideoInput = z.object({
     ])
     .optional(),
   negative_prompt: z.string().optional().default(''),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
 })
 
 /**
@@ -15883,22 +16148,22 @@ export const zPixverseV45TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
+  end_image_url: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  end_image_url: z.string(),
-  negative_prompt: z.string().optional().default(''),
   seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z.enum(['5', '8']).optional().default('5'),
+  first_image_url: z.string(),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  first_image_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
@@ -15912,11 +16177,6 @@ export const zPixverseV45TransitionOutput = z.object({
  * EffectInput
  */
 export const zPixverseV4EffectsInput = z.object({
-  image_url: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   effect: z.enum([
     'Kiss Me AI',
     'Kiss',
@@ -16010,6 +16270,37 @@ export const zPixverseV4EffectsInput = z.object({
     'Courtside Cam',
     'Pit Crew Moment',
     'K-Baseball Sprint',
+    'Toddler Doodle',
+    'Idol Ending',
+    'Apex Dance',
+    'OmniHero Forge',
+    'Palm Decode',
+    'The Age Ripple',
+    'My Future Is Limitless',
+    'Knee Slide',
+    'Epic Goal Save',
+    'Sideline Ball Boy',
+    'Cup Celebration',
+    'Victory Roar',
+    'Vuvuzela Fan',
+    'World Champion Lift',
+    'Tunnel to Captain',
+    'Liquid Soccer Morph',
+    'Jump Into Crowd 2',
+    'Golden Pitch Crasher',
+    'Stadium Fan Cam',
+    'Broadcast Moto GP',
+    'The Grotesque Clay',
+    'Rookie Star Card',
+    'The Final Hug',
+    'Sharp Post-Match Comment',
+    'Street Maverick',
+    'Pitch Legend',
+    'One Step At A Time',
+    'Birthday Mirror',
+    'Superstar Lobby',
+    'Final Battle Room',
+    'Top of the World',
     'Pixel World',
     'Mint in Box',
     'Hands up, Hand',
@@ -16018,8 +16309,13 @@ export const zPixverseV4EffectsInput = z.object({
     'Beam me up',
     'Suit Swagger',
   ]),
-  negative_prompt: z.string().optional().default(''),
   duration: z.enum(['5', '8']).optional().default('5'),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
 })
 
 /**
@@ -16060,17 +16356,17 @@ export const zPixverseV4ImageToVideoFastInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
+  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  image_url: z.string(),
   negative_prompt: z.string().optional().default(''),
-  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -16111,21 +16407,21 @@ export const zPixverseV4ImageToVideoInput = z.object({
       z.unknown(),
     ])
     .optional(),
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
+  duration: z.enum(['5', '8']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
 })
 
 /**
@@ -16139,20 +16435,20 @@ export const zPixverseV4ImageToVideoOutput = z.object({
  * FastTextToVideoRequest
  */
 export const zPixverseV4TextToVideoFastInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
   prompt: z.string(),
+  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  resolution: z.enum(['360p', '540p', '720p']).optional().default('720p'),
   negative_prompt: z.string().optional().default(''),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -16166,16 +16462,12 @@ export const zPixverseV4TextToVideoFastOutput = z.object({
  * TextToVideoRequest
  */
 export const zPixverseV4TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
+  duration: z.enum(['5', '8']).optional().default('5'),
   prompt: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
@@ -16183,7 +16475,11 @@ export const zPixverseV4TextToVideoInput = z.object({
     ])
     .optional(),
   negative_prompt: z.string().optional().default(''),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
 })
 
 /**
@@ -16197,14 +16493,6 @@ export const zPixverseV4TextToVideoOutput = z.object({
  * EffectInputV5_5
  */
 export const zPixverseV55EffectsInput = z.object({
-  duration: z.enum(['5', '8', '10']).optional().default('5'),
-  thinking_type: z
-    .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
-    .optional(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   effect: z.enum([
     'Kiss Me AI',
     'Kiss',
@@ -16298,6 +16586,37 @@ export const zPixverseV55EffectsInput = z.object({
     'Courtside Cam',
     'Pit Crew Moment',
     'K-Baseball Sprint',
+    'Toddler Doodle',
+    'Idol Ending',
+    'Apex Dance',
+    'OmniHero Forge',
+    'Palm Decode',
+    'The Age Ripple',
+    'My Future Is Limitless',
+    'Knee Slide',
+    'Epic Goal Save',
+    'Sideline Ball Boy',
+    'Cup Celebration',
+    'Victory Roar',
+    'Vuvuzela Fan',
+    'World Champion Lift',
+    'Tunnel to Captain',
+    'Liquid Soccer Morph',
+    'Jump Into Crowd 2',
+    'Golden Pitch Crasher',
+    'Stadium Fan Cam',
+    'Broadcast Moto GP',
+    'The Grotesque Clay',
+    'Rookie Star Card',
+    'The Final Hug',
+    'Sharp Post-Match Comment',
+    'Street Maverick',
+    'Pitch Legend',
+    'One Step At A Time',
+    'Birthday Mirror',
+    'Superstar Lobby',
+    'Final Battle Room',
+    'Top of the World',
     'Pixel World',
     'Mint in Box',
     'Hands up, Hand',
@@ -16306,6 +16625,14 @@ export const zPixverseV55EffectsInput = z.object({
     'Beam me up',
     'Suit Swagger',
   ]),
+  duration: z.enum(['5', '8', '10']).optional().default('5'),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
+  thinking_type: z
+    .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
+    .optional(),
   negative_prompt: z.string().optional().default(''),
   image_url: z.string(),
 })
@@ -16321,25 +16648,25 @@ export const zPixverseV55EffectsOutput = z.object({
  * ImageToVideoRequestV5_5
  */
 export const zPixverseV55ImageToVideoInput = z.object({
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
-  image_url: z.string(),
+  duration: z.enum(['5', '8', '10']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  duration: z.enum(['5', '8', '10']).optional().default('5'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
+  generate_audio_switch: z.boolean().optional().default(false),
   generate_multi_clip_switch: z.boolean().optional().default(false),
 })
 
@@ -16358,25 +16685,25 @@ export const zPixverseV55TextToVideoInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
   duration: z.enum(['5', '8', '10']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
+  negative_prompt: z.string().optional().default(''),
   generate_multi_clip_switch: z.boolean().optional().default(false),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16394,26 +16721,26 @@ export const zPixverseV55TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
+  end_image_url: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  end_image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
+  first_image_url: z.string(),
   duration: z.enum(['5', '8', '10']).optional().default('5'),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  first_image_url: z.string(),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16427,25 +16754,25 @@ export const zPixverseV55TransitionOutput = z.object({
  * ImageToVideoRequestV5_6
  */
 export const zPixverseV56ImageToVideoInput = z.object({
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
-  image_url: z.string(),
+  duration: z.enum(['5', '8', '10']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  duration: z.enum(['5', '8', '10']).optional().default('5'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16463,24 +16790,24 @@ export const zPixverseV56TextToVideoInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
   duration: z.enum(['5', '8', '10']).optional().default('5'),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16498,26 +16825,26 @@ export const zPixverseV56TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
+  end_image_url: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  end_image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
+  first_image_url: z.string(),
   duration: z.enum(['5', '8', '10']).optional().default('5'),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  first_image_url: z.string(),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16531,11 +16858,6 @@ export const zPixverseV56TransitionOutput = z.object({
  * EffectInput
  */
 export const zPixverseV5EffectsInput = z.object({
-  image_url: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   effect: z.enum([
     'Kiss Me AI',
     'Kiss',
@@ -16629,6 +16951,37 @@ export const zPixverseV5EffectsInput = z.object({
     'Courtside Cam',
     'Pit Crew Moment',
     'K-Baseball Sprint',
+    'Toddler Doodle',
+    'Idol Ending',
+    'Apex Dance',
+    'OmniHero Forge',
+    'Palm Decode',
+    'The Age Ripple',
+    'My Future Is Limitless',
+    'Knee Slide',
+    'Epic Goal Save',
+    'Sideline Ball Boy',
+    'Cup Celebration',
+    'Victory Roar',
+    'Vuvuzela Fan',
+    'World Champion Lift',
+    'Tunnel to Captain',
+    'Liquid Soccer Morph',
+    'Jump Into Crowd 2',
+    'Golden Pitch Crasher',
+    'Stadium Fan Cam',
+    'Broadcast Moto GP',
+    'The Grotesque Clay',
+    'Rookie Star Card',
+    'The Final Hug',
+    'Sharp Post-Match Comment',
+    'Street Maverick',
+    'Pitch Legend',
+    'One Step At A Time',
+    'Birthday Mirror',
+    'Superstar Lobby',
+    'Final Battle Room',
+    'Top of the World',
     'Pixel World',
     'Mint in Box',
     'Hands up, Hand',
@@ -16637,8 +16990,13 @@ export const zPixverseV5EffectsInput = z.object({
     'Beam me up',
     'Suit Swagger',
   ]),
-  negative_prompt: z.string().optional().default(''),
   duration: z.enum(['5', '8']).optional().default('5'),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
 })
 
 /**
@@ -16652,21 +17010,21 @@ export const zPixverseV5EffectsOutput = z.object({
  * ImageToVideoRequestV5
  */
 export const zPixverseV5ImageToVideoInput = z.object({
+  duration: z.enum(['5', '8']).optional().default('5'),
+  prompt: z.string(),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
-  image_url: z.string(),
   negative_prompt: z.string().optional().default(''),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -16680,16 +17038,12 @@ export const zPixverseV5ImageToVideoOutput = z.object({
  * TextToVideoRequest
  */
 export const zPixverseV5TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
+  duration: z.enum(['5', '8']).optional().default('5'),
   prompt: z.string(),
-  resolution: z
-    .enum(['360p', '540p', '720p', '1080p'])
-    .optional()
-    .default('720p'),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
@@ -16697,7 +17051,11 @@ export const zPixverseV5TextToVideoInput = z.object({
     ])
     .optional(),
   negative_prompt: z.string().optional().default(''),
-  duration: z.enum(['5', '8']).optional().default('5'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z
+    .enum(['360p', '540p', '720p', '1080p'])
+    .optional()
+    .default('720p'),
 })
 
 /**
@@ -16715,22 +17073,22 @@ export const zPixverseV5TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
+  end_image_url: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  end_image_url: z.string(),
-  negative_prompt: z.string().optional().default(''),
   seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z.enum(['5', '8']).optional().default('5'),
+  first_image_url: z.string(),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  first_image_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
 })
 
 /**
@@ -16744,22 +17102,22 @@ export const zPixverseV5TransitionOutput = z.object({
  * ExtendRequestV6
  */
 export const zPixverseV6ExtendInput = z.object({
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
   video_url: z.string(),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
   duration: z.int().gte(1).lte(15).optional().default(5),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
+  negative_prompt: z.string().optional().default(''),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16773,25 +17131,25 @@ export const zPixverseV6ExtendOutput = z.object({
  * ImageToVideoRequestV6
  */
 export const zPixverseV6ImageToVideoInput = z.object({
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
-  image_url: z.string(),
+  duration: z.int().gte(1).lte(15).optional().default(5),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  duration: z.int().gte(1).lte(15).optional().default(5),
+  negative_prompt: z.string().optional().default(''),
+  image_url: z.string(),
+  generate_audio_switch: z.boolean().optional().default(false),
   generate_multi_clip_switch: z.boolean().optional().default(false),
 })
 
@@ -16810,25 +17168,25 @@ export const zPixverseV6TextToVideoInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16', '2:3', '3:2', '21:9'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
   duration: z.int().gte(1).lte(15).optional().default(5),
+  prompt: z.string(),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
+  negative_prompt: z.string().optional().default(''),
   generate_multi_clip_switch: z.boolean().optional().default(false),
+  generate_audio_switch: z.boolean().optional().default(false),
 })
 
 /**
@@ -16846,27 +17204,27 @@ export const zPixverseV6TransitionInput = z.object({
     .enum(['16:9', '4:3', '1:1', '3:4', '9:16', '2:3', '3:2', '21:9'])
     .optional()
     .default('16:9'),
-  prompt: z.string(),
+  end_image_url: z.string(),
   style: z
     .union([
       z.enum(['anime', '3d_animation', 'clay', 'comic', 'cyberpunk']),
       z.unknown(),
     ])
     .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   thinking_type: z
     .union([z.enum(['enabled', 'disabled', 'auto']), z.unknown()])
     .optional(),
-  negative_prompt: z.string().optional().default(''),
-  end_image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  generate_audio_switch: z.boolean().optional().default(false),
+  first_image_url: z.string(),
   duration: z.int().gte(1).lte(15).optional().default(5),
+  prompt: z.string(),
+  negative_prompt: z.string().optional().default(''),
+  generate_multi_clip_switch: z.boolean().optional().default(false),
+  generate_audio_switch: z.boolean().optional().default(false),
   resolution: z
     .enum(['360p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  generate_multi_clip_switch: z.boolean().optional().default(false),
-  first_image_url: z.string(),
 })
 
 /**
@@ -16880,25 +17238,25 @@ export const zPixverseV6TransitionOutput = z.object({
  * PointPrompt
  */
 export const zPointPrompt = z.object({
-  x: z.union([z.int(), z.unknown()]).optional(),
   y: z.union([z.int(), z.unknown()]).optional(),
+  x: z.union([z.int(), z.unknown()]).optional(),
   frame_index: z.union([z.int(), z.unknown()]).optional(),
-  object_id: z.union([z.int(), z.unknown()]).optional(),
   label: z
     .union([z.union([z.literal(0), z.literal(1)]), z.unknown()])
     .optional(),
+  object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * PointPromptBase
  */
 export const zPointPromptBase = z.object({
-  x: z.union([z.int(), z.unknown()]).optional(),
   y: z.union([z.int(), z.unknown()]).optional(),
-  object_id: z.union([z.int(), z.unknown()]).optional(),
+  x: z.union([z.int(), z.unknown()]).optional(),
   label: z
     .union([z.union([z.literal(0), z.literal(1)]), z.unknown()])
     .optional(),
+  object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -16933,13 +17291,13 @@ export const zQueueStatus = z.object({
  * Used with relight_condition_type 'ic' (intrinsic conditioning).
  */
 export const zRelightParameters = z.object({
-  relight_prompt: z.string(),
+  use_sky_mask: z.boolean().optional().default(false),
   cfg: z.number().gte(1).lte(10).optional().default(2),
+  relight_prompt: z.string(),
   bg_source: z
     .enum(['Left', 'Right', 'Top', 'Bottom'])
     .optional()
     .default('Left'),
-  use_sky_mask: z.boolean().optional().default(false),
 })
 
 /**
@@ -16948,12 +17306,12 @@ export const zRelightParameters = z.object({
  * Relighting-only request (minimal schema).
  */
 export const zLightxRelightInput = z.object({
-  video_url: z.string(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
+  ref_id: z.int().gte(0).lte(48).optional().default(0),
   seed: z.union([z.int(), z.unknown()]).optional(),
   relight_parameters: z.union([zRelightParameters, z.unknown()]).optional(),
+  prompt: z.union([z.string(), z.unknown()]).optional(),
   relit_cond_type: z.enum(['ic', 'ref', 'hdr', 'bg']).optional().default('ic'),
-  ref_id: z.int().gte(0).lte(48).optional().default(0),
+  video_url: z.string(),
   relit_cond_img_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -16961,12 +17319,12 @@ export const zLightxRelightInput = z.object({
  * RIFEVideoInput
  */
 export const zRifeVideoInput = z.object({
-  use_calculated_fps: z.boolean().optional().default(true),
-  fps: z.int().gte(1).lte(60).optional().default(8),
   loop: z.boolean().optional().default(false),
-  use_scene_detection: z.boolean().optional().default(false),
+  fps: z.int().gte(1).lte(60).optional().default(8),
   num_frames: z.int().gte(1).lte(4).optional().default(1),
+  use_scene_detection: z.boolean().optional().default(false),
   video_url: z.string(),
+  use_calculated_fps: z.boolean().optional().default(true),
 })
 
 /**
@@ -16980,17 +17338,17 @@ export const zRifeVideoOutput = z.object({
  * SadTalkerInput
  */
 export const zSadtalkerInput = z.object({
-  face_model_resolution: z.enum(['256', '512']).optional().default('256'),
   preprocess: z
     .enum(['crop', 'extcrop', 'resize', 'full', 'extfull'])
     .optional()
     .default('crop'),
-  driven_audio_url: z.string(),
   expression_scale: z.number().gte(0).lte(3).optional().default(1),
-  source_image_url: z.string(),
+  face_enhancer: z.union([z.string(), z.unknown()]).optional(),
+  face_model_resolution: z.enum(['256', '512']).optional().default('256'),
+  driven_audio_url: z.string(),
   pose_style: z.int().gte(0).lte(45).optional().default(0),
   still_mode: z.boolean().optional().default(false),
-  face_enhancer: z.union([z.string(), z.unknown()]).optional(),
+  source_image_url: z.string(),
 })
 
 /**
@@ -17004,18 +17362,18 @@ export const zSadtalkerOutput = z.object({
  * SadTalkerRefVideoInput
  */
 export const zSadtalkerReferenceInput = z.object({
-  face_model_resolution: z.enum(['256', '512']).optional().default('256'),
   preprocess: z
     .enum(['crop', 'extcrop', 'resize', 'full', 'extfull'])
     .optional()
     .default('crop'),
-  driven_audio_url: z.string(),
   expression_scale: z.number().gte(0).lte(3).optional().default(1),
-  source_image_url: z.string(),
+  face_enhancer: z.union([z.string(), z.unknown()]).optional(),
+  face_model_resolution: z.enum(['256', '512']).optional().default('256'),
+  driven_audio_url: z.string(),
   pose_style: z.int().gte(0).lte(45).optional().default(0),
   still_mode: z.boolean().optional().default(false),
+  source_image_url: z.string(),
   reference_pose_video_url: z.string(),
-  face_enhancer: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -17029,20 +17387,20 @@ export const zSadtalkerReferenceOutput = z.object({
  * SAM2VideoRLEInput
  */
 export const zSam2VideoInput = z.object({
+  mask_url: z.union([z.string(), z.unknown()]).optional(),
+  video_url: z.string(),
   boundingbox_zip: z.boolean().optional().default(false),
   box_prompts: z.array(zBoxPromptType2).optional().default([]),
   prompts: z.array(zPointPromptType2).optional().default([]),
-  mask_url: z.union([z.string(), z.unknown()]).optional(),
   apply_mask: z.boolean().optional().default(false),
-  video_url: z.string(),
 })
 
 /**
  * SAM2VideoOutput
  */
 export const zSam2VideoOutput = z.object({
-  boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zFile,
+  boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
@@ -17050,12 +17408,12 @@ export const zSam2VideoOutput = z.object({
  */
 export const zSam31VideoInput = z.object({
   video_url: z.string(),
-  prompt: z.string().optional().default(''),
+  box_prompts: z.array(zBoxPromptBase).optional().default([]),
   detection_threshold: z.number().gte(0.1).lte(1).optional().default(0.5),
-  apply_mask: z.boolean().optional().default(true),
   max_num_objects: z.int().gte(1).lte(128).optional().default(16),
   point_prompts: z.array(zPointPromptBase).optional().default([]),
-  box_prompts: z.array(zBoxPromptBase).optional().default([]),
+  apply_mask: z.boolean().optional().default(true),
+  prompt: z.string().optional().default(''),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)'])
     .optional()
@@ -17066,8 +17424,8 @@ export const zSam31VideoInput = z.object({
  * SAM31VideoOutput
  */
 export const zSam31VideoOutput = z.object({
-  video: zFile,
   boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
@@ -17075,71 +17433,71 @@ export const zSam31VideoOutput = z.object({
  */
 export const zSam31VideoRleInput = z.object({
   video_url: z.string(),
-  prompt: z.string().optional().default(''),
-  mask_url: z.union([z.string(), z.unknown()]).optional(),
+  box_prompts: z.array(zBoxPrompt).optional().default([]),
   detection_threshold: z.number().gte(0.01).lte(1).optional().default(0.5),
-  apply_mask: z.boolean().optional().default(false),
+  mask_url: z.union([z.string(), z.unknown()]).optional(),
   boundingbox_zip: z.boolean().optional().default(false),
-  frame_index: z.int().optional().default(0),
   max_num_objects: z.int().gte(1).lte(128).optional().default(16),
   point_prompts: z.array(zPointPrompt).optional().default([]),
-  box_prompts: z.array(zBoxPrompt).optional().default([]),
+  apply_mask: z.boolean().optional().default(false),
+  prompt: z.string().optional().default(''),
+  frame_index: z.int().optional().default(0),
 })
 
 /**
  * SAM31VideoOutput
  */
 export const zSam31VideoRleOutput = z.object({
-  video: zFile,
   boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
  * SAM3VideoInput
  */
 export const zSam3VideoInput = z.object({
-  box_prompts: z.array(zBoxPromptBase).optional().default([]),
-  video_url: z.string(),
-  detection_threshold: z.number().gte(0.1).lte(1).optional().default(0.5),
   video_output_type: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)'])
     .optional()
     .default('X264 (.mp4)'),
-  point_prompts: z.array(zPointPromptBase).optional().default([]),
   apply_mask: z.boolean().optional().default(true),
-  prompt: z.string().optional().default(''),
+  detection_threshold: z.number().gte(0.1).lte(1).optional().default(0.5),
   text_prompt: z.union([z.string(), z.unknown()]).optional(),
+  video_url: z.string(),
+  point_prompts: z.array(zPointPromptBase).optional().default([]),
+  box_prompts: z.array(zBoxPromptBase).optional().default([]),
+  prompt: z.string().optional().default(''),
 })
 
 /**
  * SAM3VideoOutput
  */
 export const zSam3VideoOutput = z.object({
-  video: zFile,
   boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
  * SAM3VideoRLEInput
  */
 export const zSam3VideoRleInput = z.object({
-  box_prompts: z.array(zBoxPrompt).optional().default([]),
+  apply_mask: z.boolean().optional().default(false),
   boundingbox_zip: z.boolean().optional().default(false),
   mask_url: z.union([z.string(), z.unknown()]).optional(),
-  video_url: z.string(),
   detection_threshold: z.number().gte(0.01).lte(1).optional().default(0.5),
-  point_prompts: z.array(zPointPrompt).optional().default([]),
-  apply_mask: z.boolean().optional().default(false),
   prompt: z.string().optional().default(''),
+  point_prompts: z.array(zPointPrompt).optional().default([]),
   frame_index: z.int().optional().default(0),
+  box_prompts: z.array(zBoxPrompt).optional().default([]),
+  video_url: z.string(),
 })
 
 /**
  * SAM3VideoOutput
  */
 export const zSam3VideoRleOutput = z.object({
-  video: zFile,
   boundingbox_frames_zip: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
@@ -17147,14 +17505,10 @@ export const zSam3VideoRleOutput = z.object({
  */
 export const zSeedance20FastImageToVideoInput = z.object({
   generate_audio: z.boolean().optional().default(true),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  aspect_ratio: z
-    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
-    .optional()
-    .default('auto'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
   end_user_id: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .enum([
@@ -17174,15 +17528,19 @@ export const zSeedance20FastImageToVideoInput = z.object({
     ])
     .optional()
     .default('auto'),
-  prompt: z.string(),
+  image_url: z.string(),
+  aspect_ratio: z
+    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
+    .optional()
+    .default('auto'),
 })
 
 /**
  * Seedance2VideoOutput
  */
 export const zSeedance20FastImageToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -17190,6 +17548,13 @@ export const zSeedance20FastImageToVideoOutput = z.object({
  */
 export const zSeedance20FastReferenceToVideoInput = z.object({
   generate_audio: z.boolean().optional().default(true),
+  end_user_id: z.union([z.string(), z.unknown()]).optional(),
+  video_urls: z.array(z.string()).optional(),
+  image_urls: z.array(z.string()).optional(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  prompt: z.string(),
+  audio_urls: z.array(z.string()).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .enum([
       'auto',
@@ -17212,28 +17577,27 @@ export const zSeedance20FastReferenceToVideoInput = z.object({
     .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('auto'),
-  video_urls: z.array(z.string()).optional(),
-  end_user_id: z.union([z.string(), z.unknown()]).optional(),
-  image_urls: z.array(z.string()).optional(),
-  audio_urls: z.array(z.string()).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  prompt: z.string(),
 })
 
 /**
  * Seedance2VideoOutput
  */
 export const zSeedance20FastReferenceToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * Seedance2T2VFastInput
  */
 export const zSeedance20FastTextToVideoInput = z.object({
+  generate_audio: z.boolean().optional().default(true),
   end_user_id: z.union([z.string(), z.unknown()]).optional(),
+  aspect_ratio: z
+    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
+    .optional()
+    .default('auto'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .enum([
       'auto',
@@ -17252,22 +17616,16 @@ export const zSeedance20FastTextToVideoInput = z.object({
     ])
     .optional()
     .default('auto'),
-  aspect_ratio: z
-    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
-    .optional()
-    .default('auto'),
-  generate_audio: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   prompt: z.string(),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
 })
 
 /**
  * Seedance2VideoOutput
  */
 export const zSeedance20FastTextToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -17275,14 +17633,10 @@ export const zSeedance20FastTextToVideoOutput = z.object({
  */
 export const zSeedance20ImageToVideoInput = z.object({
   generate_audio: z.boolean().optional().default(true),
-  resolution: z.enum(['480p', '720p', '1080p']).optional().default('720p'),
-  aspect_ratio: z
-    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
-    .optional()
-    .default('auto'),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
   end_user_id: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string(),
+  resolution: z.enum(['480p', '720p', '1080p']).optional().default('720p'),
   seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .enum([
@@ -17302,15 +17656,19 @@ export const zSeedance20ImageToVideoInput = z.object({
     ])
     .optional()
     .default('auto'),
-  prompt: z.string(),
+  image_url: z.string(),
+  aspect_ratio: z
+    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
+    .optional()
+    .default('auto'),
 })
 
 /**
  * Seedance2VideoOutput
  */
 export const zSeedance20ImageToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
@@ -17318,6 +17676,13 @@ export const zSeedance20ImageToVideoOutput = z.object({
  */
 export const zSeedance20ReferenceToVideoInput = z.object({
   generate_audio: z.boolean().optional().default(true),
+  end_user_id: z.union([z.string(), z.unknown()]).optional(),
+  video_urls: z.array(z.string()).optional(),
+  image_urls: z.array(z.string()).optional(),
+  resolution: z.enum(['480p', '720p', '1080p']).optional().default('720p'),
+  prompt: z.string(),
+  audio_urls: z.array(z.string()).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .enum([
       'auto',
@@ -17340,28 +17705,27 @@ export const zSeedance20ReferenceToVideoInput = z.object({
     .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
     .optional()
     .default('auto'),
-  video_urls: z.array(z.string()).optional(),
-  end_user_id: z.union([z.string(), z.unknown()]).optional(),
-  image_urls: z.array(z.string()).optional(),
-  audio_urls: z.array(z.string()).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p', '1080p']).optional().default('720p'),
-  prompt: z.string(),
 })
 
 /**
  * Seedance2VideoOutput
  */
 export const zSeedance20ReferenceToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * Seedance2T2VInput
  */
 export const zSeedance20TextToVideoInput = z.object({
+  generate_audio: z.boolean().optional().default(true),
   end_user_id: z.union([z.string(), z.unknown()]).optional(),
+  aspect_ratio: z
+    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
+    .optional()
+    .default('auto'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z
     .enum([
       'auto',
@@ -17380,50 +17744,44 @@ export const zSeedance20TextToVideoInput = z.object({
     ])
     .optional()
     .default('auto'),
-  aspect_ratio: z
-    .enum(['auto', '21:9', '16:9', '4:3', '1:1', '3:4', '9:16'])
-    .optional()
-    .default('auto'),
-  generate_audio: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p', '1080p']).optional().default('720p'),
   prompt: z.string(),
+  resolution: z.enum(['480p', '720p', '1080p']).optional().default('720p'),
 })
 
 /**
  * Seedance2VideoOutput
  */
 export const zSeedance20TextToVideoOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * SeedVRVideoInput
  */
 export const zSeedvrUpscaleVideoInput = z.object({
+  upscale_mode: z.enum(['target', 'factor']).optional().default('factor'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  upscale_factor: z.number().gte(1).lte(10).optional().default(2),
+  noise_scale: z.number().gte(0).lte(1).optional().default(0.1),
   output_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  video_url: z.string(),
   target_resolution: z
     .enum(['720p', '1080p', '1440p', '2160p'])
     .optional()
     .default('1080p'),
+  video_url: z.string(),
+  sync_mode: z.boolean().optional().default(false),
   output_format: z
     .enum(['X264 (.mp4)', 'VP9 (.webm)', 'PRORES4444 (.mov)', 'GIF (.gif)'])
     .optional()
     .default('X264 (.mp4)'),
-  upscale_factor: z.number().gte(1).lte(10).optional().default(2),
   output_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  upscale_mode: z.enum(['target', 'factor']).optional().default('factor'),
-  sync_mode: z.boolean().optional().default(false),
-  noise_scale: z.number().gte(0).lte(1).optional().default(0.1),
-  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -17484,8 +17842,8 @@ export const zSora2CharactersInput = z.object({
  * Character creation response with API character ID.
  */
 export const zSora2CharactersOutput = z.object({
-  id: z.string(),
   name: z.string(),
+  id: z.string(),
 })
 
 /**
@@ -17493,11 +17851,12 @@ export const zSora2CharactersOutput = z.object({
  */
 export const zSora2ImageToVideoInput = z.object({
   prompt: z.string().min(1).max(5000),
-  delete_video: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['auto', '9:16', '16:9']).optional().default('auto'),
   model: z
     .enum(['sora-2', 'sora-2-2025-12-08', 'sora-2-2025-10-06'])
     .optional()
     .default('sora-2'),
+  image_url: z.string(),
   duration: z
     .union([
       z.literal(4),
@@ -17508,11 +17867,10 @@ export const zSora2ImageToVideoInput = z.object({
     ])
     .optional()
     .default(4),
+  delete_video: z.boolean().optional().default(true),
+  character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
   detect_and_block_ip: z.boolean().optional().default(false),
   resolution: z.enum(['auto', '720p']).optional().default('auto'),
-  image_url: z.string(),
-  character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['auto', '9:16', '16:9']).optional().default('auto'),
 })
 
 /**
@@ -17520,7 +17878,8 @@ export const zSora2ImageToVideoInput = z.object({
  */
 export const zSora2ImageToVideoProInput = z.object({
   prompt: z.string().min(1).max(5000),
-  delete_video: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['auto', '9:16', '16:9']).optional().default('auto'),
+  image_url: z.string(),
   duration: z
     .union([
       z.literal(4),
@@ -17531,14 +17890,13 @@ export const zSora2ImageToVideoProInput = z.object({
     ])
     .optional()
     .default(4),
+  delete_video: z.boolean().optional().default(true),
+  character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
   detect_and_block_ip: z.boolean().optional().default(false),
   resolution: z
     .enum(['auto', '720p', '1080p', 'true_1080p'])
     .optional()
     .default('auto'),
-  image_url: z.string(),
-  character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['auto', '9:16', '16:9']).optional().default('auto'),
 })
 
 /**
@@ -17546,7 +17904,7 @@ export const zSora2ImageToVideoProInput = z.object({
  */
 export const zSora2TextToVideoInput = z.object({
   prompt: z.string().min(1).max(5000),
-  delete_video: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
   model: z
     .enum(['sora-2', 'sora-2-2025-12-08', 'sora-2-2025-10-06'])
     .optional()
@@ -17561,10 +17919,10 @@ export const zSora2TextToVideoInput = z.object({
     ])
     .optional()
     .default(4),
+  delete_video: z.boolean().optional().default(true),
+  character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
   detect_and_block_ip: z.boolean().optional().default(false),
   resolution: z.string().optional().default('720p'),
-  character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
 })
 
 /**
@@ -17581,23 +17939,23 @@ export const zSora2TextToVideoProInput = z.object({
     ])
     .optional()
     .default(4),
-  prompt: z.string().min(1).max(5000),
+  detect_and_block_ip: z.boolean().optional().default(false),
   delete_video: z.boolean().optional().default(true),
   character_ids: z.union([z.array(z.string()).max(2), z.unknown()]).optional(),
   aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
+  prompt: z.string().min(1).max(5000),
   resolution: z
     .enum(['720p', '1080p', 'true_1080p'])
     .optional()
     .default('1080p'),
-  detect_and_block_ip: z.boolean().optional().default(false),
 })
 
 /**
  * RemixInput
  */
 export const zSora2VideoToVideoRemixInput = z.object({
-  prompt: z.string().min(1).max(5000),
   delete_video: z.boolean().optional().default(true),
+  prompt: z.string().min(1).max(5000),
   video_id: z.string(),
 })
 
@@ -17628,18 +17986,63 @@ export const zSubtitlesOutput = z.object({
 })
 
 /**
+ * Sync3ActiveSpeakerDetection
+ */
+export const zSync3ActiveSpeakerDetection = z.object({
+  face_image: z.union([z.string(), z.unknown()]).optional(),
+  v3: z.union([z.boolean(), z.unknown()]).optional(),
+  frame_number: z.union([z.int().gte(0), z.unknown()]).optional(),
+  coordinates: z.union([z.tuple([z.int(), z.int()]), z.unknown()]).optional(),
+  use_v2: z.union([z.boolean(), z.unknown()]).optional(),
+  bounding_boxes: z
+    .union([z.array(z.union([z.array(z.int()), z.unknown()])), z.unknown()])
+    .optional(),
+  auto_detect: z.union([z.boolean(), z.unknown()]).optional(),
+  bounding_boxes_url: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * Sync3GenerationOptions
+ */
+export const zSync3GenerationOptions = z.object({
+  occlusion_detection_enabled: z.union([z.boolean(), z.unknown()]).optional(),
+  prompt: z
+    .union([
+      z.enum(['happy', 'sad', 'angry', 'disgusted', 'surprised', 'neutral']),
+      z.unknown(),
+    ])
+    .optional(),
+  sync_mode: z
+    .union([
+      z.enum(['cut_off', 'loop', 'bounce', 'silence', 'remap']),
+      z.unknown(),
+    ])
+    .optional(),
+  active_speaker_detection: z
+    .union([zSync3ActiveSpeakerDetection, z.unknown()])
+    .optional(),
+  model_mode: z
+    .union([
+      z.enum(['lips', 'face', 'head', 'lipsync', 'emotion', 'talking_head']),
+      z.unknown(),
+    ])
+    .optional(),
+  temperature: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+})
+
+/**
  * LipSyncInput
  */
 export const zSyncLipsyncInput = z.object({
-  sync_mode: z
-    .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
-    .optional()
-    .default('cut_off'),
+  video_url: z.string(),
   model: z
     .enum(['lipsync-1.8.0', 'lipsync-1.7.1', 'lipsync-1.9.0-beta'])
     .optional()
     .default('lipsync-1.9.0-beta'),
-  video_url: z.string(),
+  sync_mode: z
+    .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
+    .optional()
+    .default('cut_off'),
   audio_url: z.string(),
 })
 
@@ -17654,34 +18057,34 @@ export const zSyncLipsyncOutput = z.object({
  * React1Input
  */
 export const zSyncLipsyncReact1Input = z.object({
-  model_mode: z.enum(['lips', 'face', 'head']).optional().default('face'),
-  temperature: z.number().gte(0).lte(1).optional().default(0.5),
   lipsync_mode: z
     .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
     .optional()
     .default('bounce'),
-  video_url: z.string(),
-  audio_url: z.string(),
   emotion: z.enum([
     'happy',
-    'angry',
     'sad',
-    'neutral',
+    'angry',
     'disgusted',
     'surprised',
+    'neutral',
   ]),
+  audio_url: z.string(),
+  video_url: z.string(),
+  model_mode: z.enum(['lips', 'face', 'head']).optional().default('face'),
+  temperature: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
  * LipSyncV2Input
  */
 export const zSyncLipsyncV2Input = z.object({
+  video_url: z.string(),
+  model: z.enum(['lipsync-2', 'lipsync-2-pro']).optional().default('lipsync-2'),
   sync_mode: z
     .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
     .optional()
     .default('cut_off'),
-  model: z.enum(['lipsync-2', 'lipsync-2-pro']).optional().default('lipsync-2'),
-  video_url: z.string(),
   audio_url: z.string(),
 })
 
@@ -17696,12 +18099,12 @@ export const zSyncLipsyncV2Output = z.object({
  * LipSyncV2ProInput
  */
 export const zSyncLipsyncV2ProInput = z.object({
+  video_url: z.string(),
+  audio_url: z.string(),
   sync_mode: z
     .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
     .optional()
     .default('cut_off'),
-  video_url: z.string(),
-  audio_url: z.string(),
 })
 
 /**
@@ -17715,12 +18118,13 @@ export const zSyncLipsyncV2ProOutput = z.object({
  * Sync3Input
  */
 export const zSyncLipsyncV3Input = z.object({
+  video_url: z.string(),
+  audio_url: z.string(),
   sync_mode: z
     .enum(['cut_off', 'loop', 'bounce', 'silence', 'remap'])
     .optional()
     .default('cut_off'),
-  video_url: z.string(),
-  audio_url: z.string(),
+  options: z.union([zSync3GenerationOptions, z.unknown()]).optional(),
 })
 
 /**
@@ -17734,12 +18138,12 @@ export const zSyncLipsyncV3Output = z.object({
  * Input
  */
 export const zT2vTurboInput = z.object({
-  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
   guidance_scale: z.number().gte(0.1).lte(30).optional().default(7.5),
-  seed: z.union([z.int().gte(0).lte(203279), z.unknown()]).optional(),
-  prompt: z.string(),
   export_fps: z.int().gte(1).lte(24).optional().default(8),
   num_frames: z.int().gte(16).lte(32).optional().default(16),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(1).lte(12).optional().default(4),
+  seed: z.union([z.int().gte(0).lte(203279), z.unknown()]).optional(),
 })
 
 /**
@@ -17780,231 +18184,20 @@ export const zTextCustomizations = z.object({
  * without flagging required-field asterisks the user didn't ask for.
  */
 export const zPresetCustomization = z.object({
-  shadow: z
-    .union([z.enum(['none', 'min', 'mid', 'max']), z.unknown()])
-    .optional(),
-  text_customizations: z.union([zTextCustomizations, z.unknown()]).optional(),
   position: z
     .union([z.enum(['top', 'center', 'bottom']), z.unknown()])
     .optional(),
-})
-
-/**
- * SubtitlesInput
- */
-export const zSubtitlesInput = z.object({
-  preset: z.enum([
-    'glass',
-    'whisper',
-    'glide2',
-    'fusion',
-    'glide',
-    'terminal',
-    'handwritten',
-    'simple',
-    'plain',
-    'beans',
-    'corpo',
-    'boo',
-    'shadeplay',
-    'casper',
-    'capri',
-    'lowkey',
-    'vinta',
-    'diego',
-    'ali',
-    'slay',
-    'kitty',
-    'hustle',
-    'karl',
-    'sprout',
-    'flex',
-    'mint',
-    'rizz',
-    'vegas',
-  ]),
-  video_url: z.url().min(1).max(2083),
-  language: z
-    .union([
-      z.enum([
-        'af-ZA',
-        'am-ET',
-        'ar-AE',
-        'ar-BH',
-        'ar-DZ',
-        'ar-EG',
-        'ar-IL',
-        'ar-IQ',
-        'ar-JO',
-        'ar-KW',
-        'ar-LB',
-        'ar-MA',
-        'ar-OM',
-        'ar-PS',
-        'ar-QA',
-        'ar-SA',
-        'ar-TN',
-        'ast-ES',
-        'az-AZ',
-        'ba',
-        'bas',
-        'be-BY',
-        'bg-BG',
-        'br',
-        'bs-BA',
-        'ca-ES',
-        'ceb-PH',
-        'ckb-IQ',
-        'cs-CZ',
-        'cy-GB',
-        'da-DK',
-        'de-DE',
-        'dyu',
-        'el-GR',
-        'en-AU',
-        'en-GB',
-        'en-IN',
-        'en-NZ',
-        'en-US',
-        'eo',
-        'es-AR',
-        'es-BO',
-        'es-CL',
-        'es-CO',
-        'es-CR',
-        'es-DO',
-        'es-EC',
-        'es-ES',
-        'es-GT',
-        'es-HN',
-        'es-MX',
-        'es-NI',
-        'es-PA',
-        'es-PE',
-        'es-PR',
-        'es-PY',
-        'es-SV',
-        'es-US',
-        'es-UY',
-        'es-VE',
-        'et-EE',
-        'eu-ES',
-        'fa-IR',
-        'ff',
-        'fi-FI',
-        'fil-PH',
-        'fo',
-        'fr-CA',
-        'fr-FR',
-        'fy',
-        'ga',
-        'gd',
-        'gl-ES',
-        'ha-NG',
-        'haw',
-        'he-IL',
-        'hr-HR',
-        'hsb',
-        'ht',
-        'hu-HU',
-        'hy-AM',
-        'id-ID',
-        'ig',
-        'is-IS',
-        'it-IT',
-        'ja-JP',
-        'ja-Latn-JP',
-        'jv-ID',
-        'ka-GE',
-        'kab',
-        'kam-KE',
-        'kea-CV',
-        'kk-KZ',
-        'ko-KR',
-        'ku',
-        'ky-KG',
-        'la',
-        'lb-LU',
-        'lg',
-        'lij',
-        'ln-CD',
-        'lo-LA',
-        'lt-LT',
-        'luo-KE',
-        'lv-LV',
-        'mg',
-        'mi-NZ',
-        'mk-MK',
-        'mn-MN',
-        'ms-MY',
-        'mt-MT',
-        'nb-NO',
-        'nl-NL',
-        'nn',
-        'nso-ZA',
-        'ny-MW',
-        'oc-FR',
-        'pl-PL',
-        'ps-AF',
-        'pt-BR',
-        'pt-PT',
-        'ro-RO',
-        'roh',
-        'ru-RU',
-        'rw-RW',
-        'sah',
-        'sk-SK',
-        'sl-SI',
-        'sm',
-        'sn-ZW',
-        'so-SO',
-        'sq-AL',
-        'sr-Latn-RS',
-        'sr-RS',
-        'srd',
-        'ss',
-        'su-ID',
-        'sv-SE',
-        'sw-KE',
-        'sw-TZ',
-        'tg-TJ',
-        'th-TH',
-        'tk',
-        'tn',
-        'tok',
-        'ton',
-        'tr-TR',
-        'ts-ZA',
-        'tt',
-        'uk-UA',
-        'umb-AO',
-        'ur-IN',
-        'ur-PK',
-        'uz-UZ',
-        'vi-VN',
-        'vro',
-        'wo-SN',
-        'xh-ZA',
-        'yi',
-        'yo-NG',
-        'yue-Hant-HK',
-        'zh',
-        'zh-HK',
-        'zh-TW',
-        'zu-ZA',
-      ]),
-      z.unknown(),
-    ])
+  text_customizations: z.union([zTextCustomizations, z.unknown()]).optional(),
+  shadow: z
+    .union([z.enum(['none', 'min', 'mid', 'max']), z.unknown()])
     .optional(),
-  srt_file_url: z.union([z.url().min(1).max(2083), z.unknown()]).optional(),
-  srt_content: z.union([z.string(), z.unknown()]).optional(),
-  customization: z.union([zPresetCustomization, z.unknown()]).optional(),
 })
 
 /**
  * TextVoice
  */
 export const zTextVoice = z.object({
+  voice_id: z.union([z.string(), z.unknown()]).optional(),
   speed: z.union([z.number().gte(0.5).lte(2), z.unknown()]).optional(),
   voice: z
     .enum([
@@ -18113,7 +18306,6 @@ export const zTextVoice = z.object({
     ])
     .optional(),
   prompt: z.union([z.string(), z.unknown()]).optional(),
-  voice_id: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -18122,6 +18314,10 @@ export const zTextVoice = z.object({
  * Request model for digital twin video generation using Avatar 3 (Engine III).
  */
 export const zHeygenAvatar3DigitalTwinInput = z.object({
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '4:5', '5:4', '1:1'])
+    .optional()
+    .default('16:9'),
   character: zCharacter,
   voice: zTextVoice,
   audio_url: z.union([z.string(), z.unknown()]).optional(),
@@ -18129,10 +18325,6 @@ export const zHeygenAvatar3DigitalTwinInput = z.object({
     .enum(['360p', '480p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '4:5', '5:4', '1:1'])
-    .optional()
-    .default('16:9'),
 })
 
 /**
@@ -18141,6 +18333,10 @@ export const zHeygenAvatar3DigitalTwinInput = z.object({
  * Request model for digital twin video generation using Avatar 4 (Engine IV).
  */
 export const zHeygenAvatar4DigitalTwinInput = z.object({
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '4:5', '5:4', '1:1', 'auto'])
+    .optional()
+    .default('16:9'),
   character: zCharacter,
   voice: zTextVoice,
   audio_url: z.union([z.string(), z.unknown()]).optional(),
@@ -18148,57 +18344,57 @@ export const zHeygenAvatar4DigitalTwinInput = z.object({
     .enum(['360p', '480p', '540p', '720p', '1080p'])
     .optional()
     .default('720p'),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '4:5', '5:4', '1:1', 'auto'])
-    .optional()
-    .default('16:9'),
 })
 
 /**
  * Input
  */
 export const zThinksoundAudioInput = z.object({
-  num_inference_steps: z.int().gte(2).lte(100).optional().default(24),
-  cfg_scale: z.number().gte(1).lte(20).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  video_url: z.string(),
   prompt: z.string().optional().default(''),
+  video_url: z.string(),
+  num_inference_steps: z.int().gte(2).lte(100).optional().default(24),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(1).lte(20).optional().default(5),
 })
 
 /**
  * AudioOutput
  */
 export const zThinksoundAudioOutput = z.object({
-  audio: zFile,
   prompt: z.string(),
+  audio: zFile,
 })
 
 /**
  * Input
  */
 export const zThinksoundInput = z.object({
-  num_inference_steps: z.int().gte(2).lte(100).optional().default(24),
-  cfg_scale: z.number().gte(1).lte(20).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  video_url: z.string(),
   prompt: z.string().optional().default(''),
+  video_url: z.string(),
+  num_inference_steps: z.int().gte(2).lte(100).optional().default(24),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  cfg_scale: z.number().gte(1).lte(20).optional().default(5),
 })
 
 /**
  * Output
  */
 export const zThinksoundOutput = z.object({
-  video: zFile,
   prompt: z.string(),
+  video: zFile,
 })
 
 /**
  * VideoUpscaleRequest
  */
 export const zTopazUpscaleVideoInput = z.object({
-  video_url: z.string(),
-  halo: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
   noise: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  H264_output: z.boolean().optional().default(false),
+  halo: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  compression: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
+  video_url: z.string(),
+  target_fps: z.union([z.int().gte(16).lte(60), z.unknown()]).optional(),
+  grain: z.union([z.number().gte(0).lte(0.1), z.unknown()]).optional(),
   model: z
     .enum([
       'Proteus',
@@ -18223,11 +18419,7 @@ export const zTopazUpscaleVideoInput = z.object({
     ])
     .optional()
     .default('Proteus'),
-  target_fps: z.union([z.int().gte(16).lte(60), z.unknown()]).optional(),
   recover_detail: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  grain: z.union([z.number().gte(0).lte(0.1), z.unknown()]).optional(),
-  compression: z.union([z.number().gte(0).lte(1), z.unknown()]).optional(),
-  H264_output: z.boolean().optional().default(false),
   upscale_factor: z.number().gte(1).lte(4).optional().default(2),
 })
 
@@ -18266,26 +18458,26 @@ export const zTrajectory = z.object({
  * DynamicMask
  */
 export const zDynamicMask = z.object({
-  trajectories: z.array(zTrajectory).optional(),
   mask_url: z.string(),
+  trajectories: z.array(zTrajectory).optional(),
 })
 
 /**
  * KlingV15ProImageToVideoRequest
  */
 export const zKlingVideoV15ProImageToVideoInput = z.object({
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  prompt: z.string().max(2500),
+  static_mask_url: z.union([z.string(), z.unknown()]).optional(),
+  duration: z.enum(['5', '10']).optional().default('5'),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   dynamic_masks: z.union([z.array(zDynamicMask), z.unknown()]).optional(),
-  image_url: z.string(),
-  prompt: z.string().max(2500),
-  static_mask_url: z.union([z.string(), z.unknown()]).optional(),
-  duration: z.enum(['5', '10']).optional().default('5'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
   tail_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -18293,17 +18485,17 @@ export const zKlingVideoV15ProImageToVideoInput = z.object({
  * V1ImageToVideoRequest
  */
 export const zKlingVideoV1StandardImageToVideoInput = z.object({
+  prompt: z.string().max(2500),
+  static_mask_url: z.union([z.string(), z.unknown()]).optional(),
   cfg_scale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
   negative_prompt: z
     .string()
     .max(2500)
     .optional()
     .default('blur, distort, and low quality'),
   dynamic_masks: z.union([z.array(zDynamicMask), z.unknown()]).optional(),
-  image_url: z.string(),
-  prompt: z.string().max(2500),
   duration: z.enum(['5', '10']).optional().default('5'),
-  static_mask_url: z.union([z.string(), z.unknown()]).optional(),
   tail_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -18318,9 +18510,9 @@ export const zKlingVideoV1StandardImageToVideoInput = z.object({
  * - radius: Camera distance scaling factors
  */
 export const zTrajectoryParameters = z.object({
-  radius: z.array(z.number()),
-  theta: z.array(z.number()),
   phi: z.array(z.number()),
+  theta: z.array(z.number()),
+  radius: z.array(z.number()),
 })
 
 /**
@@ -18329,16 +18521,16 @@ export const zTrajectoryParameters = z.object({
  * Re-camera-only request (minimal schema).
  */
 export const zLightxRecameraInput = z.object({
-  camera: z.enum(['traj', 'target']).optional().default('traj'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  target_pose: z.union([z.array(z.number()), z.unknown()]).optional(),
   prompt: z.union([z.string(), z.unknown()]).optional(),
-  video_url: z.string(),
-  trajectory: z.union([zTrajectoryParameters, z.unknown()]).optional(),
   mode: z
     .enum(['gradual', 'bullet', 'direct', 'dolly-zoom'])
     .optional()
     .default('gradual'),
-  target_pose: z.union([z.array(z.number()), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  video_url: z.string(),
+  camera: z.enum(['traj', 'target']).optional().default('traj'),
+  trajectory: z.union([zTrajectoryParameters, z.unknown()]).optional(),
 })
 
 /**
@@ -18348,15 +18540,15 @@ export const zLightxRecameraInput = z.object({
  */
 export const zV26ImageToVideoFlashInput = z.object({
   enable_prompt_expansion: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  multi_shots: z.boolean().optional().default(false),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  prompt: z.string().min(1),
+  multi_shots: z.boolean().optional().default(false),
   audio_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z.enum(['5', '10', '15']).optional().default('5'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().min(1),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -18366,15 +18558,15 @@ export const zV26ImageToVideoFlashInput = z.object({
  */
 export const zV26ImageToVideoInput = z.object({
   enable_prompt_expansion: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  image_url: z.string(),
-  multi_shots: z.boolean().optional().default(false),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  prompt: z.string().min(1),
+  multi_shots: z.boolean().optional().default(false),
   audio_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z.enum(['5', '10', '15']).optional().default('5'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().min(1),
+  enable_safety_checker: z.boolean().optional().default(true),
 })
 
 /**
@@ -18431,19 +18623,19 @@ export const zV26ReferenceToVideoInput = z.object({
  * Input for Wan 2.6 text-to-video generation
  */
 export const zV26TextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  multi_shots: z.boolean().optional().default(true),
-  duration: z.enum(['5', '10', '15']).optional().default('5'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  enable_safety_checker: z.boolean().optional().default(true),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
     .optional()
     .default('16:9'),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  multi_shots: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(true),
+  duration: z.enum(['5', '10', '15']).optional().default('5'),
   prompt: z.string().min(1),
   resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -18451,8 +18643,8 @@ export const zV26TextToVideoInput = z.object({
  */
 export const zVeo2ImageToVideoInput = z.object({
   image_url: z.string(),
-  duration: z.enum(['5s', '6s', '7s', '8s']).optional().default('5s'),
   prompt: z.string(),
+  duration: z.enum(['5s', '6s', '7s', '8s']).optional().default('5s'),
 })
 
 /**
@@ -18466,13 +18658,13 @@ export const zVeo2ImageToVideoOutput = z.object({
  * TextToVideoInput
  */
 export const zVeo2Input = z.object({
-  enhance_prompt: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  auto_fix: z.boolean().optional().default(true),
-  duration: z.enum(['5s', '6s', '7s', '8s']).optional().default('5s'),
   prompt: z.string().min(1),
   aspect_ratio: z.enum(['9:16', '16:9', '1:1']).optional().default('16:9'),
+  enhance_prompt: z.boolean().optional().default(true),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  duration: z.enum(['5s', '6s', '7s', '8s']).optional().default('5s'),
+  auto_fix: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -18486,19 +18678,19 @@ export const zVeo2Output = z.object({
  * Veo31VideoToVideoInput
  */
 export const zVeo31ExtendVideoInput = z.object({
+  duration: z.string().optional().default('7s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  video_url: z.string(),
-  prompt: z.string().max(20000),
-  duration: z.string().optional().default('7s'),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.string().optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18512,19 +18704,19 @@ export const zVeo31ExtendVideoOutput = z.object({
  * Veo31VideoToVideoInput
  */
 export const zVeo31FastExtendVideoInput = z.object({
+  duration: z.string().optional().default('7s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  video_url: z.string(),
-  prompt: z.string().max(20000),
-  duration: z.string().optional().default('7s'),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.string().optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18538,20 +18730,20 @@ export const zVeo31FastExtendVideoOutput = z.object({
  * Veo31FirstLastFrameToVideoInput
  */
 export const zVeo31FastFirstLastFrameToVideoInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
-  first_frame_url: z.string(),
+  last_frame_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  last_frame_url: z.string(),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
+  first_frame_url: z.string(),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18565,19 +18757,19 @@ export const zVeo31FastFirstLastFrameToVideoOutput = z.object({
  * Veo31ImageToVideoInput
  */
 export const zVeo31FastImageToVideoInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
+  image_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  image_url: z.string(),
-  prompt: z.string().max(20000),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18591,18 +18783,18 @@ export const zVeo31FastImageToVideoOutput = z.object({
  * Veo31TextToVideoInput
  */
 export const zVeo31FastInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(true),
-  generate_audio: z.boolean().optional().default(true),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  prompt: z.string().max(20000),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
@@ -18616,17 +18808,17 @@ export const zVeo31FastOutput = z.object({
  * Veo31ReferenceToVideoInput
  */
 export const zVeo31FastReferenceToVideoInput = z.object({
-  auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
   duration: z.string().optional().default('8s'),
   image_urls: z.array(z.string()),
-  prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  auto_fix: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
+  prompt: z.string().max(20000),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
@@ -18640,20 +18832,20 @@ export const zVeo31FastReferenceToVideoOutput = z.object({
  * Veo31FirstLastFrameToVideoInput
  */
 export const zVeo31FirstLastFrameToVideoInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
-  first_frame_url: z.string(),
+  last_frame_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  last_frame_url: z.string(),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
+  first_frame_url: z.string(),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18667,19 +18859,19 @@ export const zVeo31FirstLastFrameToVideoOutput = z.object({
  * Veo31ImageToVideoInput
  */
 export const zVeo31ImageToVideoInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
+  image_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  image_url: z.string(),
-  prompt: z.string().max(20000),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18693,38 +18885,38 @@ export const zVeo31ImageToVideoOutput = z.object({
  * Veo31TextToVideoInput
  */
 export const zVeo31Input = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(true),
-  generate_audio: z.boolean().optional().default(true),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  prompt: z.string().max(20000),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
  * Veo31LiteFirstLastFrameToVideoInput
  */
 export const zVeo31LiteFirstLastFrameToVideoInput = z.object({
+  duration: z.string().optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
-  first_frame_url: z.string(),
+  last_frame_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  last_frame_url: z.string(),
-  duration: z.string().optional().default('8s'),
-  prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
+  first_frame_url: z.string(),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18738,19 +18930,19 @@ export const zVeo31LiteFirstLastFrameToVideoOutput = z.object({
  * Veo31LiteImageToVideoInput
  */
 export const zVeo31LiteImageToVideoInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
+  image_url: z.string(),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  image_url: z.string(),
-  prompt: z.string().max(20000),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
 })
 
 /**
@@ -18764,18 +18956,18 @@ export const zVeo31LiteImageToVideoOutput = z.object({
  * Veo31LiteTextToVideoInput
  */
 export const zVeo31LiteInput = z.object({
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(true),
-  generate_audio: z.boolean().optional().default(true),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
-  prompt: z.string().max(20000),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p']).optional().default('720p'),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(20000),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
@@ -18796,17 +18988,17 @@ export const zVeo31Output = z.object({
  * Veo31ReferenceToVideoInput
  */
 export const zVeo31ReferenceToVideoInput = z.object({
-  auto_fix: z.boolean().optional().default(false),
-  generate_audio: z.boolean().optional().default(true),
   duration: z.string().optional().default('8s'),
   image_urls: z.array(z.string()),
-  prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  auto_fix: z.boolean().optional().default(false),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
+  generate_audio: z.boolean().optional().default(true),
   resolution: z.enum(['720p', '1080p', '4k']).optional().default('720p'),
+  prompt: z.string().max(20000),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
 })
 
 /**
@@ -18820,19 +19012,19 @@ export const zVeo31ReferenceToVideoOutput = z.object({
  * Veo3ImageToVideoInput
  */
 export const zVeo3FastImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
   generate_audio: z.boolean().optional().default(true),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
   auto_fix: z.boolean().optional().default(false),
+  image_url: z.string(),
 })
 
 /**
@@ -18846,16 +19038,16 @@ export const zVeo3FastImageToVideoOutput = z.object({
  * Veo3TextToVideoInput
  */
 export const zVeo3FastInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
   generate_audio: z.boolean().optional().default(true),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(true),
 })
@@ -18871,19 +19063,19 @@ export const zVeo3FastOutput = z.object({
  * Veo3ImageToVideoInput
  */
 export const zVeo3ImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
   generate_audio: z.boolean().optional().default(true),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['auto', '16:9', '9:16']).optional().default('auto'),
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
   auto_fix: z.boolean().optional().default(false),
+  image_url: z.string(),
 })
 
 /**
@@ -18897,16 +19089,16 @@ export const zVeo3ImageToVideoOutput = z.object({
  * Veo3TextToVideoInput
  */
 export const zVeo3Input = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
   generate_audio: z.boolean().optional().default(true),
-  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
-  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5', '6'])
     .optional()
     .default('4'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('720p'),
   prompt: z.string().max(20000),
-  aspect_ratio: z.enum(['16:9', '9:16']).optional().default('16:9'),
+  duration: z.enum(['4s', '6s', '8s']).optional().default('8s'),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   auto_fix: z.boolean().optional().default(true),
 })
@@ -18983,8 +19175,8 @@ export const zSfxV15VideoToVideoOutput = z.object({
  * VideoAgentConfig
  */
 export const zVideoAgentConfig = z.object({
-  orientation: z.enum(['portrait', 'landscape']).optional().default('portrait'),
   duration: z.union([z.int().gte(5), z.unknown()]).optional(),
+  orientation: z.enum(['portrait', 'landscape']).optional().default('portrait'),
   avatar: z
     .enum([
       'Abigail (Upper Body)',
@@ -20282,8 +20474,8 @@ export const zVideoAgentConfig = z.object({
  * VideoAgentRequest
  */
 export const zHeygenV2VideoAgentInput = z.object({
-  prompt: z.string(),
   config: zVideoAgentConfig.optional(),
+  prompt: z.string(),
 })
 
 /**
@@ -20384,128 +20576,220 @@ export const zVideoBackgroundRemovalOutputType2 = z.object({
 })
 
 /**
+ * BgRemovalInput
+ *
+ * Playground input: webcam/video source (inherited ``image_url``) plus the
+ * background to composite the subject onto — a solid colour, a custom image,
+ * or a blurred copy of the frame.
+ */
+export const zVideoBackgroundRemovalRealtimeInput = z.object({
+  blur_strength: z.int().gte(0).lte(100).optional().default(50),
+  background_color: z
+    .enum([
+      'Black',
+      'White',
+      'Gray',
+      'Red',
+      'Green',
+      'Blue',
+      'Yellow',
+      'Cyan',
+      'Magenta',
+      'Orange',
+    ])
+    .optional()
+    .default('Black'),
+  background_type: z
+    .enum(['color', 'image', 'blur'])
+    .optional()
+    .default('color'),
+  image_url: z.string().optional().default(''),
+  background_image_url: z.union([z.string(), z.unknown()]).optional(),
+})
+
+/**
+ * RealtimeOutput
+ */
+export const zVideoBackgroundRemovalRealtimeOutput = z.discriminatedUnion(
+  'type',
+  [
+    zIceServersOutput.extend({ type: z.literal('iceservers') }),
+    zAnswerOutput.extend({ type: z.literal('answer') }),
+    zIceCandidateOutput.extend({ type: z.literal('icecandidate') }),
+    zErrorOutput.extend({ type: z.literal('error') }),
+  ],
+)
+
+/**
+ * InputRemoveBackgroundModel
+ */
+export const zVideoBackgroundRemovalV3Input = z.object({
+  video_url: z.string(),
+  background_color: z
+    .enum([
+      'Transparent',
+      'Black',
+      'White',
+      'Gray',
+      'Red',
+      'Green',
+      'Blue',
+      'Yellow',
+      'Cyan',
+      'Magenta',
+      'Orange',
+    ])
+    .optional()
+    .default('Black'),
+  preserve_audio: z.boolean().optional().default(true),
+  output_container_and_codec: z
+    .enum([
+      'mp4_h265',
+      'mp4_h264',
+      'webm_vp9',
+      'mov_h265',
+      'mov_proresks',
+      'mkv_h265',
+      'mkv_h264',
+      'mkv_vp9',
+      'avi_h264',
+      'gif',
+    ])
+    .optional()
+    .default('webm_vp9'),
+})
+
+/**
+ * OutputRemoveBackgroundModel
+ */
+export const zVideoBackgroundRemovalV3Output = z.object({
+  video: zVideo,
+  request_id: z.string(),
+})
+
+/**
  * VideoConditioningInput
  */
 export const zVideoConditioningInput = z.object({
-  video_url: z.string(),
   start_frame_num: z.int().gte(0).lte(120),
+  video_url: z.string(),
 })
 
 /**
  * ExtendVideoInput
  */
 export const zLtxVideoV095ExtendInput = z.object({
-  prompt: z.string(),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
+  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
+  expand_prompt: z.boolean().optional().default(true),
   video: zVideoConditioningInput,
   seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_prompt: z.boolean().optional().default(true),
   resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  prompt: z.string(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
   negative_prompt: z
     .string()
     .optional()
     .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
 })
 
 /**
  * MultiConditioningVideoInput
  */
 export const zLtxVideoV095MulticonditioningInput = z.object({
+  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
+  expand_prompt: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  videos: z.array(zVideoConditioningInput).optional().default([]),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   prompt: z.string(),
   num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   images: z.array(zImageConditioningInputType2).optional().default([]),
-  expand_prompt: z.boolean().optional().default(true),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   negative_prompt: z
     .string()
     .optional()
     .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
-  videos: z.array(zVideoConditioningInput).optional().default([]),
 })
 
 /**
  * VideoConditioningInput
  */
 export const zVideoConditioningInputType2 = z.object({
-  start_frame_num: z.int().gte(0).lte(1440).optional().default(0),
-  video_url: z.string(),
-  target_fps: z.int().gte(1).lte(60).optional().default(24),
-  reverse_video: z.boolean().optional().default(false),
-  max_num_frames: z.int().gte(1).lte(1441).optional().default(1441),
-  resample_fps: z.boolean().optional().default(false),
   preprocess: z.boolean().optional().default(false),
+  strength: z.number().gte(0).lte(1).optional().default(1),
+  start_frame_num: z.int().gte(0).lte(1440).optional().default(0),
+  target_fps: z.int().gte(1).lte(60).optional().default(24),
+  resample_fps: z.boolean().optional().default(false),
   limit_num_frames: z.boolean().optional().default(false),
   conditioning_type: z
     .union([z.enum(['rgb', 'depth', 'pose', 'canny']), z.unknown()])
     .optional(),
-  strength: z.number().gte(0).lte(1).optional().default(1),
+  reverse_video: z.boolean().optional().default(false),
+  video_url: z.string(),
+  max_num_frames: z.int().gte(1).lte(1441).optional().default(1441),
 })
 
 /**
  * DistilledMultiConditioningVideoInput
  */
 export const zLtxv13B098DistilledMulticonditioningInput = z.object({
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  reverse_video: z.boolean().optional().default(false),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  expand_prompt: z.boolean().optional().default(false),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
   loras: z.array(zLoRaWeight).optional().default([]),
+  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  reverse_video: z.boolean().optional().default(false),
   enable_detail_pass: z.boolean().optional().default(false),
-  images: z.array(zImageConditioningInput).optional().default([]),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  prompt: z.string(),
   tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
   seed: z.union([z.int(), z.unknown()]).optional(),
   videos: z.array(zVideoConditioningInputType2).optional().default([]),
-  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
   first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  images: z.array(zImageConditioningInput).optional().default([]),
+  expand_prompt: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
   aspect_ratio: z
     .enum(['9:16', '1:1', '16:9', 'auto'])
     .optional()
     .default('auto'),
-  prompt: z.string(),
-  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
-  enable_safety_checker: z.boolean().optional().default(true),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
  * DistilledMultiConditioningVideoInput
  */
 export const zLtxVideo13bDistilledMulticonditioningInput = z.object({
-  negative_prompt: z
-    .string()
-    .optional()
-    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
-  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  images: z.array(zImageConditioningInput).optional().default([]),
+  enable_safety_checker: z.boolean().optional().default(true),
+  videos: z.array(zVideoConditioningInputType2).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  loras: z.array(zLoRaWeight).optional().default([]),
+  expand_prompt: z.boolean().optional().default(false),
+  prompt: z.string(),
+  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
+  enable_detail_pass: z.boolean().optional().default(false),
   aspect_ratio: z
     .enum(['9:16', '1:1', '16:9', 'auto'])
     .optional()
     .default('auto'),
-  second_pass_skip_initial_steps: z.int().gte(1).lte(11).optional().default(5),
-  frame_rate: z.int().gte(1).lte(60).optional().default(24),
   num_frames: z.int().gte(9).lte(1441).optional().default(121),
   reverse_video: z.boolean().optional().default(false),
-  prompt: z.string(),
-  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
-  enable_safety_checker: z.boolean().optional().default(true),
-  videos: z.array(zVideoConditioningInputType2).optional().default([]),
-  images: z.array(zImageConditioningInput).optional().default([]),
-  expand_prompt: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
-  loras: z.array(zLoRaWeight).optional().default([]),
   first_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  enable_detail_pass: z.boolean().optional().default(false),
-  tone_map_compression_ratio: z.number().gte(0).lte(1).optional().default(0),
+  temporal_adain_factor: z.number().gte(0).lte(1).optional().default(0.5),
+  constant_rate_factor: z.int().gte(0).lte(51).optional().default(29),
+  second_pass_num_inference_steps: z.int().gte(2).lte(12).optional().default(8),
+  frame_rate: z.int().gte(1).lte(60).optional().default(24),
+  negative_prompt: z
+    .string()
+    .optional()
+    .default('worst quality, inconsistent motion, blurry, jittery, distorted'),
 })
 
 /**
@@ -20598,13 +20882,13 @@ export const zVideoErasePromptOutput = z.unknown()
 export const zVideoFile = z.object({
   num_frames: z.union([z.int(), z.unknown()]).optional(),
   height: z.union([z.int(), z.unknown()]).optional(),
-  fps: z.union([z.number(), z.unknown()]).optional(),
-  duration: z.union([z.number(), z.unknown()]).optional(),
-  url: z.string(),
-  file_size: z.union([z.int(), z.unknown()]).optional(),
-  file_name: z.union([z.string(), z.unknown()]).optional(),
   content_type: z.union([z.string(), z.unknown()]).optional(),
   width: z.union([z.int(), z.unknown()]).optional(),
+  file_size: z.union([z.int(), z.unknown()]).optional(),
+  file_name: z.union([z.string(), z.unknown()]).optional(),
+  url: z.string(),
+  fps: z.union([z.number(), z.unknown()]).optional(),
+  duration: z.union([z.number(), z.unknown()]).optional(),
 })
 
 /**
@@ -20673,9 +20957,9 @@ export const zCrystalVideoUpscalerOutput = z.object({
  * EdittoOutput
  */
 export const zEdittoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
+  seed: z.int(),
   video: zVideoFile,
 })
 
@@ -20772,378 +21056,378 @@ export const zHappyHorseVideoEditOutput = z.object({
  * LTX2AudioToVideoOutput
  */
 export const zLtx219bAudioToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2AudioToVideoOutput
  */
 export const zLtx219bAudioToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2AudioToVideoOutput
  */
 export const zLtx219bDistilledAudioToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2AudioToVideoOutput
  */
 export const zLtx219bDistilledAudioToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ExtendVideoOutput
  */
 export const zLtx219bDistilledExtendVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ExtendVideoOutput
  */
 export const zLtx219bDistilledExtendVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ImageToVideoOutput
  */
 export const zLtx219bDistilledImageToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ImageToVideoOutput
  */
 export const zLtx219bDistilledImageToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2TextToVideoOutput
  */
 export const zLtx219bDistilledTextToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2TextToVideoOutput
  */
 export const zLtx219bDistilledTextToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2VideoToVideoOutput
  */
 export const zLtx219bDistilledVideoToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2VideoToVideoOutput
  */
 export const zLtx219bDistilledVideoToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ExtendVideoOutput
  */
 export const zLtx219bExtendVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ExtendVideoOutput
  */
 export const zLtx219bExtendVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ImageToVideoOutput
  */
 export const zLtx219bImageToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2ImageToVideoOutput
  */
 export const zLtx219bImageToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2TextToVideoOutput
  */
 export const zLtx219bTextToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2TextToVideoOutput
  */
 export const zLtx219bTextToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2VideoToVideoOutput
  */
 export const zLtx219bVideoToVideoLoraOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX2VideoToVideoOutput
  */
 export const zLtx219bVideoToVideoOutput = z.object({
-  seed: z.int(),
   prompt: z.string(),
   video: zVideoFile,
+  seed: z.int(),
 })
 
 /**
  * LTX23AudioToVideoOutput
  */
 export const zLtx2322bAudioToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23AudioToVideoOutput
  */
 export const zLtx2322bAudioToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23AudioToVideoOutput
  */
 export const zLtx2322bDistilledAudioToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23AudioToVideoOutput
  */
 export const zLtx2322bDistilledAudioToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ImageToVideoOutput
  */
 export const zLtx2322bDistilledImageToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ImageToVideoOutput
  */
 export const zLtx2322bDistilledImageToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ReferenceVideoToVideoOutput
  */
 export const zLtx2322bDistilledReferenceVideoToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ReferenceVideoToVideoOutput
  */
 export const zLtx2322bDistilledReferenceVideoToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23TextToVideoOutput
  */
 export const zLtx2322bDistilledTextToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23TextToVideoOutput
  */
 export const zLtx2322bDistilledTextToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23VideoToVideoOutput
  */
 export const zLtx2322bDistilledVideoToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23VideoToVideoOutput
  */
 export const zLtx2322bDistilledVideoToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ExtendVideoOutput
  */
 export const zLtx2322bExtendVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ExtendVideoOutput
  */
 export const zLtx2322bExtendVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ImageToVideoOutput
  */
 export const zLtx2322bImageToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ImageToVideoOutput
  */
 export const zLtx2322bImageToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ReferenceVideoToVideoOutput
  */
 export const zLtx2322bReferenceVideoToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23ReferenceVideoToVideoOutput
  */
 export const zLtx2322bReferenceVideoToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23TextToVideoOutput
  */
 export const zLtx2322bTextToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23TextToVideoOutput
  */
 export const zLtx2322bTextToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23VideoToVideoOutput
  */
 export const zLtx2322bVideoToVideoLoraOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
  * LTX23VideoToVideoOutput
  */
 export const zLtx2322bVideoToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   prompt: z.string(),
-  video: zVideoFile,
 })
 
 /**
@@ -21180,10 +21464,10 @@ export const zLtx23ImageToVideoOutput = z.object({
  * HDR output with professional EXR frames and a lightweight preview.
  */
 export const zLtx23QualityHdrLoraOutput = z.object({
+  exr_frames_url: zFile,
   seed: z.int(),
   preview_video: zVideoFile,
   prompt: z.string(),
-  exr_frames_url: zFile,
 })
 
 /**
@@ -21192,10 +21476,10 @@ export const zLtx23QualityHdrLoraOutput = z.object({
  * HDR output with professional EXR frames and a lightweight preview.
  */
 export const zLtx23QualityHdrOutput = z.object({
+  exr_frames_url: zFile,
   seed: z.int(),
   preview_video: zVideoFile,
   prompt: z.string(),
-  exr_frames_url: zFile,
 })
 
 /**
@@ -21280,50 +21564,50 @@ export const zLynxOutput = z.object({
  * ImageToVideoOutput
  */
 export const zSora2ImageToVideoOutput = z.object({
-  video: zVideoFile,
   spritesheet: z.union([zImageFile, z.unknown()]).optional(),
-  video_id: z.string(),
+  video: zVideoFile,
   thumbnail: z.union([zImageFile, z.unknown()]).optional(),
+  video_id: z.string(),
 })
 
 /**
  * ProImageToVideoOutput
  */
 export const zSora2ImageToVideoProOutput = z.object({
-  video: zVideoFile,
   spritesheet: z.union([zImageFile, z.unknown()]).optional(),
-  video_id: z.string(),
+  video: zVideoFile,
   thumbnail: z.union([zImageFile, z.unknown()]).optional(),
+  video_id: z.string(),
 })
 
 /**
  * TextToVideoOutput
  */
 export const zSora2TextToVideoOutput = z.object({
-  video: zVideoFile,
   spritesheet: z.union([zImageFile, z.unknown()]).optional(),
-  video_id: z.string(),
+  video: zVideoFile,
   thumbnail: z.union([zImageFile, z.unknown()]).optional(),
+  video_id: z.string(),
 })
 
 /**
  * ProTextToVideoOutput
  */
 export const zSora2TextToVideoProOutput = z.object({
-  video: zVideoFile,
   spritesheet: z.union([zImageFile, z.unknown()]).optional(),
-  video_id: z.string(),
+  video: zVideoFile,
   thumbnail: z.union([zImageFile, z.unknown()]).optional(),
+  video_id: z.string(),
 })
 
 /**
  * RemixOutput
  */
 export const zSora2VideoToVideoRemixOutput = z.object({
-  video: zVideoFile,
   spritesheet: z.union([zImageFile, z.unknown()]).optional(),
-  video_id: z.string(),
+  video: zVideoFile,
   thumbnail: z.union([zImageFile, z.unknown()]).optional(),
+  video_id: z.string(),
 })
 
 /**
@@ -21339,8 +21623,8 @@ export const zSyncLipsyncReact1Output = z.object({
  * Output for image-to-video generation
  */
 export const zV26ImageToVideoFlashOutput = z.object({
-  seed: z.int(),
   video: zVideoFile,
+  seed: z.int(),
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -21350,8 +21634,8 @@ export const zV26ImageToVideoFlashOutput = z.object({
  * Output for image-to-video generation
  */
 export const zV26ImageToVideoOutput = z.object({
-  seed: z.int(),
   video: zVideoFile,
+  seed: z.int(),
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -21383,9 +21667,9 @@ export const zV26ReferenceToVideoOutput = z.object({
  * Output for text-to-video generation
  */
 export const zV26TextToVideoOutput = z.object({
-  seed: z.int(),
-  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
   video: zVideoFile,
+  actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.int(),
 })
 
 /**
@@ -21453,8 +21737,8 @@ export const zVideoSoundEffectsGeneratorInput = z.object({
  * Input
  */
 export const zVideoUpscalerInput = z.object({
-  scale: z.number().gte(1).lte(8).optional().default(2),
   video_url: z.string(),
+  scale: z.number().gte(1).lte(8).optional().default(2),
 })
 
 /**
@@ -22095,317 +22379,765 @@ export const zViduTemplateToVideoOutput = z.object({
 })
 
 /**
+ * VocabularyEntry
+ *
+ * A term auto-transcription should recognise correctly, plus its common misspellings.
+ */
+export const zVocabularyEntry = z.object({
+  word: z.string().min(1).max(100),
+  replaces: z.array(z.string().min(1).max(100)).min(1).max(20),
+})
+
+/**
+ * SubtitlesInput
+ */
+export const zSubtitlesInput = z.object({
+  video_url: z.url().min(1).max(2083),
+  srt_file_url: z.union([z.url().min(1).max(2083), z.unknown()]).optional(),
+  srt_content: z.union([z.string(), z.unknown()]).optional(),
+  language: z
+    .union([
+      z.enum([
+        'af-ZA',
+        'am-ET',
+        'ar-AE',
+        'ar-BH',
+        'ar-DZ',
+        'ar-EG',
+        'ar-IL',
+        'ar-IQ',
+        'ar-JO',
+        'ar-KW',
+        'ar-LB',
+        'ar-MA',
+        'ar-OM',
+        'ar-PS',
+        'ar-QA',
+        'ar-SA',
+        'ar-TN',
+        'ast-ES',
+        'az-AZ',
+        'ba',
+        'bas',
+        'be-BY',
+        'bg-BG',
+        'br',
+        'bs-BA',
+        'ca-ES',
+        'ceb-PH',
+        'ckb-IQ',
+        'cs-CZ',
+        'cy-GB',
+        'da-DK',
+        'de-DE',
+        'dyu',
+        'el-GR',
+        'en-AU',
+        'en-GB',
+        'en-IN',
+        'en-NZ',
+        'en-US',
+        'eo',
+        'es-AR',
+        'es-BO',
+        'es-CL',
+        'es-CO',
+        'es-CR',
+        'es-DO',
+        'es-EC',
+        'es-ES',
+        'es-GT',
+        'es-HN',
+        'es-MX',
+        'es-NI',
+        'es-PA',
+        'es-PE',
+        'es-PR',
+        'es-PY',
+        'es-SV',
+        'es-US',
+        'es-UY',
+        'es-VE',
+        'et-EE',
+        'eu-ES',
+        'fa-IR',
+        'ff',
+        'fi-FI',
+        'fil-PH',
+        'fo',
+        'fr-CA',
+        'fr-FR',
+        'fy',
+        'ga',
+        'gd',
+        'gl-ES',
+        'ha-NG',
+        'haw',
+        'he-IL',
+        'hr-HR',
+        'hsb',
+        'ht',
+        'hu-HU',
+        'hy-AM',
+        'id-ID',
+        'ig',
+        'is-IS',
+        'it-IT',
+        'ja-JP',
+        'ja-Latn-JP',
+        'jv-ID',
+        'ka-GE',
+        'kab',
+        'kam-KE',
+        'kea-CV',
+        'kk-KZ',
+        'ko-KR',
+        'ku',
+        'ky-KG',
+        'la',
+        'lb-LU',
+        'lg',
+        'lij',
+        'ln-CD',
+        'lo-LA',
+        'lt-LT',
+        'luo-KE',
+        'lv-LV',
+        'mg',
+        'mi-NZ',
+        'mk-MK',
+        'mn-MN',
+        'ms-MY',
+        'mt-MT',
+        'nb-NO',
+        'nl-NL',
+        'nn',
+        'nso-ZA',
+        'ny-MW',
+        'oc-FR',
+        'pl-PL',
+        'ps-AF',
+        'pt-BR',
+        'pt-PT',
+        'ro-RO',
+        'roh',
+        'ru-RU',
+        'rw-RW',
+        'sah',
+        'sk-SK',
+        'sl-SI',
+        'sm',
+        'sn-ZW',
+        'so-SO',
+        'sq-AL',
+        'sr-Latn-RS',
+        'sr-RS',
+        'srd',
+        'ss',
+        'su-ID',
+        'sv-SE',
+        'sw-KE',
+        'sw-TZ',
+        'tg-TJ',
+        'th-TH',
+        'tk',
+        'tn',
+        'tok',
+        'ton',
+        'tr-TR',
+        'ts-ZA',
+        'tt',
+        'uk-UA',
+        'umb-AO',
+        'ur-IN',
+        'ur-PK',
+        'uz-UZ',
+        'vi-VN',
+        'vro',
+        'wo-SN',
+        'xh-ZA',
+        'yi',
+        'yo-NG',
+        'yue-Hant-HK',
+        'zh',
+        'zh-HK',
+        'zh-TW',
+        'zu-ZA',
+      ]),
+      z.unknown(),
+    ])
+    .optional(),
+  preset: z.enum([
+    'glass',
+    'whisper',
+    'glide2',
+    'fusion',
+    'glide',
+    'terminal',
+    'handwritten',
+    'backdrop',
+    'backdrop2',
+    'simple',
+    'plain',
+    'beans',
+    'corpo',
+    'boo',
+    'shadeplay',
+    'casper',
+    'capri',
+    'lowkey',
+    'vinta',
+    'diego',
+    'ali',
+    'slay',
+    'kitty',
+    'hustle',
+    'karl',
+    'sprout',
+    'flex',
+    'mint',
+    'rizz',
+    'vegas',
+  ]),
+  customization: z.union([zPresetCustomization, z.unknown()]).optional(),
+  translation_language: z
+    .union([
+      z.enum([
+        'ab',
+        'ace',
+        'ach',
+        'af-ZA',
+        'ak',
+        'alz',
+        'am-ET',
+        'ar-AE',
+        'ar-BH',
+        'ar-DZ',
+        'ar-EG',
+        'ar-IL',
+        'ar-IQ',
+        'ar-JO',
+        'ar-KW',
+        'ar-LB',
+        'ar-MA',
+        'ar-OM',
+        'ar-PS',
+        'ar-QA',
+        'ar-SA',
+        'ar-TN',
+        'awa',
+        'ay',
+        'az-AZ',
+        'ban',
+        'bbc',
+        'be-BY',
+        'bem',
+        'bew',
+        'bg-BG',
+        'bho',
+        'bik',
+        'bm',
+        'bs-BA',
+        'bts',
+        'btx',
+        'bua',
+        'ca-ES',
+        'ceb-PH',
+        'cgg',
+        'chm',
+        'ckb-IQ',
+        'cnh',
+        'co',
+        'crh',
+        'crs',
+        'cs-CZ',
+        'cv',
+        'cy-GB',
+        'da-DK',
+        'de-DE',
+        'din',
+        'doi',
+        'dov',
+        'dv',
+        'dz',
+        'ee',
+        'el-GR',
+        'en-AU',
+        'en-GB',
+        'en-IN',
+        'en-NZ',
+        'en-US',
+        'eo',
+        'es-AR',
+        'es-BO',
+        'es-CL',
+        'es-CO',
+        'es-CR',
+        'es-DO',
+        'es-EC',
+        'es-ES',
+        'es-GT',
+        'es-HN',
+        'es-MX',
+        'es-NI',
+        'es-PA',
+        'es-PE',
+        'es-PR',
+        'es-PY',
+        'es-SV',
+        'es-US',
+        'es-UY',
+        'es-VE',
+        'et-EE',
+        'eu-ES',
+        'fa-IR',
+        'ff',
+        'fi-FI',
+        'fil-PH',
+        'fj',
+        'fr-CA',
+        'fr-FR',
+        'fy',
+        'ga',
+        'gaa',
+        'gd',
+        'gl-ES',
+        'gn',
+        'gom',
+        'ha-NG',
+        'haw',
+        'he-IL',
+        'hil',
+        'hmn',
+        'hr-HR',
+        'hrx',
+        'ht',
+        'hu-HU',
+        'hy-AM',
+        'id-ID',
+        'ig',
+        'ilo',
+        'is-IS',
+        'it-IT',
+        'ja-JP',
+        'ja-Latn-JP',
+        'jv-ID',
+        'ka-GE',
+        'kk-KZ',
+        'ko-KR',
+        'kri',
+        'ktu',
+        'ku',
+        'ky-KG',
+        'la',
+        'lb-LU',
+        'lg',
+        'li',
+        'lij',
+        'lmo',
+        'ln-CD',
+        'lo-LA',
+        'lt-LT',
+        'ltg',
+        'luo-KE',
+        'lus',
+        'lv-LV',
+        'mai',
+        'mak',
+        'mg',
+        'mi-NZ',
+        'min',
+        'mk-MK',
+        'mn-MN',
+        'mni-Mtei',
+        'ms-Arab',
+        'ms-MY',
+        'mt-MT',
+        'nb-NO',
+        'new',
+        'nl-NL',
+        'nr',
+        'nso-ZA',
+        'nus',
+        'ny-MW',
+        'oc-FR',
+        'om',
+        'pag',
+        'pam',
+        'pap',
+        'pl-PL',
+        'ps-AF',
+        'pt-BR',
+        'pt-PT',
+        'qu',
+        'rn',
+        'ro-RO',
+        'rom',
+        'ru-RU',
+        'rw-RW',
+        'scn',
+        'sg',
+        'shn',
+        'sk-SK',
+        'sl-SI',
+        'sm',
+        'sn-ZW',
+        'so-SO',
+        'sq-AL',
+        'sr-Latn-RS',
+        'sr-RS',
+        'ss',
+        'st',
+        'su-ID',
+        'sv-SE',
+        'sw-KE',
+        'sw-TZ',
+        'szl',
+        'tet',
+        'tg-TJ',
+        'th-TH',
+        'ti',
+        'tk',
+        'tn',
+        'tr-TR',
+        'ts-ZA',
+        'tt',
+        'ug',
+        'uk-UA',
+        'ur-IN',
+        'ur-PK',
+        'uz-UZ',
+        'vi-VN',
+        'xh-ZA',
+        'yi',
+        'yo-NG',
+        'yua',
+        'yue-Hant-HK',
+        'zh',
+        'zh-HK',
+        'zh-TW',
+        'zu-ZA',
+      ]),
+      z.unknown(),
+    ])
+    .optional(),
+  vocabulary: z
+    .union([z.array(zVocabularyEntry).max(100), z.unknown()])
+    .optional(),
+})
+
+/**
  * Input
  */
 export const zVoidVideoInpaintingInput = z.object({
-  mask_prompt: z.union([z.string(), z.unknown()]).optional(),
-  video_url: z.string(),
-  num_frames: z.int().gte(1).lte(197).optional().default(85),
-  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
   enable_safety_checker: z.boolean().optional().default(true),
-  strength: z.number().gte(0).lte(1).optional().default(1),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(30),
+  strength: z.number().gte(0).lte(1).optional().default(1),
   quad_mask_video_url: z.string().optional().default(''),
-  prompt: z.string(),
-  enable_pass2_refinement: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'The video is not of a high quality, it has a low resolution. Watermark present in each frame. The background is solid. Strange body and strange trajectory. Distortion.',
     ),
+  enable_pass2_refinement: z.boolean().optional().default(false),
+  prompt: z.string(),
+  video_url: z.string(),
+  guidance_scale: z.number().gte(0).lte(20).optional().default(1),
+  num_frames: z.int().gte(1).lte(197).optional().default(85),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  mask_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * Output
  */
 export const zVoidVideoInpaintingOutput = z.object({
-  timings: z.record(z.string(), z.number()),
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * WanVACEDepthRequest
  */
 export const zWan22VaceFunA14bDepthInput = z.object({
-  video_url: z.string(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  sync_mode: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
+    .optional()
+    .default('auto'),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
   temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  enable_auto_downsample: z.boolean().optional().default(false),
-  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  ref_image_urls: z.array(z.string()).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  sync_mode: z.boolean().optional().default(false),
-  transparency_mode: z
-    .enum(['content_aware', 'white', 'black'])
-    .optional()
-    .default('content_aware'),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
-  resolution: z
-    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
-    .optional()
-    .default('auto'),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
+  match_input_num_frames: z.boolean().optional().default(false),
   preprocess: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
   prompt: z.string(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
   first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
+  return_frames_zip: z.boolean().optional().default(false),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  transparency_mode: z
+    .enum(['content_aware', 'white', 'black'])
+    .optional()
+    .default('content_aware'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
+  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
+  video_url: z.string(),
+  resolution: z
+    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
     .optional()
     .default('auto'),
-  match_input_num_frames: z.boolean().optional().default(false),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * WanVACEDepthResponse
  */
 export const zWan22VaceFunA14bDepthOutput = z.object({
-  video: zVideoFile,
-  seed: z.int(),
   prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
+  seed: z.int(),
+  video: zVideoFile,
 })
 
 /**
  * WanVACEInpaintingRequest
  */
 export const zWan22VaceFunA14bInpaintingInput = z.object({
-  video_url: z.string(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  sync_mode: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
+    .optional()
+    .default('auto'),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
   temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  enable_auto_downsample: z.boolean().optional().default(false),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  ref_image_urls: z.array(z.string()).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  mask_video_url: z.union([z.string(), z.unknown()]).optional(),
-  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  sync_mode: z.boolean().optional().default(false),
-  transparency_mode: z
-    .enum(['content_aware', 'white', 'black'])
-    .optional()
-    .default('content_aware'),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
-  resolution: z
-    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
-    .optional()
-    .default('auto'),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  preprocess: z.boolean().optional().default(false),
-  prompt: z.string(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
   match_input_num_frames: z.boolean().optional().default(false),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
+  preprocess: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  prompt: z.string(),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  return_frames_zip: z.boolean().optional().default(false),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  transparency_mode: z
+    .enum(['content_aware', 'white', 'black'])
+    .optional()
+    .default('content_aware'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
+  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  mask_video_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
+  video_url: z.string(),
+  resolution: z
+    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
     .optional()
     .default('auto'),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * WanVACEInpaintingResponse
  */
 export const zWan22VaceFunA14bInpaintingOutput = z.object({
-  video: zVideoFile,
-  seed: z.int(),
   prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
+  seed: z.int(),
+  video: zVideoFile,
 })
 
 /**
  * WanVACEOutpaintingRequest
  */
 export const zWan22VaceFunA14bOutpaintingInput = z.object({
-  video_url: z.string(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  sync_mode: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
+    .optional()
+    .default('auto'),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  enable_auto_downsample: z.boolean().optional().default(false),
-  expand_bottom: z.boolean().optional().default(false),
-  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
   expand_right: z.boolean().optional().default(false),
-  ref_image_urls: z.array(z.string()).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  expand_left: z.boolean().optional().default(false),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  sync_mode: z.boolean().optional().default(false),
-  transparency_mode: z
-    .enum(['content_aware', 'white', 'black'])
-    .optional()
-    .default('content_aware'),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
-  resolution: z
-    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
-    .optional()
-    .default('auto'),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  expand_ratio: z.number().gte(0).lte(1).optional().default(0.25),
+  expand_bottom: z.boolean().optional().default(false),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
+  match_input_num_frames: z.boolean().optional().default(false),
   expand_top: z.boolean().optional().default(false),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
   prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  shift: z.number().gte(1).lte(15).optional().default(5),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
   first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
+  expand_left: z.boolean().optional().default(false),
+  expand_ratio: z.number().gte(0).lte(1).optional().default(0.25),
+  return_frames_zip: z.boolean().optional().default(false),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  transparency_mode: z
+    .enum(['content_aware', 'white', 'black'])
+    .optional()
+    .default('content_aware'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
+  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
+  video_url: z.string(),
+  resolution: z
+    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
     .optional()
     .default('auto'),
-  match_input_num_frames: z.boolean().optional().default(false),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * WanVACEOutpaintingResponse
  */
 export const zWan22VaceFunA14bOutpaintingOutput = z.object({
-  video: zVideoFile,
-  seed: z.int(),
   prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
+  seed: z.int(),
+  video: zVideoFile,
 })
 
 /**
  * WanVACEReframeRequest
  */
 export const zWan22VaceFunA14bReframeInput = z.object({
-  video_url: z.string(),
-  trim_borders: z.boolean().optional().default(true),
-  match_input_frames_per_second: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(false),
+  zoom_factor: z.number().gte(0).lte(0.9).optional().default(0),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  sync_mode: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
+    .optional()
+    .default('auto'),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
   temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  enable_auto_downsample: z.boolean().optional().default(false),
-  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  zoom_factor: z.number().gte(0).lte(0.9).optional().default(0),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  sync_mode: z.boolean().optional().default(false),
-  transparency_mode: z
-    .enum(['content_aware', 'white', 'black'])
-    .optional()
-    .default('content_aware'),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
-  resolution: z
-    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
-    .optional()
-    .default('auto'),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
+  match_input_num_frames: z.boolean().optional().default(true),
+  trim_borders: z.boolean().optional().default(true),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
   prompt: z.string().optional().default(''),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
   first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
+  return_frames_zip: z.boolean().optional().default(false),
+  match_input_frames_per_second: z.boolean().optional().default(true),
+  transparency_mode: z
+    .enum(['content_aware', 'white', 'black'])
+    .optional()
+    .default('content_aware'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
+  last_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
+  video_url: z.string(),
+  resolution: z
+    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
     .optional()
     .default('auto'),
-  match_input_num_frames: z.boolean().optional().default(true),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * WanVACEReframeResponse
  */
 export const zWan22VaceFunA14bReframeOutput = z.object({
-  video: zVideoFile,
-  seed: z.int(),
   prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
+  seed: z.int(),
+  video: zVideoFile,
 })
 
 /**
@@ -22414,15 +23146,15 @@ export const zWan22VaceFunA14bReframeOutput = z.object({
  * Input for image-to-video generation
  */
 export const zWan25PreviewImageToVideoInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.string().min(1),
-  resolution: z.enum(['480p', '720p', '1080p']).optional().default('1080p'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z.enum(['5', '10']).optional().default('5'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   image_url: z.string(),
+  resolution: z.enum(['480p', '720p', '1080p']).optional().default('1080p'),
+  prompt: z.string().min(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
@@ -22431,9 +23163,9 @@ export const zWan25PreviewImageToVideoInput = z.object({
  * Base output for video generation
  */
 export const zWan25PreviewImageToVideoOutput = z.object({
-  video: zVideoFile,
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
   seed: z.int(),
+  video: zVideoFile,
 })
 
 /**
@@ -22442,15 +23174,15 @@ export const zWan25PreviewImageToVideoOutput = z.object({
  * Input for text-to-video generation
  */
 export const zWan25PreviewTextToVideoInput = z.object({
-  enable_safety_checker: z.boolean().optional().default(true),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  resolution: z.enum(['480p', '720p', '1080p']).optional().default('1080p'),
-  enable_prompt_expansion: z.boolean().optional().default(true),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
   duration: z.enum(['5', '10']).optional().default('5'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  resolution: z.enum(['480p', '720p', '1080p']).optional().default('1080p'),
   prompt: z.string().min(1),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
@@ -22459,20 +23191,19 @@ export const zWan25PreviewTextToVideoInput = z.object({
  * Base output for video generation
  */
 export const zWan25PreviewTextToVideoOutput = z.object({
-  video: zVideoFile,
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
   seed: z.int(),
+  video: zVideoFile,
 })
 
 /**
  * BaseInput
  */
 export const zWanEffectsInput = z.object({
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
   num_frames: z.int().gte(81).lte(100).optional().default(81),
-  turbo_mode: z.boolean().optional().default(false),
+  frames_per_second: z.int().gte(5).lte(24).optional().default(16),
   image_url: z.string(),
+  lora_scale: z.number().gte(0.1).lte(2).optional().default(1),
   effect_type: z
     .enum([
       'squish',
@@ -22521,47 +23252,48 @@ export const zWanEffectsInput = z.object({
     ])
     .optional()
     .default('cakeify'),
-  frames_per_second: z.int().gte(5).lte(24).optional().default(16),
-  lora_scale: z.number().gte(0.1).lte(2).optional().default(1),
   subject: z.string(),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  turbo_mode: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
 })
 
 /**
  * WanEffectsOutput
  */
 export const zWanEffectsOutput = z.object({
-  video: zFile,
   seed: z.int(),
+  video: zFile,
 })
 
 /**
  * WanFLF2VRequest
  */
 export const zWanFlf2vInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
-  enable_safety_checker: z.boolean().optional().default(false),
-  end_image_url: z.string(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
-  frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
+  prompt: z.string(),
   num_frames: z.union([z.int().gte(81).lte(100), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
+  start_image_url: z.string(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
+  end_image_url: z.string(),
+  shift: z.number().gte(1).lte(10).optional().default(5),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  enable_safety_checker: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
   guide_scale: z.number().gte(1).lte(10).optional().default(5),
-  start_image_url: z.string(),
-  prompt: z.string(),
-  shift: z.number().gte(1).lte(10).optional().default(5),
 })
 
 /**
@@ -22576,58 +23308,58 @@ export const zWanFlf2vOutput = z.object({
  * WanI2VRequest
  */
 export const zWanI2vInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('auto'),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
+  frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
+  guide_scale: z.number().gte(1).lte(10).optional().default(5),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   num_frames: z.union([z.int().gte(81).lte(100), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
-  frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(10).optional().default(5),
-  guide_scale: z.number().gte(1).lte(10).optional().default(5),
-  image_url: z.string(),
   prompt: z.string(),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  image_url: z.string(),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('auto'),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  shift: z.number().gte(1).lte(10).optional().default(5),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(false),
 })
 
 /**
  * WanLoRAI2VRequest
  */
 export const zWanI2vLoraInput = z.object({
+  shift: z.number().gte(1).lte(10).optional().default(5),
+  num_frames: z.union([z.int().gte(81).lte(100), z.unknown()]).optional(),
+  loras: z.array(zLoraWeightType2).optional().default([]),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  resolution: z.enum(['480p', '720p']).optional().default('720p'),
+  reverse_video: z.boolean().optional().default(false),
+  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
+  guide_scale: z.number().gte(1).lte(10).optional().default(5),
+  turbo_mode: z.boolean().optional().default(true),
   frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
+  enable_safety_checker: z.boolean().optional().default(false),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('16:9'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('16:9'),
-  turbo_mode: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  guide_scale: z.number().gte(1).lte(10).optional().default(5),
-  num_frames: z.union([z.int().gte(81).lte(100), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(10).optional().default(5),
-  reverse_video: z.boolean().optional().default(false),
-  prompt: z.string(),
-  enable_safety_checker: z.boolean().optional().default(false),
-  image_url: z.string(),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '720p']).optional().default('720p'),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
 })
 
 /**
@@ -22650,13 +23382,13 @@ export const zWanI2vOutput = z.object({
  * WanAnimateSimpleInput
  */
 export const zWanMotionInput = z.object({
-  prompt: z.string().optional().default(''),
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   enhance_identity: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  video_url: z.string(),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   adapt_motion: z.boolean().optional().default(true),
+  prompt: z.string().optional().default(''),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   image_url: z.string(),
 })
 
@@ -22664,19 +23396,19 @@ export const zWanMotionInput = z.object({
  * WanAnimateSimpleOutput
  */
 export const zWanMotionOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanProI2VRequest
  */
 export const zWanProImageToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  image_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  enable_safety_checker: z.boolean().optional().default(true),
+  image_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -22690,9 +23422,9 @@ export const zWanProImageToVideoOutput = z.object({
  * WanProT2VRequest
  */
 export const zWanProTextToVideoInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(true),
   prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -22706,6 +23438,10 @@ export const zWanProTextToVideoOutput = z.object({
  * WanT2VRequest
  */
 export const zWanT2vInput = z.object({
+  enable_safety_checker: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
   num_frames: z.union([z.int().gte(81).lte(100), z.unknown()]).optional(),
   negative_prompt: z
     .string()
@@ -22715,37 +23451,33 @@ export const zWanT2vInput = z.object({
     ),
   num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
   enable_prompt_expansion: z.boolean().optional().default(false),
-  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   prompt: z.string(),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
-  enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
   turbo_mode: z.boolean().optional().default(false),
+  frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
 })
 
 /**
  * WanLoRARequest
  */
 export const zWanT2vLoraInput = z.object({
+  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  loras: z.array(zLoraWeightType2).optional().default([]),
   frames_per_second: z.union([z.int().gte(5).lte(24), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
-  reverse_video: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  turbo_mode: z.boolean().optional().default(true),
+  enable_safety_checker: z.boolean().optional().default(false),
+  prompt: z.string(),
   num_frames: z.union([z.int().gte(81).lte(100), z.unknown()]).optional(),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
-  loras: z.array(zLoraWeightType2).optional().default([]),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(30),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  prompt: z.string(),
-  aspect_ratio: z.enum(['9:16', '16:9']).optional().default('16:9'),
-  turbo_mode: z.boolean().optional().default(true),
-  enable_safety_checker: z.boolean().optional().default(false),
+  reverse_video: z.boolean().optional().default(false),
 })
 
 /**
@@ -22760,32 +23492,32 @@ export const zWanT2vLoraOutput = z.object({
  * WanT2VResponse
  */
 export const zWanT2vOutput = z.object({
-  seed: z.int(),
   video: zFile,
+  seed: z.int(),
 })
 
 /**
  * WanAnimateMoveRequest
  */
 export const zWanV2214bAnimateMoveInput = z.object({
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  shift: z.number().gte(1).lte(10).optional().default(5),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(20),
-  enable_output_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  use_turbo: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(1),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   enable_safety_checker: z.boolean().optional().default(false),
-  video_url: z.string(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(20),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(1),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   return_frames_zip: z.boolean().optional().default(false),
+  use_turbo: z.boolean().optional().default(false),
   image_url: z.string(),
 })
 
@@ -22793,34 +23525,34 @@ export const zWanV2214bAnimateMoveInput = z.object({
  * WanAnimateMoveResponse
  */
 export const zWanV2214bAnimateMoveOutput = z.object({
-  frames_zip: z.union([zFile, z.unknown()]).optional(),
-  prompt: z.string(),
-  video: zFile,
   seed: z.int(),
+  prompt: z.string(),
+  frames_zip: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
  * WanAnimateMoveRequest
  */
 export const zWanV2214bAnimateReplaceInput = z.object({
+  video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  shift: z.number().gte(1).lte(10).optional().default(5),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(20),
-  enable_output_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  use_turbo: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(1),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   enable_safety_checker: z.boolean().optional().default(false),
-  video_url: z.string(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(20),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(1),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
   return_frames_zip: z.boolean().optional().default(false),
+  use_turbo: z.boolean().optional().default(false),
   image_url: z.string(),
 })
 
@@ -22828,37 +23560,37 @@ export const zWanV2214bAnimateReplaceInput = z.object({
  * WanAnimateReplaceResponse
  */
 export const zWanV2214bAnimateReplaceOutput = z.object({
-  frames_zip: z.union([zFile, z.unknown()]).optional(),
-  prompt: z.string(),
-  video: zFile,
   seed: z.int(),
+  prompt: z.string(),
+  frames_zip: z.union([zFile, z.unknown()]).optional(),
+  video: zFile,
 })
 
 /**
  * WanS2VRequest
  */
 export const zWanV2214bSpeechToVideoInput = z.object({
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  image_url: z.string(),
+  negative_prompt: z.string().optional().default(''),
   audio_url: z.string(),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
   enable_output_safety_checker: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.string().optional().default(''),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
-  image_url: z.string(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   enable_safety_checker: z.boolean().optional().default(false),
   shift: z.number().gte(1).lte(10).optional().default(5),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('480p'),
-  num_frames: z.int().gte(40).lte(120).optional().default(80),
+  prompt: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  num_frames: z.int().gte(40).lte(120).optional().default(80),
 })
 
 /**
@@ -22872,71 +23604,70 @@ export const zWanV2214bSpeechToVideoOutput = z.object({
  * WanSmallI2VRequest
  */
 export const zWanV225bImageToVideoInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('auto'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
   image_url: z.string(),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(0),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   shift: z.number().gte(1).lte(10).optional().default(5),
   enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   resolution: z.enum(['580p', '720p']).optional().default('720p'),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  prompt: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('auto'),
 })
 
 /**
  * WanSmallI2VResponse
  */
 export const zWanV225bImageToVideoOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanDistillT2VRequest
  */
 export const zWanV225bTextToVideoDistillInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
   guidance_scale: z.number().gte(1).lte(10).optional().default(1),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(0),
   shift: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  prompt: z.string(),
   resolution: z.enum(['580p', '720p']).optional().default('720p'),
   num_frames: z.int().gte(17).lte(161).optional().default(81),
   enable_prompt_expansion: z.boolean().optional().default(false),
@@ -22944,39 +23675,39 @@ export const zWanV225bTextToVideoDistillInput = z.object({
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
  * WanSmallT2VResponse
  */
 export const zWanV225bTextToVideoDistillOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanSmallFastVideoT2VRequest
  */
 export const zWanV225bTextToVideoFastWanInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(0),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  prompt: z.string(),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
   num_frames: z.int().gte(17).lte(161).optional().default(81),
   enable_prompt_expansion: z.boolean().optional().default(false),
@@ -22984,178 +23715,179 @@ export const zWanV225bTextToVideoFastWanInput = z.object({
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
  * WanSmallFastVideoT2VResponse
  */
 export const zWanV225bTextToVideoFastWanOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanSmallT2VRequest
  */
 export const zWanV225bTextToVideoInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  negative_prompt: z.string().optional().default(''),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(40),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(0),
-  shift: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  shift: z.number().gte(1).lte(10).optional().default(5),
   resolution: z.enum(['580p', '720p']).optional().default('720p'),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  prompt: z.string(),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
  * WanSmallT2VResponse
  */
 export const zWanV225bTextToVideoOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanI2VRequest
  */
 export const zWanV22A14bImageToVideoInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('auto'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(3.5),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(3.5),
   image_url: z.string(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
-  enable_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(5),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(1),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  shift: z.number().gte(1).lte(10).optional().default(5),
+  enable_safety_checker: z.boolean().optional().default(false),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  prompt: z.string(),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('auto'),
 })
 
 /**
  * WanLoRAI2VRequest
  */
 export const zWanV22A14bImageToVideoLoraInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  loras: z.array(zLoRaWeightType2).optional().default([]),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  reverse_video: z.boolean().optional().default(false),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
   image_url: z.string(),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
-  loras: z.array(zLoRaWeightType2).optional().default([]),
-  num_interpolated_frames: z.int().gte(0).lte(4).optional().default(1),
+  negative_prompt: z.string().optional().default(''),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   shift: z.number().gte(1).lte(10).optional().default(5),
   enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_interpolated_frames: z.int().gte(0).lte(4).optional().default(1),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  prompt: z.string(),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  reverse_video: z.boolean().optional().default(false),
 })
 
 /**
  * WanI2VResponse
  */
 export const zWanV22A14bImageToVideoLoraOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanI2VResponse
  */
 export const zWanV22A14bImageToVideoOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanTurboI2VRequest
  */
 export const zWanV22A14bImageToVideoTurboInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['auto', '16:9', '9:16', '1:1'])
     .optional()
     .default('auto'),
   enable_output_safety_checker: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(false),
   end_image_url: z.union([z.string(), z.unknown()]).optional(),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_safety_checker: z.boolean().optional().default(false),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
+  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   enable_prompt_expansion: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
@@ -23168,180 +23900,180 @@ export const zWanV22A14bImageToVideoTurboInput = z.object({
  * WanTurboI2VResponse
  */
 export const zWanV22A14bImageToVideoTurboOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanT2VRequest
  */
 export const zWanV22A14bTextToVideoInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(1),
-  shift: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   enable_safety_checker: z.boolean().optional().default(false),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  shift: z.number().gte(1).lte(10).optional().default(5),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  prompt: z.string(),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
  * WanLoRAT2VRequest
  */
 export const zWanV22A14bTextToVideoLoraInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
+  loras: z.array(zLoRaWeightType2).optional().default([]),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  reverse_video: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
-  loras: z.array(zLoRaWeightType2).optional().default([]),
-  enable_safety_checker: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(5),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(1),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  shift: z.number().gte(1).lte(10).optional().default(5),
+  enable_safety_checker: z.boolean().optional().default(false),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  prompt: z.string(),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  reverse_video: z.boolean().optional().default(false),
 })
 
 /**
  * WanT2VResponse
  */
 export const zWanV22A14bTextToVideoLoraOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanT2VResponse
  */
 export const zWanV22A14bTextToVideoOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanTurboT2VRequest
  */
 export const zWanV22A14bTextToVideoTurboInput = z.object({
-  prompt: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_output_safety_checker: z.boolean().optional().default(false),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
-  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   enable_safety_checker: z.boolean().optional().default(false),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
+  prompt: z.string(),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   enable_prompt_expansion: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  aspect_ratio: z.enum(['16:9', '9:16', '1:1']).optional().default('16:9'),
 })
 
 /**
  * WanTurboT2VResponse
  */
 export const zWanV22A14bTextToVideoTurboOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
  * WanV2VRequest
  */
 export const zWanV22A14bVideoToVideoInput = z.object({
-  prompt: z.string(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('auto'),
-  enable_output_safety_checker: z.boolean().optional().default(false),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  adjust_fps_for_interpolation: z.boolean().optional().default(true),
-  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
-  negative_prompt: z.string().optional().default(''),
-  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
+  video_url: z.string(),
+  strength: z.number().gte(0).lte(1).optional().default(0.9),
+  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
   guidance_scale: z.number().gte(1).lte(10).optional().default(3.5),
+  acceleration: z.enum(['none', 'regular']).optional().default('regular'),
   interpolator_model: z
     .enum(['none', 'film', 'rife'])
     .optional()
     .default('film'),
-  num_inference_steps: z.int().gte(2).lte(40).optional().default(27),
-  strength: z.number().gte(0).lte(1).optional().default(0.9),
-  enable_safety_checker: z.boolean().optional().default(false),
-  video_url: z.string(),
+  guidance_scale_2: z.number().gte(1).lte(10).optional().default(4),
   resample_fps: z.boolean().optional().default(false),
-  shift: z.number().gte(1).lte(10).optional().default(5),
-  frames_per_second: z.union([z.int().gte(4).lte(60), z.unknown()]).optional(),
-  resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
+  negative_prompt: z.string().optional().default(''),
   num_interpolated_frames: z.int().gte(0).lte(4).optional().default(1),
-  num_frames: z.int().gte(17).lte(161).optional().default(81),
-  enable_prompt_expansion: z.boolean().optional().default(false),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
+  enable_output_safety_checker: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
+  shift: z.number().gte(1).lte(10).optional().default(5),
+  resolution: z.enum(['480p', '580p', '720p']).optional().default('720p'),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
+  prompt: z.string(),
+  num_frames: z.int().gte(17).lte(161).optional().default(81),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  adjust_fps_for_interpolation: z.boolean().optional().default(true),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('auto'),
 })
 
 /**
  * WanV2VResponse
  */
 export const zWanV22A14bVideoToVideoOutput = z.object({
+  seed: z.int(),
   prompt: z.string().optional().default(''),
   video: zFile,
-  seed: z.int(),
 })
 
 /**
@@ -23353,10 +24085,9 @@ export const zWanV22A14bVideoToVideoOutput = z.object({
  * and video style transfer.
  */
 export const zWanV27EditVideoInput = z.object({
-  prompt: z.string().min(1),
-  aspect_ratio: z
-    .union([z.enum(['16:9', '9:16', '1:1', '4:3', '3:4']), z.unknown()])
-    .optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  video_url: z.string(),
   duration: z
     .union([
       z.literal(0),
@@ -23372,11 +24103,12 @@ export const zWanV27EditVideoInput = z.object({
     ])
     .optional()
     .default(0),
-  video_url: z.string(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z
+    .union([z.enum(['16:9', '9:16', '1:1', '4:3', '3:4']), z.unknown()])
+    .optional(),
   reference_image_url: z.union([z.string(), z.unknown()]).optional(),
-  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  enable_safety_checker: z.boolean().optional().default(true),
+  prompt: z.string().min(1),
   audio_setting: z.enum(['auto', 'origin']).optional().default('auto'),
 })
 
@@ -23386,8 +24118,8 @@ export const zWanV27EditVideoInput = z.object({
  * Output for Wan 2.7 video editing.
  */
 export const zWanV27EditVideoOutput = z.object({
-  video: zVideoFile,
   seed: z.int(),
+  video: zVideoFile,
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -23402,13 +24134,14 @@ export const zWanV27EditVideoOutput = z.object({
  * - Video continuation (provide video_url instead of image_url)
  */
 export const zWanV27ImageToVideoInput = z.object({
+  prompt: z.union([z.string(), z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.union([z.string(), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
   enable_safety_checker: z.boolean().optional().default(true),
   enable_prompt_expansion: z.boolean().optional().default(true),
-  image_url: z.union([z.string(), z.unknown()]).optional(),
-  prompt: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
-  end_image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_url: z.union([z.string(), z.unknown()]).optional(),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   duration: z
     .union([
@@ -23429,8 +24162,7 @@ export const zWanV27ImageToVideoInput = z.object({
     ])
     .optional()
     .default(5),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  video_url: z.union([z.string(), z.unknown()]).optional(),
+  end_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -23439,8 +24171,8 @@ export const zWanV27ImageToVideoInput = z.object({
  * Output for Wan 2.7 image-to-video generation.
  */
 export const zWanV27ImageToVideoOutput = z.object({
-  seed: z.int(),
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.int(),
   video: zVideoFile,
 })
 
@@ -23453,16 +24185,6 @@ export const zWanV27ImageToVideoOutput = z.object({
  * and/or videos. Also supports multi-shot narration.
  */
 export const zWanV27ReferenceToVideoInput = z.object({
-  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
-  reference_video_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
-  aspect_ratio: z
-    .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
-    .optional()
-    .default('16:9'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  enable_safety_checker: z.boolean().optional().default(true),
-  multi_shots: z.boolean().optional().default(false),
-  prompt: z.string().min(1),
   duration: z
     .union([
       z.literal(2),
@@ -23479,6 +24201,16 @@ export const zWanV27ReferenceToVideoInput = z.object({
     .default(5),
   negative_prompt: z.union([z.string(), z.unknown()]).optional(),
   reference_image_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  multi_shots: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(true),
+  reference_video_urls: z.union([z.array(z.string()), z.unknown()]).optional(),
+  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  prompt: z.string().min(1),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  aspect_ratio: z
+    .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
+    .optional()
+    .default('16:9'),
 })
 
 /**
@@ -23487,8 +24219,8 @@ export const zWanV27ReferenceToVideoInput = z.object({
  * Output for Wan 2.7 reference-to-video generation.
  */
 export const zWanV27ReferenceToVideoOutput = z.object({
-  video: zVideoFile,
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
+  video: zVideoFile,
   seed: z.int(),
 })
 
@@ -23498,15 +24230,16 @@ export const zWanV27ReferenceToVideoOutput = z.object({
  * Input for Wan 2.7 text-to-video generation.
  */
 export const zWanV27TextToVideoInput = z.object({
-  prompt: z.string().min(1),
-  audio_url: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  enable_prompt_expansion: z.boolean().optional().default(true),
+  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
   aspect_ratio: z
     .enum(['16:9', '9:16', '1:1', '4:3', '3:4'])
     .optional()
     .default('16:9'),
-  resolution: z.enum(['720p', '1080p']).optional().default('1080p'),
+  negative_prompt: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  audio_url: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().min(1),
   duration: z
     .union([
       z.literal(2),
@@ -23527,7 +24260,6 @@ export const zWanV27TextToVideoInput = z.object({
     .optional()
     .default(5),
   enable_safety_checker: z.boolean().optional().default(true),
-  enable_prompt_expansion: z.boolean().optional().default(true),
 })
 
 /**
@@ -23536,66 +24268,66 @@ export const zWanV27TextToVideoInput = z.object({
  * Output for Wan 2.7 text-to-video generation.
  */
 export const zWanV27TextToVideoOutput = z.object({
+  video: zVideoFile,
   seed: z.int(),
   actual_prompt: z.union([z.string(), z.unknown()]).optional(),
-  video: zVideoFile,
 })
 
 /**
  * WanVACEDepthRequest
  */
 export const zWanVace14bDepthInput = z.object({
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
   video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
   match_input_num_frames: z.boolean().optional().default(false),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
   transparency_mode: z
     .enum(['content_aware', 'white', 'black'])
     .optional()
     .default('content_aware'),
-  ref_image_urls: z.array(z.string()).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  prompt: z.string(),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  preprocess: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
   last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  enable_auto_downsample: z.boolean().optional().default(false),
+  preprocess: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  return_frames_zip: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  prompt: z.string(),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
     .optional()
     .default('auto'),
 })
@@ -23604,69 +24336,69 @@ export const zWanVace14bDepthInput = z.object({
  * WanVACEDepthResponse
  */
 export const zWanVace14bDepthOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zVideoFile,
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * WanVACEInpaintingRequest
  */
 export const zWanVace14bInpaintingInput = z.object({
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
   video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  mask_video_url: z.union([z.string(), z.unknown()]).optional(),
   match_input_num_frames: z.boolean().optional().default(false),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
   transparency_mode: z
     .enum(['content_aware', 'white', 'black'])
     .optional()
     .default('content_aware'),
-  ref_image_urls: z.array(z.string()).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  mask_video_url: z.union([z.string(), z.unknown()]).optional(),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  prompt: z.string(),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  preprocess: z.boolean().optional().default(false),
-  return_frames_zip: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
   last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  enable_auto_downsample: z.boolean().optional().default(false),
+  preprocess: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  return_frames_zip: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  prompt: z.string(),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
     .optional()
     .default('auto'),
 })
@@ -23675,73 +24407,73 @@ export const zWanVace14bInpaintingInput = z.object({
  * WanVACEInpaintingResponse
  */
 export const zWanVace14bInpaintingOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zVideoFile,
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * WanVACERequest
  */
 export const zWanVace14bInput = z.object({
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
   video_url: z.union([z.string(), z.unknown()]).optional(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  mask_video_url: z.union([z.string(), z.unknown()]).optional(),
   match_input_num_frames: z.boolean().optional().default(false),
-  task: z
-    .enum(['depth', 'pose', 'inpainting', 'outpainting', 'reframe'])
-    .optional()
-    .default('depth'),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
   transparency_mode: z
     .enum(['content_aware', 'white', 'black'])
     .optional()
     .default('content_aware'),
-  ref_image_urls: z.array(z.string()).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  mask_video_url: z.union([z.string(), z.unknown()]).optional(),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  prompt: z.string(),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  preprocess: z.boolean().optional().default(false),
-  return_frames_zip: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
   last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  enable_auto_downsample: z.boolean().optional().default(false),
+  preprocess: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  task: z
+    .enum(['depth', 'pose', 'inpainting', 'outpainting', 'reframe'])
+    .optional()
+    .default('depth'),
+  mask_image_url: z.union([z.string(), z.unknown()]).optional(),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  return_frames_zip: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  prompt: z.string(),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
     .optional()
     .default('auto'),
 })
@@ -23750,140 +24482,140 @@ export const zWanVace14bInput = z.object({
  * WanVACEOutpaintingRequest
  */
 export const zWanVace14bOutpaintingInput = z.object({
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
   video_url: z.string(),
-  match_input_num_frames: z.boolean().optional().default(false),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
-  transparency_mode: z
-    .enum(['content_aware', 'white', 'black'])
-    .optional()
-    .default('content_aware'),
-  ref_image_urls: z.array(z.string()).optional(),
-  expand_ratio: z.number().gte(0).lte(1).optional().default(0.25),
+  expand_top: z.boolean().optional().default(false),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   aspect_ratio: z
     .enum(['auto', '16:9', '1:1', '9:16'])
     .optional()
     .default('auto'),
-  expand_top: z.boolean().optional().default(false),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  prompt: z.string(),
+  expand_bottom: z.boolean().optional().default(false),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
   acceleration: z
     .union([z.enum(['none', 'low', 'regular']), z.unknown()])
     .optional(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  match_input_num_frames: z.boolean().optional().default(false),
+  transparency_mode: z
+    .enum(['content_aware', 'white', 'black'])
     .optional()
-    .default('balanced'),
+    .default('content_aware'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  expand_right: z.boolean().optional().default(false),
-  expand_bottom: z.boolean().optional().default(false),
-  expand_left: z.boolean().optional().default(false),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
+  expand_ratio: z.number().gte(0).lte(1).optional().default(0.25),
   last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  enable_auto_downsample: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  return_frames_zip: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
+  expand_right: z.boolean().optional().default(false),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
     .optional()
     .default('auto'),
+  prompt: z.string(),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
+  expand_left: z.boolean().optional().default(false),
 })
 
 /**
  * WanVACEOutpaintingResponse
  */
 export const zWanVace14bOutpaintingOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zVideoFile,
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * WanVACEResponse
  */
 export const zWanVace14bOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zVideoFile,
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * WanVACEPoseRequest
  */
 export const zWanVace14bPoseInput = z.object({
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
   video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
   match_input_num_frames: z.boolean().optional().default(false),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
   transparency_mode: z
     .enum(['content_aware', 'white', 'black'])
     .optional()
     .default('content_aware'),
-  ref_image_urls: z.array(z.string()).optional(),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  prompt: z.string(),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  preprocess: z.boolean().optional().default(false),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
   last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_frames_per_second: z.boolean().optional().default(false),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  enable_auto_downsample: z.boolean().optional().default(false),
+  preprocess: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  ref_image_urls: z.array(z.string()).optional(),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  return_frames_zip: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  prompt: z.string(),
+  match_input_frames_per_second: z.boolean().optional().default(false),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
     .optional()
     .default('auto'),
 })
@@ -23892,67 +24624,67 @@ export const zWanVace14bPoseInput = z.object({
  * WanVACEPoseResponse
  */
 export const zWanVace14bPoseOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zVideoFile,
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * WanVACEReframeRequest
  */
 export const zWanVace14bReframeInput = z.object({
-  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
-  enable_safety_checker: z.boolean().optional().default(false),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
   video_url: z.string(),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  enable_auto_downsample: z.boolean().optional().default(false),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
   match_input_num_frames: z.boolean().optional().default(true),
-  zoom_factor: z.number().gte(0).lte(0.9).optional().default(0),
-  num_frames: z.int().gte(17).lte(241).optional().default(81),
   transparency_mode: z
     .enum(['content_aware', 'white', 'black'])
     .optional()
     .default('content_aware'),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  prompt: z.string().optional().default(''),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  video_write_mode: z
-    .enum(['fast', 'balanced', 'small'])
-    .optional()
-    .default('balanced'),
+  shift: z.number().gte(1).lte(15).optional().default(5),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  trim_borders: z.boolean().optional().default(true),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  return_frames_zip: z.boolean().optional().default(false),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  video_write_mode: z
+    .enum(['fast', 'balanced', 'small'])
+    .optional()
+    .default('balanced'),
   sync_mode: z.boolean().optional().default(false),
+  enable_safety_checker: z.boolean().optional().default(false),
   last_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  shift: z.number().gte(1).lte(15).optional().default(5),
-  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
-  enable_prompt_expansion: z.boolean().optional().default(false),
-  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
-  match_input_frames_per_second: z.boolean().optional().default(true),
+  zoom_factor: z.number().gte(0).lte(0.9).optional().default(0),
   video_quality: z
     .enum(['low', 'medium', 'high', 'maximum'])
     .optional()
     .default('high'),
-  enable_auto_downsample: z.boolean().optional().default(false),
+  enable_prompt_expansion: z.boolean().optional().default(false),
+  trim_borders: z.boolean().optional().default(true),
+  frames_per_second: z.union([z.int().gte(5).lte(30), z.unknown()]).optional(),
+  first_frame_url: z.union([z.string(), z.unknown()]).optional(),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
+  return_frames_zip: z.boolean().optional().default(false),
+  num_interpolated_frames: z.int().gte(0).lte(5).optional().default(0),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  prompt: z.string().optional().default(''),
+  match_input_frames_per_second: z.boolean().optional().default(true),
+  num_frames: z.int().gte(17).lte(241).optional().default(81),
+  temporal_downsample_factor: z.int().gte(0).lte(5).optional().default(0),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
     .optional()
     .default('auto'),
 })
@@ -23961,62 +24693,62 @@ export const zWanVace14bReframeInput = z.object({
  * WanVACEReframeResponse
  */
 export const zWanVace14bReframeOutput = z.object({
+  seed: z.int(),
+  prompt: z.string(),
   frames_zip: z.union([zFile, z.unknown()]).optional(),
   video: zVideoFile,
-  prompt: z.string(),
-  seed: z.int(),
 })
 
 /**
  * LongWanVACEReframeRequest
  */
 export const zWanVaceAppsLongReframeInput = z.object({
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  paste_back: z.boolean().optional().default(true),
+  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
+  video_url: z.string(),
+  scene_threshold: z.number().gte(0).lte(100).optional().default(30),
+  enable_auto_downsample: z.boolean().optional().default(true),
+  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
+  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
+  return_frames_zip: z.boolean().optional().default(false),
+  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(6),
+  transparency_mode: z
+    .enum(['content_aware', 'white', 'black'])
+    .optional()
+    .default('content_aware'),
   negative_prompt: z
     .string()
     .optional()
     .default(
       'letterboxing, borders, black bars, bright colors, overexposed, static, blurred details, subtitles, style, artwork, painting, picture, still, overall gray, worst quality, low quality, JPEG compression residue, ugly, incomplete, extra fingers, poorly drawn hands, poorly drawn faces, deformed, disfigured, malformed limbs, fused fingers, still picture, cluttered background, three legs, many people in the background, walking backwards',
     ),
-  num_inference_steps: z.int().gte(2).lte(50).optional().default(30),
-  return_frames_zip: z.boolean().optional().default(false),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '1:1', '9:16'])
-    .optional()
-    .default('auto'),
-  transparency_mode: z
-    .enum(['content_aware', 'white', 'black'])
-    .optional()
-    .default('content_aware'),
-  paste_back: z.boolean().optional().default(true),
-  interpolator_model: z.enum(['rife', 'film']).optional().default('film'),
-  scene_threshold: z.number().gte(0).lte(100).optional().default(30),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
-  sampler: z.enum(['unipc', 'dpm++', 'euler']).optional().default('unipc'),
-  zoom_factor: z.number().gte(0).lte(0.9).optional().default(0),
-  video_url: z.string(),
   shift: z.number().gte(1).lte(15).optional().default(5),
-  enable_auto_downsample: z.boolean().optional().default(true),
-  video_quality: z
-    .enum(['low', 'medium', 'high', 'maximum'])
-    .optional()
-    .default('high'),
-  sync_mode: z.boolean().optional().default(false),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
-  resolution: z
-    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
-    .optional()
-    .default('auto'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(6),
-  prompt: z.string().optional().default(''),
-  enable_safety_checker: z.boolean().optional().default(false),
   video_write_mode: z
     .enum(['fast', 'balanced', 'small'])
     .optional()
     .default('balanced'),
+  enable_safety_checker: z.boolean().optional().default(false),
+  sync_mode: z.boolean().optional().default(false),
+  resolution: z
+    .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
+    .optional()
+    .default('auto'),
+  zoom_factor: z.number().gte(0).lte(0.9).optional().default(0),
+  video_quality: z
+    .enum(['low', 'medium', 'high', 'maximum'])
+    .optional()
+    .default('high'),
+  prompt: z.string().optional().default(''),
   trim_borders: z.boolean().optional().default(true),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '1:1', '9:16'])
+    .optional()
+    .default('auto'),
 })
 
 /**
@@ -24032,23 +24764,23 @@ export const zWanVaceAppsLongReframeOutput = z.object({
 export const zWanVaceAppsVideoEditInput = z.object({
   video_type: z.enum(['auto', 'general', 'human']).optional().default('auto'),
   video_url: z.string(),
-  acceleration: z
-    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
-    .optional(),
+  enable_safety_checker: z.boolean().optional().default(true),
   enable_auto_downsample: z.boolean().optional().default(true),
-  return_frames_zip: z.boolean().optional().default(false),
-  aspect_ratio: z
-    .enum(['auto', '16:9', '9:16', '1:1'])
-    .optional()
-    .default('auto'),
   resolution: z
     .enum(['auto', '240p', '360p', '480p', '580p', '720p'])
     .optional()
     .default('auto'),
   prompt: z.string(),
   auto_downsample_min_fps: z.number().gte(1).lte(60).optional().default(15),
-  enable_safety_checker: z.boolean().optional().default(true),
+  return_frames_zip: z.boolean().optional().default(false),
+  acceleration: z
+    .union([z.enum(['none', 'low', 'regular']), z.unknown()])
+    .optional(),
   image_urls: z.array(z.string()).optional().default([]),
+  aspect_ratio: z
+    .enum(['auto', '16:9', '9:16', '1:1'])
+    .optional()
+    .default('auto'),
 })
 
 /**
@@ -24065,9 +24797,51 @@ export const zWanVaceAppsVideoEditOutput = z.object({
  * Input model for automatic subtitle generation and styling
  */
 export const zWorkflowUtilitiesAutoSubtitleInput = z.object({
-  font_name: z.string().optional().default('Montserrat'),
-  language: z.string().optional().default('en'),
   font_weight: z.enum(['normal', 'bold', 'black']).optional().default('bold'),
+  stroke_width: z.int().gte(0).lte(10).optional().default(3),
+  language: z.string().optional().default('en'),
+  position: z.enum(['top', 'center', 'bottom']).optional().default('bottom'),
+  stroke_color: z
+    .enum([
+      'black',
+      'white',
+      'red',
+      'green',
+      'blue',
+      'yellow',
+      'orange',
+      'purple',
+      'pink',
+      'brown',
+      'gray',
+      'cyan',
+      'magenta',
+    ])
+    .optional()
+    .default('black'),
+  words_per_subtitle: z.int().gte(1).lte(12).optional().default(3),
+  font_size: z.int().gte(20).lte(150).optional().default(100),
+  highlight_color: z
+    .enum([
+      'white',
+      'black',
+      'red',
+      'green',
+      'blue',
+      'yellow',
+      'orange',
+      'purple',
+      'pink',
+      'brown',
+      'gray',
+      'cyan',
+      'magenta',
+    ])
+    .optional()
+    .default('purple'),
+  font_name: z.string().optional().default('Montserrat'),
+  background_opacity: z.number().gte(0).lte(1).optional().default(0),
+  enable_animation: z.boolean().optional().default(true),
   background_color: z
     .enum([
       'black',
@@ -24088,7 +24862,6 @@ export const zWorkflowUtilitiesAutoSubtitleInput = z.object({
     ])
     .optional()
     .default('none'),
-  y_offset: z.int().gte(-200).lte(200).optional().default(75),
   video_url: z.string(),
   font_color: z
     .enum([
@@ -24108,48 +24881,7 @@ export const zWorkflowUtilitiesAutoSubtitleInput = z.object({
     ])
     .optional()
     .default('white'),
-  enable_animation: z.boolean().optional().default(true),
-  highlight_color: z
-    .enum([
-      'white',
-      'black',
-      'red',
-      'green',
-      'blue',
-      'yellow',
-      'orange',
-      'purple',
-      'pink',
-      'brown',
-      'gray',
-      'cyan',
-      'magenta',
-    ])
-    .optional()
-    .default('purple'),
-  position: z.enum(['top', 'center', 'bottom']).optional().default('bottom'),
-  stroke_width: z.int().gte(0).lte(10).optional().default(3),
-  stroke_color: z
-    .enum([
-      'black',
-      'white',
-      'red',
-      'green',
-      'blue',
-      'yellow',
-      'orange',
-      'purple',
-      'pink',
-      'brown',
-      'gray',
-      'cyan',
-      'magenta',
-    ])
-    .optional()
-    .default('black'),
-  background_opacity: z.number().gte(0).lte(1).optional().default(0),
-  words_per_subtitle: z.int().gte(1).lte(12).optional().default(3),
-  font_size: z.int().gte(20).lte(150).optional().default(100),
+  y_offset: z.int().gte(-200).lte(200).optional().default(75),
 })
 
 /**
@@ -24159,14 +24891,14 @@ export const zWorkflowUtilitiesAutoSubtitleInput = z.object({
  */
 export const zWorkflowUtilitiesAutoSubtitleOutput = z.object({
   transcription: z.string(),
-  transcription_metadata: z
-    .union([z.record(z.string(), z.unknown()), z.unknown()])
-    .optional(),
-  video: zFile,
-  subtitle_count: z.int(),
   words: z
     .union([z.array(z.record(z.string(), z.unknown())), z.unknown()])
     .optional(),
+  transcription_metadata: z
+    .union([z.record(z.string(), z.unknown()), z.unknown()])
+    .optional(),
+  subtitle_count: z.int(),
+  video: zFile,
 })
 
 /**
@@ -24175,6 +24907,7 @@ export const zWorkflowUtilitiesAutoSubtitleOutput = z.object({
  * Input model for blending two video frames together
  */
 export const zWorkflowUtilitiesBlendVideoInput = z.object({
+  top_video_url: z.string(),
   blend_mode: z
     .enum([
       'addition',
@@ -24203,10 +24936,9 @@ export const zWorkflowUtilitiesBlendVideoInput = z.object({
     ])
     .optional()
     .default('overlay'),
+  shortest: z.boolean().optional().default(true),
   bottom_video_url: z.string(),
   opacity: z.number().gte(0).lte(1).optional().default(1),
-  shortest: z.boolean().optional().default(true),
-  top_video_url: z.string(),
 })
 
 /**
@@ -24242,20 +24974,20 @@ export const zWorkflowUtilitiesReverseVideoOutput = z.object({
  * Input model for scaling/resizing a video to specific dimensions
  */
 export const zWorkflowUtilitiesScaleVideoInput = z.object({
-  video_url: z.string(),
+  width: z.union([z.int().gte(2).lte(7680), z.unknown()]).optional(),
+  codec: z.enum(['libx264', 'libx265']).optional().default('libx264'),
   preset: z
     .enum(['ultrafast', 'fast', 'medium', 'slow'])
     .optional()
     .default('fast'),
   height: z.union([z.int().gte(2).lte(4320), z.unknown()]).optional(),
+  mode: z.enum(['stretch', 'pad', 'crop']).optional().default('stretch'),
+  crf: z.int().gte(0).lte(51).optional().default(18),
   pad_color: z
     .enum(['black', 'white', 'red', 'green', 'blue', 'gray'])
     .optional()
     .default('black'),
-  crf: z.int().gte(0).lte(51).optional().default(18),
-  mode: z.enum(['stretch', 'pad', 'crop']).optional().default('stretch'),
-  codec: z.enum(['libx264', 'libx265']).optional().default('libx264'),
-  width: z.union([z.int().gte(2).lte(7680), z.unknown()]).optional(),
+  video_url: z.string(),
 })
 
 /**
@@ -24265,10 +24997,10 @@ export const zWorkflowUtilitiesScaleVideoInput = z.object({
  */
 export const zWorkflowUtilitiesScaleVideoOutput = z.object({
   scaled_width: z.int(),
-  original_width: z.int(),
-  video: zFile,
   scaled_height: z.int(),
   original_height: z.int(),
+  video: zFile,
+  original_width: z.int(),
 })
 
 /**
@@ -24277,9 +25009,9 @@ export const zWorkflowUtilitiesScaleVideoOutput = z.object({
  * Input model for trimming a video to a specified time range
  */
 export const zWorkflowUtilitiesTrimVideoInput = z.object({
-  video_url: z.string(),
-  end_time: z.union([z.number(), z.unknown()]).optional(),
   start_time: z.number().gte(0).optional().default(1),
+  end_time: z.union([z.number(), z.unknown()]).optional(),
+  video_url: z.string(),
   duration: z.union([z.number(), z.unknown()]).optional(),
 })
 
@@ -24289,9 +25021,9 @@ export const zWorkflowUtilitiesTrimVideoInput = z.object({
  * Output model for trimmed video
  */
 export const zWorkflowUtilitiesTrimVideoOutput = z.object({
-  original_duration: z.number(),
   trimmed_duration: z.number(),
   video: zFile,
+  original_duration: z.number(),
 })
 
 export const zPostAlibabaHappyHorseImageToVideoBody =
@@ -24728,6 +25460,54 @@ export const zPostBriaVideoBackgroundRemovalBody = zVideoBackgroundRemovalInput
  */
 export const zPostBriaVideoBackgroundRemovalResponse = zQueueStatus
 
+export const zPostBriaVideoBackgroundRemovalRealtimeBody =
+  zVideoBackgroundRemovalRealtimeInput
+
+/**
+ * The request status.
+ */
+export const zPostBriaVideoBackgroundRemovalRealtimeResponse = zQueueStatus
+
+export const zGetBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdResponse =
+  zVideoBackgroundRemovalRealtimeOutput
+
+export const zPutBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetBriaVideoBackgroundRemovalRealtimeRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
 export const zGetBriaVideoBackgroundRemovalRequestsByRequestIdPath = z.object({
   request_id: z.string(),
 })
@@ -24765,6 +25545,55 @@ export const zGetBriaVideoBackgroundRemovalRequestsByRequestIdStatusQuery =
  * The request status.
  */
 export const zGetBriaVideoBackgroundRemovalRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostBriaVideoBackgroundRemovalV3Body =
+  zVideoBackgroundRemovalV3Input
+
+/**
+ * The request status.
+ */
+export const zPostBriaVideoBackgroundRemovalV3Response = zQueueStatus
+
+export const zGetBriaVideoBackgroundRemovalV3RequestsByRequestIdPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+/**
+ * Result of the request.
+ */
+export const zGetBriaVideoBackgroundRemovalV3RequestsByRequestIdResponse =
+  zVideoBackgroundRemovalV3Output
+
+export const zPutBriaVideoBackgroundRemovalV3RequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutBriaVideoBackgroundRemovalV3RequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetBriaVideoBackgroundRemovalV3RequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetBriaVideoBackgroundRemovalV3RequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetBriaVideoBackgroundRemovalV3RequestsByRequestIdStatusResponse =
   zQueueStatus
 
 export const zPostBriaVideoEraseKeypointsBody = zVideoEraseKeypointsInput
@@ -25812,6 +26641,196 @@ export const zGetFalAiBenV2VideoRequestsByRequestIdStatusQuery = z.object({
  * The request status.
  */
 export const zGetFalAiBenV2VideoRequestsByRequestIdStatusResponse = zQueueStatus
+
+export const zPostFalAiBerniniREditVideoBody = zBerniniREditVideoInput
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBerniniREditVideoResponse = zQueueStatus
+
+export const zGetFalAiBerniniREditVideoRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBerniniREditVideoRequestsByRequestIdResponse =
+  zBerniniREditVideoOutput
+
+export const zPutFalAiBerniniREditVideoRequestsByRequestIdCancelPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBerniniREditVideoRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetFalAiBerniniREditVideoRequestsByRequestIdStatusPath = z.object(
+  {
+    request_id: z.string(),
+  },
+)
+
+export const zGetFalAiBerniniREditVideoRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBerniniREditVideoRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostFalAiBerniniRReferenceEditVideoBody =
+  zBerniniRReferenceEditVideoInput
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBerniniRReferenceEditVideoResponse = zQueueStatus
+
+export const zGetFalAiBerniniRReferenceEditVideoRequestsByRequestIdPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBerniniRReferenceEditVideoRequestsByRequestIdResponse =
+  zBerniniRReferenceEditVideoOutput
+
+export const zPutFalAiBerniniRReferenceEditVideoRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBerniniRReferenceEditVideoRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetFalAiBerniniRReferenceEditVideoRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetFalAiBerniniRReferenceEditVideoRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBerniniRReferenceEditVideoRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostFalAiBerniniRReferenceToVideoBody =
+  zBerniniRReferenceToVideoInput
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBerniniRReferenceToVideoResponse = zQueueStatus
+
+export const zGetFalAiBerniniRReferenceToVideoRequestsByRequestIdPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBerniniRReferenceToVideoRequestsByRequestIdResponse =
+  zBerniniRReferenceToVideoOutput
+
+export const zPutFalAiBerniniRReferenceToVideoRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBerniniRReferenceToVideoRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetFalAiBerniniRReferenceToVideoRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetFalAiBerniniRReferenceToVideoRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBerniniRReferenceToVideoRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostFalAiBerniniRTextToVideoBody = zBerniniRTextToVideoInput
+
+/**
+ * The request status.
+ */
+export const zPostFalAiBerniniRTextToVideoResponse = zQueueStatus
+
+export const zGetFalAiBerniniRTextToVideoRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetFalAiBerniniRTextToVideoRequestsByRequestIdResponse =
+  zBerniniRTextToVideoOutput
+
+export const zPutFalAiBerniniRTextToVideoRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutFalAiBerniniRTextToVideoRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetFalAiBerniniRTextToVideoRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetFalAiBerniniRTextToVideoRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetFalAiBerniniRTextToVideoRequestsByRequestIdStatusResponse =
+  zQueueStatus
 
 export const zPostFalAiBirefnetV2VideoBody = zBirefnetV2VideoInput
 
@@ -45413,6 +46432,99 @@ export const zGetFalAiWorkflowUtilitiesTrimVideoRequestsByRequestIdStatusQuery =
  * The request status.
  */
 export const zGetFalAiWorkflowUtilitiesTrimVideoRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostLumaAgentRayV32ImageToVideoBody =
+  zAgentRayV32ImageToVideoInput
+
+/**
+ * The request status.
+ */
+export const zPostLumaAgentRayV32ImageToVideoResponse = zQueueStatus
+
+export const zGetLumaAgentRayV32ImageToVideoRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetLumaAgentRayV32ImageToVideoRequestsByRequestIdResponse =
+  zAgentRayV32ImageToVideoOutput
+
+export const zPutLumaAgentRayV32ImageToVideoRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutLumaAgentRayV32ImageToVideoRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetLumaAgentRayV32ImageToVideoRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetLumaAgentRayV32ImageToVideoRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetLumaAgentRayV32ImageToVideoRequestsByRequestIdStatusResponse =
+  zQueueStatus
+
+export const zPostLumaAgentRayV32TextToVideoBody = zAgentRayV32TextToVideoInput
+
+/**
+ * The request status.
+ */
+export const zPostLumaAgentRayV32TextToVideoResponse = zQueueStatus
+
+export const zGetLumaAgentRayV32TextToVideoRequestsByRequestIdPath = z.object({
+  request_id: z.string(),
+})
+
+/**
+ * Result of the request.
+ */
+export const zGetLumaAgentRayV32TextToVideoRequestsByRequestIdResponse =
+  zAgentRayV32TextToVideoOutput
+
+export const zPutLumaAgentRayV32TextToVideoRequestsByRequestIdCancelPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+/**
+ * The request was cancelled.
+ */
+export const zPutLumaAgentRayV32TextToVideoRequestsByRequestIdCancelResponse =
+  z.object({
+    success: z.boolean().optional(),
+  })
+
+export const zGetLumaAgentRayV32TextToVideoRequestsByRequestIdStatusPath =
+  z.object({
+    request_id: z.string(),
+  })
+
+export const zGetLumaAgentRayV32TextToVideoRequestsByRequestIdStatusQuery =
+  z.object({
+    logs: z.number().optional(),
+  })
+
+/**
+ * The request status.
+ */
+export const zGetLumaAgentRayV32TextToVideoRequestsByRequestIdStatusResponse =
   zQueueStatus
 
 export const zPostMireloAiSfxV15VideoToVideoBody = zSfxV15VideoToVideoInput

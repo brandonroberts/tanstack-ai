@@ -6,10 +6,10 @@ import * as z from 'zod'
  * BoxPromptBase
  */
 export const zBoxPromptBase = z.object({
-  x_min: z.union([z.int(), z.unknown()]).optional(),
+  y_min: z.union([z.int(), z.unknown()]).optional(),
   y_max: z.union([z.int(), z.unknown()]).optional(),
   x_max: z.union([z.int(), z.unknown()]).optional(),
-  y_min: z.union([z.int(), z.unknown()]).optional(),
+  x_min: z.union([z.int(), z.unknown()]).optional(),
   object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
@@ -43,27 +43,27 @@ export const zBasicAnimations = z.object({
  * Input for Image to 3D generation using full-featured models (H3.1, v2.5).
  */
 export const zH31ImageTo3dInput = z.object({
-  auto_size: z.boolean().optional().default(false),
   texture_alignment: z
     .enum(['original_image', 'geometry'])
     .optional()
     .default('original_image'),
-  geometry_quality: z
-    .enum(['standard', 'detailed'])
-    .optional()
-    .default('standard'),
-  face_limit: z.union([z.int().gte(1000).lte(2000000), z.unknown()]).optional(),
-  image_url: z.string(),
+  texture: z.boolean().optional().default(true),
   texture_quality: z
     .enum(['standard', 'detailed'])
     .optional()
     .default('standard'),
-  quad: z.boolean().optional().default(false),
   model_seed: z.union([z.int(), z.unknown()]).optional(),
-  texture_seed: z.union([z.int(), z.unknown()]).optional(),
+  auto_size: z.boolean().optional().default(false),
+  image_url: z.string(),
+  geometry_quality: z
+    .enum(['standard', 'detailed'])
+    .optional()
+    .default('standard'),
   orientation: z.enum(['default', 'align_image']).optional().default('default'),
-  texture: z.boolean().optional().default(true),
+  quad: z.boolean().optional().default(false),
+  face_limit: z.union([z.int().gte(1000).lte(2000000), z.unknown()]).optional(),
   pbr: z.boolean().optional().default(true),
+  texture_seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -77,27 +77,27 @@ export const zH31ImageTo3dInput = z.object({
  * Note: P1 is not available for multiview-to-3d.
  */
 export const zH31MultiviewTo3dInput = z.object({
-  auto_size: z.boolean().optional().default(false),
   texture_alignment: z
     .enum(['original_image', 'geometry'])
     .optional()
     .default('original_image'),
-  geometry_quality: z
-    .enum(['standard', 'detailed'])
-    .optional()
-    .default('standard'),
-  model_seed: z.union([z.int(), z.unknown()]).optional(),
-  quad: z.boolean().optional().default(false),
+  texture: z.boolean().optional().default(true),
   texture_quality: z
     .enum(['standard', 'detailed'])
     .optional()
     .default('standard'),
+  model_seed: z.union([z.int(), z.unknown()]).optional(),
+  auto_size: z.boolean().optional().default(false),
+  quad: z.boolean().optional().default(false),
+  geometry_quality: z
+    .enum(['standard', 'detailed'])
+    .optional()
+    .default('standard'),
+  orientation: z.enum(['default', 'align_image']).optional().default('default'),
+  pbr: z.boolean().optional().default(true),
   face_limit: z.union([z.int().gte(1000).lte(2000000), z.unknown()]).optional(),
   image_urls: z.array(z.string()).min(2).max(4),
   texture_seed: z.union([z.int(), z.unknown()]).optional(),
-  orientation: z.enum(['default', 'align_image']).optional().default('default'),
-  texture: z.boolean().optional().default(true),
-  pbr: z.boolean().optional().default(true),
 })
 
 /**
@@ -106,24 +106,24 @@ export const zH31MultiviewTo3dInput = z.object({
  * Input for Text to 3D generation using full-featured models (H3.1, v2.5).
  */
 export const zH31TextTo3dInput = z.object({
-  auto_size: z.boolean().optional().default(false),
-  quad: z.boolean().optional().default(false),
-  model_seed: z.union([z.int(), z.unknown()]).optional(),
-  face_limit: z.union([z.int().gte(1000).lte(2000000), z.unknown()]).optional(),
-  negative_prompt: z.union([z.string().max(1024), z.unknown()]).optional(),
-  geometry_quality: z
-    .enum(['standard', 'detailed'])
-    .optional()
-    .default('standard'),
+  image_seed: z.union([z.int(), z.unknown()]).optional(),
   texture_quality: z
     .enum(['standard', 'detailed'])
     .optional()
     .default('standard'),
-  texture_seed: z.union([z.int(), z.unknown()]).optional(),
-  image_seed: z.union([z.int(), z.unknown()]).optional(),
-  prompt: z.string().max(1024),
+  model_seed: z.union([z.int(), z.unknown()]).optional(),
   texture: z.boolean().optional().default(true),
+  auto_size: z.boolean().optional().default(false),
+  quad: z.boolean().optional().default(false),
+  geometry_quality: z
+    .enum(['standard', 'detailed'])
+    .optional()
+    .default('standard'),
   pbr: z.boolean().optional().default(true),
+  face_limit: z.union([z.int().gte(1000).lte(2000000), z.unknown()]).optional(),
+  texture_seed: z.union([z.int(), z.unknown()]).optional(),
+  prompt: z.string().max(1024),
+  negative_prompt: z.union([z.string().max(1024), z.unknown()]).optional(),
 })
 
 /**
@@ -131,8 +131,8 @@ export const zH31TextTo3dInput = z.object({
  */
 export const zHunyuanWorldImageToWorldInput = z.object({
   labels_fg1: z.string(),
-  export_drc: z.boolean().optional().default(false),
   classes: z.string(),
+  export_drc: z.boolean().optional().default(false),
   image_url: z.string(),
   labels_fg2: z.string(),
 })
@@ -150,10 +150,10 @@ export const zHunyuanWorldImageToWorldOutput = z.object({
 export const zHunyuan3dV2Input = z.object({
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   input_image_url: z.string(),
-  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
+  textured_mesh: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  textured_mesh: z.boolean().optional().default(false),
+  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
 })
 
 /**
@@ -162,10 +162,10 @@ export const zHunyuan3dV2Input = z.object({
 export const zHunyuan3dV2MiniInput = z.object({
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   input_image_url: z.string(),
-  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
+  textured_mesh: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  textured_mesh: z.boolean().optional().default(false),
+  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
 })
 
 /**
@@ -182,10 +182,10 @@ export const zHunyuan3dV2MiniOutput = z.object({
 export const zHunyuan3dV2MiniTurboInput = z.object({
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   input_image_url: z.string(),
-  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
+  textured_mesh: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  textured_mesh: z.boolean().optional().default(false),
+  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
 })
 
 /**
@@ -201,12 +201,12 @@ export const zHunyuan3dV2MiniTurboOutput = z.object({
  */
 export const zHunyuan3dV2MultiViewInput = z.object({
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
-  front_image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  left_image_url: z.string(),
   back_image_url: z.string(),
+  left_image_url: z.string(),
+  front_image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   textured_mesh: z.boolean().optional().default(false),
 })
 
@@ -223,12 +223,12 @@ export const zHunyuan3dV2MultiViewOutput = z.object({
  */
 export const zHunyuan3dV2MultiViewTurboInput = z.object({
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
-  front_image_url: z.string(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  left_image_url: z.string(),
   back_image_url: z.string(),
+  left_image_url: z.string(),
+  front_image_url: z.string(),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   textured_mesh: z.boolean().optional().default(false),
 })
 
@@ -254,10 +254,10 @@ export const zHunyuan3dV2Output = z.object({
 export const zHunyuan3dV2TurboInput = z.object({
   guidance_scale: z.number().gte(0).lte(20).optional().default(7.5),
   input_image_url: z.string(),
-  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
+  textured_mesh: z.boolean().optional().default(false),
   num_inference_steps: z.int().gte(1).lte(50).optional().default(50),
   seed: z.union([z.int(), z.unknown()]).optional(),
-  textured_mesh: z.boolean().optional().default(false),
+  octree_resolution: z.int().gte(1).lte(1024).optional().default(256),
 })
 
 /**
@@ -286,17 +286,17 @@ export const zHunyuan3dV31PartOutput = z.object({
  * ProImageTo3DInput
  */
 export const zHunyuan3dV31ProImageTo3dInput = z.object({
+  top_image_url: z.union([z.string(), z.unknown()]).optional(),
   generate_type: z.enum(['Normal', 'Geometry']).optional().default('Normal'),
-  face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
-  right_image_url: z.union([z.string(), z.unknown()]).optional(),
   bottom_image_url: z.union([z.string(), z.unknown()]).optional(),
   input_image_url: z.string(),
-  right_front_image_url: z.union([z.string(), z.unknown()]).optional(),
-  left_image_url: z.union([z.string(), z.unknown()]).optional(),
-  left_front_image_url: z.union([z.string(), z.unknown()]).optional(),
   back_image_url: z.union([z.string(), z.unknown()]).optional(),
-  top_image_url: z.union([z.string(), z.unknown()]).optional(),
+  face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
+  left_image_url: z.union([z.string(), z.unknown()]).optional(),
   enable_pbr: z.boolean().optional().default(false),
+  left_front_image_url: z.union([z.string(), z.unknown()]).optional(),
+  right_image_url: z.union([z.string(), z.unknown()]).optional(),
+  right_front_image_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
@@ -304,8 +304,8 @@ export const zHunyuan3dV31ProImageTo3dInput = z.object({
  */
 export const zHunyuan3dV31ProTextTo3dInput = z.object({
   generate_type: z.enum(['Normal', 'Geometry']).optional().default('Normal'),
-  face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
   enable_pbr: z.boolean().optional().default(false),
+  face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
   prompt: z.string().max(1024),
 })
 
@@ -322,64 +322,63 @@ export const zHunyuan3dV31RapidImageTo3dInput = z.object({
  * RapidTextTo3DInput
  */
 export const zHunyuan3dV31RapidTextTo3dInput = z.object({
-  enable_geometry: z.boolean().optional().default(false),
   enable_pbr: z.boolean().optional().default(false),
   prompt: z.string().max(200),
+  enable_geometry: z.boolean().optional().default(false),
 })
 
 /**
  * SmartTopologyInput
  */
 export const zHunyuan3dV31SmartTopologyInput = z.object({
-  polygon_type: z
-    .enum(['triangle', 'quadrilateral'])
-    .optional()
-    .default('triangle'),
   face_level: z.enum(['high', 'medium', 'low']).optional().default('medium'),
-  input_file_type: z.enum(['glb', 'obj']).optional().default('glb'),
   input_file_url: z
     .string()
     .optional()
     .default(
       'https://v3b.fal.media/files/b/0a8c09c0/VYDiCTcDGK55qY2-idGbX_model.glb',
     ),
+  polygon_type: z
+    .enum(['triangle', 'quadrilateral'])
+    .optional()
+    .default('triangle'),
+  input_file_type: z.enum(['glb', 'obj']).optional().default('glb'),
 })
 
 /**
  * ImageTo3DInput
  */
 export const zHunyuan3dV3ImageTo3dInput = z.object({
-  input_image_url: z.string(),
-  face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
-  left_image_url: z.union([z.string(), z.unknown()]).optional(),
-  back_image_url: z.union([z.string(), z.unknown()]).optional(),
-  right_image_url: z.union([z.string(), z.unknown()]).optional(),
   polygon_type: z
     .enum(['triangle', 'quadrilateral'])
     .optional()
     .default('triangle'),
+  left_image_url: z.union([z.string(), z.unknown()]).optional(),
   generate_type: z
     .enum(['Normal', 'LowPoly', 'Geometry'])
     .optional()
     .default('Normal'),
+  right_image_url: z.union([z.string(), z.unknown()]).optional(),
+  back_image_url: z.union([z.string(), z.unknown()]).optional(),
+  input_image_url: z.string(),
   enable_pbr: z.boolean().optional().default(false),
+  face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
 })
 
 /**
  * SketchTo3DInput
  */
 export const zHunyuan3dV3SketchTo3dInput = z.object({
-  input_image_url: z.string(),
-  prompt: z.string().max(1024),
   face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
+  prompt: z.string().max(1024),
   enable_pbr: z.boolean().optional().default(false),
+  input_image_url: z.string(),
 })
 
 /**
  * TextTo3DInput
  */
 export const zHunyuan3dV3TextTo3dInput = z.object({
-  prompt: z.string().max(1024),
   polygon_type: z
     .enum(['triangle', 'quadrilateral'])
     .optional()
@@ -390,16 +389,17 @@ export const zHunyuan3dV3TextTo3dInput = z.object({
     .optional()
     .default('Normal'),
   face_count: z.int().gte(40000).lte(1500000).optional().default(500000),
+  prompt: z.string().max(1024),
 })
 
 /**
  * HYMotionInput
  */
 export const zHunyuanMotionFastInput = z.object({
-  output_format: z.enum(['fbx', 'dict']).optional().default('fbx'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
   prompt: z.string(),
+  output_format: z.enum(['fbx', 'dict']).optional().default('fbx'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z.number().gte(0.5).lte(12).optional().default(5),
 })
 
@@ -407,19 +407,19 @@ export const zHunyuanMotionFastInput = z.object({
  * HYMotionOutput
  */
 export const zHunyuanMotionFastOutput = z.object({
-  motion_json: z.union([zFile, z.unknown()]).optional(),
-  fbx_file: z.union([zFile, z.unknown()]).optional(),
   seed: z.int(),
+  fbx_file: z.union([zFile, z.unknown()]).optional(),
+  motion_json: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
  * HYMotionInput
  */
 export const zHunyuanMotionInput = z.object({
-  output_format: z.enum(['fbx', 'dict']).optional().default('fbx'),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
   prompt: z.string(),
+  output_format: z.enum(['fbx', 'dict']).optional().default('fbx'),
+  guidance_scale: z.number().gte(1).lte(10).optional().default(5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   duration: z.number().gte(0.5).lte(12).optional().default(5),
 })
 
@@ -427,171 +427,46 @@ export const zHunyuanMotionInput = z.object({
  * HYMotionOutput
  */
 export const zHunyuanMotionOutput = z.object({
-  motion_json: z.union([zFile, z.unknown()]).optional(),
-  fbx_file: z.union([zFile, z.unknown()]).optional(),
   seed: z.int(),
+  fbx_file: z.union([zFile, z.unknown()]).optional(),
+  motion_json: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
  * Rodin3DInput
  */
 export const zHyper3dRodinInput = z.object({
+  quality: z
+    .enum(['high', 'medium', 'low', 'extra-low'])
+    .optional()
+    .default('medium'),
+  bbox_condition: z.union([z.array(z.int()), z.unknown()]).optional(),
+  condition_mode: z.enum(['fuse', 'concat']).optional().default('concat'),
+  input_image_urls: z.array(z.string()).optional(),
+  use_hyper: z.boolean().optional().default(false),
+  addons: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(1024).optional().default(''),
+  material: z.enum(['PBR', 'Shaded']).optional().default('PBR'),
+  TAPose: z.boolean().optional().default(false),
+  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
   tier: z.enum(['Regular', 'Sketch']).optional().default('Regular'),
   geometry_file_format: z
     .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
     .optional()
     .default('glb'),
-  TAPose: z.boolean().optional().default(false),
-  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
-  use_hyper: z.boolean().optional().default(false),
-  addons: z.union([z.string(), z.unknown()]).optional(),
-  quality: z
-    .enum(['high', 'medium', 'low', 'extra-low'])
-    .optional()
-    .default('medium'),
-  material: z.enum(['PBR', 'Shaded']).optional().default('PBR'),
-  condition_mode: z.enum(['fuse', 'concat']).optional().default('concat'),
-  input_image_urls: z.array(z.string()).optional(),
-  bbox_condition: z.union([z.array(z.int()), z.unknown()]).optional(),
-  prompt: z.string().max(1024).optional().default(''),
-})
-
-/**
- * RodinGen25ImageTo3DInput
- */
-export const zHyper3dRodinV25Input = z.object({
-  image_urls: z.array(z.string()).min(1).max(5).optional(),
-  tier: z
-    .enum([
-      'Gen-2.5-Extreme-Low',
-      'Gen-2.5-Low',
-      'Gen-2.5-Medium',
-      'Gen-2.5-High',
-      'Gen-2.5-Extreme-High',
-    ])
-    .optional()
-    .default('Gen-2.5-Medium'),
-  geometry_file_format: z
-    .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
-    .optional()
-    .default('glb'),
-  is_micro: z.boolean().optional().default(false),
-  geometry_instruct_mode: z
-    .enum(['faithful', 'creative'])
-    .optional()
-    .default('faithful'),
-  TAPose: z.boolean().optional().default(false),
-  use_original_alpha: z.boolean().optional().default(false),
-  preview_render: z.boolean().optional().default(false),
-  texture_mode: z
-    .union([
-      z.enum(['legacy', 'extreme-low', 'low', 'medium', 'high']),
-      z.unknown(),
-    ])
-    .optional(),
-  material: z.enum(['PBR', 'Shaded', 'All', 'None']).optional().default('All'),
-  bbox_condition: z
-    .union([z.tuple([z.int(), z.int(), z.int()]), z.unknown()])
-    .optional(),
-  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
-  quality_mesh_option: z
-    .enum([
-      '4K Quad',
-      '8K Quad',
-      '18K Quad',
-      '50K Quad',
-      '100K Quad',
-      '200K Quad',
-      '2K Triangle',
-      '20K Triangle',
-      '150K Triangle',
-      '500K Triangle',
-      '1M Triangle',
-      '2M Triangle',
-    ])
-    .optional()
-    .default('18K Quad'),
-  hd_texture: z.boolean().optional().default(false),
-  addons: z.union([z.array(z.string()), z.unknown()]).optional(),
-  texture_delight: z.boolean().optional().default(false),
-  is_symmetric: z
-    .enum(['symmetric', 'balanced', 'asymmetric', 'unknown'])
-    .optional()
-    .default('unknown'),
-  prompt: z.string().max(1024).optional().default(''),
-})
-
-/**
- * RodinGen25TextTo3DInput
- */
-export const zHyper3dRodinV25TextTo3dInput = z.object({
-  tier: z
-    .enum([
-      'Gen-2.5-Extreme-Low',
-      'Gen-2.5-Low',
-      'Gen-2.5-Medium',
-      'Gen-2.5-High',
-      'Gen-2.5-Extreme-High',
-    ])
-    .optional()
-    .default('Gen-2.5-Medium'),
-  geometry_file_format: z
-    .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
-    .optional()
-    .default('glb'),
-  is_micro: z.boolean().optional().default(false),
-  geometry_instruct_mode: z
-    .enum(['faithful', 'creative'])
-    .optional()
-    .default('faithful'),
-  TAPose: z.boolean().optional().default(false),
-  texture_mode: z
-    .union([
-      z.enum(['legacy', 'extreme-low', 'low', 'medium', 'high']),
-      z.unknown(),
-    ])
-    .optional(),
-  material: z.enum(['PBR', 'Shaded', 'All', 'None']).optional().default('All'),
-  bbox_condition: z
-    .union([z.tuple([z.int(), z.int(), z.int()]), z.unknown()])
-    .optional(),
-  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
-  quality_mesh_option: z
-    .enum([
-      '4K Quad',
-      '8K Quad',
-      '18K Quad',
-      '50K Quad',
-      '100K Quad',
-      '200K Quad',
-      '2K Triangle',
-      '20K Triangle',
-      '150K Triangle',
-      '500K Triangle',
-      '1M Triangle',
-      '2M Triangle',
-    ])
-    .optional()
-    .default('18K Quad'),
-  hd_texture: z.boolean().optional().default(false),
-  addons: z.union([z.array(z.string()), z.unknown()]).optional(),
-  texture_delight: z.boolean().optional().default(false),
-  is_symmetric: z
-    .enum(['symmetric', 'balanced', 'asymmetric', 'unknown'])
-    .optional()
-    .default('unknown'),
-  prompt: z.string().max(1024),
 })
 
 /**
  * RodinGen2Input
  */
 export const zHyper3dRodinV2Input = z.object({
-  geometry_file_format: z
-    .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
-    .optional()
-    .default('glb'),
-  TAPose: z.boolean().optional().default(false),
+  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
+  bbox_condition: z.union([z.array(z.int()), z.unknown()]).optional(),
+  preview_render: z.boolean().optional().default(false),
+  use_original_alpha: z.boolean().optional().default(false),
+  addons: z.union([z.string(), z.unknown()]).optional(),
+  prompt: z.string().max(1024).optional().default(''),
+  material: z.enum(['PBR', 'Shaded', 'All']).optional().default('All'),
   quality_mesh_option: z
     .enum([
       '4K Quad',
@@ -605,14 +480,12 @@ export const zHyper3dRodinV2Input = z.object({
     ])
     .optional()
     .default('500K Triangle'),
-  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
-  addons: z.union([z.string(), z.unknown()]).optional(),
-  use_original_alpha: z.boolean().optional().default(false),
-  preview_render: z.boolean().optional().default(false),
+  TAPose: z.boolean().optional().default(false),
   input_image_urls: z.array(z.string()).optional(),
-  material: z.enum(['PBR', 'Shaded', 'All']).optional().default('All'),
-  bbox_condition: z.union([z.array(z.int()), z.unknown()]).optional(),
-  prompt: z.string().max(1024).optional().default(''),
+  geometry_file_format: z
+    .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
+    .optional()
+    .default('glb'),
 })
 
 /**
@@ -621,51 +494,51 @@ export const zHyper3dRodinV2Input = z.object({
  * Represents an image file.
  */
 export const zImage = z.object({
+  content_type: z.union([z.string(), z.unknown()]).optional(),
   file_size: z.union([z.int(), z.unknown()]).optional(),
+  height: z.union([z.int(), z.unknown()]).optional(),
   url: z.string(),
   file_name: z.union([z.string(), z.unknown()]).optional(),
   width: z.union([z.int(), z.unknown()]).optional(),
-  height: z.union([z.int(), z.unknown()]).optional(),
-  content_type: z.union([z.string(), z.unknown()]).optional(),
 })
 
 /**
  * ObjectOutput
  */
 export const zHyper3dRodinOutput = z.object({
+  seed: z.int(),
   model_mesh: zFile,
   textures: z.array(zImage),
-  seed: z.int(),
 })
 
 /**
  * ObjectOutputv2
  */
 export const zHyper3dRodinV25Output = z.object({
+  model_meshes: z.array(zFile).optional(),
+  seed: z.int(),
   model_mesh: zFile,
   textures: z.array(zImage),
-  seed: z.int(),
-  model_meshes: z.array(zFile).optional(),
 })
 
 /**
  * ObjectOutputv2
  */
 export const zHyper3dRodinV25TextTo3dOutput = z.object({
+  model_meshes: z.array(zFile).optional(),
+  seed: z.int(),
   model_mesh: zFile,
   textures: z.array(zImage),
-  seed: z.int(),
-  model_meshes: z.array(zFile).optional(),
 })
 
 /**
  * ObjectOutputv2
  */
 export const zHyper3dRodinV2Output = z.object({
+  model_meshes: z.array(zFile).optional(),
+  seed: z.int(),
   model_mesh: zFile,
   textures: z.array(zImage),
-  seed: z.int(),
-  model_meshes: z.array(zFile).optional(),
 })
 
 /**
@@ -902,20 +775,20 @@ export const zMeshyV5RemeshOutput = z.object({
  * ModelUrls
  */
 export const zModelUrlsType2 = z.object({
+  glb: z.union([zFile, z.unknown()]).optional(),
+  fbx: z.union([zFile, z.unknown()]).optional(),
+  obj: z.union([zFile, z.unknown()]).optional(),
+  mtl: z.union([zFile, z.unknown()]).optional(),
   texture: z.union([zFile, z.unknown()]).optional(),
   usdz: z.union([zFile, z.unknown()]).optional(),
-  obj: z.union([zFile, z.unknown()]).optional(),
-  glb: z.union([zFile, z.unknown()]).optional(),
-  mtl: z.union([zFile, z.unknown()]).optional(),
-  fbx: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
  * ProImageTo3DOutput
  */
 export const zHunyuan3dV31ProImageTo3dOutput = z.object({
-  model_urls: zModelUrlsType2,
   seed: z.union([z.int(), z.unknown()]).optional(),
+  model_urls: zModelUrlsType2,
   model_glb: zFile,
   thumbnail: z.union([zFile, z.unknown()]).optional(),
 })
@@ -924,8 +797,8 @@ export const zHunyuan3dV31ProImageTo3dOutput = z.object({
  * ProTextTo3DOutput
  */
 export const zHunyuan3dV31ProTextTo3dOutput = z.object({
-  model_urls: zModelUrlsType2,
   seed: z.union([z.int(), z.unknown()]).optional(),
+  model_urls: zModelUrlsType2,
   model_glb: zFile,
   thumbnail: z.union([zFile, z.unknown()]).optional(),
 })
@@ -934,10 +807,10 @@ export const zHunyuan3dV31ProTextTo3dOutput = z.object({
  * RapidImageTo3DOutput
  */
 export const zHunyuan3dV31RapidImageTo3dOutput = z.object({
-  texture: z.union([zFile, z.unknown()]).optional(),
   model_urls: zModelUrlsType2,
   material_mtl: z.union([zFile, z.unknown()]).optional(),
   model_glb: z.union([zFile, z.unknown()]).optional(),
+  texture: z.union([zFile, z.unknown()]).optional(),
   thumbnail: z.union([zFile, z.unknown()]).optional(),
 })
 
@@ -945,10 +818,10 @@ export const zHunyuan3dV31RapidImageTo3dOutput = z.object({
  * RapidTextTo3DOutput
  */
 export const zHunyuan3dV31RapidTextTo3dOutput = z.object({
-  texture: z.union([zFile, z.unknown()]).optional(),
   model_urls: zModelUrlsType2,
   material_mtl: z.union([zFile, z.unknown()]).optional(),
   model_obj: z.union([zFile, z.unknown()]).optional(),
+  texture: z.union([zFile, z.unknown()]).optional(),
   thumbnail: z.union([zFile, z.unknown()]).optional(),
 })
 
@@ -966,10 +839,10 @@ export const zHunyuan3dV31SmartTopologyOutput = z.object({
  * 3D model download URLs
  */
 export const zModelUrlsType3 = z.object({
-  base_model: z.union([zFile, z.unknown()]).optional(),
-  glb: z.union([zFile, z.unknown()]).optional(),
   pbr_model: z.union([zFile, z.unknown()]).optional(),
   fbx: z.union([zFile, z.unknown()]).optional(),
+  base_model: z.union([zFile, z.unknown()]).optional(),
+  glb: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
@@ -1009,40 +882,40 @@ export const zH31TextTo3dOutput = z.object({
  * ModelUrls
  */
 export const zModelUrlsType4 = z.object({
+  obj: z.union([zFile, z.unknown()]).optional(),
   fbx: z.union([zFile, z.unknown()]).optional(),
   usdz: z.union([zFile, z.unknown()]).optional(),
   glb: z.union([zFile, z.unknown()]).optional(),
-  obj: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
  * ImageTo3DOutput
  */
 export const zHunyuan3dV3ImageTo3dOutput = z.object({
-  model_glb: zFile,
   thumbnail: z.union([zFile, z.unknown()]).optional(),
-  model_urls: zModelUrlsType4,
   seed: z.union([z.int(), z.unknown()]).optional(),
+  model_urls: zModelUrlsType4,
+  model_glb: zFile,
 })
 
 /**
  * SketchTo3DOutput
  */
 export const zHunyuan3dV3SketchTo3dOutput = z.object({
-  model_glb: zFile,
-  thumbnail: z.union([zFile, z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
+  model_glb: zFile,
   model_urls: zModelUrlsType4,
+  thumbnail: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
  * TextTo3DOutput
  */
 export const zHunyuan3dV3TextTo3dOutput = z.object({
+  thumbnail: z.union([zFile, z.unknown()]).optional(),
   seed: z.union([z.int(), z.unknown()]).optional(),
   model_glb: zFile,
   model_urls: zModelUrlsType4,
-  thumbnail: z.union([zFile, z.unknown()]).optional(),
 })
 
 /**
@@ -1054,10 +927,10 @@ export const zHunyuan3dV3TextTo3dOutput = z.object({
  * It supports a restricted parameter set compared to H3.1/v2.5.
  */
 export const zP1ImageTo3dInput = z.object({
-  image_url: z.string(),
-  face_limit: z.union([z.int().gte(48).lte(20000), z.unknown()]).optional(),
   texture: z.boolean().optional().default(true),
   model_seed: z.union([z.int(), z.unknown()]).optional(),
+  face_limit: z.union([z.int().gte(48).lte(20000), z.unknown()]).optional(),
+  image_url: z.string(),
 })
 
 /**
@@ -1080,9 +953,9 @@ export const zP1ImageTo3dOutput = z.object({
  * It supports a restricted parameter set compared to H3.1/v2.5.
  */
 export const zP1TextTo3dInput = z.object({
+  texture: z.boolean().optional().default(true),
   model_seed: z.union([z.int(), z.unknown()]).optional(),
   face_limit: z.union([z.int().gte(48).lte(20000), z.unknown()]).optional(),
-  texture: z.boolean().optional().default(true),
   prompt: z.string().max(1024),
 })
 
@@ -1101,57 +974,57 @@ export const zP1TextTo3dOutput = z.object({
  * InputModel
  */
 export const zPixal3dInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  remesh: z.boolean().optional().default(true),
   tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
-  max_num_tokens: z.int().gte(4096).lte(131072).optional().default(49152),
-  shape_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  ss_rescale_t: z.number().gte(1).lte(6).optional().default(5),
-  tex_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  image_url: z.string(),
-  decimation_target: z.int().gte(5000).lte(2000000).optional().default(200000),
+  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
   shape_slat_guidance_strength: z
     .number()
     .gte(0)
     .lte(10)
     .optional()
     .default(7.5),
+  ss_rescale_t: z.number().gte(1).lte(6).optional().default(5),
+  max_num_tokens: z.int().gte(4096).lte(131072).optional().default(49152),
+  ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
+  tex_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
   texture_size: z
     .union([z.literal(1024), z.literal(2048), z.literal(4096)])
     .optional()
     .default(2048),
-  remesh: z.boolean().optional().default(true),
+  mesh_scale: z.number().gte(0.1).lte(4).optional().default(1),
   shape_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  shape_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
+  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  ss_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.7),
+  seed: z.union([z.int(), z.unknown()]).optional(),
   resolution: z
     .union([z.literal(1024), z.literal(1536)])
     .optional()
     .default(1024),
-  shape_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
-  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
   ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
-  mesh_scale: z.number().gte(0.1).lte(4).optional().default(1),
-  ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
-  ss_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.7),
+  decimation_target: z.int().gte(5000).lte(2000000).optional().default(200000),
+  shape_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
+  image_url: z.string(),
 })
 
 /**
  * ObjectOutput
  */
 export const zPixal3dOutput = z.object({
-  seed: z.int(),
   model_glb: zFile,
+  seed: z.int(),
 })
 
 /**
  * PointPromptBase
  */
 export const zPointPromptBase = z.object({
-  x: z.union([z.int(), z.unknown()]).optional(),
   y: z.union([z.int(), z.unknown()]).optional(),
-  object_id: z.union([z.int(), z.unknown()]).optional(),
+  x: z.union([z.int(), z.unknown()]).optional(),
   label: z
     .union([z.union([z.literal(0), z.literal(1)]), z.unknown()])
     .optional(),
+  object_id: z.union([z.int(), z.unknown()]).optional(),
 })
 
 export const zQueueStatus = z.object({
@@ -1169,6 +1042,11 @@ export const zQueueStatus = z.object({
  * ImageInput
  */
 export const zReconviagen05Input = z.object({
+  resolution: z
+    .union([z.literal(512), z.literal(1024), z.literal(1536)])
+    .optional()
+    .default(1024),
+  slat_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
   multi_image_strategy: z
     .enum([
       'average_right',
@@ -1180,61 +1058,187 @@ export const zReconviagen05Input = z.object({
     ])
     .optional()
     .default('adaptive_guidance_weight'),
-  ss_source: z
-    .enum(['direct', 'mesh', 'mvtrellis2'])
-    .optional()
-    .default('mesh'),
+  slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
+  slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  image_urls: z.array(z.string()).min(1).max(16),
+  shape_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
+  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
+  decimation_target: z.int().gte(5000).lte(2000000).optional().default(500000),
   shape_slat_guidance_strength: z
     .number()
     .gte(0)
     .lte(10)
     .optional()
     .default(7.5),
+  ss_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.7),
+  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  shape_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
   texture_size: z
     .union([z.literal(1024), z.literal(2048), z.literal(4096)])
     .optional()
     .default(2048),
-  shape_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
-  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
-  tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
-  ss_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.7),
-  slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
   ss_rescale_t: z.number().gte(1).lte(6).optional().default(5),
-  shape_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
-  slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  shape_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
   tex_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  shape_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
-  image_urls: z.array(z.string()).min(1).max(16),
-  slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
-  resolution: z
-    .union([z.literal(512), z.literal(1024), z.literal(1536)])
+  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
+  ss_source: z
+    .enum(['direct', 'mesh', 'mvtrellis2'])
     .optional()
-    .default(1024),
-  decimation_target: z.int().gte(5000).lte(2000000).optional().default(500000),
-  slat_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
-  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
+    .default('mesh'),
+  ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
 })
 
 /**
  * ObjectOutput
  */
 export const zReconviagen05Output = z.object({
-  model_glb: zFile,
   seed: z.int(),
+  model_glb: zFile,
+})
+
+/**
+ * RodinGen25Addons
+ */
+export const zRodinGen25Addons = z.object({
+  high_pack: z.boolean().optional().default(false),
+})
+
+/**
+ * RodinGen25BbboxField
+ */
+export const zRodinGen25BbboxField = z.object({
+  length: z.int().gte(1).lte(2048).optional().default(100),
+  height: z.int().gte(1).lte(2048).optional().default(100),
+  width: z.int().gte(1).lte(2048).optional().default(100),
+})
+
+/**
+ * RodinGen25ImageTo3DInput
+ */
+export const zHyper3dRodinV25Input = z.object({
+  preview_render: z.boolean().optional().default(false),
+  bbox_condition: z.union([zRodinGen25BbboxField, z.unknown()]).optional(),
+  hd_texture: z.boolean().optional().default(false),
+  addons: z.union([zRodinGen25Addons, z.unknown()]).optional(),
+  is_micro: z.boolean().optional().default(false),
+  enable_creative_mode: z.boolean().optional().default(false),
+  material: z.enum(['PBR', 'Shaded', 'All', 'None']).optional().default('All'),
+  texture_mode: z
+    .union([
+      z.enum(['legacy', 'extreme-low', 'low', 'medium', 'high']),
+      z.unknown(),
+    ])
+    .optional(),
+  tier: z
+    .enum([
+      'Gen-2.5-Minimum',
+      'Gen-2.5-Extreme-Low',
+      'Gen-2.5-Low',
+      'Gen-2.5-Medium',
+      'Gen-2.5-High',
+      'Gen-2.5-Extreme-High',
+    ])
+    .optional()
+    .default('Gen-2.5-High'),
+  use_original_alpha: z.boolean().optional().default(false),
+  image_urls: z.array(z.string()).min(1).max(5).optional(),
+  prompt: z.string().max(1024).optional().default(''),
+  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
+  quality_mesh_option: z
+    .enum([
+      'Auto',
+      '4K Quad',
+      '8K Quad',
+      '18K Quad',
+      '50K Quad',
+      '100K Quad',
+      '200K Quad',
+      '2K Triangle',
+      '20K Triangle',
+      '50K Triangle',
+      '150K Triangle',
+      '500K Triangle',
+      '1M Triangle',
+      '2M Triangle',
+    ])
+    .optional()
+    .default('Auto'),
+  TAPose: z.boolean().optional().default(false),
+  texture_delight: z.boolean().optional().default(false),
+  geometry_file_format: z
+    .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
+    .optional()
+    .default('glb'),
+})
+
+/**
+ * RodinGen25TextTo3DInput
+ */
+export const zHyper3dRodinV25TextTo3dInput = z.object({
+  TAPose: z.boolean().optional().default(false),
+  bbox_condition: z.union([zRodinGen25BbboxField, z.unknown()]).optional(),
+  hd_texture: z.boolean().optional().default(false),
+  texture_delight: z.boolean().optional().default(false),
+  seed: z.union([z.int().gte(0).lte(65535), z.unknown()]).optional(),
+  addons: z.union([zRodinGen25Addons, z.unknown()]).optional(),
+  prompt: z.string().max(1024),
+  is_micro: z.boolean().optional().default(false),
+  enable_creative_mode: z.boolean().optional().default(false),
+  material: z.enum(['PBR', 'Shaded', 'All', 'None']).optional().default('All'),
+  texture_mode: z
+    .union([
+      z.enum(['legacy', 'extreme-low', 'low', 'medium', 'high']),
+      z.unknown(),
+    ])
+    .optional(),
+  quality_mesh_option: z
+    .enum([
+      'Auto',
+      '4K Quad',
+      '8K Quad',
+      '18K Quad',
+      '50K Quad',
+      '100K Quad',
+      '200K Quad',
+      '2K Triangle',
+      '20K Triangle',
+      '50K Triangle',
+      '150K Triangle',
+      '500K Triangle',
+      '1M Triangle',
+      '2M Triangle',
+    ])
+    .optional()
+    .default('Auto'),
+  tier: z
+    .enum([
+      'Gen-2.5-Minimum',
+      'Gen-2.5-Extreme-Low',
+      'Gen-2.5-Low',
+      'Gen-2.5-Medium',
+      'Gen-2.5-High',
+      'Gen-2.5-Extreme-High',
+    ])
+    .optional()
+    .default('Gen-2.5-High'),
+  geometry_file_format: z
+    .enum(['glb', 'usdz', 'fbx', 'obj', 'stl'])
+    .optional()
+    .default('glb'),
 })
 
 /**
  * SAM3DAlignmentInput
  */
 export const zSam33dAlignInput = z.object({
-  body_mask_url: z.union([z.string(), z.unknown()]).optional(),
-  image_url: z.string(),
   body_mesh_url: z.string(),
-  focal_length: z.union([z.number(), z.unknown()]).optional(),
   object_mesh_url: z.union([z.string(), z.unknown()]).optional(),
+  image_url: z.string(),
+  body_mask_url: z.union([z.string(), z.unknown()]).optional(),
+  focal_length: z.union([z.number(), z.unknown()]).optional(),
 })
 
 /**
@@ -1242,9 +1246,9 @@ export const zSam33dAlignInput = z.object({
  */
 export const zSam33dBodyInput = z.object({
   include_mhr_params: z.boolean().optional().default(true),
-  image_url: z.string(),
   export_meshes: z.boolean().optional().default(true),
   include_3d_keypoints: z.boolean().optional().default(true),
+  image_url: z.string(),
   mask_url: z.union([z.string(), z.unknown()]).optional(),
 })
 
@@ -1252,17 +1256,17 @@ export const zSam33dBodyInput = z.object({
  * SAM3DObjectInput
  */
 export const zSam33dObjectsInput = z.object({
-  box_prompts: z.array(zBoxPromptBase).optional().default([]),
-  mask_urls: z.array(z.string()).optional(),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  export_textured_glb: z.boolean().optional().default(false),
   image_url: z.string(),
+  export_textured_glb: z.boolean().optional().default(false),
   pointmap_url: z.union([z.string(), z.unknown()]).optional(),
   detection_threshold: z
     .union([z.number().gte(0.1).lte(1), z.unknown()])
     .optional(),
+  mask_urls: z.array(z.string()).optional(),
   point_prompts: z.array(zPointPromptBase).optional().default([]),
   prompt: z.union([z.string(), z.unknown()]).optional(),
+  box_prompts: z.array(zBoxPromptBase).optional().default([]),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
@@ -1271,23 +1275,23 @@ export const zSam33dObjectsInput = z.object({
  * Per-person alignment metadata.
  */
 export const zSam3dBodyAlignmentInfo = z.object({
+  target_points_count: z.int(),
   scale_factor: z.number(),
   cropped_vertices_count: z.int(),
   translation: z.array(z.number()),
   person_id: z.int(),
   focal_length: z.number(),
-  target_points_count: z.int(),
 })
 
 /**
  * SAM3DAlignmentOutput
  */
 export const zSam33dAlignOutput = z.object({
-  metadata: zSam3dBodyAlignmentInfo,
-  visualization: zFile,
-  body_mesh_ply: zFile,
   scene_glb: z.union([zFile, z.unknown()]).optional(),
+  body_mesh_ply: zFile,
+  metadata: zSam3dBodyAlignmentInfo,
   model_glb: zFile,
+  visualization: zFile,
 })
 
 /**
@@ -1303,28 +1307,28 @@ export const zSam33dAlignOutput = z.object({
  * mesh reconstruction. They are only populated when `include_mhr_params=True`.
  */
 export const zSam3dBodyPersonMetadata = z.object({
-  bbox: z.array(z.number()),
-  global_rot: z.union([z.array(z.unknown()), z.unknown()]).optional(),
-  expr_params: z.union([z.array(z.number()), z.unknown()]).optional(),
-  focal_length: z.number(),
-  pred_cam_t: z.array(z.number()),
-  pred_joint_coords: z
-    .union([z.array(z.array(z.number())), z.unknown()])
-    .optional(),
   scale_params: z.union([z.array(z.number()), z.unknown()]).optional(),
   hand_pose_params: z
     .union([z.array(z.array(z.number())), z.unknown()])
     .optional(),
-  mhr_model_params: z.union([z.array(z.unknown()), z.unknown()]).optional(),
+  pred_joint_coords: z
+    .union([z.array(z.array(z.number())), z.unknown()])
+    .optional(),
   person_id: z.int(),
-  keypoints_2d: z.array(z.array(z.number())),
-  keypoints_3d: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
-  shape_params: z.union([z.array(z.number()), z.unknown()]).optional(),
-  pred_global_rots: z.union([z.array(z.unknown()), z.unknown()]).optional(),
+  mhr_model_params: z.union([z.array(z.unknown()), z.unknown()]).optional(),
   body_pose_params: z
     .union([z.array(z.array(z.number())), z.unknown()])
     .optional(),
+  bbox: z.array(z.number()),
+  keypoints_2d: z.array(z.array(z.number())),
+  pred_global_rots: z.union([z.array(z.unknown()), z.unknown()]).optional(),
+  pred_cam_t: z.array(z.number()),
+  expr_params: z.union([z.array(z.number()), z.unknown()]).optional(),
+  keypoints_3d: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
+  global_rot: z.union([z.array(z.unknown()), z.unknown()]).optional(),
+  shape_params: z.union([z.array(z.number()), z.unknown()]).optional(),
   pred_pose_raw: z.union([z.array(z.unknown()), z.unknown()]).optional(),
+  focal_length: z.number(),
 })
 
 /**
@@ -1342,10 +1346,10 @@ export const zSam3dBodyMetadata = z.object({
  * SAM3DBodyOutput
  */
 export const zSam33dBodyOutput = z.object({
-  metadata: zSam3dBodyMetadata,
-  visualization: zFile,
   meshes: z.union([z.array(zFile), z.unknown()]).optional(),
+  metadata: zSam3dBodyMetadata,
   model_glb: zFile,
+  visualization: zFile,
 })
 
 /**
@@ -1355,10 +1359,10 @@ export const zSam33dBodyOutput = z.object({
  */
 export const zSam3dObjectMetadata = z.object({
   translation: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
-  rotation: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
-  camera_pose: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
   object_index: z.int(),
+  camera_pose: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
   scale: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
+  rotation: z.union([z.array(z.array(z.number())), z.unknown()]).optional(),
 })
 
 /**
@@ -1369,9 +1373,9 @@ export const zSam33dObjectsOutput = z.object({
   individual_glbs: z
     .union([z.array(z.union([zFile, z.unknown()])), z.unknown()])
     .optional(),
-  model_glb: zFile.optional(),
-  individual_splats: z.union([z.array(zFile), z.unknown()]).optional(),
   metadata: z.array(zSam3dObjectMetadata),
+  individual_splats: z.union([z.array(zFile), z.unknown()]).optional(),
+  model_glb: zFile.optional(),
   artifacts_zip: z.union([zFile, z.unknown()]).optional(),
 })
 
@@ -1523,72 +1527,72 @@ export const zMeshyV6TextTo3dOutput = z.object({
  * SingleImageInputModel
  */
 export const zTrellis2Input = z.object({
-  remesh: z.boolean().optional().default(true),
-  resolution: z
-    .union([z.literal(512), z.literal(1024), z.literal(1536)])
-    .optional()
-    .default(1024),
-  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
-  shape_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  uv_unwrap_global_iterations: z.int().gte(1).lte(10).optional().default(1),
-  remesh_band: z.number().gte(0).lte(4).optional().default(1),
-  uv_unwrap_smooth_strength: z.number().gte(0).lte(10).optional().default(1),
-  decimation_target: z.int().gte(5000).lte(2000000).optional().default(500000),
-  ss_guidance_interval_end: z.number().gte(0).lte(1).optional().default(1),
-  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
-  remesh_project: z.number().gte(0).lte(1).optional().default(0),
-  shape_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
-  texture_size: z
-    .union([z.literal(1024), z.literal(2048), z.literal(4096)])
-    .optional()
-    .default(2048),
-  ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  image_url: z.string(),
-  ss_rescale_t: z.number().gte(1).lte(6).optional().default(5),
-  shape_slat_guidance_interval_start: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.6),
-  tex_slat_guidance_interval_end: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.9),
-  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
-  uv_unwrap_angle_threshold_deg: z
-    .number()
-    .gte(0)
-    .lte(180)
-    .optional()
-    .default(90),
-  tex_slat_guidance_interval_start: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(0.6),
-  shape_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
-  shape_slat_guidance_interval_end: z
-    .number()
-    .gte(0)
-    .lte(1)
-    .optional()
-    .default(1),
+  tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
   shape_slat_guidance_strength: z
     .number()
     .gte(0)
     .lte(10)
     .optional()
     .default(7.5),
-  ss_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.7),
+  ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
   tex_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  uv_unwrap_refine_iterations: z.int().gte(0).lte(10).optional().default(0),
+  shape_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  shape_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
   ss_guidance_interval_start: z.number().gte(0).lte(1).optional().default(0.6),
-  tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
+  remesh_project: z.number().gte(0).lte(1).optional().default(0),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  remesh_band: z.number().gte(0).lte(4).optional().default(1),
+  uv_unwrap_angle_threshold_deg: z
+    .number()
+    .gte(0)
+    .lte(180)
+    .optional()
+    .default(90),
+  decimation_target: z.int().gte(5000).lte(2000000).optional().default(500000),
+  shape_slat_guidance_interval_end: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(1),
+  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  shape_slat_guidance_interval_start: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.6),
+  tex_slat_guidance_interval_start: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.6),
+  image_url: z.string(),
+  remesh: z.boolean().optional().default(true),
+  ss_guidance_interval_end: z.number().gte(0).lte(1).optional().default(1),
+  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
+  uv_unwrap_refine_iterations: z.int().gte(0).lte(10).optional().default(0),
+  ss_rescale_t: z.number().gte(1).lte(6).optional().default(5),
+  tex_slat_guidance_interval_end: z
+    .number()
+    .gte(0)
+    .lte(1)
+    .optional()
+    .default(0.9),
+  texture_size: z
+    .union([z.literal(1024), z.literal(2048), z.literal(4096)])
+    .optional()
+    .default(2048),
+  uv_unwrap_smooth_strength: z.number().gte(0).lte(10).optional().default(1),
+  ss_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.7),
+  resolution: z
+    .union([z.literal(512), z.literal(1024), z.literal(1536)])
+    .optional()
+    .default(1024),
+  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
+  uv_unwrap_global_iterations: z.int().gte(1).lte(10).optional().default(1),
+  shape_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0.5),
 })
 
 /**
@@ -1602,20 +1606,23 @@ export const zTrellis2Output = z.object({
  * RetextureInputModel
  */
 export const zTrellis2RetextureInput = z.object({
+  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
+  tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
+  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  mesh_url: z.string(),
+  resolution: z
+    .union([z.literal(512), z.literal(1024)])
+    .optional()
+    .default(1024),
   tex_slat_guidance_interval_end: z
     .number()
     .gte(0)
     .lte(1)
     .optional()
     .default(0.9),
-  tex_slat_rescale_t: z.number().gte(1).lte(6).optional().default(3),
   tex_slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  resolution: z
-    .union([z.literal(512), z.literal(1024)])
-    .optional()
-    .default(1024),
-  tex_slat_guidance_rescale: z.number().gte(0).lte(1).optional().default(0),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_url: z.string(),
   tex_slat_guidance_interval_start: z
     .number()
     .gte(0)
@@ -1626,9 +1633,6 @@ export const zTrellis2RetextureInput = z.object({
     .union([z.literal(1024), z.literal(2048), z.literal(4096)])
     .optional()
     .default(2048),
-  tex_slat_guidance_strength: z.number().gte(0).lte(10).optional().default(1),
-  image_url: z.string(),
-  mesh_url: z.string(),
 })
 
 /**
@@ -1642,78 +1646,78 @@ export const zTrellis2RetextureOutput = z.object({
  * InputModel
  */
 export const zTrellisInput = z.object({
-  slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  image_url: z.string(),
-  slat_guidance_strength: z.number().gte(0).lte(10).optional().default(3),
-  seed: z.union([z.int(), z.unknown()]).optional(),
   ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  mesh_simplify: z.number().gte(0.9).lte(0.98).optional().default(0.95),
+  image_url: z.string(),
+  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
+  slat_guidance_strength: z.number().gte(0).lte(10).optional().default(3),
   texture_size: z
     .union([z.literal(512), z.literal(1024), z.literal(2048)])
     .optional()
     .default(1024),
-  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
+  mesh_simplify: z.number().gte(0.9).lte(0.98).optional().default(0.95),
+  slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * MultiImageInputModel
  */
 export const zTrellisMultiInput = z.object({
-  slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  multiimage_algo: z
-    .enum(['stochastic', 'multidiffusion'])
-    .optional()
-    .default('stochastic'),
-  slat_guidance_strength: z.number().gte(0).lte(10).optional().default(3),
-  seed: z.union([z.int(), z.unknown()]).optional(),
+  image_urls: z.array(z.string()),
   ss_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
-  mesh_simplify: z.number().gte(0.9).lte(0.98).optional().default(0.95),
+  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
+  slat_guidance_strength: z.number().gte(0).lte(10).optional().default(3),
   texture_size: z
     .union([z.literal(512), z.literal(1024), z.literal(2048)])
     .optional()
     .default(1024),
-  image_urls: z.array(z.string()),
-  ss_guidance_strength: z.number().gte(0).lte(10).optional().default(7.5),
+  multiimage_algo: z
+    .enum(['stochastic', 'multidiffusion'])
+    .optional()
+    .default('stochastic'),
+  mesh_simplify: z.number().gte(0.9).lte(0.98).optional().default(0.95),
+  slat_sampling_steps: z.int().gte(1).lte(50).optional().default(12),
+  seed: z.union([z.int(), z.unknown()]).optional(),
 })
 
 /**
  * ObjectOutput
  */
 export const zTrellisMultiOutput = z.object({
-  timings: z.record(z.string(), z.number()),
   model_mesh: zFile,
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * ObjectOutput
  */
 export const zTrellisOutput = z.object({
-  timings: z.record(z.string(), z.number()),
   model_mesh: zFile,
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
  * TripoSplatInput
  */
 export const zTriposplatInput = z.object({
-  seed: z.union([z.int(), z.unknown()]).optional(),
-  num_inference_steps: z.int().gte(1).lte(50).optional().default(20),
-  enable_safety_checker: z.boolean().optional().default(true),
   output_format: z.enum(['ply', 'splat']).optional().default('ply'),
-  num_gaussians: z.int().gte(32768).lte(262144).optional().default(262144),
-  guidance_scale: z.number().gte(0).lte(10).optional().default(3),
   image_url: z.string(),
+  num_gaussians: z.int().gte(32768).lte(262144).optional().default(262144),
+  enable_safety_checker: z.boolean().optional().default(true),
+  seed: z.union([z.int(), z.unknown()]).optional(),
+  guidance_scale: z.number().gte(0).lte(10).optional().default(3),
+  num_inference_steps: z.int().gte(1).lte(50).optional().default(20),
 })
 
 /**
  * TripoSplatOutput
  */
 export const zTriposplatOutput = z.object({
-  model_mesh: zFile,
-  num_gaussians: z.int(),
-  timings: z.record(z.string(), z.number()),
-  preprocessed_image: zImage,
   seed: z.int(),
+  num_gaussians: z.int(),
+  model_mesh: zFile,
+  preprocessed_image: zImage,
+  timings: z.record(z.string(), z.number()),
 })
 
 /**
@@ -1721,19 +1725,19 @@ export const zTriposplatOutput = z.object({
  */
 export const zTriposrInput = z.object({
   output_format: z.enum(['glb', 'obj']).optional().default('glb'),
-  mc_resolution: z.int().gte(32).lte(1024).optional().default(256),
+  image_url: z.string(),
   foreground_ratio: z.number().gte(0.5).lte(1).optional().default(0.9),
   do_remove_background: z.boolean().optional().default(true),
-  image_url: z.string(),
+  mc_resolution: z.int().gte(32).lte(1024).optional().default(256),
 })
 
 /**
  * ObjectOutput
  */
 export const zTriposrOutput = z.object({
-  timings: z.record(z.string(), z.number()),
-  model_mesh: zFile,
   remeshing_dir: z.union([zFile, z.unknown()]).optional(),
+  model_mesh: zFile,
+  timings: z.record(z.string(), z.number()),
 })
 
 /**

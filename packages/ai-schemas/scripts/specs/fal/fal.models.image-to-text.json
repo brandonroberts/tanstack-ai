@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-05T08:08:07.774Z",
+  "generated_at": "2026-06-11T02:20:29.649Z",
   "total_models": 1,
   "category": "image-to-text",
   "models": [
@@ -104,27 +104,13 @@
               "required": ["status", "request_id"]
             },
             "Nemotron3NanoOmniVisionInput": {
+              "type": "object",
+              "required": ["prompt", "image_url"],
               "properties": {
-                "top_p": {
-                  "default": 0.95,
-                  "description": "Nucleus sampling probability mass.",
-                  "title": "Top P",
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 1
-                },
-                "temperature": {
-                  "default": 0.7,
-                  "description": "Sampling temperature. Lower is more deterministic.",
-                  "title": "Temperature",
-                  "type": "number",
-                  "minimum": 0,
-                  "maximum": 2
-                },
                 "system_prompt": {
+                  "examples": ["You are a concise enterprise assistant."],
                   "description": "Optional system prompt to steer the model. Reasoning behavior is controlled by the separate `reasoning_mode` field.",
                   "title": "System Prompt",
-                  "examples": ["You are a concise enterprise assistant."],
                   "anyOf": [
                     {
                       "type": "string"
@@ -134,40 +120,55 @@
                     }
                   ]
                 },
-                "reasoning_mode": {
-                  "description": "Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.",
-                  "title": "Reasoning Mode",
-                  "type": "string",
-                  "enum": ["think", "no_think"],
-                  "default": "no_think"
-                },
-                "image_url": {
-                  "description": "URL of the image to reason about. RGB JPEG or PNG.",
-                  "title": "Image URL",
-                  "type": "string",
-                  "examples": [
-                    "https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/vision_in.jpg"
-                  ]
+                "temperature": {
+                  "default": 0.7,
+                  "type": "number",
+                  "title": "Temperature",
+                  "description": "Sampling temperature. Lower is more deterministic.",
+                  "minimum": 0,
+                  "maximum": 2
                 },
                 "max_tokens": {
                   "default": 1024,
-                  "description": "Maximum number of tokens to generate.",
-                  "title": "Max Tokens",
                   "type": "integer",
+                  "title": "Max Tokens",
+                  "description": "Maximum number of tokens to generate.",
                   "minimum": 1,
                   "maximum": 20000
                 },
                 "prompt": {
-                  "description": "Text prompt to send to the model. English only.",
-                  "title": "Prompt",
                   "minLength": 1,
                   "examples": [
                     "Summarize the key capabilities of a multimodal agent."
                   ],
+                  "description": "Text prompt to send to the model. English only.",
+                  "title": "Prompt",
+                  "type": "string"
+                },
+                "top_p": {
+                  "default": 0.95,
+                  "type": "number",
+                  "title": "Top P",
+                  "description": "Nucleus sampling probability mass.",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "image_url": {
+                  "title": "Image URL",
+                  "examples": [
+                    "https://storage.googleapis.com/falserverless/example_inputs/nemotron-3-nano-omni/vision_in.jpg"
+                  ],
+                  "description": "URL of the image to reason about. RGB JPEG or PNG.",
+                  "type": "string"
+                },
+                "reasoning_mode": {
+                  "default": "no_think",
+                  "title": "Reasoning Mode",
+                  "description": "Whether the model should emit an explicit reasoning trace. `no_think` returns a direct answer; `think` returns chain-of-thought followed by the final answer.",
+                  "enum": ["think", "no_think"],
                   "type": "string"
                 }
               },
-              "type": "object",
               "title": "VisionInput",
               "x-fal-order-properties": [
                 "prompt",
@@ -177,59 +178,58 @@
                 "temperature",
                 "top_p",
                 "image_url"
-              ],
-              "required": ["prompt", "image_url"]
+              ]
             },
             "Nemotron3NanoOmniVisionOutput": {
+              "type": "object",
+              "required": ["output", "usage"],
               "properties": {
-                "finish_reason": {
-                  "description": "Reason generation stopped.",
-                  "title": "Finish Reason",
-                  "type": "string",
-                  "examples": ["stop", "length"],
-                  "default": "stop"
-                },
-                "output": {
-                  "description": "Generated text response.",
-                  "title": "Output",
-                  "type": "string",
-                  "examples": [
-                    "The image shows a golden retriever puppy sitting on a wooden floor."
-                  ]
-                },
                 "usage": {
                   "$ref": "#/components/schemas/UsageInfo",
-                  "description": "Token usage for the request.",
                   "examples": [
                     {
-                      "output_tokens": 87,
-                      "input_tokens": 412
+                      "input_tokens": 412,
+                      "output_tokens": 87
                     }
-                  ]
+                  ],
+                  "description": "Token usage for the request."
+                },
+                "output": {
+                  "examples": [
+                    "The image shows a golden retriever puppy sitting on a wooden floor."
+                  ],
+                  "description": "Generated text response.",
+                  "title": "Output",
+                  "type": "string"
+                },
+                "finish_reason": {
+                  "default": "stop",
+                  "examples": ["stop", "length"],
+                  "description": "Reason generation stopped.",
+                  "title": "Finish Reason",
+                  "type": "string"
                 }
               },
-              "type": "object",
               "title": "BaseOutput",
-              "x-fal-order-properties": ["output", "finish_reason", "usage"],
-              "required": ["output", "usage"]
+              "x-fal-order-properties": ["output", "finish_reason", "usage"]
             },
             "UsageInfo": {
+              "type": "object",
+              "required": ["input_tokens", "output_tokens"],
               "properties": {
-                "output_tokens": {
-                  "description": "Number of output tokens generated.",
-                  "title": "Output Tokens",
-                  "type": "integer"
-                },
                 "input_tokens": {
                   "description": "Number of input tokens processed.",
                   "title": "Input Tokens",
                   "type": "integer"
+                },
+                "output_tokens": {
+                  "description": "Number of output tokens generated.",
+                  "title": "Output Tokens",
+                  "type": "integer"
                 }
               },
-              "type": "object",
               "title": "UsageInfo",
-              "x-fal-order-properties": ["input_tokens", "output_tokens"],
-              "required": ["input_tokens", "output_tokens"]
+              "x-fal-order-properties": ["input_tokens", "output_tokens"]
             }
           }
         },

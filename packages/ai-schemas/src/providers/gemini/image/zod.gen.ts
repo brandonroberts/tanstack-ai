@@ -6,8 +6,8 @@ import * as z from 'zod'
  * Request message for PredictionService.Predict.
  */
 export const zPredictRequest = z.object({
-  instances: z.array(z.unknown()).optional(),
   parameters: z.unknown().optional(),
+  instances: z.array(z.unknown()).optional(),
 })
 
 /**

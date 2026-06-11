@@ -6,15 +6,15 @@ export const PredictRequestSchema = {
   type: 'object',
   description: 'Request message for PredictionService.Predict.',
   properties: {
+    parameters: {
+      type: 'any',
+      description: 'Optional. The parameters that govern the prediction call.',
+    },
     instances: {
       type: 'array',
       description:
         'Required. The instances that are the input to the prediction call.',
       items: { type: 'any' },
-    },
-    parameters: {
-      type: 'any',
-      description: 'Optional. The parameters that govern the prediction call.',
     },
   },
 } as const

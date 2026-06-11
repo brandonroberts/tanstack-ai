@@ -51,6 +51,23 @@ export const BadRequestResponseErrorDataSchema = {
   type: 'object',
 } as const
 
+export const ContentPartAudioSchema = {
+  example: {
+    audio_url: { url: 'https://example.com/audio.mp3' },
+    type: 'audio_url',
+  },
+  properties: {
+    audio_url: {
+      properties: { url: { type: 'string' } },
+      required: ['url'],
+      type: 'object',
+    },
+    type: { enum: ['audio_url'], type: 'string' },
+  },
+  required: ['type', 'audio_url'],
+  type: 'object',
+} as const
+
 export const ContentPartImageSchema = {
   example: {
     image_url: { url: 'https://example.com/image.png' },
@@ -65,6 +82,23 @@ export const ContentPartImageSchema = {
     type: { enum: ['image_url'], type: 'string' },
   },
   required: ['type', 'image_url'],
+  type: 'object',
+} as const
+
+export const ContentPartVideoSchema = {
+  example: {
+    type: 'video_url',
+    video_url: { url: 'https://example.com/clip.mp4' },
+  },
+  properties: {
+    type: { enum: ['video_url'], type: 'string' },
+    video_url: {
+      properties: { url: { type: 'string' } },
+      required: ['url'],
+      type: 'object',
+    },
+  },
+  required: ['type', 'video_url'],
   type: 'object',
 } as const
 
@@ -105,6 +139,78 @@ export const FrameImageSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+  },
+} as const
+
+export const InputReferenceSchema = {
+  description:
+    'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+  discriminator: {
+    mapping: {
+      audio_url: '#/components/schemas/ContentPartAudio',
+      image_url: '#/components/schemas/ContentPartImage',
+      video_url: '#/components/schemas/ContentPartVideo',
+    },
+    propertyName: 'type',
+  },
+  example: {
+    image_url: { url: 'https://example.com/image.png' },
+    type: 'image_url',
+  },
+  oneOf: [
+    { $ref: '#/$defs/ContentPartImage' },
+    { $ref: '#/$defs/ContentPartAudio' },
+    { $ref: '#/$defs/ContentPartVideo' },
+  ],
+  $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
+    ContentPartImage: {
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      properties: {
+        image_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['image_url'], type: 'string' },
+      },
+      required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
   },
@@ -313,6 +419,7 @@ export const ProviderOptionsSchema = {
     crucible: { additionalProperties: { nullable: true }, type: 'object' },
     crusoe: { additionalProperties: { nullable: true }, type: 'object' },
     darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+    decart: { additionalProperties: { nullable: true }, type: 'object' },
     deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
     deepseek: { additionalProperties: { nullable: true }, type: 'object' },
     dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -419,6 +526,7 @@ export const ProviderOptionsSchema = {
     ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
     upstage: { additionalProperties: { nullable: true }, type: 'object' },
     venice: { additionalProperties: { nullable: true }, type: 'object' },
+    wafer: { additionalProperties: { nullable: true }, type: 'object' },
     wandb: { additionalProperties: { nullable: true }, type: 'object' },
     xai: { additionalProperties: { nullable: true }, type: 'object' },
     xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -567,8 +675,9 @@ export const VideoGenerationRequestSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: { type: 'string' },
@@ -611,6 +720,22 @@ export const VideoGenerationRequestSchema = {
   required: ['prompt', 'model'],
   type: 'object',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -625,6 +750,22 @@ export const VideoGenerationRequestSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -649,6 +790,27 @@ export const VideoGenerationRequestSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -709,6 +871,7 @@ export const VideoGenerationRequestSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -860,6 +1023,7 @@ export const VideoGenerationRequestSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -913,8 +1077,9 @@ export const VideoGenerationRequestAlibabaWan26Schema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -965,6 +1130,22 @@ export const VideoGenerationRequestAlibabaWan26Schema = {
   description:
     "Alibaba: Wan 2.6 (alibaba/wan-2.6) — model-constrained video generation request. Alibaba's most advanced video generation model, supporting over 10 visual creation capabilities in a unified system. Wan 2.6 generates 1080p video at 24fps from text, images, reference videos, or audio,...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -979,6 +1160,22 @@ export const VideoGenerationRequestAlibabaWan26Schema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -1003,6 +1200,27 @@ export const VideoGenerationRequestAlibabaWan26Schema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -1063,6 +1281,7 @@ export const VideoGenerationRequestAlibabaWan26Schema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -1214,6 +1433,7 @@ export const VideoGenerationRequestAlibabaWan26Schema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -1267,8 +1487,9 @@ export const VideoGenerationRequestAlibabaWan27Schema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -1330,6 +1551,22 @@ export const VideoGenerationRequestAlibabaWan27Schema = {
   description:
     'Alibaba: Wan 2.7 (alibaba/wan-2.7) — model-constrained video generation request. Wan 2.7 is a video generation model from Alibaba. It supports text-to-video, image-to-video with first and last frame control, and reference-to-video, where multiple reference images guide the style and content...',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -1344,6 +1581,22 @@ export const VideoGenerationRequestAlibabaWan27Schema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -1368,6 +1621,27 @@ export const VideoGenerationRequestAlibabaWan27Schema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -1428,6 +1702,7 @@ export const VideoGenerationRequestAlibabaWan27Schema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -1579,6 +1854,7 @@ export const VideoGenerationRequestAlibabaWan27Schema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -1632,8 +1908,9 @@ export const VideoGenerationRequestBytedanceSeedance15ProSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -1706,6 +1983,22 @@ export const VideoGenerationRequestBytedanceSeedance15ProSchema = {
   description:
     "ByteDance: Seedance 1.5 Pro (bytedance/seedance-1-5-pro) — model-constrained video generation request. ByteDance's next-generation audio-visual generation model with a 4.5B parameter Dual-Branch Diffusion Transformer architecture. Seedance 1.5 Pro generates video and audio simultaneously in a single unified pass — eliminating the timing...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -1720,6 +2013,22 @@ export const VideoGenerationRequestBytedanceSeedance15ProSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -1744,6 +2053,27 @@ export const VideoGenerationRequestBytedanceSeedance15ProSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -1804,6 +2134,7 @@ export const VideoGenerationRequestBytedanceSeedance15ProSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -1955,6 +2286,7 @@ export const VideoGenerationRequestBytedanceSeedance15ProSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -2008,8 +2340,9 @@ export const VideoGenerationRequestBytedanceSeedance20Schema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -2080,6 +2413,22 @@ export const VideoGenerationRequestBytedanceSeedance20Schema = {
   description:
     'ByteDance: Seedance 2.0 (bytedance/seedance-2.0) — model-constrained video generation request. Seedance 2.0 is a video generation model from ByteDance. It supports text-to-video, image-to-video with first and last frame control, and multimodal reference-to-video. It is particularly strong at preserving character consistency,...',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -2094,6 +2443,22 @@ export const VideoGenerationRequestBytedanceSeedance20Schema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -2118,6 +2483,27 @@ export const VideoGenerationRequestBytedanceSeedance20Schema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -2178,6 +2564,7 @@ export const VideoGenerationRequestBytedanceSeedance20Schema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -2329,6 +2716,7 @@ export const VideoGenerationRequestBytedanceSeedance20Schema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -2382,8 +2770,9 @@ export const VideoGenerationRequestBytedanceSeedance20FastSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -2448,6 +2837,22 @@ export const VideoGenerationRequestBytedanceSeedance20FastSchema = {
   description:
     'ByteDance: Seedance 2.0 Fast (bytedance/seedance-2.0-fast) — model-constrained video generation request. Seedance 2.0 Fast is a video generation model from ByteDance. It supports text-to-video, image-to-video with first and last frame control, and multimodal reference-to-video. It prioritizes generation speed and lower cost...',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -2462,6 +2867,22 @@ export const VideoGenerationRequestBytedanceSeedance20FastSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -2486,6 +2907,27 @@ export const VideoGenerationRequestBytedanceSeedance20FastSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -2546,6 +2988,7 @@ export const VideoGenerationRequestBytedanceSeedance20FastSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -2697,6 +3140,7 @@ export const VideoGenerationRequestBytedanceSeedance20FastSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -2750,8 +3194,9 @@ export const VideoGenerationRequestGoogleVeo31Schema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -2809,6 +3254,22 @@ export const VideoGenerationRequestGoogleVeo31Schema = {
   description:
     "Google: Veo 3.1 (google/veo-3.1) — model-constrained video generation request. Google's state-of-the-art video generation model, built for maximum visual fidelity in final production cuts. Veo 3.1 generates high-quality 1080p video from text or image prompts with native synchronized audio —...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -2823,6 +3284,22 @@ export const VideoGenerationRequestGoogleVeo31Schema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -2847,6 +3324,27 @@ export const VideoGenerationRequestGoogleVeo31Schema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -2907,6 +3405,7 @@ export const VideoGenerationRequestGoogleVeo31Schema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -3058,6 +3557,7 @@ export const VideoGenerationRequestGoogleVeo31Schema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -3111,8 +3611,9 @@ export const VideoGenerationRequestGoogleVeo31FastSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -3170,6 +3671,22 @@ export const VideoGenerationRequestGoogleVeo31FastSchema = {
   description:
     "Google: Veo 3.1 Fast (google/veo-3.1-fast) — model-constrained video generation request. Google's mid-tier video generation model balancing speed and quality. Veo 3.1 Fast generates high-quality video from text or image prompts with native synchronized audio, offering faster turnaround than Veo 3.1...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -3184,6 +3701,22 @@ export const VideoGenerationRequestGoogleVeo31FastSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -3208,6 +3741,27 @@ export const VideoGenerationRequestGoogleVeo31FastSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -3268,6 +3822,7 @@ export const VideoGenerationRequestGoogleVeo31FastSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -3419,6 +3974,7 @@ export const VideoGenerationRequestGoogleVeo31FastSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -3472,8 +4028,9 @@ export const VideoGenerationRequestGoogleVeo31LiteSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -3524,6 +4081,22 @@ export const VideoGenerationRequestGoogleVeo31LiteSchema = {
   description:
     "Google: Veo 3.1 Lite (google/veo-3.1-lite) — model-constrained video generation request. Google's most cost-effective video generation model, designed for high-volume applications and rapid iteration. Veo 3.1 Lite generates 720p and 1080p video from text or image prompts with native synchronized audio...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -3538,6 +4111,22 @@ export const VideoGenerationRequestGoogleVeo31LiteSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -3562,6 +4151,27 @@ export const VideoGenerationRequestGoogleVeo31LiteSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -3622,6 +4232,7 @@ export const VideoGenerationRequestGoogleVeo31LiteSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -3773,6 +4384,7 @@ export const VideoGenerationRequestGoogleVeo31LiteSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -3826,8 +4438,9 @@ export const VideoGenerationRequestKwaivgiKlingV30ProSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -3873,6 +4486,22 @@ export const VideoGenerationRequestKwaivgiKlingV30ProSchema = {
   description:
     "Kling: Video v3.0 Pro (kwaivgi/kling-v3.0-pro) — model-constrained video generation request. Kling v3.0 Pro is Kuaishou's premium video generation model, offering higher visual quality than the Standard tier. It supports text-to-video and image-to-video workflows, with first-frame and last-frame control for precise...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -3887,6 +4516,22 @@ export const VideoGenerationRequestKwaivgiKlingV30ProSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -3911,6 +4556,27 @@ export const VideoGenerationRequestKwaivgiKlingV30ProSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -3971,6 +4637,7 @@ export const VideoGenerationRequestKwaivgiKlingV30ProSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -4122,6 +4789,7 @@ export const VideoGenerationRequestKwaivgiKlingV30ProSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -4175,8 +4843,9 @@ export const VideoGenerationRequestKwaivgiKlingV30StdSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -4222,6 +4891,22 @@ export const VideoGenerationRequestKwaivgiKlingV30StdSchema = {
   description:
     'Kling: Video v3.0 Standard (kwaivgi/kling-v3.0-std) — model-constrained video generation request. Kling v3.0 Standard is a video generation model from Kuaishou. It supports text-to-video and image-to-video workflows, with first-frame and last-frame control for guided scene composition. Clips range from 3 to...',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -4236,6 +4921,22 @@ export const VideoGenerationRequestKwaivgiKlingV30StdSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -4260,6 +4961,27 @@ export const VideoGenerationRequestKwaivgiKlingV30StdSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -4320,6 +5042,7 @@ export const VideoGenerationRequestKwaivgiKlingV30StdSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -4471,6 +5194,7 @@ export const VideoGenerationRequestKwaivgiKlingV30StdSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -4524,8 +5248,9 @@ export const VideoGenerationRequestKwaivgiKlingVideoO1Schema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -4571,6 +5296,22 @@ export const VideoGenerationRequestKwaivgiKlingVideoO1Schema = {
   description:
     'Kling: Video O1 (kwaivgi/kling-video-o1) — model-constrained video generation request. Kling Video O1 is a video generation model from Kuaishou. It supports text and image inputs with video output, enabling text-to-video and image-to-video workflows. It is suited for cinematic content...',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -4585,6 +5326,22 @@ export const VideoGenerationRequestKwaivgiKlingVideoO1Schema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -4609,6 +5366,27 @@ export const VideoGenerationRequestKwaivgiKlingVideoO1Schema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -4669,6 +5447,7 @@ export const VideoGenerationRequestKwaivgiKlingVideoO1Schema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -4820,6 +5599,7 @@ export const VideoGenerationRequestKwaivgiKlingVideoO1Schema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -4867,8 +5647,9 @@ export const VideoGenerationRequestMinimaxHailuo23Schema = {
       type: 'array',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -4914,6 +5695,22 @@ export const VideoGenerationRequestMinimaxHailuo23Schema = {
   description:
     'MiniMax: Hailuo 2.3 (minimax/hailuo-2.3) — model-constrained video generation request. Hailuo 2.3 is a video generation model from MiniMax. It accepts text prompts and reference images as input and generates video output, supporting both text-to-video and image-to-video workflows. It is...',
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -4928,6 +5725,22 @@ export const VideoGenerationRequestMinimaxHailuo23Schema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -4952,6 +5765,27 @@ export const VideoGenerationRequestMinimaxHailuo23Schema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -5012,6 +5846,7 @@ export const VideoGenerationRequestMinimaxHailuo23Schema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -5163,6 +5998,7 @@ export const VideoGenerationRequestMinimaxHailuo23Schema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -5210,8 +6046,9 @@ export const VideoGenerationRequestOpenaiSora2ProSchema = {
       type: 'boolean',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -5257,6 +6094,22 @@ export const VideoGenerationRequestOpenaiSora2ProSchema = {
   description:
     "OpenAI: Sora 2 Pro (openai/sora-2-pro) — model-constrained video generation request. OpenAI's flagship video generation model, delivering production-quality video with physics-accurate motion, synchronized audio, and world-state persistence across shots. Sora 2 Pro follows intricate multi-shot instructions while maintaining consistent spatial relationships...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -5272,6 +6125,43 @@ export const VideoGenerationRequestOpenaiSora2ProSchema = {
       },
       required: ['type', 'image_url'],
       type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
+      type: 'object',
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -5332,6 +6222,7 @@ export const VideoGenerationRequestOpenaiSora2ProSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -5483,6 +6374,7 @@ export const VideoGenerationRequestOpenaiSora2ProSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },
@@ -5530,8 +6422,9 @@ export const VideoGenerationRequestXAiGrokImagineVideoSchema = {
       type: 'array',
     },
     input_references: {
-      description: 'Reference images to guide video generation',
-      items: { $ref: '#/$defs/ContentPartImage' },
+      description:
+        'Reference assets to guide video generation. Accepts image, audio, and video references. Audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0); other providers use image references and ignore the rest.',
+      items: { $ref: '#/$defs/InputReference' },
       type: 'array',
     },
     model: {
@@ -5591,6 +6484,22 @@ export const VideoGenerationRequestXAiGrokImagineVideoSchema = {
   description:
     "xAI: Grok Imagine Video (x-ai/grok-imagine-video) — model-constrained video generation request. Grok Imagine Video is xAI's fast, text-, image-, and reference-conditioned video generation model. It produces short videos (1–15 seconds, 24 fps) at 480p or 720p across seven aspect ratios -...",
   $defs: {
+    ContentPartAudio: {
+      example: {
+        audio_url: { url: 'https://example.com/audio.mp3' },
+        type: 'audio_url',
+      },
+      properties: {
+        audio_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+        type: { enum: ['audio_url'], type: 'string' },
+      },
+      required: ['type', 'audio_url'],
+      type: 'object',
+    },
     ContentPartImage: {
       example: {
         image_url: { url: 'https://example.com/image.png' },
@@ -5605,6 +6514,22 @@ export const VideoGenerationRequestXAiGrokImagineVideoSchema = {
         type: { enum: ['image_url'], type: 'string' },
       },
       required: ['type', 'image_url'],
+      type: 'object',
+    },
+    ContentPartVideo: {
+      example: {
+        type: 'video_url',
+        video_url: { url: 'https://example.com/clip.mp4' },
+      },
+      properties: {
+        type: { enum: ['video_url'], type: 'string' },
+        video_url: {
+          properties: { url: { type: 'string' } },
+          required: ['url'],
+          type: 'object',
+        },
+      },
+      required: ['type', 'video_url'],
       type: 'object',
     },
     FrameImage: {
@@ -5629,6 +6554,27 @@ export const VideoGenerationRequestXAiGrokImagineVideoSchema = {
         image_url: { url: 'https://example.com/image.png' },
         type: 'image_url',
       },
+    },
+    InputReference: {
+      description:
+        'A reference asset used to guide video generation. Image references are supported by all providers; audio and video references are only honored by providers that support them (currently BytePlus Seedance 2.0).',
+      discriminator: {
+        mapping: {
+          audio_url: '#/components/schemas/ContentPartAudio',
+          image_url: '#/components/schemas/ContentPartImage',
+          video_url: '#/components/schemas/ContentPartVideo',
+        },
+        propertyName: 'type',
+      },
+      example: {
+        image_url: { url: 'https://example.com/image.png' },
+        type: 'image_url',
+      },
+      oneOf: [
+        { $ref: '#/$defs/ContentPartImage' },
+        { $ref: '#/$defs/ContentPartAudio' },
+        { $ref: '#/$defs/ContentPartVideo' },
+      ],
     },
     ProviderOptions: {
       description:
@@ -5689,6 +6635,7 @@ export const VideoGenerationRequestXAiGrokImagineVideoSchema = {
         crucible: { additionalProperties: { nullable: true }, type: 'object' },
         crusoe: { additionalProperties: { nullable: true }, type: 'object' },
         darkbloom: { additionalProperties: { nullable: true }, type: 'object' },
+        decart: { additionalProperties: { nullable: true }, type: 'object' },
         deepinfra: { additionalProperties: { nullable: true }, type: 'object' },
         deepseek: { additionalProperties: { nullable: true }, type: 'object' },
         dekallm: { additionalProperties: { nullable: true }, type: 'object' },
@@ -5840,6 +6787,7 @@ export const VideoGenerationRequestXAiGrokImagineVideoSchema = {
         ubicloud: { additionalProperties: { nullable: true }, type: 'object' },
         upstage: { additionalProperties: { nullable: true }, type: 'object' },
         venice: { additionalProperties: { nullable: true }, type: 'object' },
+        wafer: { additionalProperties: { nullable: true }, type: 'object' },
         wandb: { additionalProperties: { nullable: true }, type: 'object' },
         xai: { additionalProperties: { nullable: true }, type: 'object' },
         xiaomi: { additionalProperties: { nullable: true }, type: 'object' },

@@ -233,61 +233,61 @@ export const AudioTrackSchema = {
 } as const
 
 export const BagelUnderstandInputSchema = {
-  'x-fal-order-properties': ['image_url', 'prompt', 'seed'],
-  type: 'object',
   properties: {
-    seed: {
-      description: 'The seed to use for the generation.',
-      title: 'Seed',
-      type: 'integer',
-    },
     prompt: {
-      description: 'The prompt to query the image with.',
-      examples: ['What is shown in the image? '],
       title: 'Prompt',
+      description: 'The prompt to query the image with.',
       type: 'string',
+      examples: ['What is shown in the image? '],
     },
     image_url: {
+      title: 'Image Url',
       description: 'The image for the query.',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/bagel/wRhCPSyiKTiLnnWvUpGIl.jpeg',
       ],
-      title: 'Image Url',
-      type: 'string',
       'x-fal-file-input': true,
     },
+    seed: {
+      title: 'Seed',
+      description: 'The seed to use for the generation.',
+      type: 'integer',
+    },
   },
+  'x-fal-order-properties': ['image_url', 'prompt', 'seed'],
   title: 'ImageUnderstandingInput',
   required: ['image_url', 'prompt'],
+  type: 'object',
 } as const
 
 export const BagelUnderstandOutputSchema = {
-  'x-fal-order-properties': ['text', 'seed', 'prompt', 'timings'],
-  type: 'object',
   properties: {
     text: {
-      description: 'The answer to the query.',
       title: 'Text',
+      description: 'The answer to the query.',
       type: 'string',
-    },
-    timings: {
-      description: 'The timings of the generation.',
-      title: 'Timings',
-      type: 'object',
-    },
-    seed: {
-      description: 'The seed used for the generation.',
-      title: 'Seed',
-      type: 'integer',
     },
     prompt: {
-      description: 'The query used for the generation.',
       title: 'Prompt',
+      description: 'The query used for the generation.',
       type: 'string',
     },
+    seed: {
+      title: 'Seed',
+      description: 'The seed used for the generation.',
+      type: 'integer',
+    },
+    timings: {
+      title: 'Timings',
+      description: 'The timings of the generation.',
+      type: 'object',
+    },
   },
+  'x-fal-order-properties': ['text', 'seed', 'prompt', 'timings'],
   title: 'TextOutput',
   required: ['text', 'seed', 'prompt', 'timings'],
+  type: 'object',
 } as const
 
 export const FfmpegApiLoudnormInputSchema = {
@@ -954,6 +954,42 @@ export const FfmpegApiWaveformOutputSchema = {
 } as const
 
 export const FiboEditEditStructured_instructionInputSchema = {
+  title: 'StructuredInstructionInputModel',
+  type: 'object',
+  properties: {
+    seed: {
+      title: 'Seed',
+      default: 5555,
+      type: 'integer',
+      description: 'Random seed for reproducibility.',
+    },
+    image_url: {
+      title: 'Image Url',
+      examples: [
+        'https://v3b.fal.media/files/b/0a8b07e8/GYKVk2EVivg_MC3jRRZi3_png%20-%202026-01-13T094835.850%20(3).png',
+      ],
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description: 'Reference image (file or URL).',
+    },
+    mask_url: {
+      title: 'Mask Url',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description: 'Reference image mask (file or URL). Optional.',
+    },
+    sync_mode: {
+      title: 'Sync Mode',
+      default: false,
+      type: 'boolean',
+      description:
+        'If true, returns the image directly in the response (increases latency).',
+    },
+    instruction: {
+      title: 'Instruction',
+      examples: ['change lighting to starlight nighttime'],
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description: 'Instruction for image editing.',
+    },
+  },
   'x-fal-order-properties': [
     'image_url',
     'mask_url',
@@ -961,42 +997,6 @@ export const FiboEditEditStructured_instructionInputSchema = {
     'seed',
     'sync_mode',
   ],
-  type: 'object',
-  properties: {
-    mask_url: {
-      description: 'Reference image mask (file or URL). Optional.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Mask Url',
-    },
-    sync_mode: {
-      description:
-        'If true, returns the image directly in the response (increases latency).',
-      type: 'boolean',
-      default: false,
-      title: 'Sync Mode',
-    },
-    image_url: {
-      examples: [
-        'https://v3b.fal.media/files/b/0a8b07e8/GYKVk2EVivg_MC3jRRZi3_png%20-%202026-01-13T094835.850%20(3).png',
-      ],
-      description: 'Reference image (file or URL).',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Image Url',
-    },
-    instruction: {
-      examples: ['change lighting to starlight nighttime'],
-      description: 'Instruction for image editing.',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      title: 'Instruction',
-    },
-    seed: {
-      description: 'Random seed for reproducibility.',
-      type: 'integer',
-      default: 5555,
-      title: 'Seed',
-    },
-  },
-  title: 'StructuredInstructionInputModel',
 } as const
 
 export const FiboEditEditStructured_instructionOutputSchema = {} as const
@@ -2264,61 +2264,60 @@ export const ObjectDescriptionSchema = {
 } as const
 
 export const OmnilottieImageToLottieInputSchema = {
-  title: 'ImageToLottieInput',
   required: ['prompt', 'image_url'],
-  type: 'object',
   properties: {
-    top_p: {
-      title: 'Top P',
-      minimum: 0,
-      type: 'number',
-      description: 'Nucleus sampling probability threshold.',
-      default: 0.25,
-      maximum: 1,
-    },
-    max_tokens: {
-      title: 'Max Tokens',
-      minimum: 256,
-      type: 'integer',
-      description: 'Maximum number of Lottie tokens to generate.',
-      default: 4096,
-      maximum: 8192,
-    },
-    temperature: {
-      title: 'Temperature',
-      minimum: 0,
-      type: 'number',
-      description: 'Sampling temperature for generation.',
-      default: 0.9,
-      maximum: 2,
-    },
-    top_k: {
-      title: 'Top K',
-      minimum: 1,
-      type: 'integer',
-      description: 'Top-k sampling parameter.',
-      default: 5,
-      maximum: 100,
-    },
     image_url: {
       title: 'Image Url',
       type: 'string',
-      description: 'URL of the reference image to animate.',
       examples: [
         'https://storage.googleapis.com/falserverless/gallery/00de75e2c031cb3fc3f472e356aba5b6.png',
       ],
+      description: 'URL of the reference image to animate.',
       'x-fal-file-input': true,
+    },
+    top_p: {
+      default: 0.25,
+      minimum: 0,
+      type: 'number',
+      title: 'Top P',
+      maximum: 1,
+      description: 'Nucleus sampling probability threshold.',
+    },
+    temperature: {
+      default: 0.9,
+      minimum: 0,
+      type: 'number',
+      title: 'Temperature',
+      maximum: 2,
+      description: 'Sampling temperature for generation.',
+    },
+    max_tokens: {
+      default: 4096,
+      minimum: 256,
+      type: 'integer',
+      title: 'Max Tokens',
+      maximum: 8192,
+      description: 'Maximum number of Lottie tokens to generate.',
     },
     prompt: {
       title: 'Prompt',
       type: 'string',
-      description: 'Text description guiding the animation of the image.',
       maxLength: 2000,
       examples: [
         'A cyan-colored, elongated shape resembling a smiley face, consisting of two pink oval eyes with navy blue circular pupils positioned symmetrically. The shape rotates gradually around its horizontal axis, revealing small animated sparklesâpink and tealâthat appear sporadically near the eyes, enhancing the dynamic visual effect.',
       ],
+      description: 'Text description guiding the animation of the image.',
+    },
+    top_k: {
+      default: 5,
+      minimum: 1,
+      type: 'integer',
+      title: 'Top K',
+      maximum: 100,
+      description: 'Top-k sampling parameter.',
     },
   },
+  title: 'ImageToLottieInput',
   'x-fal-order-properties': [
     'prompt',
     'image_url',
@@ -2327,19 +2326,20 @@ export const OmnilottieImageToLottieInputSchema = {
     'top_p',
     'top_k',
   ],
+  type: 'object',
 } as const
 
 export const OmnilottieImageToLottieOutputSchema = {
-  title: 'LottieOutput',
   required: ['lottie_file'],
-  type: 'object',
   properties: {
     lottie_file: {
       $ref: '#/$defs/File',
       description: 'The generated Lottie animation as a JSON file.',
     },
   },
+  title: 'LottieOutput',
   'x-fal-order-properties': ['lottie_file'],
+  type: 'object',
   $defs: {
     File: {
       properties: {
@@ -2382,50 +2382,49 @@ export const OmnilottieImageToLottieOutputSchema = {
 } as const
 
 export const OmnilottieInputSchema = {
-  title: 'TextToLottieInput',
   required: ['prompt'],
-  type: 'object',
   properties: {
-    top_p: {
-      title: 'Top P',
-      minimum: 0,
-      type: 'number',
-      description: 'Nucleus sampling probability threshold.',
-      default: 0.25,
-      maximum: 1,
-    },
     max_tokens: {
-      title: 'Max Tokens',
+      default: 4096,
       minimum: 256,
       type: 'integer',
-      description: 'Maximum number of Lottie tokens to generate.',
-      default: 4096,
+      title: 'Max Tokens',
       maximum: 8192,
+      description: 'Maximum number of Lottie tokens to generate.',
     },
-    temperature: {
-      title: 'Temperature',
+    top_p: {
+      default: 0.25,
       minimum: 0,
       type: 'number',
-      description: 'Sampling temperature for generation.',
-      default: 0.9,
-      maximum: 2,
+      title: 'Top P',
+      maximum: 1,
+      description: 'Nucleus sampling probability threshold.',
     },
-    top_k: {
-      title: 'Top K',
-      minimum: 1,
-      type: 'integer',
-      description: 'Top-k sampling parameter.',
-      default: 5,
-      maximum: 100,
+    temperature: {
+      default: 0.9,
+      minimum: 0,
+      type: 'number',
+      title: 'Temperature',
+      maximum: 2,
+      description: 'Sampling temperature for generation.',
     },
     prompt: {
       title: 'Prompt',
       type: 'string',
-      description: 'Text description of the Lottie animation to generate.',
       maxLength: 2000,
       examples: ['A red ball bouncing up and down'],
+      description: 'Text description of the Lottie animation to generate.',
+    },
+    top_k: {
+      default: 5,
+      minimum: 1,
+      type: 'integer',
+      title: 'Top K',
+      maximum: 100,
+      description: 'Top-k sampling parameter.',
     },
   },
+  title: 'TextToLottieInput',
   'x-fal-order-properties': [
     'prompt',
     'max_tokens',
@@ -2433,19 +2432,20 @@ export const OmnilottieInputSchema = {
     'top_p',
     'top_k',
   ],
+  type: 'object',
 } as const
 
 export const OmnilottieOutputSchema = {
-  title: 'LottieOutput',
   required: ['lottie_file'],
-  type: 'object',
   properties: {
     lottie_file: {
       $ref: '#/$defs/File',
       description: 'The generated Lottie animation as a JSON file.',
     },
   },
+  title: 'LottieOutput',
   'x-fal-order-properties': ['lottie_file'],
+  type: 'object',
   $defs: {
     File: {
       properties: {
@@ -2488,57 +2488,56 @@ export const OmnilottieOutputSchema = {
 } as const
 
 export const OmnilottieVideoToLottieInputSchema = {
-  title: 'VideoToLottieInput',
   required: ['video_url'],
-  type: 'object',
   properties: {
+    max_tokens: {
+      default: 4096,
+      minimum: 256,
+      type: 'integer',
+      title: 'Max Tokens',
+      maximum: 8192,
+      description: 'Maximum number of Lottie tokens to generate.',
+    },
+    top_p: {
+      default: 0.25,
+      minimum: 0,
+      type: 'number',
+      title: 'Top P',
+      maximum: 1,
+      description: 'Nucleus sampling probability threshold.',
+    },
+    temperature: {
+      default: 0.9,
+      minimum: 0,
+      type: 'number',
+      title: 'Temperature',
+      maximum: 2,
+      description: 'Sampling temperature for generation.',
+    },
+    prompt: {
+      anyOf: [{ maxLength: 2000, type: 'string' }, { type: 'null' }],
+      title: 'Prompt',
+      description: 'Optional text description guiding the conversion.',
+    },
     video_url: {
       title: 'Video Url',
       type: 'string',
-      description: 'URL of the video to convert into a Lottie animation.',
       examples: [
         'https://storage.googleapis.com/falserverless/gallery/0dd62535b46d6f8ecf42f22dc0e148cd.mp4',
       ],
+      description: 'URL of the video to convert into a Lottie animation.',
       'x-fal-file-input': true,
     },
-    top_p: {
-      title: 'Top P',
-      minimum: 0,
-      type: 'number',
-      description: 'Nucleus sampling probability threshold.',
-      default: 0.25,
-      maximum: 1,
-    },
-    max_tokens: {
-      title: 'Max Tokens',
-      minimum: 256,
-      type: 'integer',
-      description: 'Maximum number of Lottie tokens to generate.',
-      default: 4096,
-      maximum: 8192,
-    },
-    temperature: {
-      title: 'Temperature',
-      minimum: 0,
-      type: 'number',
-      description: 'Sampling temperature for generation.',
-      default: 0.9,
-      maximum: 2,
-    },
     top_k: {
-      title: 'Top K',
+      default: 5,
       minimum: 1,
       type: 'integer',
-      description: 'Top-k sampling parameter.',
-      default: 5,
+      title: 'Top K',
       maximum: 100,
-    },
-    prompt: {
-      title: 'Prompt',
-      description: 'Optional text description guiding the conversion.',
-      anyOf: [{ type: 'string', maxLength: 2000 }, { type: 'null' }],
+      description: 'Top-k sampling parameter.',
     },
   },
+  title: 'VideoToLottieInput',
   'x-fal-order-properties': [
     'prompt',
     'video_url',
@@ -2547,19 +2546,20 @@ export const OmnilottieVideoToLottieInputSchema = {
     'top_p',
     'top_k',
   ],
+  type: 'object',
 } as const
 
 export const OmnilottieVideoToLottieOutputSchema = {
-  title: 'LottieOutput',
   required: ['lottie_file'],
-  type: 'object',
   properties: {
     lottie_file: {
       $ref: '#/$defs/File',
       description: 'The generated Lottie animation as a JSON file.',
     },
   },
+  title: 'LottieOutput',
   'x-fal-order-properties': ['lottie_file'],
+  type: 'object',
   $defs: {
     File: {
       properties: {

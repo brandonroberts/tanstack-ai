@@ -57,478 +57,428 @@ export const EventSegmentSchema = {
 } as const
 
 export const EventSegmentType2Schema = {
-  properties: {
-    start: {
-      description: 'Start time in seconds.',
-      title: 'Start',
-      type: 'number',
-      examples: [10.4],
-    },
-    end: {
-      description: 'End time in seconds.',
-      title: 'End',
-      type: 'number',
-      examples: [12.5],
-    },
-  },
+  required: ['start', 'end'],
   title: 'EventSegment',
   type: 'object',
   'x-fal-order-properties': ['start', 'end'],
-  required: ['start', 'end'],
+  properties: {
+    end: {
+      examples: [12.5],
+      title: 'End',
+      type: 'number',
+      description: 'End time in seconds.',
+    },
+    start: {
+      examples: [10.4],
+      title: 'Start',
+      type: 'number',
+      description: 'Start time in seconds.',
+    },
+  },
 } as const
 
 export const FileSchema = {
-  'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
-  type: 'object',
-  title: 'File',
+  required: ['url'],
   properties: {
-    content_type: {
-      description: 'The mime type of the file.',
-      title: 'Content Type',
-      examples: ['image/png'],
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-    },
     file_size: {
-      description: 'The size of the file in bytes.',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
       title: 'File Size',
       examples: [4404019],
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    file_name: {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-      title: 'File Name',
-      examples: ['z9RV14K95DvU.png'],
-      anyOf: [{ type: 'string' }, { type: 'null' }],
+      description: 'The size of the file in bytes.',
     },
     url: {
-      description: 'The URL where the file can be downloaded from.',
       title: 'Url',
       type: 'string',
+      description: 'The URL where the file can be downloaded from.',
+    },
+    content_type: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'Content Type',
+      examples: ['image/png'],
+      description: 'The mime type of the file.',
+    },
+    file_name: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      title: 'File Name',
+      examples: ['z9RV14K95DvU.png'],
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
     },
   },
-  required: ['url'],
+  title: 'File',
+  type: 'object',
+  'x-fal-order-properties': ['url', 'content_type', 'file_name', 'file_size'],
 } as const
 
 export const Florence2LargeCaptionInputSchema = {
+  title: 'ImageInput',
+  required: ['image_url'],
   properties: {
     image_url: {
-      type: 'string',
-      title: 'Image Url',
       examples: [
         'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg',
         'http://ecx.images-amazon.com/images/I/51UUzBDAMsL.jpg',
       ],
       description: 'The URL of the image to be processed.',
+      title: 'Image Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
   },
   type: 'object',
   'x-fal-order-properties': ['image_url'],
-  title: 'ImageInput',
-  required: ['image_url'],
 } as const
 
 export const Florence2LargeCaptionOutputSchema = {
+  title: 'TextOutput',
+  required: ['results'],
   properties: {
     results: {
-      type: 'string',
-      title: 'Results',
       description: 'Results from the model',
+      title: 'Results',
+      type: 'string',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['results'],
-  title: 'TextOutput',
-  required: ['results'],
 } as const
 
 export const Florence2LargeDetailedCaptionInputSchema = {
+  title: 'ImageInput',
+  required: ['image_url'],
   properties: {
     image_url: {
-      type: 'string',
-      title: 'Image Url',
       examples: [
         'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg',
         'http://ecx.images-amazon.com/images/I/51UUzBDAMsL.jpg',
       ],
       description: 'The URL of the image to be processed.',
+      title: 'Image Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
   },
   type: 'object',
   'x-fal-order-properties': ['image_url'],
-  title: 'ImageInput',
-  required: ['image_url'],
 } as const
 
 export const Florence2LargeDetailedCaptionOutputSchema = {
+  title: 'TextOutput',
+  required: ['results'],
   properties: {
     results: {
-      type: 'string',
-      title: 'Results',
       description: 'Results from the model',
+      title: 'Results',
+      type: 'string',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['results'],
-  title: 'TextOutput',
-  required: ['results'],
 } as const
 
 export const Florence2LargeMoreDetailedCaptionInputSchema = {
+  title: 'ImageInput',
+  required: ['image_url'],
   properties: {
     image_url: {
-      type: 'string',
-      title: 'Image Url',
       examples: [
         'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg',
         'http://ecx.images-amazon.com/images/I/51UUzBDAMsL.jpg',
       ],
       description: 'The URL of the image to be processed.',
+      title: 'Image Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
   },
   type: 'object',
   'x-fal-order-properties': ['image_url'],
-  title: 'ImageInput',
-  required: ['image_url'],
 } as const
 
 export const Florence2LargeMoreDetailedCaptionOutputSchema = {
+  title: 'TextOutput',
+  required: ['results'],
   properties: {
     results: {
-      type: 'string',
-      title: 'Results',
       description: 'Results from the model',
+      title: 'Results',
+      type: 'string',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['results'],
-  title: 'TextOutput',
-  required: ['results'],
 } as const
 
 export const Florence2LargeOcrInputSchema = {
+  title: 'ImageInput',
+  required: ['image_url'],
   properties: {
     image_url: {
-      type: 'string',
-      title: 'Image Url',
       examples: [
         'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg',
         'http://ecx.images-amazon.com/images/I/51UUzBDAMsL.jpg',
       ],
       description: 'The URL of the image to be processed.',
+      title: 'Image Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
   },
   type: 'object',
   'x-fal-order-properties': ['image_url'],
-  title: 'ImageInput',
-  required: ['image_url'],
 } as const
 
 export const Florence2LargeOcrOutputSchema = {
+  title: 'TextOutput',
+  required: ['results'],
   properties: {
     results: {
-      type: 'string',
-      title: 'Results',
       description: 'Results from the model',
+      title: 'Results',
+      type: 'string',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['results'],
-  title: 'TextOutput',
-  required: ['results'],
 } as const
 
 export const Florence2LargeRegionToCategoryInputSchema = {
+  title: 'ImageWithUserCoordinatesInput',
+  required: ['image_url', 'region'],
   properties: {
     image_url: {
-      type: 'string',
-      title: 'Image Url',
       examples: [
         'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg',
         'http://ecx.images-amazon.com/images/I/51UUzBDAMsL.jpg',
       ],
       description: 'The URL of the image to be processed.',
+      title: 'Image Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
     region: {
       $ref: '#/$defs/Region',
-      examples: [{ x2: 200, x1: 100, y1: 100, y2: 200 }],
       description: 'The user input coordinates',
+      examples: [{ x2: 200, y2: 200, y1: 100, x1: 100 }],
     },
   },
   type: 'object',
   'x-fal-order-properties': ['image_url', 'region'],
-  title: 'ImageWithUserCoordinatesInput',
-  required: ['image_url', 'region'],
   $defs: {
     Region: {
+      title: 'Region',
+      required: ['x1', 'y1', 'x2', 'y2'],
       properties: {
         x2: {
-          type: 'integer',
-          title: 'X2',
-          minimum: 0,
           description: 'X-coordinate of the bottom-right corner',
-          maximum: 999,
-        },
-        x1: {
-          type: 'integer',
-          title: 'X1',
           minimum: 0,
-          description: 'X-coordinate of the top-left corner',
+          title: 'X2',
           maximum: 999,
-        },
-        y1: {
           type: 'integer',
-          title: 'Y1',
-          minimum: 0,
-          description: 'Y-coordinate of the top-left corner',
-          maximum: 999,
         },
         y2: {
-          type: 'integer',
-          title: 'Y2',
-          minimum: 0,
           description: 'Y-coordinate of the bottom-right corner',
+          minimum: 0,
+          title: 'Y2',
           maximum: 999,
+          type: 'integer',
+        },
+        y1: {
+          description: 'Y-coordinate of the top-left corner',
+          minimum: 0,
+          title: 'Y1',
+          maximum: 999,
+          type: 'integer',
+        },
+        x1: {
+          description: 'X-coordinate of the top-left corner',
+          minimum: 0,
+          title: 'X1',
+          maximum: 999,
+          type: 'integer',
         },
       },
       type: 'object',
       'x-fal-order-properties': ['x1', 'y1', 'x2', 'y2'],
-      title: 'Region',
-      required: ['x1', 'y1', 'x2', 'y2'],
     },
   },
 } as const
 
 export const Florence2LargeRegionToCategoryOutputSchema = {
+  title: 'TextOutput',
+  required: ['results'],
   properties: {
     results: {
-      type: 'string',
-      title: 'Results',
       description: 'Results from the model',
+      title: 'Results',
+      type: 'string',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['results'],
-  title: 'TextOutput',
-  required: ['results'],
 } as const
 
 export const Florence2LargeRegionToDescriptionInputSchema = {
+  title: 'ImageWithUserCoordinatesInput',
+  required: ['image_url', 'region'],
   properties: {
     image_url: {
-      type: 'string',
-      title: 'Image Url',
       examples: [
         'https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/transformers/tasks/car.jpg',
         'http://ecx.images-amazon.com/images/I/51UUzBDAMsL.jpg',
       ],
       description: 'The URL of the image to be processed.',
+      title: 'Image Url',
+      type: 'string',
       'x-fal-file-input': true,
     },
     region: {
       $ref: '#/$defs/Region',
-      examples: [{ x2: 200, x1: 100, y1: 100, y2: 200 }],
       description: 'The user input coordinates',
+      examples: [{ x2: 200, y2: 200, y1: 100, x1: 100 }],
     },
   },
   type: 'object',
   'x-fal-order-properties': ['image_url', 'region'],
-  title: 'ImageWithUserCoordinatesInput',
-  required: ['image_url', 'region'],
   $defs: {
     Region: {
+      title: 'Region',
+      required: ['x1', 'y1', 'x2', 'y2'],
       properties: {
         x2: {
-          type: 'integer',
-          title: 'X2',
-          minimum: 0,
           description: 'X-coordinate of the bottom-right corner',
-          maximum: 999,
-        },
-        x1: {
-          type: 'integer',
-          title: 'X1',
           minimum: 0,
-          description: 'X-coordinate of the top-left corner',
+          title: 'X2',
           maximum: 999,
-        },
-        y1: {
           type: 'integer',
-          title: 'Y1',
-          minimum: 0,
-          description: 'Y-coordinate of the top-left corner',
-          maximum: 999,
         },
         y2: {
-          type: 'integer',
-          title: 'Y2',
-          minimum: 0,
           description: 'Y-coordinate of the bottom-right corner',
+          minimum: 0,
+          title: 'Y2',
           maximum: 999,
+          type: 'integer',
+        },
+        y1: {
+          description: 'Y-coordinate of the top-left corner',
+          minimum: 0,
+          title: 'Y1',
+          maximum: 999,
+          type: 'integer',
+        },
+        x1: {
+          description: 'X-coordinate of the top-left corner',
+          minimum: 0,
+          title: 'X1',
+          maximum: 999,
+          type: 'integer',
         },
       },
       type: 'object',
       'x-fal-order-properties': ['x1', 'y1', 'x2', 'y2'],
-      title: 'Region',
-      required: ['x1', 'y1', 'x2', 'y2'],
     },
   },
 } as const
 
 export const Florence2LargeRegionToDescriptionOutputSchema = {
+  title: 'TextOutput',
+  required: ['results'],
   properties: {
     results: {
-      type: 'string',
-      title: 'Results',
       description: 'Results from the model',
+      title: 'Results',
+      type: 'string',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['results'],
-  title: 'TextOutput',
-  required: ['results'],
 } as const
 
 export const GotOcrV2InputSchema = {
-  type: 'object',
+  'x-fal-order-properties': ['input_image_urls', 'do_format', 'multi_page'],
   properties: {
     multi_page: {
-      type: 'boolean',
       default: false,
-      title: 'Multi Page',
       description: 'Use provided images to generate a single output.',
+      title: 'Multi Page',
+      type: 'boolean',
     },
     input_image_urls: {
-      type: 'array',
-      examples: [],
-      title: 'Input Image Urls',
-      items: { type: 'string', 'x-fal-file-input': true },
       default: [],
+      items: { type: 'string', 'x-fal-file-input': true },
+      title: 'Input Image Urls',
+      examples: [],
       description: 'URL of images.',
+      type: 'array',
     },
     do_format: {
-      type: 'boolean',
       default: false,
-      title: 'Do Format',
       description: 'Generate the output in formatted mode.',
+      title: 'Do Format',
+      type: 'boolean',
     },
   },
   title: 'ImageInput',
-  'x-fal-order-properties': ['input_image_urls', 'do_format', 'multi_page'],
+  type: 'object',
 } as const
 
 export const GotOcrV2OutputSchema = {
   type: 'object',
-  required: ['outputs'],
+  'x-fal-order-properties': ['outputs'],
   properties: {
     outputs: {
-      type: 'array',
-      title: 'Output',
       items: { type: 'string' },
       description: 'Generated output',
+      title: 'Output',
+      type: 'array',
     },
   },
   title: 'ImageChatOutput',
-  'x-fal-order-properties': ['outputs'],
+  required: ['outputs'],
 } as const
 
 export const ImageSchema = {
-  description: 'Represents an image file.',
-  'x-fal-order-properties': [
-    'url',
-    'content_type',
-    'file_name',
-    'file_size',
-    'width',
-    'height',
-  ],
-  type: 'object',
-  title: 'Image',
   properties: {
     content_type: {
       description: 'The mime type of the file.',
       title: 'Content Type',
-      examples: ['image/png'],
       anyOf: [{ type: 'string' }, { type: 'null' }],
+      examples: ['image/png'],
+    },
+    url: {
+      title: 'Url',
+      type: 'string',
+      description: 'The URL where the file can be downloaded from.',
     },
     file_size: {
       description: 'The size of the file in bytes.',
       title: 'File Size',
-      examples: [4404019],
       anyOf: [{ type: 'integer' }, { type: 'null' }],
+      examples: [4404019],
+    },
+    file_name: {
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+      title: 'File Name',
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      examples: ['z9RV14K95DvU.png'],
     },
     width: {
       description: 'The width of the image in pixels.',
       title: 'Width',
-      examples: [1024],
       anyOf: [{ type: 'integer' }, { type: 'null' }],
+      examples: [1024],
     },
     height: {
       description: 'The height of the image in pixels.',
       title: 'Height',
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
       examples: [1024],
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-    },
-    file_name: {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-      title: 'File Name',
-      examples: ['z9RV14K95DvU.png'],
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-    },
-    url: {
-      description: 'The URL where the file can be downloaded from.',
-      title: 'Url',
-      type: 'string',
     },
   },
+  title: 'Image',
   required: ['url'],
-} as const
-
-export const ImageFileSchema = {
   type: 'object',
-  properties: {
-    height: {
-      title: 'Height',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'The height of the image',
-    },
-    content_type: {
-      description: 'The mime type of the file.',
-      title: 'Content Type',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: ['image/png'],
-    },
-    file_name: {
-      description:
-        'The name of the file. It will be auto-generated if not provided.',
-      title: 'File Name',
-      anyOf: [{ type: 'string' }, { type: 'null' }],
-      examples: ['z9RV14K95DvU.png'],
-    },
-    file_size: {
-      description: 'The size of the file in bytes.',
-      title: 'File Size',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      examples: [4404019],
-    },
-    width: {
-      title: 'Width',
-      anyOf: [{ type: 'integer' }, { type: 'null' }],
-      description: 'The width of the image',
-    },
-    url: {
-      type: 'string',
-      title: 'Url',
-      description: 'The URL where the file can be downloaded from.',
-    },
-  },
-  title: 'ImageFile',
   'x-fal-order-properties': [
     'url',
     'content_type',
@@ -537,7 +487,57 @@ export const ImageFileSchema = {
     'width',
     'height',
   ],
+  description: 'Represents an image file.',
+} as const
+
+export const ImageFileSchema = {
   required: ['url'],
+  properties: {
+    file_name: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      examples: ['z9RV14K95DvU.png'],
+      title: 'File Name',
+      description:
+        'The name of the file. It will be auto-generated if not provided.',
+    },
+    file_size: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      examples: [4404019],
+      title: 'File Size',
+      description: 'The size of the file in bytes.',
+    },
+    height: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Height',
+      description: 'The height of the image',
+    },
+    url: {
+      title: 'Url',
+      type: 'string',
+      description: 'The URL where the file can be downloaded from.',
+    },
+    content_type: {
+      anyOf: [{ type: 'string' }, { type: 'null' }],
+      examples: ['image/png'],
+      title: 'Content Type',
+      description: 'The mime type of the file.',
+    },
+    width: {
+      anyOf: [{ type: 'integer' }, { type: 'null' }],
+      title: 'Width',
+      description: 'The width of the image',
+    },
+  },
+  title: 'ImageFile',
+  type: 'object',
+  'x-fal-order-properties': [
+    'url',
+    'content_type',
+    'file_name',
+    'file_size',
+    'width',
+    'height',
+  ],
 } as const
 
 export const ImageutilsNsfwInputSchema = {
@@ -675,47 +675,47 @@ export const Isaac01OutputSchema = {
 } as const
 
 export const LlavaNextInputSchema = {
+  required: ['image_url', 'prompt'],
   type: 'object',
   properties: {
-    image_url: {
+    prompt: {
+      description: 'Prompt to be used for the image',
       type: 'string',
-      description: 'URL of the image to be processed',
-      title: 'Image URL',
-      examples: ['https://llava-vl.github.io/static/images/monalisa.jpg'],
-      'x-fal-file-input': true,
+      examples: ['Do you know who drew this painting?'],
+      title: 'Prompt',
     },
     top_p: {
-      type: 'number',
       description: 'Top P for sampling',
-      title: 'Top P',
+      type: 'number',
       minimum: 0,
       maximum: 1,
       default: 1,
+      title: 'Top P',
     },
-    max_tokens: {
-      type: 'integer',
-      min: 32,
-      title: 'Max Tokens',
-      default: 64,
-      description: 'Maximum number of tokens to generate',
-      max: 1024,
+    image_url: {
+      description: 'URL of the image to be processed',
+      type: 'string',
+      examples: ['https://llava-vl.github.io/static/images/monalisa.jpg'],
+      title: 'Image URL',
+      'x-fal-file-input': true,
     },
     temperature: {
-      type: 'number',
-      exclusiveMinimum: 0,
-      title: 'Temperature',
-      default: 0.2,
-      maximum: 1,
       description: 'Temperature for sampling',
+      type: 'number',
+      maximum: 1,
+      exclusiveMinimum: 0,
+      default: 0.2,
+      title: 'Temperature',
     },
-    prompt: {
-      type: 'string',
-      description: 'Prompt to be used for the image',
-      title: 'Prompt',
-      examples: ['Do you know who drew this painting?'],
+    max_tokens: {
+      max: 1024,
+      description: 'Maximum number of tokens to generate',
+      type: 'integer',
+      min: 32,
+      default: 64,
+      title: 'Max Tokens',
     },
   },
-  title: 'LLavaInput',
   'x-fal-order-properties': [
     'image_url',
     'prompt',
@@ -723,28 +723,28 @@ export const LlavaNextInputSchema = {
     'temperature',
     'top_p',
   ],
-  required: ['image_url', 'prompt'],
+  title: 'LLavaInput',
 } as const
 
 export const LlavaNextOutputSchema = {
+  required: ['output'],
   type: 'object',
   properties: {
     partial: {
-      type: 'boolean',
       description: 'Whether the output is partial',
-      title: 'Partial',
+      type: 'boolean',
       default: false,
+      title: 'Partial',
     },
     output: {
-      type: 'string',
       description: 'Generated output',
-      title: 'Output',
+      type: 'string',
       examples: ['Leonardo da Vinci'],
+      title: 'Output',
     },
   },
-  title: 'LLavaOutput',
   'x-fal-order-properties': ['output', 'partial'],
-  required: ['output'],
+  title: 'LLavaOutput',
 } as const
 
 export const MarlinFindInputSchema = {
@@ -983,9 +983,10 @@ export const MarlinOutputSchema = {
 } as const
 
 export const Moondream2InputSchema = {
-  'x-fal-order-properties': ['image_url'],
-  type: 'object',
   title: 'MoondreamInput',
+  required: ['image_url'],
+  type: 'object',
+  'x-fal-order-properties': ['image_url'],
   properties: {
     image_url: {
       description: 'URL of the image to be processed',
@@ -995,18 +996,18 @@ export const Moondream2InputSchema = {
       'x-fal-file-input': true,
     },
   },
-  required: ['image_url'],
 } as const
 
 export const Moondream2ObjectDetectionInputSchema = {
-  'x-fal-order-properties': ['image_url', 'object'],
-  type: 'object',
   title: 'MoondreamObjectInput',
+  required: ['image_url', 'object'],
+  type: 'object',
+  'x-fal-order-properties': ['image_url', 'object'],
   properties: {
     object: {
-      description: 'Object to be detected in the image',
       title: 'Object',
       type: 'string',
+      description: 'Object to be detected in the image',
     },
     image_url: {
       description: 'URL of the image to be processed',
@@ -1016,29 +1017,68 @@ export const Moondream2ObjectDetectionInputSchema = {
       'x-fal-file-input': true,
     },
   },
-  required: ['image_url', 'object'],
 } as const
 
 export const Moondream2ObjectDetectionOutputSchema = {
-  'x-fal-order-properties': ['objects', 'image'],
-  type: 'object',
   title: 'MoondreamObjectOutput',
+  required: ['objects', 'image'],
+  type: 'object',
+  'x-fal-order-properties': ['objects', 'image'],
   properties: {
+    objects: {
+      description: 'Objects detected in the image',
+      title: 'Objects',
+      type: 'array',
+      items: { type: 'object' },
+    },
     image: {
       $ref: '#/$defs/Image',
       description: 'Image with detected objects',
     },
-    objects: {
-      items: { type: 'object' },
-      description: 'Objects detected in the image',
-      title: 'Objects',
-      type: 'array',
-    },
   },
-  required: ['objects', 'image'],
   $defs: {
     Image: {
-      description: 'Represents an image file.',
+      properties: {
+        content_type: {
+          description: 'The mime type of the file.',
+          title: 'Content Type',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_size: {
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [4404019],
+        },
+        file_name: {
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          title: 'File Name',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['z9RV14K95DvU.png'],
+        },
+        width: {
+          description: 'The width of the image in pixels.',
+          title: 'Width',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+        height: {
+          description: 'The height of the image in pixels.',
+          title: 'Height',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+      },
+      title: 'Image',
+      required: ['url'],
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -1047,74 +1087,35 @@ export const Moondream2ObjectDetectionOutputSchema = {
         'width',
         'height',
       ],
-      type: 'object',
-      title: 'Image',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        width: {
-          description: 'The width of the image in pixels.',
-          title: 'Width',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        height: {
-          description: 'The height of the image in pixels.',
-          title: 'Height',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Moondream2OutputSchema = {
-  'x-fal-order-properties': ['output'],
-  type: 'object',
   title: 'MoondreamOutput',
+  required: ['output'],
+  type: 'object',
+  'x-fal-order-properties': ['output'],
   properties: {
     output: {
-      description: 'Output for the given query',
       title: 'Output',
       type: 'string',
+      description: 'Output for the given query',
     },
   },
-  required: ['output'],
 } as const
 
 export const Moondream2PointObjectDetectionInputSchema = {
-  'x-fal-order-properties': ['image_url', 'object'],
-  type: 'object',
   title: 'MoondreamObjectInput',
+  required: ['image_url', 'object'],
+  type: 'object',
+  'x-fal-order-properties': ['image_url', 'object'],
   properties: {
     object: {
-      description: 'Object to be detected in the image',
       title: 'Object',
       type: 'string',
+      description: 'Object to be detected in the image',
     },
     image_url: {
       description: 'URL of the image to be processed',
@@ -1124,29 +1125,68 @@ export const Moondream2PointObjectDetectionInputSchema = {
       'x-fal-file-input': true,
     },
   },
-  required: ['image_url', 'object'],
 } as const
 
 export const Moondream2PointObjectDetectionOutputSchema = {
-  'x-fal-order-properties': ['objects', 'image'],
-  type: 'object',
   title: 'MoondreamObjectOutput',
+  required: ['objects', 'image'],
+  type: 'object',
+  'x-fal-order-properties': ['objects', 'image'],
   properties: {
+    objects: {
+      description: 'Objects detected in the image',
+      title: 'Objects',
+      type: 'array',
+      items: { type: 'object' },
+    },
     image: {
       $ref: '#/$defs/Image',
       description: 'Image with detected objects',
     },
-    objects: {
-      items: { type: 'object' },
-      description: 'Objects detected in the image',
-      title: 'Objects',
-      type: 'array',
-    },
   },
-  required: ['objects', 'image'],
   $defs: {
     Image: {
-      description: 'Represents an image file.',
+      properties: {
+        content_type: {
+          description: 'The mime type of the file.',
+          title: 'Content Type',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_size: {
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [4404019],
+        },
+        file_name: {
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          title: 'File Name',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['z9RV14K95DvU.png'],
+        },
+        width: {
+          description: 'The width of the image in pixels.',
+          title: 'Width',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+        height: {
+          description: 'The height of the image in pixels.',
+          title: 'Height',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+      },
+      title: 'Image',
+      required: ['url'],
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -1155,56 +1195,22 @@ export const Moondream2PointObjectDetectionOutputSchema = {
         'width',
         'height',
       ],
-      type: 'object',
-      title: 'Image',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        width: {
-          description: 'The width of the image in pixels.',
-          title: 'Width',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        height: {
-          description: 'The height of the image in pixels.',
-          title: 'Height',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Moondream2VisualQueryInputSchema = {
-  'x-fal-order-properties': ['image_url', 'prompt'],
-  type: 'object',
   title: 'MoondreamQueryInput',
+  required: ['image_url', 'prompt'],
+  type: 'object',
+  'x-fal-order-properties': ['image_url', 'prompt'],
   properties: {
+    prompt: {
+      title: 'Query',
+      type: 'string',
+      description: 'Query to be asked in the image',
+    },
     image_url: {
       description: 'URL of the image to be processed',
       title: 'Image URL',
@@ -1212,140 +1218,134 @@ export const Moondream2VisualQueryInputSchema = {
       examples: ['https://llava-vl.github.io/static/images/monalisa.jpg'],
       'x-fal-file-input': true,
     },
-    prompt: {
-      description: 'Query to be asked in the image',
-      title: 'Query',
-      type: 'string',
-    },
   },
-  required: ['image_url', 'prompt'],
 } as const
 
 export const Moondream2VisualQueryOutputSchema = {
-  'x-fal-order-properties': ['output'],
-  type: 'object',
   title: 'MoondreamOutput',
+  required: ['output'],
+  type: 'object',
+  'x-fal-order-properties': ['output'],
   properties: {
     output: {
-      description: 'Output for the given query',
       title: 'Output',
       type: 'string',
+      description: 'Output for the given query',
     },
   },
-  required: ['output'],
 } as const
 
 export const Moondream3PreviewCaptionInputSchema = {
-  type: 'object',
+  required: ['image_url'],
   properties: {
-    temperature: {
-      title: 'Temperature',
-      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
-      description:
-        'Sampling temperature to use, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. If not set, defaults to 0.',
-    },
-    length: {
-      default: 'normal',
-      type: 'string',
-      enum: ['short', 'normal', 'long'],
-      title: 'Length',
-      description: 'Length of the caption to generate',
-    },
-    top_p: {
-      title: 'Top P',
-      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
-      description: 'Nucleus sampling probability mass to use, between 0 and 1.',
-    },
     image_url: {
+      max_width: 7000,
+      max_height: 7000,
+      title: 'Image URL',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/example_inputs/moondream-3-preview/caption_in.jpg',
       ],
-      max_height: 7000,
-      type: 'string',
-      title: 'Image URL',
-      max_width: 7000,
       description: 'URL of the image to be processed',
       'x-fal-file-input': true,
     },
+    length: {
+      default: 'normal',
+      title: 'Length',
+      type: 'string',
+      enum: ['short', 'normal', 'long'],
+      description: 'Length of the caption to generate',
+    },
+    temperature: {
+      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
+      title: 'Temperature',
+      description:
+        'Sampling temperature to use, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. If not set, defaults to 0.',
+    },
+    top_p: {
+      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
+      title: 'Top P',
+      description: 'Nucleus sampling probability mass to use, between 0 and 1.',
+    },
   },
   title: 'MoondreamCaptionInput',
+  type: 'object',
   'x-fal-order-properties': ['image_url', 'length', 'temperature', 'top_p'],
-  required: ['image_url'],
 } as const
 
 export const Moondream3PreviewCaptionOutputSchema = {
-  type: 'object',
+  required: ['finish_reason', 'usage_info', 'output'],
   properties: {
-    finish_reason: {
-      description: 'Reason for finishing the output generation',
-      type: 'string',
-      title: 'Finish Reason',
-      examples: ['stop'],
-    },
     usage_info: {
-      description: 'Usage information for the request',
-      $ref: '#/$defs/UsageInfo',
       examples: [
         {
+          prefill_time_ms: 54.45315001998097,
           output_tokens: 23,
           ttft_ms: 91.87838807702065,
           decode_time_ms: 811.5944429300725,
           input_tokens: 737,
-          prefill_time_ms: 54.45315001998097,
         },
       ],
+      $ref: '#/$defs/UsageInfo',
+      description: 'Usage information for the request',
     },
     output: {
-      description: 'Generated caption for the image',
-      type: 'string',
       title: 'Output',
+      type: 'string',
       examples: [
         "A hedgehog is captured in a close-up shot, focusing on its face and nose. The hedgehog's spines are visible along its back, and its nose is dark and wet-looking. A gold ring with a small diamond is positioned on the grass in front of the hedgehog, partially obscured by its nose. The background is a blurred green grassy field, with small white flowers scattered throughout the grass.",
       ],
+      description: 'Generated caption for the image',
+    },
+    finish_reason: {
+      title: 'Finish Reason',
+      type: 'string',
+      examples: ['stop'],
+      description: 'Reason for finishing the output generation',
     },
   },
   title: 'MoondreamCaptionOutput',
+  type: 'object',
   'x-fal-order-properties': ['finish_reason', 'usage_info', 'output'],
-  required: ['finish_reason', 'usage_info', 'output'],
   $defs: {
     UsageInfo: {
-      type: 'object',
-      properties: {
-        output_tokens: {
-          type: 'integer',
-          title: 'Output Tokens',
-          description: 'Number of output tokens generated',
-        },
-        ttft_ms: {
-          type: 'number',
-          title: 'Ttft Ms',
-          description: 'Time to first token in milliseconds',
-        },
-        decode_time_ms: {
-          type: 'number',
-          title: 'Decode Time Ms',
-          description: 'Time taken for decoding in milliseconds',
-        },
-        input_tokens: {
-          type: 'integer',
-          title: 'Input Tokens',
-          description: 'Number of input tokens processed',
-        },
-        prefill_time_ms: {
-          type: 'number',
-          title: 'Prefill Time Ms',
-          description: 'Time taken for prefill in milliseconds',
-        },
-      },
-      title: 'UsageInfo',
-      'x-fal-order-properties': [
+      required: [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
         'decode_time_ms',
         'ttft_ms',
       ],
-      required: [
+      properties: {
+        prefill_time_ms: {
+          title: 'Prefill Time Ms',
+          type: 'number',
+          description: 'Time taken for prefill in milliseconds',
+        },
+        output_tokens: {
+          title: 'Output Tokens',
+          type: 'integer',
+          description: 'Number of output tokens generated',
+        },
+        ttft_ms: {
+          title: 'Ttft Ms',
+          type: 'number',
+          description: 'Time to first token in milliseconds',
+        },
+        decode_time_ms: {
+          title: 'Decode Time Ms',
+          type: 'number',
+          description: 'Time taken for decoding in milliseconds',
+        },
+        input_tokens: {
+          title: 'Input Tokens',
+          type: 'integer',
+          description: 'Number of input tokens processed',
+        },
+      },
+      title: 'UsageInfo',
+      type: 'object',
+      'x-fal-order-properties': [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
@@ -1357,136 +1357,137 @@ export const Moondream3PreviewCaptionOutputSchema = {
 } as const
 
 export const Moondream3PreviewDetectInputSchema = {
-  type: 'object',
+  required: ['image_url', 'prompt'],
   properties: {
-    preview: {
-      default: false,
-      description: 'Whether to preview the output',
-      type: 'boolean',
-      title: 'Preview',
-      examples: [true],
-    },
     image_url: {
+      max_width: 7000,
+      max_height: 7000,
+      title: 'Image URL',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/example_inputs/moondream-3-preview/detect_in.jpg',
       ],
-      max_height: 7000,
-      type: 'string',
-      title: 'Image URL',
-      max_width: 7000,
       description: 'URL of the image to be processed',
       'x-fal-file-input': true,
     },
     prompt: {
-      description: 'Object to be detected in the image',
-      type: 'string',
       title: 'Prompt',
+      type: 'string',
       minLength: 1,
       examples: ['Speed limit'],
+      description: 'Object to be detected in the image',
+    },
+    preview: {
+      default: false,
+      title: 'Preview',
+      type: 'boolean',
+      examples: [true],
+      description: 'Whether to preview the output',
     },
   },
   title: 'MoondreamDetectInput',
+  type: 'object',
   'x-fal-order-properties': ['image_url', 'prompt', 'preview'],
-  required: ['image_url', 'prompt'],
 } as const
 
 export const Moondream3PreviewDetectOutputSchema = {
-  type: 'object',
+  required: ['finish_reason', 'usage_info', 'objects'],
   properties: {
+    usage_info: {
+      examples: [
+        {
+          prefill_time_ms: 54.45315001998097,
+          output_tokens: 23,
+          ttft_ms: 91.87838807702065,
+          decode_time_ms: 811.5944429300725,
+          input_tokens: 737,
+        },
+      ],
+      $ref: '#/$defs/UsageInfo',
+      description: 'Usage information for the request',
+    },
     image: {
-      description: 'Image with bounding boxes drawn around detected objects',
       anyOf: [{ $ref: '#/$defs/ImageFile' }, { type: 'null' }],
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/moondream-3-preview/detect_out.png',
         },
       ],
+      description: 'Image with bounding boxes drawn around detected objects',
+    },
+    finish_reason: {
+      title: 'Finish Reason',
+      type: 'string',
+      examples: ['stop'],
+      description: 'Reason for finishing the output generation',
     },
     objects: {
-      description: 'List of detected objects with their bounding boxes',
-      type: 'array',
       title: 'Objects',
+      type: 'array',
       items: { $ref: '#/$defs/Object' },
       examples: [
         [
           {
             x_max: 0.8755747037932524,
             y_max: 0.3061258583998726,
-            x_min: 0.8174849247502471,
             y_min: 0.16308235274382246,
+            x_min: 0.8174849247502471,
           },
           {
             x_max: 0.7155113776357592,
             y_max: 0.21011001215700012,
-            x_min: 0.6706078794512399,
             y_min: 0.0987853935125991,
+            x_min: 0.6706078794512399,
           },
         ],
       ],
-    },
-    finish_reason: {
-      description: 'Reason for finishing the output generation',
-      type: 'string',
-      title: 'Finish Reason',
-      examples: ['stop'],
-    },
-    usage_info: {
-      description: 'Usage information for the request',
-      $ref: '#/$defs/UsageInfo',
-      examples: [
-        {
-          output_tokens: 23,
-          ttft_ms: 91.87838807702065,
-          decode_time_ms: 811.5944429300725,
-          input_tokens: 737,
-          prefill_time_ms: 54.45315001998097,
-        },
-      ],
+      description: 'List of detected objects with their bounding boxes',
     },
   },
   title: 'MoondreamDetectOutput',
+  type: 'object',
   'x-fal-order-properties': ['finish_reason', 'usage_info', 'objects', 'image'],
-  required: ['finish_reason', 'usage_info', 'objects'],
   $defs: {
     ImageFile: {
-      type: 'object',
+      required: ['url'],
       properties: {
-        height: {
-          title: 'Height',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'The height of the image',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          examples: ['image/png'],
-        },
         file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
           examples: ['z9RV14K95DvU.png'],
+          title: 'File Name',
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
         },
         file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           examples: [4404019],
+          title: 'File Size',
+          description: 'The size of the file in bytes.',
         },
-        width: {
-          title: 'Width',
+        height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'The width of the image',
+          title: 'Height',
+          description: 'The height of the image',
         },
         url: {
-          type: 'string',
           title: 'Url',
+          type: 'string',
           description: 'The URL where the file can be downloaded from.',
+        },
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+          title: 'Content Type',
+          description: 'The mime type of the file.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          description: 'The width of the image',
         },
       },
       title: 'ImageFile',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -1495,78 +1496,77 @@ export const Moondream3PreviewDetectOutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
     },
     Object: {
-      type: 'object',
+      required: ['x_min', 'y_min', 'x_max', 'y_max'],
       properties: {
         x_max: {
-          type: 'number',
           title: 'X Max',
+          type: 'number',
           description:
             'Right boundary of detection box in normalized format (0 to 1)',
         },
         y_max: {
-          type: 'number',
           title: 'Y Max',
+          type: 'number',
           description:
             'Bottom boundary of detection box in normalized format (0 to 1)',
         },
-        x_min: {
-          type: 'number',
-          title: 'X Min',
-          description:
-            'Left boundary of detection box in normalized format (0 to 1)',
-        },
         y_min: {
-          type: 'number',
           title: 'Y Min',
+          type: 'number',
           description:
             'Top boundary of detection box in normalized format (0 to 1)',
         },
+        x_min: {
+          title: 'X Min',
+          type: 'number',
+          description:
+            'Left boundary of detection box in normalized format (0 to 1)',
+        },
       },
       title: 'Object',
+      type: 'object',
       'x-fal-order-properties': ['x_min', 'y_min', 'x_max', 'y_max'],
-      required: ['x_min', 'y_min', 'x_max', 'y_max'],
     },
     UsageInfo: {
-      type: 'object',
-      properties: {
-        output_tokens: {
-          type: 'integer',
-          title: 'Output Tokens',
-          description: 'Number of output tokens generated',
-        },
-        ttft_ms: {
-          type: 'number',
-          title: 'Ttft Ms',
-          description: 'Time to first token in milliseconds',
-        },
-        decode_time_ms: {
-          type: 'number',
-          title: 'Decode Time Ms',
-          description: 'Time taken for decoding in milliseconds',
-        },
-        input_tokens: {
-          type: 'integer',
-          title: 'Input Tokens',
-          description: 'Number of input tokens processed',
-        },
-        prefill_time_ms: {
-          type: 'number',
-          title: 'Prefill Time Ms',
-          description: 'Time taken for prefill in milliseconds',
-        },
-      },
-      title: 'UsageInfo',
-      'x-fal-order-properties': [
+      required: [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
         'decode_time_ms',
         'ttft_ms',
       ],
-      required: [
+      properties: {
+        prefill_time_ms: {
+          title: 'Prefill Time Ms',
+          type: 'number',
+          description: 'Time taken for prefill in milliseconds',
+        },
+        output_tokens: {
+          title: 'Output Tokens',
+          type: 'integer',
+          description: 'Number of output tokens generated',
+        },
+        ttft_ms: {
+          title: 'Ttft Ms',
+          type: 'number',
+          description: 'Time to first token in milliseconds',
+        },
+        decode_time_ms: {
+          title: 'Decode Time Ms',
+          type: 'number',
+          description: 'Time taken for decoding in milliseconds',
+        },
+        input_tokens: {
+          title: 'Input Tokens',
+          type: 'integer',
+          description: 'Number of input tokens processed',
+        },
+      },
+      title: 'UsageInfo',
+      type: 'object',
+      'x-fal-order-properties': [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
@@ -1578,135 +1578,136 @@ export const Moondream3PreviewDetectOutputSchema = {
 } as const
 
 export const Moondream3PreviewPointInputSchema = {
-  type: 'object',
+  required: ['image_url', 'prompt'],
   properties: {
-    preview: {
-      default: false,
-      description: 'Whether to preview the output',
-      type: 'boolean',
-      title: 'Preview',
-      examples: [true],
-    },
     image_url: {
+      max_width: 7000,
+      max_height: 7000,
+      title: 'Image URL',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/example_inputs/moondream-3-preview/point_in.jpg',
       ],
-      max_height: 7000,
-      type: 'string',
-      title: 'Image URL',
-      max_width: 7000,
       description: 'URL of the image to be processed',
       'x-fal-file-input': true,
     },
     prompt: {
-      description: 'Object to be located in the image',
-      type: 'string',
       title: 'Prompt',
+      type: 'string',
       minLength: 1,
       examples: ['bottle caps'],
+      description: 'Object to be located in the image',
+    },
+    preview: {
+      default: false,
+      title: 'Preview',
+      type: 'boolean',
+      examples: [true],
+      description: 'Whether to preview the output',
     },
   },
   title: 'MoondreamPointInput',
+  type: 'object',
   'x-fal-order-properties': ['image_url', 'prompt', 'preview'],
-  required: ['image_url', 'prompt'],
 } as const
 
 export const Moondream3PreviewPointOutputSchema = {
-  type: 'object',
+  required: ['finish_reason', 'usage_info', 'points'],
   properties: {
+    usage_info: {
+      examples: [
+        {
+          prefill_time_ms: 54.45315001998097,
+          output_tokens: 23,
+          ttft_ms: 91.87838807702065,
+          decode_time_ms: 811.5944429300725,
+          input_tokens: 737,
+        },
+      ],
+      $ref: '#/$defs/UsageInfo',
+      description: 'Usage information for the request',
+    },
     image: {
-      description: 'Image with points drawn on detected objects',
       anyOf: [{ $ref: '#/$defs/ImageFile' }, { type: 'null' }],
       examples: [
         {
           url: 'https://storage.googleapis.com/falserverless/example_outputs/moondream-3-preview/point_out.png',
         },
       ],
+      description: 'Image with points drawn on detected objects',
     },
     finish_reason: {
-      description: 'Reason for finishing the output generation',
-      type: 'string',
       title: 'Finish Reason',
+      type: 'string',
       examples: ['stop'],
-    },
-    usage_info: {
-      description: 'Usage information for the request',
-      $ref: '#/$defs/UsageInfo',
-      examples: [
-        {
-          output_tokens: 23,
-          ttft_ms: 91.87838807702065,
-          decode_time_ms: 811.5944429300725,
-          input_tokens: 737,
-          prefill_time_ms: 54.45315001998097,
-        },
-      ],
+      description: 'Reason for finishing the output generation',
     },
     points: {
-      description: 'List of points marking the detected objects',
-      type: 'array',
       title: 'Points',
+      type: 'array',
       items: { $ref: '#/$defs/Point' },
       examples: [
         [
-          { x: 0.11827956989247312, y: 0.8660801564027371 },
-          { x: 0.3118279569892473, y: 0.8660801564027371 },
-          { x: 0.5953079178885631, y: 0.8660801564027371 },
-          { x: 0.7888563049853372, y: 0.8758553274682307 },
-          { x: 0.9423264907135875, y: 0.5796676441837733 },
-          { x: 0.6324535679374389, y: 0.5796676441837733 },
-          { x: 0.44281524926686217, y: 0.6021505376344086 },
-          { x: 0.3010752688172043, y: 0.5982404692082112 },
-          { x: 0.20332355816226785, y: 0.4701857282502444 },
-          { x: 0.053763440860215055, y: 0.4506353861192571 },
-          { x: 0.053763440860215055, y: 0.6021505376344086 },
+          { y: 0.8660801564027371, x: 0.11827956989247312 },
+          { y: 0.8660801564027371, x: 0.3118279569892473 },
+          { y: 0.8660801564027371, x: 0.5953079178885631 },
+          { y: 0.8758553274682307, x: 0.7888563049853372 },
+          { y: 0.5796676441837733, x: 0.9423264907135875 },
+          { y: 0.5796676441837733, x: 0.6324535679374389 },
+          { y: 0.6021505376344086, x: 0.44281524926686217 },
+          { y: 0.5982404692082112, x: 0.3010752688172043 },
+          { y: 0.4701857282502444, x: 0.20332355816226785 },
+          { y: 0.4506353861192571, x: 0.053763440860215055 },
+          { y: 0.6021505376344086, x: 0.053763440860215055 },
         ],
       ],
+      description: 'List of points marking the detected objects',
     },
   },
   title: 'MoondreamPointOutput',
+  type: 'object',
   'x-fal-order-properties': ['finish_reason', 'usage_info', 'points', 'image'],
-  required: ['finish_reason', 'usage_info', 'points'],
   $defs: {
     ImageFile: {
-      type: 'object',
+      required: ['url'],
       properties: {
-        height: {
-          title: 'Height',
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'The height of the image',
-        },
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-          examples: ['image/png'],
-        },
         file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
           anyOf: [{ type: 'string' }, { type: 'null' }],
           examples: ['z9RV14K95DvU.png'],
+          title: 'File Name',
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
         },
         file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
           anyOf: [{ type: 'integer' }, { type: 'null' }],
           examples: [4404019],
+          title: 'File Size',
+          description: 'The size of the file in bytes.',
         },
-        width: {
-          title: 'Width',
+        height: {
           anyOf: [{ type: 'integer' }, { type: 'null' }],
-          description: 'The width of the image',
+          title: 'Height',
+          description: 'The height of the image',
         },
         url: {
-          type: 'string',
           title: 'Url',
+          type: 'string',
           description: 'The URL where the file can be downloaded from.',
+        },
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+          title: 'Content Type',
+          description: 'The mime type of the file.',
+        },
+        width: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'Width',
+          description: 'The width of the image',
         },
       },
       title: 'ImageFile',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -1715,66 +1716,65 @@ export const Moondream3PreviewPointOutputSchema = {
         'width',
         'height',
       ],
-      required: ['url'],
     },
     Point: {
-      type: 'object',
+      required: ['x', 'y'],
       properties: {
-        x: {
-          type: 'number',
-          title: 'X',
-          description:
-            'X coordinate of the point in normalized format (0 to 1)',
-        },
         y: {
-          type: 'number',
           title: 'Y',
+          type: 'number',
           description:
             'Y coordinate of the point in normalized format (0 to 1)',
         },
+        x: {
+          title: 'X',
+          type: 'number',
+          description:
+            'X coordinate of the point in normalized format (0 to 1)',
+        },
       },
       title: 'Point',
+      type: 'object',
       'x-fal-order-properties': ['x', 'y'],
-      required: ['x', 'y'],
     },
     UsageInfo: {
-      type: 'object',
-      properties: {
-        output_tokens: {
-          type: 'integer',
-          title: 'Output Tokens',
-          description: 'Number of output tokens generated',
-        },
-        ttft_ms: {
-          type: 'number',
-          title: 'Ttft Ms',
-          description: 'Time to first token in milliseconds',
-        },
-        decode_time_ms: {
-          type: 'number',
-          title: 'Decode Time Ms',
-          description: 'Time taken for decoding in milliseconds',
-        },
-        input_tokens: {
-          type: 'integer',
-          title: 'Input Tokens',
-          description: 'Number of input tokens processed',
-        },
-        prefill_time_ms: {
-          type: 'number',
-          title: 'Prefill Time Ms',
-          description: 'Time taken for prefill in milliseconds',
-        },
-      },
-      title: 'UsageInfo',
-      'x-fal-order-properties': [
+      required: [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
         'decode_time_ms',
         'ttft_ms',
       ],
-      required: [
+      properties: {
+        prefill_time_ms: {
+          title: 'Prefill Time Ms',
+          type: 'number',
+          description: 'Time taken for prefill in milliseconds',
+        },
+        output_tokens: {
+          title: 'Output Tokens',
+          type: 'integer',
+          description: 'Number of output tokens generated',
+        },
+        ttft_ms: {
+          title: 'Ttft Ms',
+          type: 'number',
+          description: 'Time to first token in milliseconds',
+        },
+        decode_time_ms: {
+          title: 'Decode Time Ms',
+          type: 'number',
+          description: 'Time taken for decoding in milliseconds',
+        },
+        input_tokens: {
+          title: 'Input Tokens',
+          type: 'integer',
+          description: 'Number of input tokens processed',
+        },
+      },
+      title: 'UsageInfo',
+      type: 'object',
+      'x-fal-order-properties': [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
@@ -1786,47 +1786,48 @@ export const Moondream3PreviewPointOutputSchema = {
 } as const
 
 export const Moondream3PreviewQueryInputSchema = {
-  type: 'object',
+  required: ['image_url', 'prompt'],
   properties: {
-    temperature: {
-      title: 'Temperature',
-      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
-      description:
-        'Sampling temperature to use, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. If not set, defaults to 0.',
-    },
-    top_p: {
-      title: 'Top P',
-      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
-      description: 'Nucleus sampling probability mass to use, between 0 and 1.',
-    },
     image_url: {
+      max_width: 7000,
+      max_height: 7000,
+      title: 'Image URL',
+      type: 'string',
       examples: [
         'https://storage.googleapis.com/falserverless/example_inputs/moondream-3-preview/query_in.jpg',
       ],
-      max_height: 7000,
-      type: 'string',
-      title: 'Image URL',
-      max_width: 7000,
       description: 'URL of the image to be processed',
       'x-fal-file-input': true,
     },
     prompt: {
-      description: 'Query to be asked in the image',
-      type: 'string',
       title: 'Prompt',
+      type: 'string',
       minLength: 1,
       examples: [
         'List the safety measures taken by this worker in a JSON array under `safety_measures` key',
       ],
+      description: 'Query to be asked in the image',
+    },
+    temperature: {
+      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
+      title: 'Temperature',
+      description:
+        'Sampling temperature to use, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. If not set, defaults to 0.',
     },
     reasoning: {
       default: true,
-      type: 'boolean',
       title: 'Reasoning',
+      type: 'boolean',
       description: 'Whether to include detailed reasoning behind the answer',
+    },
+    top_p: {
+      anyOf: [{ minimum: 0, type: 'number', maximum: 1 }, { type: 'null' }],
+      title: 'Top P',
+      description: 'Nucleus sampling probability mass to use, between 0 and 1.',
     },
   },
   title: 'MoondreamQueryInput',
+  type: 'object',
   'x-fal-order-properties': [
     'image_url',
     'prompt',
@@ -1834,95 +1835,94 @@ export const Moondream3PreviewQueryInputSchema = {
     'temperature',
     'top_p',
   ],
-  required: ['image_url', 'prompt'],
 } as const
 
 export const Moondream3PreviewQueryOutputSchema = {
-  type: 'object',
+  required: ['finish_reason', 'usage_info', 'output'],
   properties: {
-    finish_reason: {
-      description: 'Reason for finishing the output generation',
-      type: 'string',
-      title: 'Finish Reason',
-      examples: ['stop'],
-    },
-    usage_info: {
-      description: 'Usage information for the request',
-      $ref: '#/$defs/UsageInfo',
-      examples: [
-        {
-          output_tokens: 23,
-          ttft_ms: 91.87838807702065,
-          decode_time_ms: 811.5944429300725,
-          input_tokens: 737,
-          prefill_time_ms: 54.45315001998097,
-        },
-      ],
-    },
     reasoning: {
-      description: 'Detailed reasoning behind the answer, if enabled',
-      title: 'Reasoning',
       anyOf: [{ type: 'string' }, { type: 'null' }],
       examples: [
         'The worker is wearing a red hard hat for head protection and safety glasses for eye protection.',
       ],
+      title: 'Reasoning',
+      description: 'Detailed reasoning behind the answer, if enabled',
+    },
+    usage_info: {
+      examples: [
+        {
+          prefill_time_ms: 54.45315001998097,
+          output_tokens: 23,
+          ttft_ms: 91.87838807702065,
+          decode_time_ms: 811.5944429300725,
+          input_tokens: 737,
+        },
+      ],
+      $ref: '#/$defs/UsageInfo',
+      description: 'Usage information for the request',
     },
     output: {
-      description: 'Answer to the query about the image',
-      type: 'string',
       title: 'Output',
+      type: 'string',
       examples: [
         '{\n  "safety_measures": [\n    "Red hard hat",\n    "Safety glasses"\n  ]\n}',
       ],
+      description: 'Answer to the query about the image',
+    },
+    finish_reason: {
+      title: 'Finish Reason',
+      type: 'string',
+      examples: ['stop'],
+      description: 'Reason for finishing the output generation',
     },
   },
   title: 'MoondreamQueryOutput',
+  type: 'object',
   'x-fal-order-properties': [
     'finish_reason',
     'usage_info',
     'output',
     'reasoning',
   ],
-  required: ['finish_reason', 'usage_info', 'output'],
   $defs: {
     UsageInfo: {
-      type: 'object',
-      properties: {
-        output_tokens: {
-          type: 'integer',
-          title: 'Output Tokens',
-          description: 'Number of output tokens generated',
-        },
-        ttft_ms: {
-          type: 'number',
-          title: 'Ttft Ms',
-          description: 'Time to first token in milliseconds',
-        },
-        decode_time_ms: {
-          type: 'number',
-          title: 'Decode Time Ms',
-          description: 'Time taken for decoding in milliseconds',
-        },
-        input_tokens: {
-          type: 'integer',
-          title: 'Input Tokens',
-          description: 'Number of input tokens processed',
-        },
-        prefill_time_ms: {
-          type: 'number',
-          title: 'Prefill Time Ms',
-          description: 'Time taken for prefill in milliseconds',
-        },
-      },
-      title: 'UsageInfo',
-      'x-fal-order-properties': [
+      required: [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
         'decode_time_ms',
         'ttft_ms',
       ],
-      required: [
+      properties: {
+        prefill_time_ms: {
+          title: 'Prefill Time Ms',
+          type: 'number',
+          description: 'Time taken for prefill in milliseconds',
+        },
+        output_tokens: {
+          title: 'Output Tokens',
+          type: 'integer',
+          description: 'Number of output tokens generated',
+        },
+        ttft_ms: {
+          title: 'Ttft Ms',
+          type: 'number',
+          description: 'Time to first token in milliseconds',
+        },
+        decode_time_ms: {
+          title: 'Decode Time Ms',
+          type: 'number',
+          description: 'Time taken for decoding in milliseconds',
+        },
+        input_tokens: {
+          title: 'Input Tokens',
+          type: 'integer',
+          description: 'Number of input tokens processed',
+        },
+      },
+      title: 'UsageInfo',
+      type: 'object',
+      'x-fal-order-properties': [
         'input_tokens',
         'output_tokens',
         'prefill_time_ms',
@@ -2082,145 +2082,179 @@ export const MoondreamInputParamSchema = {
 } as const
 
 export const MoondreamNextBatchInputSchema = {
-  'x-fal-order-properties': ['images_data_url', 'prompt', 'max_tokens'],
-  type: 'object',
-  title: 'BatchQueryInput',
+  required: ['images_data_url', 'prompt'],
   properties: {
     max_tokens: {
       default: 64,
-      description: 'Maximum number of tokens to generate',
-      title: 'Max Tokens',
-      type: 'integer',
-      maximum: 512,
       minimum: 1,
+      type: 'integer',
+      title: 'Max Tokens',
+      maximum: 512,
+      description: 'Maximum number of tokens to generate',
     },
     prompt: {
-      description: 'Single prompt to apply to all images',
       title: 'Prompt',
       type: 'string',
       examples: ['Describe this image in detail.'],
+      description: 'Single prompt to apply to all images',
     },
     images_data_url: {
-      description: 'List of image URLs to be processed (maximum 32 images)',
       title: 'Image URLs',
       type: 'string',
+      description: 'List of image URLs to be processed (maximum 32 images)',
       'x-fal-file-input': true,
     },
   },
-  required: ['images_data_url', 'prompt'],
+  title: 'BatchQueryInput',
+  type: 'object',
+  'x-fal-order-properties': ['images_data_url', 'prompt', 'max_tokens'],
 } as const
 
 export const MoondreamNextBatchOutputSchema = {
-  'x-fal-order-properties': ['captions_file', 'outputs'],
-  type: 'object',
-  title: 'BatchMoonDreamOutput',
+  required: ['captions_file', 'outputs'],
   properties: {
+    outputs: {
+      title: 'Outputs',
+      type: 'array',
+      items: { type: 'string' },
+      description: 'List of generated captions',
+    },
     captions_file: {
       $ref: '#/$defs/File',
       description:
         'URL to the generated captions JSON file containing filename-caption pairs.',
     },
-    outputs: {
-      items: { type: 'string' },
-      description: 'List of generated captions',
-      title: 'Outputs',
-      type: 'array',
-    },
   },
-  required: ['captions_file', 'outputs'],
+  title: 'BatchMoonDreamOutput',
+  type: 'object',
+  'x-fal-order-properties': ['captions_file', 'outputs'],
   $defs: {
     File: {
+      required: ['url'],
+      properties: {
+        file_size: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
+        file_name: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+      },
+      title: 'File',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
-      type: 'object',
-      title: 'File',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
     },
   },
 } as const
 
 export const MoondreamNextInputSchema = {
-  'x-fal-order-properties': ['image_url', 'task_type', 'prompt', 'max_tokens'],
-  type: 'object',
-  title: 'QueryInput',
+  required: ['image_url', 'prompt'],
   properties: {
-    task_type: {
-      description: 'Type of task to perform',
-      title: 'Task Type',
-      type: 'string',
-      enum: ['caption', 'query'],
-      default: 'caption',
-    },
     image_url: {
-      description: 'Image URL to be processed',
       title: 'Image URL',
       type: 'string',
       examples: ['https://llava-vl.github.io/static/images/monalisa.jpg'],
+      description: 'Image URL to be processed',
       'x-fal-file-input': true,
     },
     prompt: {
-      description: 'Prompt for query task',
       title: 'Prompt',
       type: 'string',
       examples: ['Describe this image in detail.'],
+      description: 'Prompt for query task',
     },
     max_tokens: {
       default: 64,
-      description: 'Maximum number of tokens to generate',
-      title: 'Max Tokens',
-      type: 'integer',
-      maximum: 512,
       minimum: 1,
+      type: 'integer',
+      title: 'Max Tokens',
+      maximum: 512,
+      description: 'Maximum number of tokens to generate',
+    },
+    task_type: {
+      default: 'caption',
+      title: 'Task Type',
+      type: 'string',
+      enum: ['caption', 'query'],
+      description: 'Type of task to perform',
     },
   },
-  required: ['image_url', 'prompt'],
+  title: 'QueryInput',
+  type: 'object',
+  'x-fal-order-properties': ['image_url', 'task_type', 'prompt', 'max_tokens'],
 } as const
 
 export const MoondreamNextOutputSchema = {
-  'x-fal-order-properties': ['output'],
-  type: 'object',
-  title: 'MoonDreamOutput',
+  required: ['output'],
   properties: {
     output: {
-      description: 'Response from the model',
       title: 'Output',
       type: 'string',
+      description: 'Response from the model',
     },
   },
-  required: ['output'],
+  title: 'MoonDreamOutput',
+  type: 'object',
+  'x-fal-order-properties': ['output'],
 } as const
 
 export const NemotronDiffusionVLMTimingsSchema = {
+  type: 'object',
+  properties: {
+    gpu_transfer_time: {
+      type: 'number',
+      title: 'GPU Transfer Time',
+      description: 'Time spent moving tensors to the GPU.',
+    },
+    decode_time: {
+      type: 'number',
+      title: 'Decode Time',
+      description: 'Time spent decoding output token IDs to text.',
+    },
+    total_time: {
+      type: 'number',
+      title: 'Total Time',
+      description: 'Total request time in seconds.',
+    },
+    generation_time: {
+      type: 'number',
+      title: 'Generation Time',
+      description: 'Time spent inside model generation.',
+    },
+    preprocessing_time: {
+      type: 'number',
+      title: 'Preprocessing Time',
+      description:
+        'Time spent expanding the chat template and preprocessing tensors.',
+    },
+    image_validation_time: {
+      type: 'number',
+      title: 'Image Validation Time',
+      description: 'Time spent validating and loading the input image.',
+    },
+  },
   'x-fal-order-properties': [
     'total_time',
     'image_validation_time',
@@ -2230,40 +2264,6 @@ export const NemotronDiffusionVLMTimingsSchema = {
     'decode_time',
   ],
   title: 'NemotronDiffusionVLMTimings',
-  properties: {
-    total_time: {
-      title: 'Total Time',
-      type: 'number',
-      description: 'Total request time in seconds.',
-    },
-    preprocessing_time: {
-      title: 'Preprocessing Time',
-      type: 'number',
-      description:
-        'Time spent expanding the chat template and preprocessing tensors.',
-    },
-    gpu_transfer_time: {
-      title: 'GPU Transfer Time',
-      type: 'number',
-      description: 'Time spent moving tensors to the GPU.',
-    },
-    image_validation_time: {
-      title: 'Image Validation Time',
-      type: 'number',
-      description: 'Time spent validating and loading the input image.',
-    },
-    decode_time: {
-      title: 'Decode Time',
-      type: 'number',
-      description: 'Time spent decoding output token IDs to text.',
-    },
-    generation_time: {
-      title: 'Generation Time',
-      type: 'number',
-      description: 'Time spent inside model generation.',
-    },
-  },
-  type: 'object',
   required: [
     'total_time',
     'image_validation_time',
@@ -2275,34 +2275,83 @@ export const NemotronDiffusionVLMTimingsSchema = {
 } as const
 
 export const NemotronDiffusionVLMUsageSchema = {
+  type: 'object',
+  properties: {
+    prompt_tokens: {
+      type: 'integer',
+      title: 'Prompt Tokens',
+      description: 'Number of prompt tokens sent to the model.',
+    },
+    completion_tokens: {
+      type: 'integer',
+      title: 'Completion Tokens',
+      description: 'Number of generated completion tokens.',
+    },
+    num_function_evals: {
+      type: 'integer',
+      title: 'Num Function Evals',
+      description: 'Number of model function evaluations used for generation.',
+    },
+  },
   'x-fal-order-properties': [
     'prompt_tokens',
     'completion_tokens',
     'num_function_evals',
   ],
   title: 'NemotronDiffusionVLMUsage',
-  properties: {
-    num_function_evals: {
-      title: 'Num Function Evals',
-      type: 'integer',
-      description: 'Number of model function evaluations used for generation.',
-    },
-    completion_tokens: {
-      title: 'Completion Tokens',
-      type: 'integer',
-      description: 'Number of generated completion tokens.',
-    },
-    prompt_tokens: {
-      title: 'Prompt Tokens',
-      type: 'integer',
-      description: 'Number of prompt tokens sent to the model.',
-    },
-  },
-  type: 'object',
   required: ['prompt_tokens', 'completion_tokens', 'num_function_evals'],
 } as const
 
 export const NemotronDiffusionVlmInputSchema = {
+  type: 'object',
+  properties: {
+    prompt: {
+      type: 'string',
+      examples: ['Describe the image in one short sentence.'],
+      title: 'Prompt',
+      description: 'Prompt to answer about the image.',
+    },
+    image_url: {
+      type: 'string',
+      examples: [
+        'https://storage.googleapis.com/falserverless/example_inputs/dog.png',
+      ],
+      title: 'Image URL',
+      description: 'URL of the image to be processed.',
+      'x-fal-file-input': true,
+    },
+    threshold: {
+      type: 'number',
+      maximum: 1,
+      minimum: 0,
+      title: 'Threshold',
+      default: 0.9,
+      description: 'Confidence threshold used by diffusion decoding.',
+    },
+    num_inference_steps: {
+      title: 'Num Inference Steps',
+      default: 256,
+      description:
+        'Number of diffusion decoding steps. Defaults to 256, rounded up only when omitted and required by the upstream block schedule. Explicit values must be at least max_tokens / block_length and divisible by max_tokens / block_length.',
+      anyOf: [{ type: 'integer', maximum: 1024, minimum: 1 }, { type: 'null' }],
+    },
+    block_length: {
+      type: 'integer',
+      maximum: 128,
+      minimum: 8,
+      title: 'Block Length',
+      default: 32,
+      description: 'Block length used by diffusion decoding.',
+    },
+    max_tokens: {
+      type: 'integer',
+      maximum: 8192,
+      minimum: 1,
+      title: 'Max Tokens',
+      default: 512,
+      description: 'Maximum number of tokens to generate.',
+    },
+  },
   'x-fal-order-properties': [
     'image_url',
     'prompt',
@@ -2312,83 +2361,68 @@ export const NemotronDiffusionVlmInputSchema = {
     'threshold',
   ],
   title: 'NemotronDiffusionVLMInput',
-  properties: {
-    image_url: {
-      examples: [
-        'https://storage.googleapis.com/falserverless/example_inputs/dog.png',
-      ],
-      title: 'Image URL',
-      type: 'string',
-      description: 'URL of the image to be processed.',
-      'x-fal-file-input': true,
-    },
-    threshold: {
-      title: 'Threshold',
-      minimum: 0,
-      maximum: 1,
-      type: 'number',
-      default: 0.9,
-      description: 'Confidence threshold used by diffusion decoding.',
-    },
-    block_length: {
-      title: 'Block Length',
-      minimum: 8,
-      maximum: 128,
-      type: 'integer',
-      default: 32,
-      description: 'Block length used by diffusion decoding.',
-    },
-    max_tokens: {
-      title: 'Max Tokens',
-      minimum: 1,
-      maximum: 8192,
-      type: 'integer',
-      default: 512,
-      description: 'Maximum number of tokens to generate.',
-    },
-    prompt: {
-      examples: ['Describe the image in one short sentence.'],
-      title: 'Prompt',
-      type: 'string',
-      description: 'Prompt to answer about the image.',
-    },
-    num_inference_steps: {
-      title: 'Num Inference Steps',
-      anyOf: [{ minimum: 1, maximum: 1024, type: 'integer' }, { type: 'null' }],
-      description:
-        'Number of diffusion decoding steps. Defaults to 256, rounded up only when omitted and required by the upstream block schedule. Explicit values must be at least max_tokens / block_length and divisible by max_tokens / block_length.',
-      default: 256,
-    },
-  },
-  type: 'object',
   required: ['image_url', 'prompt'],
 } as const
 
 export const NemotronDiffusionVlmOutputSchema = {
-  'x-fal-order-properties': ['output', 'usage', 'timings'],
-  title: 'NemotronDiffusionVLMOutput',
+  type: 'object',
   properties: {
     output: {
+      type: 'string',
       examples: ['The image shows a dog sitting outdoors.'],
       title: 'Output',
-      type: 'string',
       description: 'Generated answer.',
     },
     usage: {
+      $ref: '#/$defs/NemotronDiffusionVLMUsage',
       title: 'Usage',
       description: 'Token and diffusion decoding usage information.',
-      $ref: '#/$defs/NemotronDiffusionVLMUsage',
     },
     timings: {
+      $ref: '#/$defs/NemotronDiffusionVLMTimings',
       title: 'Timings',
       description: 'Request timing breakdown in seconds.',
-      $ref: '#/$defs/NemotronDiffusionVLMTimings',
     },
   },
-  type: 'object',
+  'x-fal-order-properties': ['output', 'usage', 'timings'],
+  title: 'NemotronDiffusionVLMOutput',
   required: ['output', 'usage', 'timings'],
   $defs: {
     NemotronDiffusionVLMTimings: {
+      type: 'object',
+      properties: {
+        gpu_transfer_time: {
+          type: 'number',
+          title: 'GPU Transfer Time',
+          description: 'Time spent moving tensors to the GPU.',
+        },
+        decode_time: {
+          type: 'number',
+          title: 'Decode Time',
+          description: 'Time spent decoding output token IDs to text.',
+        },
+        total_time: {
+          type: 'number',
+          title: 'Total Time',
+          description: 'Total request time in seconds.',
+        },
+        generation_time: {
+          type: 'number',
+          title: 'Generation Time',
+          description: 'Time spent inside model generation.',
+        },
+        preprocessing_time: {
+          type: 'number',
+          title: 'Preprocessing Time',
+          description:
+            'Time spent expanding the chat template and preprocessing tensors.',
+        },
+        image_validation_time: {
+          type: 'number',
+          title: 'Image Validation Time',
+          description: 'Time spent validating and loading the input image.',
+        },
+      },
       'x-fal-order-properties': [
         'total_time',
         'image_validation_time',
@@ -2398,40 +2432,6 @@ export const NemotronDiffusionVlmOutputSchema = {
         'decode_time',
       ],
       title: 'NemotronDiffusionVLMTimings',
-      properties: {
-        total_time: {
-          title: 'Total Time',
-          type: 'number',
-          description: 'Total request time in seconds.',
-        },
-        preprocessing_time: {
-          title: 'Preprocessing Time',
-          type: 'number',
-          description:
-            'Time spent expanding the chat template and preprocessing tensors.',
-        },
-        gpu_transfer_time: {
-          title: 'GPU Transfer Time',
-          type: 'number',
-          description: 'Time spent moving tensors to the GPU.',
-        },
-        image_validation_time: {
-          title: 'Image Validation Time',
-          type: 'number',
-          description: 'Time spent validating and loading the input image.',
-        },
-        decode_time: {
-          title: 'Decode Time',
-          type: 'number',
-          description: 'Time spent decoding output token IDs to text.',
-        },
-        generation_time: {
-          title: 'Generation Time',
-          type: 'number',
-          description: 'Time spent inside model generation.',
-        },
-      },
-      type: 'object',
       required: [
         'total_time',
         'image_validation_time',
@@ -2442,86 +2442,86 @@ export const NemotronDiffusionVlmOutputSchema = {
       ],
     },
     NemotronDiffusionVLMUsage: {
+      type: 'object',
+      properties: {
+        prompt_tokens: {
+          type: 'integer',
+          title: 'Prompt Tokens',
+          description: 'Number of prompt tokens sent to the model.',
+        },
+        completion_tokens: {
+          type: 'integer',
+          title: 'Completion Tokens',
+          description: 'Number of generated completion tokens.',
+        },
+        num_function_evals: {
+          type: 'integer',
+          title: 'Num Function Evals',
+          description:
+            'Number of model function evaluations used for generation.',
+        },
+      },
       'x-fal-order-properties': [
         'prompt_tokens',
         'completion_tokens',
         'num_function_evals',
       ],
       title: 'NemotronDiffusionVLMUsage',
-      properties: {
-        num_function_evals: {
-          title: 'Num Function Evals',
-          type: 'integer',
-          description:
-            'Number of model function evaluations used for generation.',
-        },
-        completion_tokens: {
-          title: 'Completion Tokens',
-          type: 'integer',
-          description: 'Number of generated completion tokens.',
-        },
-        prompt_tokens: {
-          title: 'Prompt Tokens',
-          type: 'integer',
-          description: 'Number of prompt tokens sent to the model.',
-        },
-      },
-      type: 'object',
       required: ['prompt_tokens', 'completion_tokens', 'num_function_evals'],
     },
   },
 } as const
 
 export const ObjectSchema = {
-  type: 'object',
+  required: ['x_min', 'y_min', 'x_max', 'y_max'],
   properties: {
     x_max: {
-      type: 'number',
       title: 'X Max',
+      type: 'number',
       description:
         'Right boundary of detection box in normalized format (0 to 1)',
     },
     y_max: {
-      type: 'number',
       title: 'Y Max',
+      type: 'number',
       description:
         'Bottom boundary of detection box in normalized format (0 to 1)',
     },
-    x_min: {
-      type: 'number',
-      title: 'X Min',
-      description:
-        'Left boundary of detection box in normalized format (0 to 1)',
-    },
     y_min: {
-      type: 'number',
       title: 'Y Min',
+      type: 'number',
       description:
         'Top boundary of detection box in normalized format (0 to 1)',
     },
+    x_min: {
+      title: 'X Min',
+      type: 'number',
+      description:
+        'Left boundary of detection box in normalized format (0 to 1)',
+    },
   },
   title: 'Object',
+  type: 'object',
   'x-fal-order-properties': ['x_min', 'y_min', 'x_max', 'y_max'],
-  required: ['x_min', 'y_min', 'x_max', 'y_max'],
 } as const
 
 export const PointSchema = {
-  type: 'object',
+  required: ['x', 'y'],
   properties: {
-    x: {
-      type: 'number',
-      title: 'X',
-      description: 'X coordinate of the point in normalized format (0 to 1)',
-    },
     y: {
-      type: 'number',
       title: 'Y',
+      type: 'number',
       description: 'Y coordinate of the point in normalized format (0 to 1)',
+    },
+    x: {
+      title: 'X',
+      type: 'number',
+      description: 'X coordinate of the point in normalized format (0 to 1)',
     },
   },
   title: 'Point',
+  type: 'object',
   'x-fal-order-properties': ['x', 'y'],
-  required: ['x', 'y'],
 } as const
 
 export const PromptTokensDetailsSchema = {
@@ -2562,40 +2562,40 @@ export const QueueStatusSchema = {
 } as const
 
 export const RegionSchema = {
+  title: 'Region',
+  required: ['x1', 'y1', 'x2', 'y2'],
   properties: {
     x2: {
-      type: 'integer',
-      title: 'X2',
-      minimum: 0,
       description: 'X-coordinate of the bottom-right corner',
-      maximum: 999,
-    },
-    x1: {
-      type: 'integer',
-      title: 'X1',
       minimum: 0,
-      description: 'X-coordinate of the top-left corner',
+      title: 'X2',
       maximum: 999,
-    },
-    y1: {
       type: 'integer',
-      title: 'Y1',
-      minimum: 0,
-      description: 'Y-coordinate of the top-left corner',
-      maximum: 999,
     },
     y2: {
-      type: 'integer',
-      title: 'Y2',
-      minimum: 0,
       description: 'Y-coordinate of the bottom-right corner',
+      minimum: 0,
+      title: 'Y2',
       maximum: 999,
+      type: 'integer',
+    },
+    y1: {
+      description: 'Y-coordinate of the top-left corner',
+      minimum: 0,
+      title: 'Y1',
+      maximum: 999,
+      type: 'integer',
+    },
+    x1: {
+      description: 'X-coordinate of the top-left corner',
+      minimum: 0,
+      title: 'X1',
+      maximum: 999,
+      type: 'integer',
     },
   },
   type: 'object',
   'x-fal-order-properties': ['x1', 'y1', 'x2', 'y2'],
-  title: 'Region',
-  required: ['x1', 'y1', 'x2', 'y2'],
 } as const
 
 export const RouterVisionInputSchema = {
@@ -2751,75 +2751,115 @@ export const RouterVisionOutputSchema = {
 } as const
 
 export const Sa2va4bImageInputSchema = {
+  required: ['prompt', 'image_url'],
+  type: 'object',
   properties: {
-    prompt: {
-      type: 'string',
-      title: 'Prompt',
-      examples: [
-        'Could you please give me a brief description of the image? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
-      ],
-      description: 'Prompt to be used for the chat completion',
-    },
     image_url: {
       type: 'string',
-      title: 'Image Url',
       examples: [
         'https://raw.githubusercontent.com/facebookresearch/segment-anything-2/main/notebooks/images/truck.jpg',
       ],
       description: 'Url for the Input image.',
+      title: 'Image Url',
       'x-fal-file-input': true,
     },
+    prompt: {
+      description: 'Prompt to be used for the chat completion',
+      type: 'string',
+      examples: [
+        'Could you please give me a brief description of the image? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
+      ],
+      title: 'Prompt',
+    },
   },
-  type: 'object',
   'x-fal-order-properties': ['prompt', 'image_url'],
-  required: ['prompt', 'image_url'],
   title: 'ImageInput',
 } as const
 
 export const Sa2va4bImageOutputSchema = {
+  required: ['output', 'masks'],
+  type: 'object',
   properties: {
-    output: {
-      type: 'string',
-      title: 'Output',
-      examples: [
-        '<p>  A white pickup truck  </p>   [SEG]  is parked on the side of  <p>  the red building  </p>   [SEG] , creating a unique and eye-catching contrast.<|im_end|>',
-      ],
-      description: 'Generated output',
-    },
     masks: {
+      items: { $ref: '#/$defs/Image' },
+      description: 'Dictionary of label: mask image',
       type: 'array',
-      title: 'Masks',
       examples: [
         [
           {
-            height: 1200,
-            file_name: '019c3c1e3c50446e9996f709d36debb4.png',
-            content_type: 'image/png',
-            url: 'https://v3.fal.media/files/monkey/6ITmhHQJ-69s-UxajrY5T_019c3c1e3c50446e9996f709d36debb4.png',
             width: 1800,
+            height: 1200,
+            content_type: 'image/png',
             file_size: 15724,
+            url: 'https://v3.fal.media/files/monkey/6ITmhHQJ-69s-UxajrY5T_019c3c1e3c50446e9996f709d36debb4.png',
+            file_name: '019c3c1e3c50446e9996f709d36debb4.png',
           },
           {
-            height: 1200,
-            file_name: '0a1522ca410942c7ad6c73efa15b3549.png',
-            content_type: 'image/png',
-            url: 'https://v3.fal.media/files/monkey/IljtMxahoo9-7SUpx0fth_0a1522ca410942c7ad6c73efa15b3549.png',
             width: 1800,
+            height: 1200,
+            content_type: 'image/png',
             file_size: 14905,
+            url: 'https://v3.fal.media/files/monkey/IljtMxahoo9-7SUpx0fth_0a1522ca410942c7ad6c73efa15b3549.png',
+            file_name: '0a1522ca410942c7ad6c73efa15b3549.png',
           },
         ],
       ],
-      description: 'Dictionary of label: mask image',
-      items: { $ref: '#/$defs/Image' },
+      title: 'Masks',
+    },
+    output: {
+      description: 'Generated output',
+      type: 'string',
+      examples: [
+        '<p>  A white pickup truck  </p>   [SEG]  is parked on the side of  <p>  the red building  </p>   [SEG] , creating a unique and eye-catching contrast.<|im_end|>',
+      ],
+      title: 'Output',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['output', 'masks'],
-  required: ['output', 'masks'],
   title: 'ImageChatOutput',
   $defs: {
     Image: {
-      description: 'Represents an image file.',
+      properties: {
+        content_type: {
+          description: 'The mime type of the file.',
+          title: 'Content Type',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_size: {
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [4404019],
+        },
+        file_name: {
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          title: 'File Name',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['z9RV14K95DvU.png'],
+        },
+        width: {
+          description: 'The width of the image in pixels.',
+          title: 'Width',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+        height: {
+          description: 'The height of the image in pixels.',
+          title: 'Height',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+      },
+      title: 'Image',
+      required: ['url'],
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -2828,231 +2868,231 @@ export const Sa2va4bImageOutputSchema = {
         'width',
         'height',
       ],
-      type: 'object',
-      title: 'Image',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        width: {
-          description: 'The width of the image in pixels.',
-          title: 'Width',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        height: {
-          description: 'The height of the image in pixels.',
-          title: 'Height',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Sa2va4bVideoInputSchema = {
+  required: ['prompt', 'video_url'],
+  type: 'object',
   properties: {
+    num_frames_to_sample: {
+      description:
+        'Number of frames to sample from the video. Defaults to 32 if not provided. Minimum 5, maximum 100.',
+      anyOf: [{ type: 'integer', minimum: 5, maximum: 100 }, { type: 'null' }],
+      title: 'Num Frames To Sample',
+    },
+    prompt: {
+      description: 'Prompt to be used for the chat completion',
+      type: 'string',
+      examples: [
+        'Could you please give me a brief description of the video? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
+      ],
+      title: 'Prompt',
+    },
     video_url: {
       type: 'string',
-      title: 'Video Url',
       examples: [
         'https://drive.google.com/uc?id=1iOFYbNITYwrebBBp9kaEGhBndFSRLz8k',
       ],
       description: 'The URL of the input video.',
+      title: 'Video Url',
       'x-fal-file-input': true,
     },
-    prompt: {
-      type: 'string',
-      title: 'Prompt',
-      examples: [
-        'Could you please give me a brief description of the video? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
-      ],
-      description: 'Prompt to be used for the chat completion',
-    },
-    num_frames_to_sample: {
-      anyOf: [{ type: 'integer', minimum: 5, maximum: 100 }, { type: 'null' }],
-      title: 'Num Frames To Sample',
-      description:
-        'Number of frames to sample from the video. Defaults to 32 if not provided. Minimum 5, maximum 100.',
-    },
   },
-  type: 'object',
   'x-fal-order-properties': ['prompt', 'video_url', 'num_frames_to_sample'],
-  required: ['prompt', 'video_url'],
   title: 'VideoInput',
 } as const
 
 export const Sa2va4bVideoOutputSchema = {
+  required: ['output', 'masks'],
+  type: 'object',
   properties: {
-    output: {
-      type: 'string',
-      title: 'Output',
-      examples: [
-        '<p>  Two children  </p>   [SEG]  are jumping on  <p>  a bed  </p>   [SEG]  .<|im_end|>',
-      ],
-      description: 'Generated output',
-    },
     masks: {
+      items: { $ref: '#/$defs/File' },
+      description: 'Dictionary of label: mask video',
       type: 'array',
-      title: 'Masks',
       examples: [
         [
           {
-            file_size: 3259012,
-            file_name: 'output_0.mp4',
             content_type: 'application/octet-stream',
+            file_size: 3259012,
             url: 'https://v3.fal.media/files/kangaroo/KSuUWm24leGew4jTouuTM_output_0.mp4',
+            file_name: 'output_0.mp4',
           },
           {
-            file_size: 1241471,
-            file_name: 'output_1.mp4',
             content_type: 'application/octet-stream',
+            file_size: 1241471,
             url: 'https://v3.fal.media/files/monkey/0jHCYm2lZM6FjDmtXw1Kt_output_1.mp4',
+            file_name: 'output_1.mp4',
           },
         ],
       ],
-      description: 'Dictionary of label: mask video',
-      items: { $ref: '#/$defs/File' },
+      title: 'Masks',
+    },
+    output: {
+      description: 'Generated output',
+      type: 'string',
+      examples: [
+        '<p>  Two children  </p>   [SEG]  are jumping on  <p>  a bed  </p>   [SEG]  .<|im_end|>',
+      ],
+      title: 'Output',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['output', 'masks'],
-  required: ['output', 'masks'],
   title: 'VideoChatOutput',
   $defs: {
     File: {
+      required: ['url'],
+      properties: {
+        file_size: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
+        file_name: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+      },
+      title: 'File',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
-      type: 'object',
-      title: 'File',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
     },
   },
 } as const
 
 export const Sa2va8bImageInputSchema = {
+  required: ['prompt', 'image_url'],
+  type: 'object',
   properties: {
-    prompt: {
-      type: 'string',
-      title: 'Prompt',
-      examples: [
-        'Could you please give me a brief description of the image? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
-      ],
-      description: 'Prompt to be used for the chat completion',
-    },
     image_url: {
       type: 'string',
-      title: 'Image Url',
       examples: [
         'https://raw.githubusercontent.com/facebookresearch/segment-anything-2/main/notebooks/images/truck.jpg',
       ],
       description: 'Url for the Input image.',
+      title: 'Image Url',
       'x-fal-file-input': true,
     },
+    prompt: {
+      description: 'Prompt to be used for the chat completion',
+      type: 'string',
+      examples: [
+        'Could you please give me a brief description of the image? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
+      ],
+      title: 'Prompt',
+    },
   },
-  type: 'object',
   'x-fal-order-properties': ['prompt', 'image_url'],
-  required: ['prompt', 'image_url'],
   title: 'ImageInput',
 } as const
 
 export const Sa2va8bImageOutputSchema = {
+  required: ['output', 'masks'],
+  type: 'object',
   properties: {
-    output: {
-      type: 'string',
-      title: 'Output',
-      examples: [
-        '<p>  A white pickup truck  </p>   [SEG]  is parked on the side of  <p>  the red building  </p>   [SEG] , creating a unique and eye-catching contrast.<|im_end|>',
-      ],
-      description: 'Generated output',
-    },
     masks: {
+      items: { $ref: '#/$defs/Image' },
+      description: 'Dictionary of label: mask image',
       type: 'array',
-      title: 'Masks',
       examples: [
         [
           {
-            height: 1200,
-            file_name: '019c3c1e3c50446e9996f709d36debb4.png',
-            content_type: 'image/png',
-            url: 'https://v3.fal.media/files/monkey/6ITmhHQJ-69s-UxajrY5T_019c3c1e3c50446e9996f709d36debb4.png',
             width: 1800,
+            height: 1200,
+            content_type: 'image/png',
             file_size: 15724,
+            url: 'https://v3.fal.media/files/monkey/6ITmhHQJ-69s-UxajrY5T_019c3c1e3c50446e9996f709d36debb4.png',
+            file_name: '019c3c1e3c50446e9996f709d36debb4.png',
           },
           {
-            height: 1200,
-            file_name: '0a1522ca410942c7ad6c73efa15b3549.png',
-            content_type: 'image/png',
-            url: 'https://v3.fal.media/files/monkey/IljtMxahoo9-7SUpx0fth_0a1522ca410942c7ad6c73efa15b3549.png',
             width: 1800,
+            height: 1200,
+            content_type: 'image/png',
             file_size: 14905,
+            url: 'https://v3.fal.media/files/monkey/IljtMxahoo9-7SUpx0fth_0a1522ca410942c7ad6c73efa15b3549.png',
+            file_name: '0a1522ca410942c7ad6c73efa15b3549.png',
           },
         ],
       ],
-      description: 'Dictionary of label: mask image',
-      items: { $ref: '#/$defs/Image' },
+      title: 'Masks',
+    },
+    output: {
+      description: 'Generated output',
+      type: 'string',
+      examples: [
+        '<p>  A white pickup truck  </p>   [SEG]  is parked on the side of  <p>  the red building  </p>   [SEG] , creating a unique and eye-catching contrast.<|im_end|>',
+      ],
+      title: 'Output',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['output', 'masks'],
-  required: ['output', 'masks'],
   title: 'ImageChatOutput',
   $defs: {
     Image: {
-      description: 'Represents an image file.',
+      properties: {
+        content_type: {
+          description: 'The mime type of the file.',
+          title: 'Content Type',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_size: {
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [4404019],
+        },
+        file_name: {
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          title: 'File Name',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['z9RV14K95DvU.png'],
+        },
+        width: {
+          description: 'The width of the image in pixels.',
+          title: 'Width',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+        height: {
+          description: 'The height of the image in pixels.',
+          title: 'Height',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+      },
+      title: 'Image',
+      required: ['url'],
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -3061,232 +3101,155 @@ export const Sa2va8bImageOutputSchema = {
         'width',
         'height',
       ],
-      type: 'object',
-      title: 'Image',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        width: {
-          description: 'The width of the image in pixels.',
-          title: 'Width',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        height: {
-          description: 'The height of the image in pixels.',
-          title: 'Height',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const Sa2va8bVideoInputSchema = {
+  required: ['prompt', 'video_url'],
+  type: 'object',
   properties: {
+    num_frames_to_sample: {
+      description:
+        'Number of frames to sample from the video. Defaults to 32 if not provided. Minimum 5, maximum 100.',
+      anyOf: [{ type: 'integer', minimum: 5, maximum: 100 }, { type: 'null' }],
+      title: 'Num Frames To Sample',
+    },
+    prompt: {
+      description: 'Prompt to be used for the chat completion',
+      type: 'string',
+      examples: [
+        'Could you please give me a brief description of the video? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
+      ],
+      title: 'Prompt',
+    },
     video_url: {
       type: 'string',
-      title: 'Video Url',
       examples: [
         'https://drive.google.com/uc?id=1iOFYbNITYwrebBBp9kaEGhBndFSRLz8k',
       ],
       description: 'The URL of the input video.',
+      title: 'Video Url',
       'x-fal-file-input': true,
     },
-    prompt: {
-      type: 'string',
-      title: 'Prompt',
-      examples: [
-        'Could you please give me a brief description of the video? Please respond with interleaved segmentation masks for the corresponding parts of the answer.',
-      ],
-      description: 'Prompt to be used for the chat completion',
-    },
-    num_frames_to_sample: {
-      anyOf: [{ type: 'integer', minimum: 5, maximum: 100 }, { type: 'null' }],
-      title: 'Num Frames To Sample',
-      description:
-        'Number of frames to sample from the video. Defaults to 32 if not provided. Minimum 5, maximum 100.',
-    },
   },
-  type: 'object',
   'x-fal-order-properties': ['prompt', 'video_url', 'num_frames_to_sample'],
-  required: ['prompt', 'video_url'],
   title: 'VideoInput',
 } as const
 
 export const Sa2va8bVideoOutputSchema = {
+  required: ['output', 'masks'],
+  type: 'object',
   properties: {
-    output: {
-      type: 'string',
-      title: 'Output',
-      examples: [
-        '<p>  Two children  </p>   [SEG]  are jumping on  <p>  a bed  </p>   [SEG]  .<|im_end|>',
-      ],
-      description: 'Generated output',
-    },
     masks: {
+      items: { $ref: '#/$defs/File' },
+      description: 'Dictionary of label: mask video',
       type: 'array',
-      title: 'Masks',
       examples: [
         [
           {
-            file_size: 3259012,
-            file_name: 'output_0.mp4',
             content_type: 'application/octet-stream',
+            file_size: 3259012,
             url: 'https://v3.fal.media/files/kangaroo/KSuUWm24leGew4jTouuTM_output_0.mp4',
+            file_name: 'output_0.mp4',
           },
           {
-            file_size: 1241471,
-            file_name: 'output_1.mp4',
             content_type: 'application/octet-stream',
+            file_size: 1241471,
             url: 'https://v3.fal.media/files/monkey/0jHCYm2lZM6FjDmtXw1Kt_output_1.mp4',
+            file_name: 'output_1.mp4',
           },
         ],
       ],
-      description: 'Dictionary of label: mask video',
-      items: { $ref: '#/$defs/File' },
+      title: 'Masks',
+    },
+    output: {
+      description: 'Generated output',
+      type: 'string',
+      examples: [
+        '<p>  Two children  </p>   [SEG]  are jumping on  <p>  a bed  </p>   [SEG]  .<|im_end|>',
+      ],
+      title: 'Output',
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['output', 'masks'],
-  required: ['output', 'masks'],
   title: 'VideoChatOutput',
   $defs: {
     File: {
+      required: ['url'],
+      properties: {
+        file_size: {
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          title: 'File Size',
+          examples: [4404019],
+          description: 'The size of the file in bytes.',
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        content_type: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'Content Type',
+          examples: ['image/png'],
+          description: 'The mime type of the file.',
+        },
+        file_name: {
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          title: 'File Name',
+          examples: ['z9RV14K95DvU.png'],
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+        },
+      },
+      title: 'File',
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
         'file_name',
         'file_size',
       ],
-      type: 'object',
-      title: 'File',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
     },
   },
 } as const
 
 export const Sam3ImageEmbedInputSchema = {
-  type: 'object',
+  title: 'SAM3EmbeddingInput',
+  'x-fal-order-properties': ['image_url'],
   properties: {
     image_url: {
+      title: 'Image Url',
       description: 'URL of the image to embed.',
       type: 'string',
-      title: 'Image Url',
       examples: [
         'https://raw.githubusercontent.com/facebookresearch/segment-anything-2/main/notebooks/images/truck.jpg',
       ],
       'x-fal-file-input': true,
     },
   },
-  title: 'SAM3EmbeddingInput',
-  'x-fal-order-properties': ['image_url'],
   required: ['image_url'],
+  type: 'object',
 } as const
 
 export const Sam3ImageEmbedOutputSchema = {
-  type: 'object',
-  properties: {
-    embedding_b64: {
-      type: 'string',
-      title: 'Embedding B64',
-      description: 'Embedding of the image',
-    },
-  },
   title: 'SAM3EmbeddingOutput',
   'x-fal-order-properties': ['embedding_b64'],
+  properties: {
+    embedding_b64: {
+      title: 'Embedding B64',
+      description: 'Embedding of the image',
+      type: 'string',
+    },
+  },
   required: ['embedding_b64'],
+  type: 'object',
 } as const
 
 export const SceneFinderInputSchema = {
-  properties: {
-    video_url: {
-      description: 'URL of the video to search through.',
-      _fal_ui_field: 'video',
-      title: 'Video Url',
-      type: 'string',
-      max_file_size: 524288000,
-      examples: [
-        'https://v3b.fal.media/files/b/0a913346/ZbEaRKcU1dMNYkHl9g1Zz_T4QEyOJ3R3WzuQS9.mp4',
-      ],
-      'x-fal-file-input': true,
-    },
-    prompt: {
-      description:
-        'Text description of the event or scene to find in the video.',
-      title: 'Prompt',
-      type: 'string',
-      maxLength: 1000,
-      examples: ['a dog with only one eye open', 'blonde woman with her bag'],
-    },
-    frame_selection: {
-      default: 'mid',
-      title: 'Frame Selection',
-      enum: ['mid', 'start', 'end', 'all'],
-      type: 'string',
-      description:
-        "Which frame(s) to extract from each detected segment. 'mid' returns the midpoint frame, 'start' the first frame, 'end' the last frame, 'all' returns start + mid + end.",
-    },
-    frames_per_second: {
-      minimum: 1,
-      default: 2,
-      title: 'Frames Per Second',
-      type: 'integer',
-      maximum: 8,
-      description:
-        'Frames per second to sample from the video. Higher values give more precision but use more memory.',
-    },
-  },
+  required: ['video_url', 'prompt'],
   title: 'LocateInput',
   type: 'object',
   'x-fal-order-properties': [
@@ -3295,53 +3258,130 @@ export const SceneFinderInputSchema = {
     'frames_per_second',
     'frame_selection',
   ],
-  required: ['video_url', 'prompt'],
+  properties: {
+    video_url: {
+      examples: [
+        'https://v3b.fal.media/files/b/0a913346/ZbEaRKcU1dMNYkHl9g1Zz_T4QEyOJ3R3WzuQS9.mp4',
+      ],
+      title: 'Video Url',
+      _fal_ui_field: 'video',
+      type: 'string',
+      max_file_size: 524288000,
+      description: 'URL of the video to search through.',
+      'x-fal-file-input': true,
+    },
+    frames_per_second: {
+      title: 'Frames Per Second',
+      minimum: 1,
+      type: 'integer',
+      default: 2,
+      maximum: 8,
+      description:
+        'Frames per second to sample from the video. Higher values give more precision but use more memory.',
+    },
+    frame_selection: {
+      title: 'Frame Selection',
+      enum: ['mid', 'start', 'end', 'all'],
+      type: 'string',
+      default: 'mid',
+      description:
+        "Which frame(s) to extract from each detected segment. 'mid' returns the midpoint frame, 'start' the first frame, 'end' the last frame, 'all' returns start + mid + end.",
+    },
+    prompt: {
+      maxLength: 1000,
+      examples: ['a dog with only one eye open', 'blonde woman with her bag'],
+      title: 'Prompt',
+      type: 'string',
+      description:
+        'Text description of the event or scene to find in the video.',
+    },
+  },
 } as const
 
 export const SceneFinderOutputSchema = {
-  properties: {
-    segments: {
-      description: 'Detected event time segments.',
-      title: 'Segments',
-      type: 'array',
-      items: { $ref: '#/$defs/EventSegmentType2' },
-      examples: [[{ start: 10.4, end: 12.5 }]],
-    },
-    images: {
-      title: 'Images',
-      type: 'array',
-      items: { $ref: '#/$defs/Image' },
-      description:
-        'Extracted frames from each detected segment based on frame_selection.',
-    },
-  },
+  required: ['segments', 'images'],
   title: 'LocateOutput',
   type: 'object',
   'x-fal-order-properties': ['segments', 'images'],
-  required: ['segments', 'images'],
+  properties: {
+    images: {
+      description:
+        'Extracted frames from each detected segment based on frame_selection.',
+      title: 'Images',
+      type: 'array',
+      items: { $ref: '#/$defs/Image' },
+    },
+    segments: {
+      description: 'Detected event time segments.',
+      examples: [[{ end: 12.5, start: 10.4 }]],
+      title: 'Segments',
+      type: 'array',
+      items: { $ref: '#/$defs/EventSegmentType2' },
+    },
+  },
   $defs: {
     EventSegmentType2: {
-      properties: {
-        start: {
-          description: 'Start time in seconds.',
-          title: 'Start',
-          type: 'number',
-          examples: [10.4],
-        },
-        end: {
-          description: 'End time in seconds.',
-          title: 'End',
-          type: 'number',
-          examples: [12.5],
-        },
-      },
+      required: ['start', 'end'],
       title: 'EventSegment',
       type: 'object',
       'x-fal-order-properties': ['start', 'end'],
-      required: ['start', 'end'],
+      properties: {
+        end: {
+          examples: [12.5],
+          title: 'End',
+          type: 'number',
+          description: 'End time in seconds.',
+        },
+        start: {
+          examples: [10.4],
+          title: 'Start',
+          type: 'number',
+          description: 'Start time in seconds.',
+        },
+      },
     },
     Image: {
-      description: 'Represents an image file.',
+      properties: {
+        content_type: {
+          description: 'The mime type of the file.',
+          title: 'Content Type',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['image/png'],
+        },
+        url: {
+          title: 'Url',
+          type: 'string',
+          description: 'The URL where the file can be downloaded from.',
+        },
+        file_size: {
+          description: 'The size of the file in bytes.',
+          title: 'File Size',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [4404019],
+        },
+        file_name: {
+          description:
+            'The name of the file. It will be auto-generated if not provided.',
+          title: 'File Name',
+          anyOf: [{ type: 'string' }, { type: 'null' }],
+          examples: ['z9RV14K95DvU.png'],
+        },
+        width: {
+          description: 'The width of the image in pixels.',
+          title: 'Width',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+        height: {
+          description: 'The height of the image in pixels.',
+          title: 'Height',
+          anyOf: [{ type: 'integer' }, { type: 'null' }],
+          examples: [1024],
+        },
+      },
+      title: 'Image',
+      required: ['url'],
+      type: 'object',
       'x-fal-order-properties': [
         'url',
         'content_type',
@@ -3350,89 +3390,49 @@ export const SceneFinderOutputSchema = {
         'width',
         'height',
       ],
-      type: 'object',
-      title: 'Image',
-      properties: {
-        content_type: {
-          description: 'The mime type of the file.',
-          title: 'Content Type',
-          examples: ['image/png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        file_size: {
-          description: 'The size of the file in bytes.',
-          title: 'File Size',
-          examples: [4404019],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        width: {
-          description: 'The width of the image in pixels.',
-          title: 'Width',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        height: {
-          description: 'The height of the image in pixels.',
-          title: 'Height',
-          examples: [1024],
-          anyOf: [{ type: 'integer' }, { type: 'null' }],
-        },
-        file_name: {
-          description:
-            'The name of the file. It will be auto-generated if not provided.',
-          title: 'File Name',
-          examples: ['z9RV14K95DvU.png'],
-          anyOf: [{ type: 'string' }, { type: 'null' }],
-        },
-        url: {
-          description: 'The URL where the file can be downloaded from.',
-          title: 'Url',
-          type: 'string',
-        },
-      },
-      required: ['url'],
+      description: 'Represents an image file.',
     },
   },
 } as const
 
 export const UsageInfoSchema = {
-  type: 'object',
-  properties: {
-    output_tokens: {
-      type: 'integer',
-      title: 'Output Tokens',
-      description: 'Number of output tokens generated',
-    },
-    ttft_ms: {
-      type: 'number',
-      title: 'Ttft Ms',
-      description: 'Time to first token in milliseconds',
-    },
-    decode_time_ms: {
-      type: 'number',
-      title: 'Decode Time Ms',
-      description: 'Time taken for decoding in milliseconds',
-    },
-    input_tokens: {
-      type: 'integer',
-      title: 'Input Tokens',
-      description: 'Number of input tokens processed',
-    },
-    prefill_time_ms: {
-      type: 'number',
-      title: 'Prefill Time Ms',
-      description: 'Time taken for prefill in milliseconds',
-    },
-  },
-  title: 'UsageInfo',
-  'x-fal-order-properties': [
+  required: [
     'input_tokens',
     'output_tokens',
     'prefill_time_ms',
     'decode_time_ms',
     'ttft_ms',
   ],
-  required: [
+  properties: {
+    prefill_time_ms: {
+      title: 'Prefill Time Ms',
+      type: 'number',
+      description: 'Time taken for prefill in milliseconds',
+    },
+    output_tokens: {
+      title: 'Output Tokens',
+      type: 'integer',
+      description: 'Number of output tokens generated',
+    },
+    ttft_ms: {
+      title: 'Ttft Ms',
+      type: 'number',
+      description: 'Time to first token in milliseconds',
+    },
+    decode_time_ms: {
+      title: 'Decode Time Ms',
+      type: 'number',
+      description: 'Time taken for decoding in milliseconds',
+    },
+    input_tokens: {
+      title: 'Input Tokens',
+      type: 'integer',
+      description: 'Number of input tokens processed',
+    },
+  },
+  title: 'UsageInfo',
+  type: 'object',
+  'x-fal-order-properties': [
     'input_tokens',
     'output_tokens',
     'prefill_time_ms',
@@ -3485,55 +3485,56 @@ export const UsageInfoType2Schema = {
 } as const
 
 export const VideoUnderstandingInputSchema = {
-  type: 'object',
-  required: ['video_url', 'prompt'],
-  title: 'VideoUnderstandingInput',
   properties: {
-    video_url: {
+    prompt: {
+      title: 'Prompt',
+      examples: ['What is happening in this video?'],
       type: 'string',
+      maxLength: 5000,
+      description: 'The question or prompt about the video content.',
+      minLength: 1,
+    },
+    video_url: {
+      title: 'Video Url',
       examples: [
         'https://v3.fal.media/files/elephant/mLAMkUTxFMbe2xF0qpLdA_Ll9mDE8webFA6GAu3vD_M_71ee7217db1d4aa4af1d2f1ae060389b.mp4',
       ],
-      title: 'Video Url',
+      type: 'string',
       description: 'URL of the video to analyze',
       'x-fal-file-input': true,
     },
     detailed_analysis: {
-      type: 'boolean',
-      default: false,
       title: 'Detailed Analysis',
       description: 'Whether to request a more detailed analysis of the video',
-    },
-    prompt: {
-      type: 'string',
-      minLength: 1,
-      examples: ['What is happening in this video?'],
-      title: 'Prompt',
-      description: 'The question or prompt about the video content.',
-      maxLength: 5000,
+      type: 'boolean',
+      default: false,
     },
   },
   'x-fal-order-properties': ['video_url', 'prompt', 'detailed_analysis'],
+  title: 'VideoUnderstandingInput',
+  required: ['video_url', 'prompt'],
+  type: 'object',
 } as const
 
 export const VideoUnderstandingOutputSchema = {
-  type: 'object',
-  required: ['output'],
-  title: 'VideoUnderstandingOutput',
   properties: {
     output: {
-      type: 'string',
+      title: 'Output',
       examples: [
         'Based on the video, a woman is singing passionately into a microphone in what appears to be a professional recording studio. She is wearing headphones, and behind her, there are sound-dampening foam panels, a mixing board, and other studio equipment.',
       ],
-      title: 'Output',
+      type: 'string',
       description: 'The analysis of the video content based on the prompt',
     },
   },
   'x-fal-order-properties': ['output'],
+  title: 'VideoUnderstandingOutput',
+  required: ['output'],
+  type: 'object',
 } as const
 
 export const XAilabNsfwInputSchema = {
+  required: ['image_urls'],
   properties: {
     image_urls: {
       items: {
@@ -3541,34 +3542,33 @@ export const XAilabNsfwInputSchema = {
         _fal_ui_field: 'image',
         'x-fal-file-input': true,
       },
+      type: 'array',
       description:
         'List of image URLs to check. If more than 10 images are provided, only the first 10 will be checked.',
       title: 'Image Urls',
-      type: 'array',
       examples: [
         'https://storage.googleapis.com/falserverless/model_tests/remove_background/elephant.jpg',
       ],
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['image_urls'],
+  type: 'object',
   title: 'NSFWInput',
-  required: ['image_urls'],
 } as const
 
 export const XAilabNsfwOutputSchema = {
+  required: ['has_nsfw_concepts'],
   properties: {
     has_nsfw_concepts: {
       items: { type: 'boolean' },
+      type: 'array',
       description:
         'List of booleans indicating if the image has an NSFW concept',
       title: 'Has Nsfw Concepts',
-      type: 'array',
       examples: [[true]],
     },
   },
-  type: 'object',
   'x-fal-order-properties': ['has_nsfw_concepts'],
+  type: 'object',
   title: 'NSFWOutput',
-  required: ['has_nsfw_concepts'],
 } as const

@@ -2,6 +2,10 @@
 // Generated via scripts/generate-endpoint-maps.ts
 
 import {
+  AgentRayV32ImageToVideoInputSchema,
+  AgentRayV32ImageToVideoOutputSchema,
+  AgentRayV32TextToVideoInputSchema,
+  AgentRayV32TextToVideoOutputSchema,
   AiAvatarMultiInputSchema,
   AiAvatarMultiOutputSchema,
   AiAvatarMultiTextInputSchema,
@@ -24,6 +28,14 @@ import {
   AvatarsTextToVideoOutputType2Schema,
   BenV2VideoInputSchema,
   BenV2VideoOutputSchema,
+  BerniniREditVideoInputSchema,
+  BerniniREditVideoOutputSchema,
+  BerniniRReferenceEditVideoInputSchema,
+  BerniniRReferenceEditVideoOutputSchema,
+  BerniniRReferenceToVideoInputSchema,
+  BerniniRReferenceToVideoOutputSchema,
+  BerniniRTextToVideoInputSchema,
+  BerniniRTextToVideoOutputSchema,
   BirefnetV2VideoInputSchema,
   BirefnetV2VideoOutputSchema,
   Bria_video_eraserEraseKeypointsInputSchema,
@@ -828,6 +840,10 @@ import {
   VideoBackgroundRemovalInputType2Schema,
   VideoBackgroundRemovalOutputSchema,
   VideoBackgroundRemovalOutputType2Schema,
+  VideoBackgroundRemovalRealtimeInputSchema,
+  VideoBackgroundRemovalRealtimeOutputSchema,
+  VideoBackgroundRemovalV3InputSchema,
+  VideoBackgroundRemovalV3OutputSchema,
   VideoEraseKeypointsInputSchema,
   VideoEraseKeypointsOutputSchema,
   VideoEraseMaskInputSchema,
@@ -1020,6 +1036,14 @@ export const falVideoEndpointSchemaMap: {
     readonly input: typeof VideoBackgroundRemovalInputSchema
     readonly output: typeof VideoBackgroundRemovalOutputSchema
   }
+  readonly 'bria/video/background-removal/realtime': {
+    readonly input: typeof VideoBackgroundRemovalRealtimeInputSchema
+    readonly output: typeof VideoBackgroundRemovalRealtimeOutputSchema
+  }
+  readonly 'bria/video/background-removal/v3': {
+    readonly input: typeof VideoBackgroundRemovalV3InputSchema
+    readonly output: typeof VideoBackgroundRemovalV3OutputSchema
+  }
   readonly 'bria/video/erase/keypoints': {
     readonly input: typeof VideoEraseKeypointsInputSchema
     readonly output: typeof VideoEraseKeypointsOutputSchema
@@ -1111,6 +1135,22 @@ export const falVideoEndpointSchemaMap: {
   readonly 'fal-ai/ben/v2/video': {
     readonly input: typeof BenV2VideoInputSchema
     readonly output: typeof BenV2VideoOutputSchema
+  }
+  readonly 'fal-ai/bernini-r/edit-video': {
+    readonly input: typeof BerniniREditVideoInputSchema
+    readonly output: typeof BerniniREditVideoOutputSchema
+  }
+  readonly 'fal-ai/bernini-r/reference-edit-video': {
+    readonly input: typeof BerniniRReferenceEditVideoInputSchema
+    readonly output: typeof BerniniRReferenceEditVideoOutputSchema
+  }
+  readonly 'fal-ai/bernini-r/reference-to-video': {
+    readonly input: typeof BerniniRReferenceToVideoInputSchema
+    readonly output: typeof BerniniRReferenceToVideoOutputSchema
+  }
+  readonly 'fal-ai/bernini-r/text-to-video': {
+    readonly input: typeof BerniniRTextToVideoInputSchema
+    readonly output: typeof BerniniRTextToVideoOutputSchema
   }
   readonly 'fal-ai/birefnet/v2/video': {
     readonly input: typeof BirefnetV2VideoInputSchema
@@ -2800,6 +2840,14 @@ export const falVideoEndpointSchemaMap: {
     readonly input: typeof WorkflowUtilitiesTrimVideoInputSchema
     readonly output: typeof WorkflowUtilitiesTrimVideoOutputSchema
   }
+  readonly 'luma/agent/ray/v3.2/image-to-video': {
+    readonly input: typeof AgentRayV32ImageToVideoInputSchema
+    readonly output: typeof AgentRayV32ImageToVideoOutputSchema
+  }
+  readonly 'luma/agent/ray/v3.2/text-to-video': {
+    readonly input: typeof AgentRayV32TextToVideoInputSchema
+    readonly output: typeof AgentRayV32TextToVideoOutputSchema
+  }
   readonly 'mirelo-ai/sfx-v1.5/video-to-video': {
     readonly input: typeof SfxV15VideoToVideoInputSchema
     readonly output: typeof SfxV15VideoToVideoOutputSchema
@@ -2957,6 +3005,14 @@ export const falVideoEndpointSchemaMap: {
     input: VideoBackgroundRemovalInputSchema,
     output: VideoBackgroundRemovalOutputSchema,
   },
+  'bria/video/background-removal/realtime': {
+    input: VideoBackgroundRemovalRealtimeInputSchema,
+    output: VideoBackgroundRemovalRealtimeOutputSchema,
+  },
+  'bria/video/background-removal/v3': {
+    input: VideoBackgroundRemovalV3InputSchema,
+    output: VideoBackgroundRemovalV3OutputSchema,
+  },
   'bria/video/erase/keypoints': {
     input: VideoEraseKeypointsInputSchema,
     output: VideoEraseKeypointsOutputSchema,
@@ -3045,6 +3101,22 @@ export const falVideoEndpointSchemaMap: {
   'fal-ai/ben/v2/video': {
     input: BenV2VideoInputSchema,
     output: BenV2VideoOutputSchema,
+  },
+  'fal-ai/bernini-r/edit-video': {
+    input: BerniniREditVideoInputSchema,
+    output: BerniniREditVideoOutputSchema,
+  },
+  'fal-ai/bernini-r/reference-edit-video': {
+    input: BerniniRReferenceEditVideoInputSchema,
+    output: BerniniRReferenceEditVideoOutputSchema,
+  },
+  'fal-ai/bernini-r/reference-to-video': {
+    input: BerniniRReferenceToVideoInputSchema,
+    output: BerniniRReferenceToVideoOutputSchema,
+  },
+  'fal-ai/bernini-r/text-to-video': {
+    input: BerniniRTextToVideoInputSchema,
+    output: BerniniRTextToVideoOutputSchema,
   },
   'fal-ai/birefnet/v2/video': {
     input: BirefnetV2VideoInputSchema,
@@ -4712,6 +4784,14 @@ export const falVideoEndpointSchemaMap: {
   'fal-ai/workflow-utilities/trim-video': {
     input: WorkflowUtilitiesTrimVideoInputSchema,
     output: WorkflowUtilitiesTrimVideoOutputSchema,
+  },
+  'luma/agent/ray/v3.2/image-to-video': {
+    input: AgentRayV32ImageToVideoInputSchema,
+    output: AgentRayV32ImageToVideoOutputSchema,
+  },
+  'luma/agent/ray/v3.2/text-to-video': {
+    input: AgentRayV32TextToVideoInputSchema,
+    output: AgentRayV32TextToVideoOutputSchema,
   },
   'mirelo-ai/sfx-v1.5/video-to-video': {
     input: SfxV15VideoToVideoInputSchema,

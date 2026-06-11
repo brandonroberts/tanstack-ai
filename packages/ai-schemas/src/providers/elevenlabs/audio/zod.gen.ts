@@ -583,6 +583,7 @@ export const zRenderType = z.enum([
   'aaf',
   'tracks_zip',
   'clips_zip',
+  'zip',
 ])
 
 /**
@@ -1778,6 +1779,7 @@ export const zTextToDialogueQuery = z.object({
     ])
     .optional()
     .default('mp3_44100_128'),
+  enable_logging: z.boolean().optional().default(true),
 })
 
 /**
@@ -1794,6 +1796,7 @@ export const zTextToDialogueStreamHeaders = z.object({
 
 export const zTextToDialogueStreamQuery = z.object({
   output_format: zAllowedOutputFormats.optional(),
+  enable_logging: z.boolean().optional().default(true),
 })
 
 /**
@@ -1810,6 +1813,7 @@ export const zTextToDialogueStreamWithTimestampsHeaders = z.object({
 
 export const zTextToDialogueStreamWithTimestampsQuery = z.object({
   output_format: zAllowedOutputFormats.optional(),
+  enable_logging: z.boolean().optional().default(true),
 })
 
 /**
@@ -1859,6 +1863,7 @@ export const zTextToDialogueFullWithTimestampsQuery = z.object({
     ])
     .optional()
     .default('mp3_44100_128'),
+  enable_logging: z.boolean().optional().default(true),
 })
 
 /**

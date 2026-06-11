@@ -6,38 +6,38 @@ import * as z from 'zod'
  * ChatInput
  */
 export const zNemotron3NanoOmniInput = z.object({
-  top_p: z.number().gte(0).lte(1).optional().default(0.95),
-  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   system_prompt: z.union([z.string(), z.unknown()]).optional(),
-  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
+  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   max_tokens: z.int().gte(1).lte(20000).optional().default(1024),
   prompt: z.string().min(1),
+  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
 })
 
 /**
  * VideoInput
  */
 export const zNemotron3NanoOmniVideoInput = z.object({
-  top_p: z.number().gte(0).lte(1).optional().default(0.95),
-  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   system_prompt: z.union([z.string(), z.unknown()]).optional(),
-  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
   video_url: z.string(),
+  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   max_tokens: z.int().gte(1).lte(20000).optional().default(1024),
   prompt: z.string().min(1),
+  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
 })
 
 /**
  * VisionInput
  */
 export const zNemotron3NanoOmniVisionInput = z.object({
-  top_p: z.number().gte(0).lte(1).optional().default(0.95),
-  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   system_prompt: z.union([z.string(), z.unknown()]).optional(),
-  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
-  image_url: z.string(),
+  temperature: z.number().gte(0).lte(2).optional().default(0.7),
   max_tokens: z.int().gte(1).lte(20000).optional().default(1024),
   prompt: z.string().min(1),
+  top_p: z.number().gte(0).lte(1).optional().default(0.95),
+  image_url: z.string(),
+  reasoning_mode: z.enum(['think', 'no_think']).optional().default('no_think'),
 })
 
 /**
@@ -163,35 +163,35 @@ export const zBytedanceSeedV2MiniOutput = z.object({
  * UsageInfo
  */
 export const zUsageInfo = z.object({
-  output_tokens: z.int(),
   input_tokens: z.int(),
+  output_tokens: z.int(),
 })
 
 /**
  * BaseOutput
  */
 export const zNemotron3NanoOmniOutput = z.object({
-  finish_reason: z.string().optional().default('stop'),
-  output: z.string(),
   usage: zUsageInfo,
+  output: z.string(),
+  finish_reason: z.string().optional().default('stop'),
 })
 
 /**
  * BaseOutput
  */
 export const zNemotron3NanoOmniVideoOutput = z.object({
-  finish_reason: z.string().optional().default('stop'),
-  output: z.string(),
   usage: zUsageInfo,
+  output: z.string(),
+  finish_reason: z.string().optional().default('stop'),
 })
 
 /**
  * BaseOutput
  */
 export const zNemotron3NanoOmniVisionOutput = z.object({
-  finish_reason: z.string().optional().default('stop'),
-  output: z.string(),
   usage: zUsageInfo,
+  output: z.string(),
+  finish_reason: z.string().optional().default('stop'),
 })
 
 /**
@@ -238,90 +238,6 @@ export const zRouterVideoOutput = z.object({
  * InputModel
  */
 export const zVideoPromptGeneratorInput = z.object({
-  style: z
-    .enum([
-      'Minimalist',
-      'Simple',
-      'Detailed',
-      'Descriptive',
-      'Dynamic',
-      'Cinematic',
-      'Documentary',
-      'Animation',
-      'Action',
-      'Experimental',
-    ])
-    .optional()
-    .default('Simple'),
-  prompt_length: z
-    .enum(['Short', 'Medium', 'Long'])
-    .optional()
-    .default('Medium'),
-  pacing: z
-    .enum([
-      'None',
-      'Slow burn',
-      'Rhythmic pulse',
-      'Frantic energy',
-      'Ebb and flow',
-      'Hypnotic drift',
-      'Time-lapse rush',
-      'Stop-motion staccato',
-      'Gradual build',
-      'Quick cut rhythm',
-      'Long take meditation',
-      'Jump cut energy',
-      'Match cut flow',
-      'Cross-dissolve dreamscape',
-      'Parallel action',
-      'Slow motion impact',
-      'Ramping dynamics',
-      'Montage tempo',
-      'Continuous flow',
-      'Episodic breaks',
-    ])
-    .optional()
-    .default('None'),
-  camera_direction: z
-    .enum([
-      'None',
-      'Zoom in',
-      'Zoom out',
-      'Pan left',
-      'Pan right',
-      'Tilt up',
-      'Tilt down',
-      'Orbital rotation',
-      'Push in',
-      'Pull out',
-      'Track forward',
-      'Track backward',
-      'Spiral in',
-      'Spiral out',
-      'Arc movement',
-      'Diagonal traverse',
-      'Vertical rise',
-      'Vertical descent',
-    ])
-    .optional()
-    .default('None'),
-  model: z
-    .enum([
-      'anthropic/claude-3.5-sonnet',
-      'anthropic/claude-3-5-haiku',
-      'anthropic/claude-3-haiku',
-      'google/gemini-2.5-flash-lite',
-      'google/gemini-2.0-flash-001',
-      'meta-llama/llama-3.2-1b-instruct',
-      'meta-llama/llama-3.2-3b-instruct',
-      'meta-llama/llama-3.1-8b-instruct',
-      'meta-llama/llama-3.1-70b-instruct',
-      'openai/gpt-4o-mini',
-      'openai/gpt-4o',
-      'deepseek/deepseek-r1',
-    ])
-    .optional()
-    .default('google/gemini-2.0-flash-001'),
   special_effects: z
     .enum([
       'None',
@@ -348,7 +264,31 @@ export const zVideoPromptGeneratorInput = z.object({
     ])
     .optional()
     .default('None'),
-  custom_elements: z.string().optional().default(''),
+  pacing: z
+    .enum([
+      'None',
+      'Slow burn',
+      'Rhythmic pulse',
+      'Frantic energy',
+      'Ebb and flow',
+      'Hypnotic drift',
+      'Time-lapse rush',
+      'Stop-motion staccato',
+      'Gradual build',
+      'Quick cut rhythm',
+      'Long take meditation',
+      'Jump cut energy',
+      'Match cut flow',
+      'Cross-dissolve dreamscape',
+      'Parallel action',
+      'Slow motion impact',
+      'Ramping dynamics',
+      'Montage tempo',
+      'Continuous flow',
+      'Episodic breaks',
+    ])
+    .optional()
+    .default('None'),
   camera_style: z
     .enum([
       'None',
@@ -377,6 +317,66 @@ export const zVideoPromptGeneratorInput = z.object({
     .default('None'),
   image_url: z.string().optional(),
   input_concept: z.string(),
+  model: z
+    .enum([
+      'anthropic/claude-3.5-sonnet',
+      'anthropic/claude-3-5-haiku',
+      'anthropic/claude-3-haiku',
+      'google/gemini-2.5-flash-lite',
+      'google/gemini-2.0-flash-001',
+      'meta-llama/llama-3.2-1b-instruct',
+      'meta-llama/llama-3.2-3b-instruct',
+      'meta-llama/llama-3.1-8b-instruct',
+      'meta-llama/llama-3.1-70b-instruct',
+      'openai/gpt-4o-mini',
+      'openai/gpt-4o',
+      'deepseek/deepseek-r1',
+    ])
+    .optional()
+    .default('google/gemini-2.0-flash-001'),
+  custom_elements: z.string().optional().default(''),
+  prompt_length: z
+    .enum(['Short', 'Medium', 'Long'])
+    .optional()
+    .default('Medium'),
+  style: z
+    .enum([
+      'Minimalist',
+      'Simple',
+      'Detailed',
+      'Descriptive',
+      'Dynamic',
+      'Cinematic',
+      'Documentary',
+      'Animation',
+      'Action',
+      'Experimental',
+    ])
+    .optional()
+    .default('Simple'),
+  camera_direction: z
+    .enum([
+      'None',
+      'Zoom in',
+      'Zoom out',
+      'Pan left',
+      'Pan right',
+      'Tilt up',
+      'Tilt down',
+      'Orbital rotation',
+      'Push in',
+      'Pull out',
+      'Track forward',
+      'Track backward',
+      'Spiral in',
+      'Spiral out',
+      'Arc movement',
+      'Diagonal traverse',
+      'Vertical rise',
+      'Vertical descent',
+    ])
+    .optional()
+    .default('None'),
 })
 
 /**

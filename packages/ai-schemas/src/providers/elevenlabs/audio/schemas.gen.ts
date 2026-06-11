@@ -1048,7 +1048,16 @@ export const Body_Render_audio_or_video_for_the_given_language_v1_dubbing_resour
     $defs: {
       RenderType: {
         type: 'string',
-        enum: ['mp4', 'aac', 'mp3', 'wav', 'aaf', 'tracks_zip', 'clips_zip'],
+        enum: [
+          'mp4',
+          'aac',
+          'mp3',
+          'wav',
+          'aaf',
+          'tracks_zip',
+          'clips_zip',
+          'zip',
+        ],
         title: 'RenderType',
       },
     },
@@ -1219,7 +1228,7 @@ export const Body_Speech_to_Text_v1_speech_to_text_postSchema = {
       anyOf: [{ type: 'string', format: 'binary' }, { type: 'null' }],
       title: 'File',
       description:
-        'The file to transcribe (100ms minimum audio length). All major audio and video formats are supported. Exactly one of the file or cloud_storage_url parameters must be provided. The file size must be less than 3.0GB.',
+        'The file to transcribe (100ms minimum audio length). All major audio and video formats are supported. Exactly one of the file or cloud_storage_url parameters must be provided. The file size must be less than 5.0GB.',
     },
     language_code: {
       anyOf: [{ type: 'string' }, { type: 'null' }],
@@ -1284,7 +1293,7 @@ export const Body_Speech_to_Text_v1_speech_to_text_postSchema = {
       anyOf: [{ type: 'string' }, { type: 'null' }],
       title: 'Cloud Storage Url',
       description:
-        'The HTTPS URL of the file to transcribe. Exactly one of the file or cloud_storage_url parameters must be provided. The file must be accessible via HTTPS and the file size must be less than 2GB. Any valid HTTPS URL is accepted, including URLs from cloud storage providers (AWS S3, Google Cloud Storage, Cloudflare R2, etc.), CDNs, or any other HTTPS source. URLs can be pre-signed or include authentication tokens in query parameters.',
+        "[Deprecated] This parameter is deprecated and will be removed in the future. Use 'source_url' instead.The HTTPS URL of the file to transcribe. Exactly one of the file or cloud_storage_url parameters must be provided. The file must be accessible via HTTPS and the file size must be less than 2GB. Any valid HTTPS URL is accepted, including URLs from cloud storage providers (AWS S3, Google Cloud Storage, Cloudflare R2, etc.), CDNs, or any other HTTPS source. URLs can be pre-signed or include authentication tokens in query parameters.",
       deprecated: true,
       examples: [
         'https://storage.googleapis.com/my-bucket/folder/audio.mp3',
@@ -5157,7 +5166,7 @@ export const RecordingResponseModelSchema = {
 
 export const RenderTypeSchema = {
   type: 'string',
-  enum: ['mp4', 'aac', 'mp3', 'wav', 'aaf', 'tracks_zip', 'clips_zip'],
+  enum: ['mp4', 'aac', 'mp3', 'wav', 'aaf', 'tracks_zip', 'clips_zip', 'zip'],
   title: 'RenderType',
 } as const
 
