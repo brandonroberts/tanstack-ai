@@ -17,6 +17,7 @@
  *     exits 0 unless every requested provider failed.
  */
 
+import { execFileSync } from 'node:child_process'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -88,6 +89,17 @@ async function main(): Promise<void> {
       )
       failed++
     }
+  }
+
+  if (succeeded > 0) {
+    // Fetchers write plain JSON.stringify output; normalise with the repo's
+    // Prettier so the committed specs match what `pnpm format` / the autofix
+    // bot would produce — otherwise every sync PR gets a formatting
+    // follow-up commit.
+    console.log('\nFormatting fetched specs with Prettier...')
+    execFileSync('pnpm', ['exec', 'prettier', '--write', SPECS_ROOT], {
+      stdio: 'inherit',
+    })
   }
 
   console.log(
