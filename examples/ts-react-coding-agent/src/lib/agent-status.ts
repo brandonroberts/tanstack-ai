@@ -43,10 +43,21 @@ export const getAgentConfigFn = createServerFn({ method: 'GET' }).handler(
     const geminiCli =
       Boolean(env.GEMINI_API_KEY) || Boolean(env.GEMINI_ACP_AUTH_METHOD)
 
+    // OpenCode resolves any configured provider — count a provider API key in
+    // the environment or an `opencode auth login` credential file.
+    const opencode =
+      Boolean(env.ANTHROPIC_API_KEY) ||
+      Boolean(env.OPENAI_API_KEY) ||
+      Boolean(env.GEMINI_API_KEY) ||
+      (await fileExists(
+        path.join(home, '.local', 'share', 'opencode', 'auth.json'),
+      ))
+
     return {
       'claude-code': claudeCode,
       codex,
       'gemini-cli': geminiCli,
+      opencode,
     }
   },
 )

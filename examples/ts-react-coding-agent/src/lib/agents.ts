@@ -3,21 +3,28 @@
  *
  * Each entry maps to a harness adapter on the server (see
  * `src/routes/api.chat.ts`): Claude Code (`@tanstack/ai-claude-code`),
- * Codex (`@tanstack/ai-codex`), and Gemini CLI (`@tanstack/ai-gemini-cli`).
+ * Codex (`@tanstack/ai-codex`), Gemini CLI (`@tanstack/ai-gemini-cli`), and
+ * OpenCode (`@tanstack/ai-opencode`).
  */
 export const AGENTS = [
   { id: 'claude-code', label: 'Claude Code' },
   { id: 'codex', label: 'Codex' },
   { id: 'gemini-cli', label: 'Gemini CLI' },
+  { id: 'opencode', label: 'OpenCode' },
 ] as const
 
 /** Agent ids with a working adapter behind them. */
-export type AgentId = 'claude-code' | 'codex' | 'gemini-cli'
+export type AgentId = 'claude-code' | 'codex' | 'gemini-cli' | 'opencode'
 
 export const DEFAULT_AGENT: AgentId = 'claude-code'
 
 export function isAgentId(value: unknown): value is AgentId {
-  return value === 'claude-code' || value === 'codex' || value === 'gemini-cli'
+  return (
+    value === 'claude-code' ||
+    value === 'codex' ||
+    value === 'gemini-cli' ||
+    value === 'opencode'
+  )
 }
 
 /** A single, optionally command-bearing step in an agent's setup guide. */
@@ -102,16 +109,37 @@ export const AGENT_SETUP: Record<AgentId, AgentSetup> = {
     ],
     docsUrl: 'https://github.com/google-gemini/gemini-cli',
   },
+  opencode: {
+    label: 'OpenCode',
+    summary:
+      'Drives OpenCode through @tanstack/ai-opencode. Needs the opencode CLI installed and a provider authenticated on the server.',
+    steps: [
+      {
+        text: 'Install the OpenCode CLI:',
+        code: 'npm i -g opencode-ai',
+      },
+      {
+        text: 'Authenticate a provider once (interactive):',
+        code: 'opencode auth login',
+      },
+      {
+        text: '…or set the provider API key in the server environment instead:',
+        code: 'export ANTHROPIC_API_KEY=sk-ant-…',
+      },
+      { text: 'Restart the dev server so it picks up new credentials.' },
+    ],
+    docsUrl: 'https://opencode.ai/docs',
+  },
 }
 
 /**
  * What the agent is allowed to do in the workspace:
  * - `read-only`: it can read and search, but file edits and shell commands
  *   are blocked.
- * - `edit`: file edits are auto-approved; with Claude Code and Gemini CLI,
- *   shell commands still get denied by each adapter's default permission
- *   policy (a deliberate demo of the permission system), while Codex
- *   sandboxes them inside the workspace instead.
+ * - `edit`: file edits are auto-approved; with Claude Code, Gemini CLI, and
+ *   OpenCode, shell commands still get denied by each adapter's default
+ *   permission policy (a deliberate demo of the permission system), while
+ *   Codex sandboxes them inside the workspace instead.
  */
 export type AgentMode = 'read-only' | 'edit'
 

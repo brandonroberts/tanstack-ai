@@ -8,6 +8,7 @@ import {
 import { claudeCodeText } from '@tanstack/ai-claude-code'
 import { codexText } from '@tanstack/ai-codex'
 import { geminiCliText } from '@tanstack/ai-gemini-cli'
+import { opencodeText } from '@tanstack/ai-opencode'
 import { isAgentId, isAgentMode } from '@/lib/agents'
 import { lookupStyleGuide } from '@/lib/style-guide-tool'
 import type { AgentId, AgentMode } from '@/lib/agents'
@@ -60,6 +61,14 @@ function createAdapter(
         ...(process.env.GEMINI_ACP_AUTH_METHOD && {
           authMethodId: process.env.GEMINI_ACP_AUTH_METHOD,
         }),
+      })
+    case 'opencode':
+      return opencodeText('anthropic/claude-sonnet-4-5', {
+        directory: cwd,
+        // Edit mode auto-approves file edits; shell commands still get
+        // rejected by the adapter's default permission policy, same demo
+        // as Claude Code and Gemini CLI above.
+        permissionMode: mode === 'edit' ? 'acceptEdits' : 'default',
       })
   }
 }

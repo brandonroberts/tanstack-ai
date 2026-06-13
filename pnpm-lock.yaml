@@ -500,6 +500,9 @@ importers:
       '@tanstack/ai-gemini-cli':
         specifier: workspace:*
         version: link:../../packages/ai-gemini-cli
+      '@tanstack/ai-opencode':
+        specifier: workspace:*
+        version: link:../../packages/ai-opencode
       '@tanstack/ai-react':
         specifier: workspace:*
         version: link:../../packages/ai-react
@@ -1553,6 +1556,22 @@ importers:
       zod:
         specifier: ^4.2.0
         version: 4.3.6
+
+  packages/ai-opencode:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@4.3.6)
+      '@opencode-ai/sdk':
+        specifier: ^1.17.4
+        version: 1.17.4
+    devDependencies:
+      '@tanstack/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@vitest/coverage-v8':
+        specifier: 4.0.14
+        version: 4.0.14(vitest@4.0.14(@opentelemetry/api@1.9.1)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@27.3.0(postcss@8.5.15))(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/ai-openrouter:
     dependencies:
@@ -4623,6 +4642,9 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
+
+  '@opencode-ai/sdk@1.17.4':
+    resolution: {integrity: sha512-OdHkBoNIQOjQsPnFtkcxAp9HsLAKn/MQiq7wIQURkRARmw8yhFqGiMPYbNm+UfLn6bMkx97rdPkWQARejMyiXQ==}
 
   '@openrouter/sdk@0.12.35':
     resolution: {integrity: sha512-s4QVLLnG1AmfW3TjnnHUqGfsCkzwVK+kboGcZmKbde09m1DPqgzl4RUFt/HJ5v97MX8aEaN0UG3mKv2S+qj2Gw==}
@@ -16575,6 +16597,10 @@ snapshots:
 
   '@openai/codex@0.139.0-win32-x64':
     optional: true
+
+  '@opencode-ai/sdk@1.17.4':
+    dependencies:
+      cross-spawn: 7.0.6
 
   '@openrouter/sdk@0.12.35':
     dependencies:

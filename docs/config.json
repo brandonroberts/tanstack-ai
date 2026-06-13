@@ -461,6 +461,11 @@
           "label": "Gemini CLI",
           "to": "adapters/gemini-cli",
           "addedAt": "2026-06-12"
+        },
+        {
+          "label": "OpenCode",
+          "to": "adapters/opencode",
+          "addedAt": "2026-06-12"
         }
       ]
     },
