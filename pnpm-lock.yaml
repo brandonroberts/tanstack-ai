@@ -494,6 +494,12 @@ importers:
       '@tanstack/ai-client':
         specifier: workspace:*
         version: link:../../packages/ai-client
+      '@tanstack/ai-codex':
+        specifier: workspace:*
+        version: link:../../packages/ai-codex
+      '@tanstack/ai-gemini-cli':
+        specifier: workspace:*
+        version: link:../../packages/ai-gemini-cli
       '@tanstack/ai-react':
         specifier: workspace:*
         version: link:../../packages/ai-react
@@ -1230,6 +1236,22 @@ importers:
         specifier: ^4.21.0
         version: 4.21.0
 
+  packages/ai-codex:
+    dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@4.3.6)
+      '@openai/codex-sdk':
+        specifier: ^0.139.0
+        version: 0.139.0
+    devDependencies:
+      '@tanstack/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@vitest/coverage-v8':
+        specifier: 4.0.14
+        version: 4.0.14(vitest@4.0.14(@opentelemetry/api@1.9.1)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@27.3.0(postcss@8.5.15))(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+
   packages/ai-devtools:
     dependencies:
       '@tanstack/ai':
@@ -1345,6 +1367,22 @@ importers:
       zod:
         specifier: ^4.2.0
         version: 4.3.6
+
+  packages/ai-gemini-cli:
+    dependencies:
+      '@agentclientprotocol/sdk':
+        specifier: ^0.25.0
+        version: 0.25.0(zod@4.3.6)
+      '@modelcontextprotocol/sdk':
+        specifier: ^1.29.0
+        version: 1.29.0(zod@4.3.6)
+    devDependencies:
+      '@tanstack/ai':
+        specifier: workspace:*
+        version: link:../ai
+      '@vitest/coverage-v8':
+        specifier: 4.0.14
+        version: 4.0.14(vitest@4.0.14(@opentelemetry/api@1.9.1)(@types/node@24.10.3)(happy-dom@20.0.11)(jiti@2.6.1)(jsdom@27.3.0(postcss@8.5.15))(lightningcss@1.30.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/ai-grok:
     dependencies:
@@ -2202,6 +2240,11 @@ packages:
 
   '@ag-ui/core@0.0.52':
     resolution: {integrity: sha512-Xo0bUaNV56EqylzcrAuhUkQX7et7+SZIrqZZtEByGwEq/I1EHny6ZMkWHLkKR7UNi0FJZwJyhKYmKJS3B2SEgA==}
+
+  '@agentclientprotocol/sdk@0.25.0':
+    resolution: {integrity: sha512-wU1VgXNtMvdVotX49txc3WJUDV+/QbLpsgjMvFhlRmp37osdLbI7L7y+iwAlQATwfjLxcv1r1p3ZxZBcXlGhcQ==}
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
 
   '@anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.176':
     resolution: {integrity: sha512-QZLVv9Hlo5W7YEV23eTsAKYQTkA1V7TG4Z5oFESgvkVfx02TxguZKtUbqlpmzZ9JqXRu+qMY9iIpIgbI3PwRJw==}
@@ -4535,6 +4578,51 @@ packages:
   '@oozcitak/util@8.3.8':
     resolution: {integrity: sha512-T8TbSnGsxo6TDBJx/Sgv/BlVJL3tshxZP7Aq5R1mSnM5OcHY2dQaxLMu2+E8u3gN0MLOzdjurqN4ZRVuzQycOQ==}
     engines: {node: '>=8.0'}
+
+  '@openai/codex-sdk@0.139.0':
+    resolution: {integrity: sha512-r4lDckaVx4mVZy1v/7ykEhkeWjVfM/4oGJfhG0AP4+zN3Sa+jcf5hdY4EHfJasofBcp0tIF/7JCKHpv534R+tw==}
+    engines: {node: '>=18'}
+
+  '@openai/codex@0.139.0':
+    resolution: {integrity: sha512-wr2fRE+fzW0CjEbfFsLh1ftarVEcw0CMLWS7QyA0nyOz5qacQPVq3cq2+/U7oEbwm1TOqoi0Fm1nxniB5FkpmA==}
+    engines: {node: '>=16'}
+    hasBin: true
+
+  '@openai/codex@0.139.0-darwin-arm64':
+    resolution: {integrity: sha512-o+0ZKWwgDFMMLO7rwinzO0PQsgK+Vme1pMN2GeAxsX29ZgGZcyPICfpJbeGSUO1mb2a36Skjx6nfdRnxMY0r7w==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@openai/codex@0.139.0-darwin-x64':
+    resolution: {integrity: sha512-9gkBWzu6DB2rqU4DbpxD3DE5bofGpsK46Lp0h0I+bKWc2IIcxvSi8K2utKmBLoJCbKrn4JQu7dFNGRqEfENung==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [darwin]
+
+  '@openai/codex@0.139.0-linux-arm64':
+    resolution: {integrity: sha512-tBQE5lZciRHeWZGuURgjP9S717MvTIpQMc593+DNxY2LQxozkngOkzFSQd1+/UmQKGrCqdFLu5irIwPXpSZyEw==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@openai/codex@0.139.0-linux-x64':
+    resolution: {integrity: sha512-14UgzDS+X4crkvdt6S02A/ZZOrS8ZyWiuTRpguCtnhNamb7unSuDxy86BWgpAl3sqiTaN2CP8VLyp2ohQ8Nbzw==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [linux]
+
+  '@openai/codex@0.139.0-win32-arm64':
+    resolution: {integrity: sha512-nlwRjsYotH1Rtqu/Q0VwQbIeO2UX1mkHK84Ov9qn/hl29QqqoBtno0tRyqIPbkXFIVQuWiAYXlV3ugLwH5fTrQ==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [win32]
+
+  '@openai/codex@0.139.0-win32-x64':
+    resolution: {integrity: sha512-lQrVLNz+90wdvWVNFDvCkHQRiAK9ZllmkTka3c8eqSDqdJk35Gpgppfv9Xtw5M2ZBtTq0sBdWBiCMyzGDBSpmQ==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [win32]
 
   '@openrouter/sdk@0.12.35':
     resolution: {integrity: sha512-s4QVLLnG1AmfW3TjnnHUqGfsCkzwVK+kboGcZmKbde09m1DPqgzl4RUFt/HJ5v97MX8aEaN0UG3mKv2S+qj2Gw==}
@@ -10060,10 +10148,6 @@ packages:
     resolution: {integrity: sha512-tAAg/72/VxOUW7RQSX1pIxJVucYKcjFjfvj60L57jrZpYCHC3XN0WCQ3sNYL4Gmvv+7GPvTAjc+KSdeNuE8oWQ==}
     engines: {node: '>=12.22.0'}
 
-  ip-address@10.1.0:
-    resolution: {integrity: sha512-XXADHxXmvT9+CRxhXg56LJovE+bmWnEWB78LB83VZTprKTmaC5QfruXocxzTZ2Kl0DNwKuBdlIhjL8LeY8Sf8Q==}
-    engines: {node: '>= 12'}
-
   ip-address@10.2.0:
     resolution: {integrity: sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA==}
     engines: {node: '>= 12'}
@@ -14082,6 +14166,10 @@ snapshots:
     dependencies:
       zod: 3.25.76
 
+  '@agentclientprotocol/sdk@0.25.0(zod@4.3.6)':
+    dependencies:
+      zod: 4.3.6
+
   '@anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.176':
     optional: true
 
@@ -16456,6 +16544,37 @@ snapshots:
   '@oozcitak/util@10.0.0': {}
 
   '@oozcitak/util@8.3.8': {}
+
+  '@openai/codex-sdk@0.139.0':
+    dependencies:
+      '@openai/codex': 0.139.0
+
+  '@openai/codex@0.139.0':
+    optionalDependencies:
+      '@openai/codex-darwin-arm64': '@openai/codex@0.139.0-darwin-arm64'
+      '@openai/codex-darwin-x64': '@openai/codex@0.139.0-darwin-x64'
+      '@openai/codex-linux-arm64': '@openai/codex@0.139.0-linux-arm64'
+      '@openai/codex-linux-x64': '@openai/codex@0.139.0-linux-x64'
+      '@openai/codex-win32-arm64': '@openai/codex@0.139.0-win32-arm64'
+      '@openai/codex-win32-x64': '@openai/codex@0.139.0-win32-x64'
+
+  '@openai/codex@0.139.0-darwin-arm64':
+    optional: true
+
+  '@openai/codex@0.139.0-darwin-x64':
+    optional: true
+
+  '@openai/codex@0.139.0-linux-arm64':
+    optional: true
+
+  '@openai/codex@0.139.0-linux-x64':
+    optional: true
+
+  '@openai/codex@0.139.0-win32-arm64':
+    optional: true
+
+  '@openai/codex@0.139.0-win32-x64':
+    optional: true
 
   '@openrouter/sdk@0.12.35':
     dependencies:
@@ -22971,8 +23090,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  ip-address@10.1.0: {}
-
   ip-address@10.2.0: {}
 
   ipaddr.js@1.9.1: {}
@@ -26310,7 +26427,7 @@ snapshots:
 
   socks@2.8.7:
     dependencies:
-      ip-address: 10.1.0
+      ip-address: 10.2.0
       smart-buffer: 4.2.0
 
   solid-js@1.9.10:
