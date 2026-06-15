@@ -29,13 +29,17 @@ export interface CocoChatCallbacks {
   onMessages: (messages: Array<UIMessage>) => void
   onLoading: (loading: boolean) => void
   onError: (error: string | null) => void
+  /** Emitted as soon as `sendMessage` is invoked, before any network I/O. */
+  onSubmit?: () => void
 }
 
 export class CocoChat {
   private readonly client: ChatClient
+  private readonly callbacks: CocoChatCallbacks
   private fwd: ForwardedProps
 
   constructor(agent: AgentId, mode: AgentMode, callbacks: CocoChatCallbacks) {
+    this.callbacks = callbacks
     this.fwd = { agentId: agent, mode }
     this.client = new ChatClient({
       connection: fetchServerSentEvents('/__coco/api/chat'),
@@ -65,7 +69,12 @@ export class CocoChat {
 
   send(text: string) {
     this.applyForwardedProps()
-    void this.client.sendMessage(text).catch(() => undefined)
+    console.debug('[coco] send →', { text, forwardedProps: this.fwd })
+    this.callbacks.onSubmit?.()
+    void this.client.sendMessage(text).catch((err) => {
+      console.error('[coco] sendMessage failed:', err)
+      this.callbacks.onError(err instanceof Error ? err.message : String(err))
+    })
   }
 
   clear() {

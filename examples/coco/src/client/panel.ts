@@ -36,12 +36,24 @@ export interface PanelState {
   open: boolean
   agent: AgentId
   mode: AgentMode
-  configured: AgentConfigMap
+  /**
+   * Per-agent "credentials are configured" hint. `null` when we haven't
+   * fetched `/__coco/api/agents` yet (or it errored); when null the panel
+   * shows a soft "(checking…)" and DOES NOT block sends — we let the
+   * server's response speak for itself.
+   */
+  configured: AgentConfigMap | null
   route: string
   selected: SelectedElement | null
   picking: boolean
   messages: Array<UIMessage>
   isLoading: boolean
+  /**
+   * High-level status for the in-flight indicator. `idle` means nothing is
+   * happening; `sending` is the moment between submit and the first server
+   * chunk; `streaming` is once we've started receiving chunks.
+   */
+  status: 'idle' | 'sending' | 'streaming'
   error: string | null
   setupOpen: AgentId | null
 }
@@ -125,17 +137,13 @@ export class Panel {
       open: false,
       agent: DEFAULT_AGENT,
       mode: 'edit',
-      configured: {
-        'claude-code': false,
-        codex: false,
-        'gemini-cli': false,
-        opencode: false,
-      },
+      configured: null,
       route: window.location.pathname,
       selected: null,
       picking: false,
       messages: [],
       isLoading: false,
+      status: 'idle',
       error: null,
       setupOpen: null,
     }
@@ -176,18 +184,24 @@ export class Panel {
 
     const s = this.state
     const launcherHtml = `
-      <button class="launcher${s.open ? ' hidden' : ''}" type="button" aria-label="Open Coco">🥥</button>
+      <button class="launcher${s.open ? ' hidden' : ''}${s.status !== 'idle' ? ' busy' : ''}" type="button" aria-label="Open Coco">
+        🥥${s.status !== 'idle' ? '<span class="launcher-dot"></span>' : ''}
+      </button>
     `
 
     const setupHtml = s.setupOpen ? this.renderSetup(s.setupOpen) : ''
 
-    const isConfigured = s.configured[s.agent]
-    const notice = !isConfigured
-      ? `<div class="notice">
-          <span style="flex:1">⚠️ ${escapeHtml(AGENT_SETUP[s.agent].label)} isn't configured.</span>
-          <button class="btn" data-action="open-setup">Setup</button>
-        </div>`
-      : ''
+    // `configured === null` means we haven't successfully fetched the agent
+    // status yet — show a soft pending hint but never block the user.
+    const cfgKnown = s.configured !== null
+    const isConfigured = cfgKnown && s.configured![s.agent]
+    const notice =
+      cfgKnown && !isConfigured
+        ? `<div class="notice">
+            <span style="flex:1">⚠️ ${escapeHtml(AGENT_SETUP[s.agent].label)} isn't configured. Sending anyway will likely fail.</span>
+            <button class="btn" data-action="open-setup">Setup</button>
+          </div>`
+        : ''
 
     const chips: Array<string> = []
     chips.push(
@@ -201,23 +215,55 @@ export class Panel {
     }
 
     const errorHtml = s.error
-      ? `<div class="error">${escapeHtml(s.error)}</div>`
+      ? `<div class="error">⚠ ${escapeHtml(s.error)}</div>`
       : ''
 
+    const statusLabel = s.error
+      ? `Error — see message above`
+      : s.status === 'sending'
+        ? `Sending to ${s.agent}…`
+        : s.status === 'streaming'
+          ? `Streaming from ${s.agent}…`
+          : !cfgKnown
+            ? 'Checking agent status…'
+            : `Ready (${s.agent}, ${s.mode})`
+    const statusClass = s.error
+      ? 'error'
+      : s.status === 'idle'
+        ? 'idle'
+        : s.status
+    const statusBarHtml = `<div class="status-bar ${statusClass}"><span class="status-dot"></span><span>${escapeHtml(statusLabel)}</span></div>`
+
+    const thinkingHtml =
+      s.status !== 'idle'
+        ? `<div class="thinking-pill" role="status" aria-live="polite">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="label">${
+              s.status === 'sending'
+                ? 'Coco is calling the agent…'
+                : 'Coco is working…'
+            }</span>
+          </div>`
+        : ''
+
     const messagesHtml =
-      s.messages.length === 0
+      s.messages.length === 0 && s.status === 'idle'
         ? `<div class="empty">Ask Coco to change something in this page. Try “make the heading larger” or click 🎯 to point at an element.</div>`
-        : s.messages.map(renderMessage).join('')
+        : s.messages.map(renderMessage).join('') + thinkingHtml
 
     const panelHtml = `
       <div class="panel${s.open ? '' : ' hidden'}" role="dialog" aria-label="Coco">
         <div class="header">
           <span class="title"><span class="title-emoji">🥥</span>Coco</span>
           <select class="select" data-control="agent" aria-label="Agent">
-            ${AGENTS.map(
-              (a) =>
-                `<option value="${a.id}"${a.id === s.agent ? ' selected' : ''}>${escapeHtml(a.label)}${s.configured[a.id] ? '' : ' (setup)'}</option>`,
-            ).join('')}
+            ${AGENTS.map((a) => {
+              const tag = !cfgKnown
+                ? ''
+                : s.configured![a.id]
+                  ? ''
+                  : ' (setup)'
+              return `<option value="${a.id}"${a.id === s.agent ? ' selected' : ''}>${escapeHtml(a.label)}${tag}</option>`
+            }).join('')}
           </select>
           <select class="select" data-control="mode" aria-label="Mode">
             <option value="edit"${s.mode === 'edit' ? ' selected' : ''}>Edit</option>
@@ -233,8 +279,11 @@ export class Panel {
         ${errorHtml}
         <form class="composer" data-action="send-form">
           <textarea class="input" rows="1" placeholder="${s.picking ? 'Click an element on the page…' : 'Ask Coco to change this page…'}" ${s.picking ? 'disabled' : ''}></textarea>
-          <button class="btn primary" type="submit" ${s.isLoading || s.picking ? 'disabled' : ''}>${s.isLoading ? '…' : 'Send'}</button>
+          <button class="btn primary" type="submit" ${s.status !== 'idle' || s.picking ? 'disabled' : ''}>${
+            s.status !== 'idle' ? '…' : 'Send'
+          }</button>
         </form>
+        ${statusBarHtml}
         ${setupHtml}
       </div>
     `
@@ -350,10 +399,14 @@ export class Panel {
     form?.addEventListener('submit', (e) => {
       e.preventDefault()
       const ta = $<HTMLTextAreaElement>('.input')
-      if (!ta) return
-      const text = ta.value.trim()
+      const text = ta?.value.trim() ?? ''
+      console.debug('[coco] form submit', {
+        textareaFound: Boolean(ta),
+        text,
+        rawValue: ta?.value,
+      })
       if (!text) return
-      ta.value = ''
+      ta!.value = ''
       this.inputDraft = ''
       this.callbacks.send(text)
     })

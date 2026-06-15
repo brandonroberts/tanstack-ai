@@ -36,6 +36,27 @@ export const PANEL_CSS = `
 }
 .launcher:hover { filter: brightness(1.1); }
 .launcher.hidden { display: none; }
+.launcher.busy::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  border: 2px solid rgba(96,165,250,0.6);
+  border-top-color: transparent;
+  animation: coco-spin 1s linear infinite;
+}
+.launcher .launcher-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #34d399;
+  border: 2px solid #0f172a;
+  animation: coco-pulse 1.2s infinite;
+}
+@keyframes coco-spin { to { transform: rotate(360deg); } }
 
 .panel {
   position: fixed;
@@ -226,6 +247,60 @@ export const PANEL_CSS = `
   color: #94a3b8;
   font-size: 10.5px;
   margin-left: auto;
+}
+
+.thinking-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(37,99,235,0.18), rgba(180,83,9,0.18));
+  border: 1px solid rgba(96,165,250,0.4);
+  color: #e0e7ff;
+  font-size: 12px;
+  margin-top: 4px;
+}
+.thinking-pill .label { margin-left: 2px; }
+.thinking-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #93c5fd;
+  display: inline-block;
+  animation: coco-bounce 1s infinite ease-in-out;
+}
+.thinking-pill .dot:nth-child(2) { animation-delay: 0.15s; }
+.thinking-pill .dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes coco-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-3px); opacity: 1; }
+}
+
+.status-bar {
+  padding: 4px 10px;
+  background: #0b1220;
+  border-top: 1px solid #1f2937;
+  font-size: 11px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.status-bar .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: #475569;
+}
+.status-bar.idle .status-dot { background: #475569; }
+.status-bar.sending .status-dot { background: #facc15; animation: coco-pulse 1.2s infinite; }
+.status-bar.streaming .status-dot { background: #34d399; animation: coco-pulse 1.2s infinite; }
+.status-bar.error .status-dot { background: #f87171; }
+@keyframes coco-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 .error {

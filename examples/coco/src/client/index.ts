@@ -16,18 +16,17 @@ import { DEFAULT_AGENT, type AgentId, type AgentMode } from '../agents.ts'
 
 const MOUNT_FLAG = '__coco_mounted__'
 
-const fetchAgentConfig = async (): Promise<AgentConfigMap> => {
+const fetchAgentConfig = async (): Promise<AgentConfigMap | null> => {
   try {
     const res = await fetch('/__coco/api/agents', { cache: 'no-store' })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
     return (await res.json()) as AgentConfigMap
-  } catch {
-    return {
-      'claude-code': false,
-      codex: false,
-      'gemini-cli': false,
-      opencode: false,
-    }
+  } catch (err) {
+    console.warn(
+      '[coco] failed to fetch /__coco/api/agents; sends will still work but the "needs setup" hint is unavailable.',
+      err,
+    )
+    return null
   }
 }
 
@@ -42,23 +41,20 @@ const main = () => {
   let mode: AgentMode = 'edit'
 
   const panel = new Panel({
-    send: (text) => {
-      const isConfigured = panel.getState().configured[agent]
-      if (!isConfigured) {
-        panel.setState({ setupOpen: agent })
-        return
-      }
-      chat.send(text)
-    },
+    send: (text) => chat.send(text),
     newSession: () => {
       chat.clear()
-      panel.setState({ error: null })
+      panel.setState({ error: null, status: 'idle' })
     },
     selectAgent: (id) => {
       agent = id
       chat.setAgent(id)
-      const configured = panel.getState().configured[id]
-      panel.setState({ agent: id, setupOpen: configured ? null : id })
+      const cfg = panel.getState().configured
+      const known = cfg !== null
+      panel.setState({
+        agent: id,
+        setupOpen: known && !cfg[id] ? id : null,
+      })
     },
     selectMode: (m) => {
       mode = m
@@ -91,9 +87,31 @@ const main = () => {
   })
 
   const chat = new CocoChat(agent, mode, {
-    onMessages: (messages) => panel.setState({ messages }),
-    onLoading: (isLoading) => panel.setState({ isLoading }),
-    onError: (error) => panel.setState({ error }),
+    onSubmit: () => panel.setState({ status: 'sending', error: null }),
+    onMessages: (messages) => {
+      // The first chunk that creates an assistant message means the stream
+      // has started — flip from sending → streaming.
+      const cur = panel.getState()
+      const patch: Parameters<typeof panel.setState>[0] = { messages }
+      if (
+        cur.status === 'sending' &&
+        messages.some((m) => m.role === 'assistant')
+      ) {
+        patch.status = 'streaming'
+      }
+      panel.setState(patch)
+    },
+    onLoading: (isLoading) => {
+      const patch: Parameters<typeof panel.setState>[0] = { isLoading }
+      if (!isLoading) patch.status = 'idle'
+      else if (panel.getState().status === 'idle') patch.status = 'sending'
+      panel.setState(patch)
+    },
+    onError: (error) =>
+      panel.setState({
+        error,
+        status: error ? 'idle' : panel.getState().status,
+      }),
   })
 
   // Initial route + watcher.
@@ -102,8 +120,12 @@ const main = () => {
     panel.setState({ route })
   })
 
-  // Fetch agent-config from the server and surface it in the panel.
-  void fetchAgentConfig().then((configured) => panel.setState({ configured }))
+  // Fetch agent-config from the server and surface it in the panel. If the
+  // fetch fails we leave `configured` as `null` so the panel hides the
+  // setup hint instead of falsely claiming everything is unconfigured.
+  void fetchAgentConfig().then((configured) => {
+    if (configured) panel.setState({ configured })
+  })
 
   document.body.appendChild(panel.hostElement)
 
