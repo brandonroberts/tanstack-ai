@@ -36,14 +36,14 @@ export const watchRoute = (cb: (route: string) => void): (() => void) => {
   const origPush = history.pushState
   const origReplace = history.replaceState
   history.pushState = function (...args) {
-    const result = origPush.apply(this, args as Parameters<typeof origPush>)
+    const result = origPush.apply(this, args)
     queueMicrotask(fire)
     return result
   }
   history.replaceState = function (...args) {
     const result = origReplace.apply(
       this,
-      args as Parameters<typeof origReplace>,
+      args,
     )
     queueMicrotask(fire)
     return result

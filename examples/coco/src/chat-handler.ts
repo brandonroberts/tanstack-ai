@@ -17,8 +17,8 @@ import { claudeCodeText } from '@tanstack/ai-claude-code'
 import { codexText } from '@tanstack/ai-codex'
 import { geminiCliText } from '@tanstack/ai-gemini-cli'
 import { opencodeText } from '@tanstack/ai-opencode'
-import type { AnyTextAdapter } from '@tanstack/ai'
 import { isAgentId, isAgentMode } from './agents.ts'
+import type { AnyTextAdapter } from '@tanstack/ai'
 import type { AgentId, AgentMode } from './agents.ts'
 
 const BASE_SYSTEM_PROMPT = `You are Coco, an in-browser coding assistant

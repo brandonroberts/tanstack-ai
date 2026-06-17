@@ -12,12 +12,21 @@
  * The chat I/O itself lives in `chat.ts` (ChatClient wrapper); this module
  * accepts callbacks from `index.ts` so the two stay independent.
  */
-import { AGENTS, AGENT_SETUP, DEFAULT_AGENT, type AgentId, type AgentMode } from '../agents.ts'
+import { AGENTS, AGENT_SETUP, DEFAULT_AGENT } from '../agents.ts'
+import { PANEL_CSS } from './styles.ts'
+import type { AgentId, AgentMode } from '../agents.ts'
 import type { SelectedElement } from './context.ts'
 import type { UIMessage } from '@tanstack/ai-client'
-import { PANEL_CSS } from './styles.ts'
 
-export type AgentConfigMap = Record<AgentId, boolean>
+export interface AgentStatus {
+  installed: boolean
+  configured: boolean
+}
+
+export type AgentStatusMap = Record<AgentId, AgentStatus>
+
+/** @deprecated Kept for backwards compat; prefer `AgentStatusMap`. */
+export type AgentConfigMap = AgentStatusMap
 
 export interface PanelCallbacks {
   send: (text: string) => void
@@ -37,12 +46,12 @@ export interface PanelState {
   agent: AgentId
   mode: AgentMode
   /**
-   * Per-agent "credentials are configured" hint. `null` when we haven't
-   * fetched `/__coco/api/agents` yet (or it errored); when null the panel
-   * shows a soft "(checking…)" and DOES NOT block sends — we let the
-   * server's response speak for itself.
+   * Per-agent install + credential status. `null` when we haven't fetched
+   * `/__coco/api/agents` yet (or it errored); when null the panel shows a
+   * soft "(checking…)" and DOES NOT block sends — we let the server's
+   * response speak for itself.
    */
-  configured: AgentConfigMap | null
+  configured: AgentStatusMap | null
   route: string
   selected: SelectedElement | null
   picking: boolean
@@ -131,7 +140,7 @@ export class Panel {
   private state: PanelState
   private inputDraft = ''
 
-  constructor(callbacks: PanelCallbacks) {
+  constructor(callbacks: PanelCallbacks, initial?: Partial<PanelState>) {
     this.callbacks = callbacks
     this.state = {
       open: false,
@@ -146,6 +155,7 @@ export class Panel {
       status: 'idle',
       error: null,
       setupOpen: null,
+      ...initial,
     }
 
     this.hostElement = document.createElement('div')
@@ -194,7 +204,7 @@ export class Panel {
     // `configured === null` means we haven't successfully fetched the agent
     // status yet — show a soft pending hint but never block the user.
     const cfgKnown = s.configured !== null
-    const isConfigured = cfgKnown && s.configured![s.agent]
+    const isConfigured = cfgKnown && s.configured![s.agent].configured
     const notice =
       cfgKnown && !isConfigured
         ? `<div class="notice">
@@ -256,14 +266,22 @@ export class Panel {
         <div class="header">
           <span class="title"><span class="title-emoji">🥥</span>Coco</span>
           <select class="select" data-control="agent" aria-label="Agent">
-            ${AGENTS.map((a) => {
-              const tag = !cfgKnown
-                ? ''
-                : s.configured![a.id]
+            ${AGENTS.filter((a) => {
+              if (!cfgKnown) return true
+              return s.configured![a.id].installed || a.id === s.agent
+            })
+              .map((a) => {
+                const status = cfgKnown ? s.configured![a.id] : null
+                const tag = !status
                   ? ''
-                  : ' (setup)'
-              return `<option value="${a.id}"${a.id === s.agent ? ' selected' : ''}>${escapeHtml(a.label)}${tag}</option>`
-            }).join('')}
+                  : !status.installed
+                    ? ' (not installed)'
+                    : !status.configured
+                      ? ' (setup)'
+                      : ''
+                return `<option value="${a.id}"${a.id === s.agent ? ' selected' : ''}>${escapeHtml(a.label)}${tag}</option>`
+              })
+              .join('')}
           </select>
           <select class="select" data-control="mode" aria-label="Mode">
             <option value="edit"${s.mode === 'edit' ? ' selected' : ''}>Edit</option>

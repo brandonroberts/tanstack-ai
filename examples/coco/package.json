@@ -6,6 +6,10 @@
   "bin": {
     "coco": "./src/cli.ts"
   },
+  "exports": {
+    ".": "./src/index.ts",
+    "./vite": "./src/vite/plugin.ts"
+  },
   "scripts": {
     "dev": "tsx src/cli.ts",
     "start": "tsx src/cli.ts",

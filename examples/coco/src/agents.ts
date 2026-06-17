@@ -9,13 +9,21 @@
  */
 
 export const AGENTS = [
-  { id: 'claude-code', label: 'Claude Code' },
-  { id: 'codex', label: 'Codex' },
-  { id: 'gemini-cli', label: 'Gemini CLI' },
-  { id: 'opencode', label: 'OpenCode' },
+  { id: 'claude-code', label: 'Claude Code', bin: 'claude' },
+  { id: 'codex', label: 'Codex', bin: 'codex' },
+  { id: 'gemini-cli', label: 'Gemini CLI', bin: 'gemini' },
+  { id: 'opencode', label: 'OpenCode', bin: 'opencode' },
 ] as const
 
 export type AgentId = 'claude-code' | 'codex' | 'gemini-cli' | 'opencode'
+
+/** Map AgentId -> CLI binary name expected on PATH. */
+export const AGENT_BIN: Record<AgentId, string> = {
+  'claude-code': 'claude',
+  codex: 'codex',
+  'gemini-cli': 'gemini',
+  opencode: 'opencode',
+}
 
 export const DEFAULT_AGENT: AgentId = 'claude-code'
 

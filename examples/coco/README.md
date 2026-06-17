@@ -21,10 +21,38 @@ DOM root, so it never collides with the host app's CSS or React/Vue/Svelte/etc.
 
 ## Quick start
 
+Coco offers two integration paths. **Pick the first one for any Vite-based
+project (TanStack Start, plain Vite, etc.); fall back to the proxy CLI for
+non-Vite dev servers.**
+
+### Recommended: `coco init` (TanStack Start / any Vite app)
+
+```bash
+# from the root of a TanStack Start / Vite project
+pnpm dlx coco init   # or: npx coco init / pnpm coco init
+
+pnpm dev             # start your dev server as usual
+```
+
+`coco init` adds the dev-only `coco/vite` plugin to your `vite.config.ts`
+(idempotent — safe to re-run) and prints which supported agent CLIs it
+found. After that the 🥥 launcher appears in the corner of every page your
+dev server renders — **but only when at least one of `claude`, `codex`,
+`gemini`, or `opencode` is found on `PATH`**. Otherwise the panel stays
+silent so it never shows up on machines that don't have an agent installed.
+
+Pass `--dry-run` to preview the rewrite without writing.
+
+### Alternative: reverse-proxy CLI (framework-agnostic)
+
 ```bash
 # from inside your web project (must have a "dev" script)
 pnpm dlx coco            # or: npx coco, or: pnpm --filter coco dev
 ```
+
+This spawns `pnpm dev` for you and serves a proxy on `:7777` that injects
+the panel into every HTML response. Use this when you can't (or don't want
+to) edit your dev tooling.
 
 ### Try it against the bundled sample-app
 
@@ -52,7 +80,7 @@ pnpm --filter coco sample:reset    # revert all sample-app edits, keep node_modu
 `sample-apps/simple-app/`, so it only touches that subdirectory and leaves
 `node_modules` (and everything else `.gitignore`d) alone.
 
-By default Coco:
+In proxy mode, Coco:
 
 - runs `pnpm dev` as a subprocess and scrapes its stdout for the local URL,
 - serves a reverse proxy on `http://localhost:7777` (override with `--port`),
@@ -60,7 +88,9 @@ By default Coco:
 - proxies WebSockets so HMR keeps working.
 
 Open the printed Coco URL (not the dev server's URL!) and click the 🥥 button
-in the corner.
+in the corner. The launcher only appears when one of `claude`, `codex`,
+`gemini`, or `opencode` is on `PATH` (cross-OS lookup, honors `PATHEXT` on
+Windows).
 
 ### Flags
 
@@ -129,18 +159,29 @@ opencode auth login                   # or: export ANTHROPIC_API_KEY=sk-ant-…
 
 ## How it works
 
+Two equivalent surfaces serve the same `__coco/*` endpoints and inject the
+same panel `<script>`:
+
 ```
-browser  ──▶  http://localhost:7777        (Coco proxy)
-                ├─ proxies HTML / JS / CSS / WS ──▶  pnpm dev (e.g. :5173)
+Vite-plugin mode (coco/vite, dev-only):
+  browser ─▶ vite dev server ──┬─ transformIndexHtml + response wrapper
+                                ├─ /__coco/client.js  (panel bundle)
+                                └─ /__coco/api/*       (chat + agent status)
+
+Proxy mode (coco CLI):
+  browser ─▶ http://localhost:7777 (Coco proxy)
+                ├─ proxies HTML / JS / CSS / WS ─▶ pnpm dev (e.g. :5173)
                 ├─ injects <script src="/__coco/client.js"> into HTML
-                ├─ serves /__coco/client.js (Shadow-DOM chat panel)
-                └─ handles /__coco/api/*   (chat + agent status)
+                ├─ /__coco/client.js (Shadow-DOM chat panel)
+                └─ /__coco/api/*      (chat + agent status)
 ```
 
-The panel uses the headless `ChatClient` from `@tanstack/ai-client`, posting
-to `/__coco/api/chat`. The server runs `chat()` from `@tanstack/ai` with one
-of the four CLI-agent adapters, `cwd` set to `process.cwd()` (the project
-Coco was launched in). Each chat turn forwards two pieces of UI context:
+In both modes the panel uses the headless `ChatClient` from
+`@tanstack/ai-client`, posting to `/__coco/api/chat`. The server runs
+`chat()` from `@tanstack/ai` with one of the four CLI-agent adapters, `cwd`
+set to the project root (Vite's `config.root` for the plugin,
+`process.cwd()` for the CLI). Each chat turn forwards two pieces of UI
+context:
 
 - `route` — `location.pathname + search + hash`, tracked across SPA nav.
 - `selectedElement` — when the user activates the picker (🎯 button) and

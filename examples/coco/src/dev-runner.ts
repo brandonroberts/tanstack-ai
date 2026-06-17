@@ -5,9 +5,9 @@
  * server's startup logs.
  */
 import { spawn } from 'node:child_process'
-import type { ChildProcess } from 'node:child_process'
 import net from 'node:net'
 import { URL } from 'node:url'
+import type { ChildProcess } from 'node:child_process'
 
 const LOCAL_URL_RE =
   /\bhttps?:\/\/(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1?\])(?::(\d+))?(?:\/\S*)?/i

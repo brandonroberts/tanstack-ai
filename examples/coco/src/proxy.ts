@@ -10,14 +10,21 @@
  * to gets the panel.
  */
 import http from 'node:http'
-import type { IncomingMessage, ServerResponse } from 'node:http'
-import { Readable } from 'node:stream'
-import { promises as fs } from 'node:fs'
 import path from 'node:path'
 import { URL } from 'node:url'
 import httpProxy from 'http-proxy'
 import { detectAgentConfig } from './agent-status.ts'
 import { handleChat } from './chat-handler.ts'
+import {
+  injectIntoHtml,
+  pipeFetchResponse,
+  send404,
+  send500,
+  sendJson,
+  serveClientBundle,
+  toFetchRequest,
+} from './http-bridge.ts'
+import type { IncomingMessage } from 'node:http'
 
 export interface ProxyOptions {
   /** Upstream dev-server URL (e.g. `http://localhost:5173`). */
@@ -28,133 +35,6 @@ export interface ProxyOptions {
   projectCwd: string
   /** Absolute path to the built panel bundle (`dist/client/client.js`). */
   clientBundlePath: string
-}
-
-const INJECTED_TAG =
-  '<script type="module" src="/__coco/client.js"></script>'
-
-const injectIntoHtml = (html: string): string => {
-  if (html.includes('/__coco/client.js')) return html // already there
-  const lower = html.toLowerCase()
-  const idx = lower.lastIndexOf('</body>')
-  if (idx >= 0) {
-    return html.slice(0, idx) + INJECTED_TAG + html.slice(idx)
-  }
-  // Fall back to appending if there's no </body>.
-  return html + INJECTED_TAG
-}
-
-const sendJson = (res: ServerResponse, status: number, value: unknown) => {
-  const body = JSON.stringify(value)
-  res.writeHead(status, {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Content-Length': Buffer.byteLength(body),
-    'Cache-Control': 'no-store',
-  })
-  res.end(body)
-}
-
-const send404 = (res: ServerResponse, msg = 'Not found') => {
-  res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' })
-  res.end(msg)
-}
-
-const send500 = (res: ServerResponse, err: unknown) => {
-  if (res.headersSent) {
-    res.end()
-    return
-  }
-  const body = err instanceof Error ? err.message : String(err)
-  res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' })
-  res.end(body)
-}
-
-/**
- * Build an absolute URL for the incoming Node request so we can construct a
- * `Request` from it.
- */
-const requestUrl = (req: IncomingMessage): string => {
-  const host = req.headers.host ?? 'localhost'
-  return `http://${host}${req.url ?? '/'}`
-}
-
-/**
- * Convert a Node IncomingMessage into a Web `Request`. The body is taken
- * directly from the readable stream for POSTs.
- */
-const toFetchRequest = (req: IncomingMessage): Request => {
-  const headers = new Headers()
-  for (const [key, value] of Object.entries(req.headers)) {
-    if (value === undefined) continue
-    if (Array.isArray(value)) for (const v of value) headers.append(key, v)
-    else headers.set(key, value)
-  }
-  const method = (req.method ?? 'GET').toUpperCase()
-  const hasBody = method !== 'GET' && method !== 'HEAD'
-  const init: RequestInit & { duplex?: 'half' } = {
-    method,
-    headers,
-  }
-  if (hasBody) {
-    init.body = Readable.toWeb(req) as ReadableStream<Uint8Array>
-    init.duplex = 'half'
-  }
-  return new Request(requestUrl(req), init)
-}
-
-/**
- * Pipe a Web `Response` back into a Node ServerResponse. Streams the body so
- * SSE flows in real-time.
- */
-const pipeFetchResponse = async (
-  response: Response,
-  res: ServerResponse,
-): Promise<void> => {
-  const headers: Record<string, string> = {}
-  response.headers.forEach((value, key) => {
-    headers[key] = value
-  })
-  res.writeHead(response.status, headers)
-  if (!response.body) {
-    res.end()
-    return
-  }
-  const reader = response.body.getReader()
-  const onClose = () => {
-    reader.cancel().catch(() => undefined)
-  }
-  res.once('close', onClose)
-  try {
-    for (;;) {
-      const { value, done } = await reader.read()
-      if (done) break
-      if (value) res.write(value)
-    }
-  } finally {
-    res.off('close', onClose)
-    res.end()
-  }
-}
-
-/** Serve the built panel bundle. */
-const serveClientBundle = async (
-  res: ServerResponse,
-  bundlePath: string,
-): Promise<void> => {
-  try {
-    const buf = await fs.readFile(bundlePath)
-    res.writeHead(200, {
-      'Content-Type': 'application/javascript; charset=utf-8',
-      'Content-Length': buf.length,
-      'Cache-Control': 'no-store',
-    })
-    res.end(buf)
-  } catch {
-    res.writeHead(503, { 'Content-Type': 'text/plain; charset=utf-8' })
-    res.end(
-      'Coco panel bundle is missing. Run `pnpm --filter coco build` and reload.',
-    )
-  }
 }
 
 /**
@@ -187,7 +67,7 @@ export const startProxyServer = async (
   proxy.on('error', (err, _req, resOrSocket) => {
     if (resOrSocket && 'writeHead' in resOrSocket) {
       try {
-        const res = resOrSocket as ServerResponse
+        const res = resOrSocket
         if (!res.headersSent) {
           res.writeHead(502, { 'Content-Type': 'text/plain; charset=utf-8' })
         }

@@ -8,11 +8,8 @@
  * - pulls the session-id back out of `<agent>.session-id` custom events so
  *   follow-ups continue the same harness session.
  */
-import {
-  ChatClient,
-  fetchServerSentEvents,
-  type UIMessage,
-} from '@tanstack/ai-client'
+import { ChatClient, fetchServerSentEvents } from '@tanstack/ai-client'
+import type { UIMessage } from '@tanstack/ai-client'
 import type { AgentId, AgentMode } from '../agents.ts'
 import type { SelectedElement } from './context.ts'
 

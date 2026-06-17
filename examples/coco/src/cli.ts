@@ -17,7 +17,8 @@ import { parseArgs } from 'node:util'
 import path from 'node:path'
 import { startDevServer } from './dev-runner.ts'
 import { startProxyServer } from './proxy.ts'
-import { isAgentId, isAgentMode, DEFAULT_AGENT } from './agents.ts'
+import { runInit } from './init.ts'
+import { DEFAULT_AGENT, isAgentId, isAgentMode } from './agents.ts'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 
@@ -28,15 +29,20 @@ const usage = () => {
   process.stdout.write(`coco — AI coding-agent overlay for your dev server
 
 Usage:
-  coco [options]
+  coco init [--dry-run]   Wire coco/vite into a TanStack Start / Vite project
+  coco [options]          Run the reverse-proxy dev overlay
 
-Options:
+Options (proxy mode):
   --port <n>         Port Coco listens on (default ${DEFAULT_PORT})
   --command <cmd>    Dev-server command (default "${DEFAULT_COMMAND}")
   --target <url>     Existing dev-server URL (skips spawning --command)
   --agent <id>       Default agent: claude-code | codex | gemini-cli | opencode
   --mode <m>         Default permission mode: edit | read-only
   --help             Show this help
+
+For TanStack Start (recommended): \`coco init\` adds the coco/vite plugin to
+your vite config and you just run \`pnpm dev\`. The reverse-proxy CLI remains
+available for framework-agnostic projects.
 
 The chat panel can change the agent/mode at runtime — these flags only set
 the defaults. The selected agent (and edit-mode in particular) writes to
@@ -100,7 +106,49 @@ const resolveBundlePath = (): { path: string; built: boolean } => {
   return { path: built, built: existsSync(built) }
 }
 
+/**
+ * Subcommand dispatch. We pull off a leading non-flag arg (e.g. `init`)
+ * before handing the remainder to `parseArgs`, since `parseArgs` is strict
+ * about unknown positionals.
+ */
+const handleSubcommand = async (): Promise<boolean> => {
+  const argv = process.argv.slice(2)
+  if (argv.length === 0 || argv[0].startsWith('-')) return false
+  const sub = argv[0]
+  const rest = argv.slice(1)
+
+  if (sub === 'init') {
+    const { values } = parseArgs({
+      args: rest,
+      options: {
+        'dry-run': { type: 'boolean' },
+        help: { type: 'boolean', short: 'h' },
+      },
+      strict: true,
+    })
+    if (values.help) {
+      process.stdout.write(
+        'Usage: coco init [--dry-run]\n\n' +
+          'Adds the `coco/vite` plugin to your project\'s vite config and prints\n' +
+          'next steps. Idempotent — safe to re-run.\n',
+      )
+      process.exit(0)
+    }
+    const code = await runInit({
+      cwd: process.cwd(),
+      dryRun: Boolean(values['dry-run']),
+    })
+    process.exit(code)
+  }
+
+  process.stderr.write(`coco: unknown subcommand "${sub}"\n\n`)
+  usage()
+  process.exit(2)
+}
+
 const main = async () => {
+  if (await handleSubcommand()) return
+
   let flags
   try {
     flags = parseFlags()
