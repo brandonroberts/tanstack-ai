@@ -4,7 +4,8 @@ description: >
   Image, audio, video, speech (TTS), and transcription generation using
   activity-specific adapters: generateImage() with openaiImage/geminiImage,
   generateAudio() with geminiAudio/falAudio, generateVideo() with
-  openaiVideo/geminiVideo (async polling, per-model typed durations),
+  openaiVideo/geminiVideo/openRouterVideo/falVideo (async polling; per-model
+  typed durations on geminiVideo/openRouterVideo),
   generateSpeech() with openaiSpeech, generateTranscription() with
   openaiTranscription. React hooks: useGenerateImage, useGenerateAudio,
   useGenerateSpeech, useTranscription, useGenerateVideo.
@@ -458,6 +459,28 @@ const { jobId } = await generateVideo({
 })
 // Note: Veo result URLs require the Google API key to download
 // (x-goog-api-key header or ?key= query parameter).
+```
+
+OpenRouter (`@tanstack/ai-openrouter`, `openRouterVideo`) runs the dedicated
+async video API (`POST /api/v1/videos`) and shares the same typed-duration
+contract — `duration`, `size`, and provider options are narrowed per model
+from OpenRouter's published metadata, with the same `availableDurations()` /
+`snapDuration()` helpers:
+
+```typescript
+import { openRouterVideo } from '@tanstack/ai-openrouter'
+
+const adapter = openRouterVideo('bytedance/seedance-2.0')
+adapter.availableDurations()
+// { kind: 'discrete', values: [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] }
+adapter.snapDuration(7.4) // 7
+
+const { jobId } = await generateVideo({
+  adapter,
+  prompt: 'A timelapse of clouds',
+  duration: adapter.snapDuration(sliderSeconds),
+})
+// Completed url is a data: URL; usage.cost carries the real billed cost.
 ```
 
 Client hook with job tracking:

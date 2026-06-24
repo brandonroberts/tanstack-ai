@@ -262,7 +262,7 @@
           "label": "Video Generation",
           "to": "media/video-generation",
           "addedAt": "2026-04-15",
-          "updatedAt": "2026-06-10"
+          "updatedAt": "2026-06-24"
         },
         {
           "label": "Generation Hooks",
@@ -455,7 +455,7 @@
           "label": "OpenRouter Adapter",
           "to": "adapters/openrouter",
           "addedAt": "2026-04-15",
-          "updatedAt": "2026-06-10"
+          "updatedAt": "2026-06-24"
         },
         {
           "label": "OpenAI-Compatible",
