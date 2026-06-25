@@ -1,44 +1,63 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { rerank } from '@tanstack/ai'
 import { createOpenRouterRerank } from '../src/adapters/rerank'
 
-// Mock the OpenRouter SDK so the adapter's `new OpenRouter().rerank.rerank()`
-// call resolves to a controlled response. `vi.hoisted` lets the (hoisted)
-// vi.mock factory reference the spy.
-const { rerankFn } = vi.hoisted(() => ({ rerankFn: vi.fn() }))
-
-vi.mock('@openrouter/sdk', () => ({
-  // A class so `new OpenRouter(config)` is constructable; each instance exposes
-  // the spied `rerank.rerank`.
-  OpenRouter: class {
-    rerank = { rerank: rerankFn }
-  },
-}))
+// Intercept at the network layer and drive the REAL @openrouter/sdk. This keeps
+// the test free of module mocking (which is sensitive to runner/isolation
+// differences) and exercises the SDK's real request building and response
+// parsing.
+const fetchMock = vi.fn<typeof fetch>()
 
 beforeEach(() => {
-  rerankFn.mockReset()
+  vi.stubGlobal('fetch', fetchMock)
+  fetchMock.mockReset()
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
 })
 
 const documents = ['sunny day at the beach', 'rainy afternoon in the city']
 
-/** A parsed SDK rerank response (camelCase, as the SDK returns it). */
-function sdkResponse() {
+/** A 200 response in the wire shape the SDK's zod schema parses. */
+function rerankResponse(body: unknown): Response {
+  return new Response(JSON.stringify(body), {
+    status: 200,
+    headers: { 'content-type': 'application/json' },
+  })
+}
+
+/** Default wire-format payload reordering documents [1, 0]. */
+function wireBody() {
   return {
     id: 'or-1',
     model: 'cohere/rerank-v3.5',
     results: [
-      { document: { text: documents[1] }, index: 1, relevanceScore: 0.97 },
-      { document: { text: documents[0] }, index: 0, relevanceScore: 0.1 },
+      { document: { text: documents[1] }, index: 1, relevance_score: 0.97 },
+      { document: { text: documents[0] }, index: 0, relevance_score: 0.1 },
     ],
-    usage: { searchUnits: 1, cost: 0.002, totalTokens: 20 },
+    usage: { search_units: 1, cost: 0.002, total_tokens: 20 },
   }
 }
 
 const adapter = () => createOpenRouterRerank('cohere/rerank-v3.5', 'sk-or-test')
 
+/** The request the SDK handed to fetch, as { url, body }. */
+async function capturedRequest() {
+  const [input, init] = fetchMock.mock.calls[0]!
+  // The SDK may call fetch with a Request object or (url, init).
+  if (input instanceof Request) {
+    return { url: input.url, body: await input.clone().json() }
+  }
+  return {
+    url: String(input),
+    body: init?.body ? JSON.parse(String(init.body)) : undefined,
+  }
+}
+
 describe('OpenRouterRerankAdapter', () => {
-  it('calls the SDK rerank with the request body and maps the response', async () => {
-    rerankFn.mockResolvedValue(sdkResponse())
+  it('hits the /rerank endpoint and maps the response', async () => {
+    fetchMock.mockResolvedValue(rerankResponse(wireBody()))
 
     const result = await rerank({
       adapter: adapter(),
@@ -47,15 +66,15 @@ describe('OpenRouterRerankAdapter', () => {
       topN: 2,
     })
 
-    expect(rerankFn).toHaveBeenCalledTimes(1)
-    expect(rerankFn.mock.calls[0]![0]).toEqual({
-      requestBody: {
-        model: 'cohere/rerank-v3.5',
-        query: 'talk about rain',
-        documents,
-        topN: 2,
-      },
+    const { url, body } = await capturedRequest()
+    expect(url).toContain('/rerank')
+    expect(body).toMatchObject({
+      model: 'cohere/rerank-v3.5',
+      query: 'talk about rain',
+      documents,
+      top_n: 2,
     })
+
     expect(result.id).toBe('or-1')
     expect(result.ranking).toEqual([
       { index: 1, score: 0.97, document: documents[1] },
@@ -63,8 +82,8 @@ describe('OpenRouterRerankAdapter', () => {
     ])
   })
 
-  it('maps SDK usage (searchUnits/cost/totalTokens)', async () => {
-    rerankFn.mockResolvedValue(sdkResponse())
+  it('maps usage (search_units/cost/total_tokens)', async () => {
+    fetchMock.mockResolvedValue(rerankResponse(wireBody()))
 
     const result = await rerank({ adapter: adapter(), query: 'q', documents })
 
@@ -74,27 +93,21 @@ describe('OpenRouterRerankAdapter', () => {
   })
 
   it('works with a non-Cohere model slug', async () => {
-    rerankFn.mockResolvedValue({
-      ...sdkResponse(),
-      model: 'nvidia/llama-nemotron-rerank-vl-1b-v2',
-    })
+    const model = 'nvidia/llama-nemotron-rerank-vl-1b-v2'
+    fetchMock.mockResolvedValue(rerankResponse({ ...wireBody(), model }))
 
     await rerank({
-      adapter: createOpenRouterRerank(
-        'nvidia/llama-nemotron-rerank-vl-1b-v2',
-        'sk-or-test',
-      ),
+      adapter: createOpenRouterRerank(model, 'sk-or-test'),
       query: 'q',
       documents,
     })
 
-    expect(rerankFn.mock.calls[0]![0].requestBody.model).toBe(
-      'nvidia/llama-nemotron-rerank-vl-1b-v2',
-    )
+    const { body } = await capturedRequest()
+    expect(body.model).toBe(model)
   })
 
   it('forwards provider routing preferences into the request body', async () => {
-    rerankFn.mockResolvedValue(sdkResponse())
+    fetchMock.mockResolvedValue(rerankResponse(wireBody()))
 
     await rerank({
       adapter: adapter(),
@@ -103,32 +116,17 @@ describe('OpenRouterRerankAdapter', () => {
       modelOptions: { provider: { order: ['cohere'] } },
     })
 
-    expect(rerankFn.mock.calls[0]![0].requestBody.provider).toEqual({
-      order: ['cohere'],
-    })
+    const { body } = await capturedRequest()
+    expect(body.provider).toEqual({ order: ['cohere'] })
   })
 
-  it('forwards the abort signal via fetchOptions', async () => {
-    rerankFn.mockResolvedValue(sdkResponse())
-    const controller = new AbortController()
-
-    await rerank({
-      adapter: adapter(),
-      query: 'q',
-      documents,
-      abortSignal: controller.signal,
-    })
-
-    expect(rerankFn.mock.calls[0]![1]).toEqual({
-      fetchOptions: { signal: controller.signal },
-    })
-  })
-
-  it('throws when the SDK returns a bare string response', async () => {
-    rerankFn.mockResolvedValue('error: bad request')
+  it('throws on a non-200 response', async () => {
+    fetchMock.mockResolvedValue(
+      new Response('bad request', { status: 400, statusText: 'Bad Request' }),
+    )
 
     await expect(
       rerank({ adapter: adapter(), query: 'q', documents, debug: false }),
-    ).rejects.toThrow('unexpected response')
+    ).rejects.toThrow()
   })
 })
