@@ -1,3 +1,4 @@
+import type { ChatContentCacheControl } from '@openrouter/sdk/models'
 import type { JSONSchema, Tool } from '@tanstack/ai'
 
 export interface FunctionTool {
@@ -7,6 +8,16 @@ export interface FunctionTool {
     description?: string
     parameters: Record<string, unknown>
   }
+  /**
+   * Anthropic-style prompt-cache breakpoint for the tool definition.
+   *
+   * The SDK accepts this camelCase field as a top-level sibling of `function`
+   * and remaps it to `cache_control` on the wire (its outbound Zod schema
+   * strips an unrecognized snake_case `cache_control`, so the field must be
+   * `cacheControl`). Forwarding it lets callers cache tool definitions through
+   * OpenRouter exactly as `@tanstack/ai-anthropic` does directly.
+   */
+  cacheControl?: ChatContentCacheControl
 }
 
 /**
@@ -22,6 +33,11 @@ export function convertFunctionToolToAdapterFormat(tool: Tool): FunctionTool {
     required: [],
   }) as JSONSchema
 
+  // `Tool.metadata` is `Record<string, any>`, so the field is already
+  // assignable here — the annotation narrows it without a cast.
+  const cacheControl: ChatContentCacheControl | null | undefined =
+    tool.metadata?.cacheControl
+
   return {
     type: 'function',
     function: {
@@ -29,5 +45,7 @@ export function convertFunctionToolToAdapterFormat(tool: Tool): FunctionTool {
       description: tool.description,
       parameters: inputSchema,
     },
+    // Only present when supplied — additive and non-breaking.
+    ...(cacheControl ? { cacheControl } : {}),
   }
 }
