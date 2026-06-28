@@ -33,10 +33,11 @@ export const kind = 'rerank' as const
 // ===========================
 
 /** Extract provider options from a RerankAdapter via ~types */
-export type RerankProviderOptions<TAdapter> =
-  TAdapter extends RerankAdapter<any, any>
-    ? TAdapter['~types']['providerOptions']
-    : object
+export type RerankProviderOptions<TAdapter> = TAdapter extends {
+  '~types': { providerOptions: infer P extends object }
+}
+  ? P
+  : object
 
 // ===========================
 // Activity Options Type
@@ -50,7 +51,7 @@ export type RerankProviderOptions<TAdapter> =
  * @template TDocument - The document element type (string or object)
  */
 export interface RerankActivityOptions<
-  TAdapter extends RerankAdapter<string, object>,
+  TAdapter extends RerankAdapter<string, RerankProviderOptions<TAdapter>>,
   TDocument extends string | object = string,
 > {
   /** The rerank adapter to use (must be created with a model) */
@@ -142,7 +143,7 @@ function isAbortError(error: unknown, signal?: AbortSignal): boolean {
  * ```
  */
 export async function rerank<
-  TAdapter extends RerankAdapter<string, object>,
+  TAdapter extends RerankAdapter<string, RerankProviderOptions<TAdapter>>,
   TDocument extends string | object = string,
 >(
   options: RerankActivityOptions<TAdapter, TDocument>,
@@ -277,7 +278,7 @@ export async function rerank<
  * Create typed options for the rerank() function without executing.
  */
 export function createRerankOptions<
-  TAdapter extends RerankAdapter<string, object>,
+  TAdapter extends RerankAdapter<string, RerankProviderOptions<TAdapter>>,
   TDocument extends string | object = string,
 >(
   options: RerankActivityOptions<TAdapter, TDocument>,
